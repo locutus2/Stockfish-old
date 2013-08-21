@@ -96,8 +96,8 @@ namespace {
   #define S(mg, eg) make_score(mg, eg)
   
   // Penalty for distance between king and pawns in endgame
-  const Score KingOwnPawnDistance = S(0, 5);
-  const Score KingEnemyPawnDistance = S(0, 5);
+  const Score KingOwnPawnDistance = S(0, 1);
+  const Score KingEnemyPawnDistance = S(0, 1);
 
   // Internal evaluation weights. These are applied on top of the evaluation
   // weights read from UCI parameters. The purpose is to be able to change
