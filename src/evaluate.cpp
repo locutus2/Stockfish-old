@@ -94,6 +94,10 @@ namespace {
 
   typedef Value V;
   #define S(mg, eg) make_score(mg, eg)
+  
+  // Penalty for distance between king and pawns in endgame
+  const Score KingOwnPawnDistance = S(0, 5);
+  const Score KingEnemyPawnDistance = S(0, 5);
 
   // Internal evaluation weights. These are applied on top of the evaluation
   // weights read from UCI parameters. The purpose is to be able to change
@@ -686,6 +690,24 @@ Value do_evaluate(const Position& pos, Value& margin) {
     // King shelter and enemy pawns storm
     Score score = ei.pi->king_safety<Us>(pos, ksq);
 
+    // King-pawn-proximity
+    Square s;
+    const Square* pl = pos.list<PAWN>(Us);
+    // Loop through all pawns of the current color and score each pawn
+    while ((s = *pl++) != SQ_NONE)
+    {
+        assert(pos.piece_on(s) == make_piece(Us, PAWN));
+        score -= KingOwnPawnDistance * square_distance(s, ksq);
+    }
+    
+    pl = pos.list<PAWN>(Them);
+    // Loop through all pawns of the opposite color and score each pawn
+    while ((s = *pl++) != SQ_NONE)
+    {
+        assert(pos.piece_on(s) == make_piece(Them, PAWN));
+        score -= KingEnemyPawnDistance * square_distance(s, ksq);
+    }
+    
     // King safety. This is quite complicated, and is almost certainly far
     // from optimally tuned.
     if (   ei.kingAttackersCount[Them] >= 2
