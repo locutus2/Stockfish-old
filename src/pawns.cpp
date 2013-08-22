@@ -259,9 +259,11 @@ Score Entry::update_safety(const Position& pos, Square ksq) {
   if (pawns)
       while (!(DistanceRingsBB[ksq][minKPdistance[Us]++] & pawns)) {}
 
+  const int kingPawnProximity = -8 * minKPdistance[Us];
+  
   if (relative_rank(Us, ksq) > RANK_4)
-      return kingSafety[Us] = make_score(0, -16 * minKPdistance[Us]);
-
+      return kingSafety[Us] = make_score(0, kingPawnProximity);
+  
   Value bonus = shelter_storm<Us>(pos, ksq);
 
   // If we can castle use the bonus after the castle if is bigger
@@ -271,7 +273,7 @@ Score Entry::update_safety(const Position& pos, Square ksq) {
   if (pos.can_castle(make_castle_right(Us, QUEEN_SIDE)))
       bonus = std::max(bonus, shelter_storm<Us>(pos, relative_square(Us, SQ_C1)));
 
-  return kingSafety[Us] = make_score(bonus, -16 * minKPdistance[Us]);
+  return kingSafety[Us] = make_score(bonus, kingPawnProximity);
 }
 
 // Explicit template instantiation
