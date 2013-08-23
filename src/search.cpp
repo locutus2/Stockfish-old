@@ -309,6 +309,8 @@ namespace {
 
     std::memset(ss-2, 0, 5 * sizeof(Stack));
     (ss-1)->currentMove = MOVE_NULL; // Hack to skip update gains
+    (ss-1)->threatMove = MOVE_NONE;
+    (ss-2)->threatMove = MOVE_NONE;
 
     depth = BestMoveChanges = 0;
     bestValue = delta = alpha = -VALUE_INFINITE;
@@ -505,11 +507,12 @@ namespace {
     Depth ext, newDepth;
     Value bestValue, value, ttValue;
     Value eval, nullValue, futilityValue;
-    bool inCheck, givesCheck, pvMove, singularExtensionNode, improving;
+    bool inCheck, givesCheck, pvMove, singularExtensionNode, improving, BotvinnikMarkovExtensionNode;
     bool captureOrPromotion, dangerous, doFullDepthSearch;
     int moveCount, quietCount;
 
     // Step 1. Initialize node
+    BotvinnikMarkovExtensionNode = false;
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
 
@@ -530,7 +533,7 @@ namespace {
 
     moveCount = quietCount = 0;
     bestValue = -VALUE_INFINITE;
-    ss->currentMove = threatMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    ss->currentMove = ss->threatMove = threatMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->ply = (ss-1)->ply + 1;
     ss->futilityMoveCount = 0;
     (ss+1)->skipNullMove = false; (ss+1)->reduction = DEPTH_ZERO;
@@ -661,6 +664,7 @@ namespace {
         return eval - futility_margin(depth, (ss-1)->futilityMoveCount);
 
     // Step 8. Null move search with verification search (is omitted in PV nodes)
+    ss->threatMove = MOVE_NONE;
     if (   !PvNode
         && !ss->skipNullMove
         &&  depth > ONE_PLY
@@ -683,6 +687,8 @@ namespace {
                                       : - search<NonPV>(pos, ss+1, -beta, -alpha, depth-R, !cutNode);
         (ss+1)->skipNullMove = false;
         pos.undo_null_move();
+        
+        ss->threatMove = (ss+1)->currentMove;
 
         if (nullValue >= beta)
         {
@@ -716,7 +722,15 @@ namespace {
                 && threatMove != MOVE_NONE
                 && allows(pos, (ss-1)->currentMove, threatMove))
                 return alpha;
+                
         }
+        
+        // Trigger Botvinnik-Markov extension if current threat is the same as for 2 plies
+        if (    ss->ply >= 2
+             && threatMove != MOVE_NONE
+             && (ss-2)->threatMove != MOVE_NONE
+             && threatMove == (ss-2)->threatMove)
+             BotvinnikMarkovExtensionNode = true;
     }
 
     // Step 9. ProbCut (skipped when in check)
@@ -830,13 +844,19 @@ moves_loop: // When in check and at SpNode search starts from here
                  || pos.is_passed_pawn_push(move)
                  || type_of(move) == CASTLE;
 
-      // Step 12. Extend checks and, in PV nodes, also dangerous moves
-      if (PvNode && dangerous)
+      // Step 12. Extend checks and, in PV nodes, also dangerous moves and triggers Botvinnik-Markov extension
+      if (BotvinnikMarkovExtensionNode)
+          ext = ONE_PLY;
+          
+      else if (PvNode && dangerous)
           ext = ONE_PLY;
 
       else if (givesCheck && pos.see_sign(move) >= 0)
           ext = ONE_PLY / 2;
 
+
+      
+          
       // Singular extension search. If all moves but one fail low on a search of
       // (alpha-s, beta-s), and just one fails high on (alpha, beta), then that move
       // is singular and should be extended. To verify this we do a reduced search
@@ -860,6 +880,8 @@ moves_loop: // When in check and at SpNode search starts from here
           if (value < rBeta)
               ext = ONE_PLY;
       }
+
+
 
       // Update current move (this must be done after singular extension search)
       newDepth = depth - ONE_PLY + ext;
