@@ -667,7 +667,7 @@ namespace {
     ss->threatMove = MOVE_NONE;
     if (   !PvNode
         && !ss->skipNullMove
-        &&  depth > ONE_PLY
+        &&  depth >= 2 * ONE_PLY
         &&  eval >= beta
         &&  abs(beta) < VALUE_MATE_IN_MAX_PLY
         &&  pos.non_pawn_material(pos.side_to_move()))
@@ -1257,6 +1257,7 @@ moves_loop: // When in check and at SpNode search starts from here
           && !givesCheck
           &&  move != ttMove
           &&  type_of(move) != PROMOTION
+          &&  futilityBase > -VALUE_KNOWN_WIN
           && !pos.is_passed_pawn_push(move))
       {
           futilityValue =  futilityBase
