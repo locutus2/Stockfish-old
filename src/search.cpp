@@ -725,10 +725,11 @@ namespace {
                 
         }
         
-        // Trigger Botvinnik-Markov extension if current threat is the same as for 2 plies
-        if (    ss->ply >= 2
+        // Botvinnik-Markov extension: trigger if current threat is the same as for 2 plies.
+        // Extend only at PV nodes
+        if (    PvNode
+             && ss->ply >= 2
              && threatMove != MOVE_NONE
-             && (ss-2)->threatMove != MOVE_NONE
              && threatMove == (ss-2)->threatMove)
              BotvinnikMarkovExtensionNode = true;
     }
