@@ -725,13 +725,16 @@ namespace {
                 
         }
         
-        // Trigger Botvinnik-Markov extension if current threat is the same as for 2 plies
+        // Botvinnik-Markov extension: trigger if current threat is the same as for 2 plies
+        // and last move was reduced
         if (    ss->ply >= 2
+             && (ss-1)->reduction
              && threatMove != MOVE_NONE
-             && (ss-2)->threatMove != MOVE_NONE
              && threatMove == (ss-2)->threatMove)
              BotvinnikMarkovExtensionNode = true;
     }
+    
+
 
     // Step 9. ProbCut (skipped when in check)
     // If we have a very good capture (i.e. SEE > seeValues[captured_piece_type])
@@ -800,6 +803,8 @@ moves_loop: // When in check and at SpNode search starts from here
                            && (tte->bound() & BOUND_LOWER)
                            &&  tte->depth() >= depth - 3 * ONE_PLY;
 
+      
+
     // Step 11. Loop through moves
     // Loop through all pseudo-legal moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move<SpNode>()) != MOVE_NONE)
@@ -847,7 +852,7 @@ moves_loop: // When in check and at SpNode search starts from here
       // Step 12. Extend checks and, in PV nodes, also dangerous moves and triggers Botvinnik-Markov extension
       if (BotvinnikMarkovExtensionNode)
           ext = ONE_PLY;
-          
+
       else if (PvNode && dangerous)
           ext = ONE_PLY;
 
