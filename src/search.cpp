@@ -850,7 +850,7 @@ moves_loop: // When in check and at SpNode search starts from here
                  || type_of(move) == CASTLE;
 
       // Step 12. Extend checks and, in PV nodes, also dangerous moves and triggers Botvinnik-Markov extension
-      if (BotvinnikMarkovExtensionNode)
+      if (BotvinnikMarkovExtensionNode && refutes(pos, move, threatMove))
           ext = ONE_PLY;
 
       else if (PvNode && dangerous)
