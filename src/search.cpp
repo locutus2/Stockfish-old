@@ -507,12 +507,11 @@ namespace {
     Depth ext, newDepth;
     Value bestValue, value, ttValue;
     Value eval, nullValue, futilityValue;
-    bool inCheck, givesCheck, pvMove, singularExtensionNode, improving, BotvinnikMarkovExtensionNode;
+    bool inCheck, givesCheck, pvMove, singularExtensionNode, improving;
     bool captureOrPromotion, dangerous, doFullDepthSearch;
     int moveCount, quietCount;
 
     // Step 1. Initialize node
-    BotvinnikMarkovExtensionNode = false;
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
 
@@ -725,14 +724,13 @@ namespace {
                 
         }
         
-        // Botvinnik-Markov extension: trigger if current threat is the same as for 2 plies,
-        // last move was reduced and static eval >= beta
+        // Botvinnik-Markov extension: if current threat is the same as for 2 plies,
+        // instead extending directly, return alpha to trigger full depth re-search
         if (    ss->ply >= 2
              && (ss-1)->reduction
-             && ss->staticEval >= beta
              && threatMove != MOVE_NONE
              && threatMove == (ss-2)->threatMove)
-             BotvinnikMarkovExtensionNode = true;
+             return alpha;
     }
     
 
@@ -850,11 +848,8 @@ moves_loop: // When in check and at SpNode search starts from here
                  || pos.is_passed_pawn_push(move)
                  || type_of(move) == CASTLE;
 
-      // Step 12. Extend checks and, in PV nodes, also dangerous moves and triggers Botvinnik-Markov extension
-      if (BotvinnikMarkovExtensionNode)
-          ext = ONE_PLY;
-
-      else if (PvNode && dangerous)
+      // Step 12. Extend checks and, in PV nodes, also dangerous moves
+      if (PvNode && dangerous)
           ext = ONE_PLY;
 
       else if (givesCheck && pos.see_sign(move) >= 0)
