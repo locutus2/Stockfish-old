@@ -726,9 +726,10 @@ namespace {
         }
         
         // Botvinnik-Markov extension: trigger if current threat is the same as for 2 plies
-        // and last move was reduced
+        // and last move was reduced and depth <= 2
         if (    ss->ply >= 2
              && (ss-1)->reduction
+             && depth <= 2*ONE_PLY
              && threatMove != MOVE_NONE
              && threatMove == (ss-2)->threatMove)
              BotvinnikMarkovExtensionNode = true;
