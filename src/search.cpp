@@ -725,11 +725,11 @@ namespace {
         }
         
         // Botvinnik-Markov extension: if current threat is the same as for 2 plies,
-        // last move reduced and depth <= 2,
+        // last move reduced and depth <= 3,
         // instead extending directly, return alpha to trigger full depth re-search
         if (    ss->ply >= 2
              && (ss-1)->reduction
-             && depth <= 2 * ONE_PLY
+             && depth <= 3 * ONE_PLY
              && threatMove != MOVE_NONE
              && threatMove == (ss-2)->threatMove)
              return alpha;
