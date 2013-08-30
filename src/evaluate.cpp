@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <cmath>
 
 #include "bitcount.h"
 #include "evaluate.h"
@@ -227,6 +228,9 @@ namespace {
   // KingDanger[Color][attackUnits] contains the actual king danger weighted
   // scores, indexed by color and by a calculated integer number.
   Score KingDanger[COLOR_NB][128];
+  
+  // Weight for each phase in eval interpolation
+  int InterpolationPhaseWeight[PHASE_MIDGAME-PHASE_ENDGAME+1];
 
   // Function prototypes
   template<bool Trace>
@@ -278,8 +282,8 @@ namespace Eval {
   }
 
 
-  /// init() computes evaluation weights from the corresponding UCI parameters
-  /// and setup king tables.
+  /// init() computes evaluation weights from the corresponding UCI parameters,
+  /// setup king tables and eval interpolation phase weights.
 
   void init() {
 
@@ -299,6 +303,12 @@ namespace Eval {
 
         KingDanger[1][i] = apply_weight(make_score(t, 0), Weights[KingDangerUs]);
         KingDanger[0][i] = apply_weight(make_score(t, 0), Weights[KingDangerThem]);
+    }
+    
+    const double a = M_PI/128;
+    for(int ph = PHASE_ENDGAME; ph <= PHASE_MIDGAME; ++ph)
+    {
+        InterpolationPhaseWeight[ph] = floor(64*sin(a * (ph-64)) + 64 + 0.5);
     }
   }
 
@@ -1095,7 +1105,8 @@ Value do_evaluate(const Position& pos, Value& margin) {
     assert(ph >= PHASE_ENDGAME && ph <= PHASE_MIDGAME);
 
     int e = (eg_value(v) * int(sf)) / SCALE_FACTOR_NORMAL;
-    int r = (mg_value(v) * int(ph) + e * int(PHASE_MIDGAME - ph)) / PHASE_MIDGAME;
+    const int ph_weight = InterpolationPhaseWeight[ph];
+    int r = (mg_value(v) * int(ph_weight) + e * int(PHASE_MIDGAME - ph_weight)) / PHASE_MIDGAME;
     return Value((r / GrainSize) * GrainSize); // Sign independent
   }
 
