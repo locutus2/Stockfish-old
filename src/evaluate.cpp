@@ -305,10 +305,10 @@ namespace Eval {
         KingDanger[0][i] = apply_weight(make_score(t, 0), Weights[KingDangerThem]);
     }
     
-    const double b = 0.01, a = 64/atan(64*b);
+    const double b = 0.01, a = 64/tan(64*b);
     for(int ph = PHASE_ENDGAME; ph <= PHASE_MIDGAME; ++ph)
     {
-        InterpolationPhaseWeight[ph] = floor(a*atan(b * (ph - 64)) + 64 + 0.5);
+        InterpolationPhaseWeight[ph] = floor(a*tan(b * (ph - 64)) + 64 + 0.5);
     }
   }
 
