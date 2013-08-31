@@ -506,7 +506,7 @@ namespace {
     Depth ext, newDepth;
     Value bestValue, value, ttValue;
     Value eval, nullValue, futilityValue;
-    bool inCheck, givesCheck, pvMove, singularExtensionNode, improving;
+    bool inCheck, givesCheck, pvMove, improving;
     bool captureOrPromotion, dangerous, doFullDepthSearch;
     int moveCount, quietCount;
 
@@ -779,14 +779,6 @@ moves_loop: // When in check and at SpNode search starts from here
                || ss->staticEval == VALUE_NONE
                ||(ss-2)->staticEval == VALUE_NONE;
 
-    singularExtensionNode =   !RootNode
-                           && !SpNode
-                           &&  depth >= (PvNode ? 6 * ONE_PLY : 8 * ONE_PLY)
-                           &&  ttMove != MOVE_NONE
-                           && !excludedMove // Recursive singular search is not allowed
-                           && (tte->bound() & BOUND_LOWER)
-                           &&  tte->depth() >= depth - 3 * ONE_PLY;
-
     // Step 11. Loop through moves
     // Loop through all pseudo-legal moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move<SpNode>()) != MOVE_NONE)
@@ -835,34 +827,7 @@ moves_loop: // When in check and at SpNode search starts from here
       if (PvNode && dangerous)
           ext = ONE_PLY;
 
-      else if (givesCheck && pos.see_sign(move) >= 0)
-          ext = ONE_PLY / 2;
-
-      // Singular extension search. If all moves but one fail low on a search of
-      // (alpha-s, beta-s), and just one fails high on (alpha, beta), then that move
-      // is singular and should be extended. To verify this we do a reduced search
-      // on all the other moves but the ttMove, if result is lower than ttValue minus
-      // a margin then we extend ttMove.
-      if (    singularExtensionNode
-          &&  move == ttMove
-          && !ext
-          &&  pos.pl_move_is_legal(move, ci.pinned)
-          &&  abs(ttValue) < VALUE_KNOWN_WIN)
-      {
-          assert(ttValue != VALUE_NONE);
-
-          Value rBeta = ttValue - int(depth);
-          ss->excludedMove = move;
-          ss->skipNullMove = true;
-          value = search<NonPV>(pos, ss, rBeta - 1, rBeta, depth / 2, cutNode);
-          ss->skipNullMove = false;
-          ss->excludedMove = MOVE_NONE;
-
-          if (value < rBeta)
-              ext = ONE_PLY;
-      }
-
-      // Update current move (this must be done after singular extension search)
+      // Update current move
       newDepth = depth - ONE_PLY + ext;
 
       // Step 13. Futility pruning (is omitted in PV nodes)
@@ -1073,7 +1038,6 @@ moves_loop: // When in check and at SpNode search starts from here
     // must be mate or stalemate. Note that we can have a false positive in
     // case of Signals.stop or thread.cutoff_occurred() are set, but this is
     // harmless because return value is discarded anyhow in the parent nodes.
-    // If we are in a singular extension search then return a fail low score.
     // A split node has at least one move, the one tried before to be splitted.
     if (!moveCount)
         return  excludedMove ? alpha
