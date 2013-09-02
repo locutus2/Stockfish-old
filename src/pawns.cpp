@@ -266,7 +266,7 @@ Score Entry::update_safety(const Position& pos, Square ksq) {
   if (themPawns)
       while (!(DistanceRingsBB[ksq][minKPdistance[Them]++] & themPawns)) {}
 
-  const int kingPawnProximity = -16 * std::min(minKPdistance[Us], minKPdistance[Them]);
+  const int kingPawnProximity = -16 * std::max(minKPdistance[Us], minKPdistance[Them]);
   
   if (relative_rank(Us, ksq) > RANK_4)
       return kingSafety[Us] = make_score(0, kingPawnProximity);
