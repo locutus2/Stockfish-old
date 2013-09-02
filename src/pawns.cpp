@@ -255,13 +255,18 @@ Score Entry::update_safety(const Position& pos, Square ksq) {
   
   kingSquares[Us] = ksq;
   castleRights[Us] = pos.can_castle(Us);
+  minKPdistance[Us] = 0;
   minKPdistance[Them] = 0;
 
+  Bitboard pawns = pos.pieces(Us, PAWN);
+  if (pawns)
+      while (!(DistanceRingsBB[ksq][minKPdistance[Us]++] & pawns)) {}
+      
   Bitboard themPawns = pos.pieces(Them, PAWN);
   if (themPawns)
       while (!(DistanceRingsBB[ksq][minKPdistance[Them]++] & themPawns)) {}
 
-  const int kingPawnProximity = -16 * minKPdistance[Them];
+  const int kingPawnProximity = -16 * std::min(minKPdistance[Us], minKPdistance[Them]);
   
   if (relative_rank(Us, ksq) > RANK_4)
       return kingSafety[Us] = make_score(0, kingPawnProximity);
