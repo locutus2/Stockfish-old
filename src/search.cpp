@@ -933,6 +933,8 @@ moves_loop: // When in check and at SpNode search starts from here
       if (!SpNode && !captureOrPromotion && quietCount < 64)
           quietsSearched[quietCount++] = move;
 
+      const bool moveRefutesThreat = threatMove && refutes(pos, move, threatMove);
+      
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
 
@@ -944,7 +946,7 @@ moves_loop: // When in check and at SpNode search starts from here
           &&  move != ttMove
           &&  move != ss->killers[0]
           &&  move != ss->killers[1]
-          && (ss->ply < 1 || !(ss-1)->reduction))
+          && !moveRefutesThreat)
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
