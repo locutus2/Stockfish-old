@@ -944,7 +944,7 @@ moves_loop: // When in check and at SpNode search starts from here
           &&  move != ttMove
           &&  move != ss->killers[0]
           &&  move != ss->killers[1]
-          && (!threatMove || !refutes(pos, move, threatMove)))
+          && (ss->ply < 1 || !(ss-1)->reduction))
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
