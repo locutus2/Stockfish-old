@@ -933,20 +933,19 @@ moves_loop: // When in check and at SpNode search starts from here
       if (!SpNode && !captureOrPromotion && quietCount < 64)
           quietsSearched[quietCount++] = move;
 
-      const bool moveRefutesThreat = threatMove && refutes(pos, move, threatMove);
+      const bool allowLMR =   depth > 3 * ONE_PLY
+                          && !pvMove
+                          &&  move != ttMove
+                          &&  move != ss->killers[0]
+                          &&  move != ss->killers[1]
+                          && (!captureOrPromotion || pos.see_sign(move) > 0);
       
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
 
       // Step 15. Reduced depth search (LMR). If the move fails high will be
       // re-searched at full depth.
-      if (    depth > 3 * ONE_PLY
-          && !pvMove
-          && !captureOrPromotion
-          &&  move != ttMove
-          &&  move != ss->killers[0]
-          &&  move != ss->killers[1]
-          && !moveRefutesThreat)
+      if (allowLMR)
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
