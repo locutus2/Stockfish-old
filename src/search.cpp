@@ -938,7 +938,8 @@ moves_loop: // When in check and at SpNode search starts from here
                           &&  move != ttMove
                           &&  move != ss->killers[0]
                           &&  move != ss->killers[1]
-                          && (!captureOrPromotion || pos.see_sign(move) > 0);
+                          && (!captureOrPromotion
+                                || (type_of(move) != PROMOTION && pos.see_sign(move) < 0));
       
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
