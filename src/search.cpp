@@ -333,7 +333,7 @@ namespace {
     while (++depth <= MAX_PLY && !Signals.stop && (!Limits.depth || depth <= Limits.depth))
     {
         // Age out PV variability metric
-        BestMoveChanges *= 0.8;
+        BestMoveChanges *= 0.8f;
 
         // Save last iteration's scores before first PV line is searched and all
         // the move scores but the (new) PV are set to -VALUE_INFINITE.
@@ -780,7 +780,7 @@ moves_loop: // When in check and at SpNode search starts from here
 
     singularExtensionNode =   !RootNode
                            && !SpNode
-                           &&  depth >= (PvNode ? 6 * ONE_PLY : 8 * ONE_PLY)
+                           &&  depth >= 8 * ONE_PLY
                            &&  ttMove != MOVE_NONE
                            && !excludedMove // Recursive singular search is not allowed
                            && (tte->bound() & BOUND_LOWER)
@@ -936,10 +936,8 @@ moves_loop: // When in check and at SpNode search starts from here
                           && !pvMove
                           &&  move != ttMove
                           &&  move != ss->killers[0]
-                          &&  move != ss->killers[1]
-                          && (!captureOrPromotion
-                                || (type_of(move) != PROMOTION && pos.see_sign(move) < 0));
-      
+                          &&  move != ss->killers[1]);
+                          
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
 
@@ -1364,7 +1362,10 @@ moves_loop: // When in check and at SpNode search starts from here
     Square m2to = to_sq(second);
 
     // The piece is the same or second's destination was vacated by the first move
-    if (m1to == m2from || m2to == m1from)
+    // We exclude the trivial case where a sliding piece does in two moves what
+    // it could do in one move: eg. Ra1a2, Ra2a3.
+    if (    m2to == m1from
+        || (m1to == m2from && !squares_aligned(m1from, m2from, m2to)))
         return true;
 
     // Second one moves through the square vacated by first one
