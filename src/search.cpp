@@ -101,7 +101,6 @@ namespace {
   Value value_from_tt(Value v, int ply);
   bool allows(const Position& pos, Move first, Move second);
   bool refutes(const Position& pos, Move first, Move second);
-  bool pieceInDanger(const Position& pos, Square s);
   string uci_pv(const Position& pos, int depth, Value alpha, Value beta);
 
   struct Skill {
@@ -929,22 +928,17 @@ moves_loop: // When in check and at SpNode search starts from here
       if (!SpNode && !captureOrPromotion && quietCount < 64)
           quietsSearched[quietCount++] = move;
 
-      const bool doLMR = depth >= 3 * ONE_PLY
-                          && !pvMove
-                          && !captureOrPromotion
-                          &&  move != ttMove
-                          &&  move != ss->killers[0]
-                          &&  move != ss->killers[1];
-      const bool isPieceInDanger = doLMR && (move == countermoves[0] || move == countermoves[1])
-                                         && pieceInDanger(pos, from_sq(move));
-      
-
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
 
       // Step 15. Reduced depth search (LMR). If the move fails high will be
       // re-searched at full depth.
-      if (doLMR)
+      if (    depth >= 3 * ONE_PLY
+          && !pvMove
+          && !captureOrPromotion
+          &&  move != ttMove
+          &&  move != ss->killers[0]
+          &&  move != ss->killers[1])
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
@@ -954,10 +948,8 @@ moves_loop: // When in check and at SpNode search starts from here
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
 
-          if(isPieceInDanger)
-              ss->reduction = std::max(DEPTH_ZERO, ss->reduction - 2 * ONE_PLY);
-
-          else if (move == countermoves[0] || move == countermoves[1])
+          if (move == countermoves[0] || move == countermoves[1]
+                || (inCheck && (ss-1)->reduction))
               ss->reduction = std::max(DEPTH_ZERO, ss->reduction - ONE_PLY);
 
           Depth d = std::max(newDepth - ss->reduction, ONE_PLY);
@@ -1441,31 +1433,6 @@ moves_loop: // When in check and at SpNode search starts from here
         return true;
 
     return false;
-  }
-
-  // pieceInDanger() tests whether a piece (excluding king) on the given square
-  // is attacked by an opponent piece of lower value.
-  bool pieceInDanger(const Position& pos, Square s)
-  {
-    const Color Them = ~color_of(pos.piece_on(s));
-
-    Bitboard b = 0;
-
-    switch(type_of(pos.piece_on(s)))
-    {
-        case QUEEN:
-            b |= pos.pieces(Them, ROOK);
-        case ROOK:
-            b |= pos.pieces(Them, KNIGHT, BISHOP);
-        case KNIGHT:
-        case BISHOP:
-            b |= pos.pieces(Them, PAWN);
-            break;
-        default:
-            break;
-    }
-
-    return b & pos.attackers_to(s, pos.pieces());
   }
 
   // When playing with strength handicap choose best move among the MultiPV set
