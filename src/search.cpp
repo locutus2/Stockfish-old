@@ -934,9 +934,10 @@ moves_loop: // When in check and at SpNode search starts from here
                           && !captureOrPromotion
                           &&  move != ttMove
                           &&  move != ss->killers[0]
-                          &&  move != ss->killers[1]
-                          && !((move == countermoves[0] || move == countermoves[1])
-                                && pieceInDanger(pos, from_sq(move)));
+                          &&  move != ss->killers[1];
+      const bool isPieceInDanger = doLMR && (move == countermoves[0] || move == countermoves[1])
+                                         && pieceInDanger(pos, from_sq(move));
+      
 
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
@@ -953,7 +954,10 @@ moves_loop: // When in check and at SpNode search starts from here
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
 
-          if (move == countermoves[0] || move == countermoves[1])
+          if(isPieceInDanger)
+              ss->reduction = std::max(DEPTH_ZERO, ss->reduction - 2 * ONE_PLY);
+
+          else if (move == countermoves[0] || move == countermoves[1])
               ss->reduction = std::max(DEPTH_ZERO, ss->reduction - ONE_PLY);
 
           Depth d = std::max(newDepth - ss->reduction, ONE_PLY);
