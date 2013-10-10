@@ -931,24 +931,26 @@ moves_loop: // When in check and at SpNode search starts from here
       if (!SpNode && !captureOrPromotion && quietCount < 64)
           quietsSearched[quietCount++] = move;
       
+      const bool doLMR = depth >= 3 * ONE_PLY
+                      && !pvMove
+                      &&  move != ttMove
+                      &&  move != ss->killers[0]
+                      &&  move != ss->killers[1]
+                      && (!captureOrPromotion || (type_of(move) != PROMOTION && pos.see_sign(move) < 0));
+          
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
 
       // Step 15. Reduced depth search (LMR). If the move fails high will be
       // re-searched at full depth.
-      if (    depth >= 3 * ONE_PLY
-          && !pvMove
-          && !captureOrPromotion
-          &&  move != ttMove
-          &&  move != ss->killers[0]
-          &&  move != ss->killers[1]
-          && !((move == countermoves[0] || move == countermoves[1])
-                && threatMove != MOVE_NONE && from_sq(move) == to_sq(threatMove))
-         )
+      if (doLMR)
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
-          if (!PvNode && cutNode)
+          if(captureOrPromotion)
+              ss->reduction = std::min(ss->reduction, ONE_PLY);
+
+          else if (!PvNode && cutNode)
               ss->reduction += ONE_PLY;
 
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
