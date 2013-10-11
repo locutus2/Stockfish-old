@@ -948,7 +948,7 @@ moves_loop: // When in check and at SpNode search starts from here
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
           if(captureOrPromotion)
-              ss->reduction = std::min(ss->reduction, ONE_PLY);
+              ss->reduction = std::min(ss->reduction, 2 * ONE_PLY);
 
           else if (!PvNode && cutNode)
               ss->reduction += ONE_PLY;
