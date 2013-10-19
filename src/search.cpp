@@ -933,14 +933,11 @@ moves_loop: // When in check and at SpNode search starts from here
       
       const bool doLMR = depth >= 3 * ONE_PLY
                       && !pvMove
+                      && !captureOrPromotion
                       &&  move != ttMove
                       &&  move != ss->killers[0]
-                      &&  move != ss->killers[1]
-                      && (!captureOrPromotion || (   !PvNode
-                                                  && !inCheck
-                                                  && !givesCheck
-                                                  && type_of(move) != PROMOTION
-                                                  && pos.see_sign(move) < 0));
+                      &&  move != ss->killers[1];
+      const bool badSEE = doLMR && singularExtensionNode && pos.see_sign(move) < 0;
           
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
@@ -951,10 +948,7 @@ moves_loop: // When in check and at SpNode search starts from here
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
-          if(captureOrPromotion)
-              ss->reduction = std::min(ss->reduction, ONE_PLY);
-          
-          else if (!PvNode && cutNode)
+          if ((!PvNode && cutNode) || badSEE)
               ss->reduction += ONE_PLY;
 
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
