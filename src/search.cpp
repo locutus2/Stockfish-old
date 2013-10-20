@@ -937,7 +937,7 @@ moves_loop: // When in check and at SpNode search starts from here
                       &&  move != ttMove
                       &&  move != ss->killers[0]
                       &&  move != ss->killers[1];
-      const bool badSEE = doLMR && depth > ss->ply * ONE_PLY && pos.see_sign(move) < 0;
+      const bool badSEE = doLMR && 2 * depth > ss->ply * ONE_PLY && pos.see_sign(move) < 0;
           
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
@@ -948,10 +948,7 @@ moves_loop: // When in check and at SpNode search starts from here
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
-          if (badSEE)
-              ss->reduction += ONE_PLY;
-              
-          if (!PvNode && cutNode)
+          if ((!PvNode && cutNode) || badSEE)
               ss->reduction += ONE_PLY;
 
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
