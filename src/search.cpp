@@ -937,7 +937,10 @@ moves_loop: // When in check and at SpNode search starts from here
                       &&  move != ttMove
                       &&  move != ss->killers[0]
                       &&  move != ss->killers[1];
-      const bool badSEE = doLMR && depth > 2 * ss->ply * ONE_PLY && pos.see_sign(move) < 0;
+      const bool badSEE =    doLMR
+                          && ss->staticEval != VALUE_NONE
+                          && ss->staticEval + futility_margin(depth, (ss-1)->futilityMoveCount) <= alpha
+                          && pos.see_sign(move) < 0;
           
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
