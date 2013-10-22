@@ -931,33 +931,28 @@ moves_loop: // When in check and at SpNode search starts from here
       if (!SpNode && !captureOrPromotion && quietCount < 64)
           quietsSearched[quietCount++] = move;
       
-      const bool doLMR = depth >= 3 * ONE_PLY
-                      && !pvMove
-                      && !captureOrPromotion
-                      &&  move != ttMove
-                      &&  move != ss->killers[0]
-                      &&  move != ss->killers[1];
-      const bool badSEE =    doLMR
-                          && ss->staticEval != VALUE_NONE
-                          && ss->staticEval + futility_margin(depth, (ss-1)->futilityMoveCount) <= alpha
-                          && pos.see_sign(move) < 0;
-          
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
 
       // Step 15. Reduced depth search (LMR). If the move fails high will be
       // re-searched at full depth.
-      if (doLMR)
+      if (    depth >= 3 * ONE_PLY
+          && !pvMove
+          && !captureOrPromotion
+          &&  move != ttMove
+          &&  move != ss->killers[0]
+          &&  move != ss->killers[1])
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
-          if ((!PvNode && cutNode) || badSEE)
+          if (!PvNode && cutNode)
               ss->reduction += ONE_PLY;
 
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
               
-          else if (givesCheck && !ext)
+          else if (   PvNode && ss->staticEval != VALUE_NONE
+                   && ss->staticEval + futility_margin(depth, (ss-1)->futilityMoveCount) <= alpha)
               ss->reduction += ONE_PLY / 2;
 
           if (move == countermoves[0] || move == countermoves[1])
