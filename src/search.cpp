@@ -951,8 +951,7 @@ moves_loop: // When in check and at SpNode search starts from here
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
               
-          else if (   PvNode && ss->staticEval != VALUE_NONE
-                   && ss->staticEval + futility_margin(depth, (ss-1)->futilityMoveCount) <= alpha)
+          else if (!ext && givesCheck)
               ss->reduction += ONE_PLY / 2;
 
           if (move == countermoves[0] || move == countermoves[1])
