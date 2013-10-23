@@ -951,7 +951,7 @@ moves_loop: // When in check and at SpNode search starts from here
           else if (   PvNode
                    && ss->staticEval != VALUE_NONE
                    && ss->staticEval + futility_margin(depth, moveCount) <= alpha)
-              ss->reduction += ONE_PLY;
+              ss->reduction += std::max(ss->reduction / 2, ONE_PLY / 2);
               
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
