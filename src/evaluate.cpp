@@ -475,7 +475,7 @@ Value do_evaluate(const Position& pos) {
   template<PieceType Piece, Color Us, bool Trace>
   Score evaluate_pieces(const Position& pos, EvalInfo& ei, Score* mobility, Bitboard mobilityArea) {
 
-    Bitboard b;
+    Bitboard b, b_mob;
     Square s;
     Score score = SCORE_ZERO;
 
@@ -487,12 +487,12 @@ Value do_evaluate(const Position& pos) {
     while ((s = *pl++) != SQ_NONE)
     {
         // Find attacked squares, including x-ray attacks for bishops and rooks
-        b = Piece == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, QUEEN))
-          : Piece ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(Us, ROOK, QUEEN))
-                            : pos.attacks_from<Piece>(s);
+        b_mob = b = Piece == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, QUEEN))
+                  : Piece ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(Us, ROOK, QUEEN))
+                                    : pos.attacks_from<Piece>(s);
 
         if (ei.pinnedPieces[Us] & s)
-            b &= LineBB[pos.king_square(Us)][s];
+            b_mob &= LineBB[pos.king_square(Us)][s];
 
         ei.attackedBy[Us][Piece] |= b;
 
@@ -505,8 +505,8 @@ Value do_evaluate(const Position& pos) {
                 ei.kingAdjacentZoneAttacksCount[Us] += popcount<Max15>(bb);
         }
 
-        int mob = Piece != QUEEN ? popcount<Max15>(b & mobilityArea)
-                                 : popcount<Full >(b & mobilityArea);
+        int mob = Piece != QUEEN ? popcount<Max15>(b_mob & mobilityArea)
+                                 : popcount<Full >(b_mob & mobilityArea);
 
         mobility[Us] += MobilityBonus[Piece][mob];
 
