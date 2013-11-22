@@ -147,7 +147,7 @@ public:
 
   // Accessing hash keys
   Key key() const;
-  Key exclusion_key() const;
+  Key exclusion_key(Move move) const;
   Key pawn_key() const;
   Key material_key() const;
 

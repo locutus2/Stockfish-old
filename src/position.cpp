@@ -55,7 +55,7 @@ namespace Zobrist {
   Key exclusion;
 }
 
-Key Position::exclusion_key() const { return st->key ^ Zobrist::exclusion;}
+Key Position::exclusion_key(Move move) const { return st->key ^ Zobrist::exclusion ^ move ^ (move << 16);}
 
 namespace {
 
