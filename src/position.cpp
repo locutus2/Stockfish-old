@@ -52,10 +52,9 @@ namespace Zobrist {
   Key enpassant[FILE_NB];
   Key castle[CASTLE_RIGHT_NB];
   Key side;
-  Key exclusion;
 }
 
-Key Position::exclusion_key(Move move) const { return st->key ^ Zobrist::exclusion ^ move ^ (move << 16);}
+Key Position::exclusion_key(Move move) const { return st->key ^ (move << 2);}
 
 namespace {
 
@@ -139,7 +138,6 @@ void Position::init() {
   }
 
   Zobrist::side = rk.rand<Key>();
-  Zobrist::exclusion  = rk.rand<Key>();
 
   for (PieceType pt = PAWN; pt <= KING; ++pt)
   {
