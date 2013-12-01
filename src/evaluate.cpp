@@ -179,6 +179,7 @@ namespace {
   const Score UndefendedMinor  = make_score(25, 10);
   const Score TrappedRook      = make_score(90,  0);
   const Score Unstoppable      = make_score( 0, 20);
+  const Score LowKingMobility  = make_score(30, 15);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -639,6 +640,12 @@ Value do_evaluate(const Position& pos) {
 
     // King shelter and enemy pawns storm
     Score score = ei.pi->king_safety<Us>(pos, ksq);
+    
+    // Penalize if king have lesser than two safe squares to move on
+    if(!more_than_one(   ei.attackedBy[Us][KING]
+                      & ~ei.attackedBy[Them][ALL_PIECES]
+                      & ~pos.pieces(Us)))
+        score -= LowKingMobility;
 
     // Main king safety evaluation
     if (   ei.kingAttackersCount[Them] >= 2
