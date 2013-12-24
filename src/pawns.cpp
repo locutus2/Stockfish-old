@@ -56,6 +56,9 @@ namespace {
   const Score CandidatePassed[RANK_NB] = {
     S( 0, 0), S( 6, 13), S(6,13), S(14,29),
     S(34,68), S(83,166), S(0, 0), S( 0, 0) };
+    
+  // Candidate passed pawn bonus by rank
+  const Score PawnsFileSpan = S( 0, 10);
 
   // Weakness of our pawn shelter in front of the king indexed by [rank]
   const Value ShelterWeakness[RANK_NB] =
@@ -85,7 +88,7 @@ namespace {
 
     Bitboard b;
     Square s;
-    File f;
+    File f, fLeft = FILE_H, fRight = FILE_A;
     bool passed, isolated, doubled, opposed, chain, backward, candidate;
     Score value = SCORE_ZERO;
     const Square* pl = pos.list<PAWN>(Us);
@@ -106,6 +109,8 @@ namespace {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
         f = file_of(s);
+        fLeft  = std::min(fLeft,  f);
+        fRight = std::max(fRight, f);
 
         // This file cannot be semi-open
         e->semiopenFiles[Us] &= ~(1 << f);
@@ -180,6 +185,9 @@ namespace {
                 e->candidatePawns[Us] |= s;
         }
     }
+    
+    if(fLeft < fRight)
+        value += PawnsFileSpan * int(fRight - fLeft);
 
     return value;
   }
