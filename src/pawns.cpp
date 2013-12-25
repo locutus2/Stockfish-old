@@ -57,7 +57,7 @@ namespace {
     S( 0, 0), S( 6, 13), S(6,13), S(14,29),
     S(34,68), S(83,166), S(0, 0), S( 0, 0) };
     
-  // Candidate passed pawn bonus by rank
+  // Multiplier for file distance of left and right outermost pawns
   const Score PawnsFileSpan = S( 0, 10);
 
   // Weakness of our pawn shelter in front of the king indexed by [rank]
