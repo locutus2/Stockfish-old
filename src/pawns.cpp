@@ -60,6 +60,9 @@ namespace {
   // Multiplier for file distance of left and right outermost pawns
   const Score PawnsFileSpan = S( 0, 10);
 
+  // Bonus for file distance of the two outermost pawns
+  const Score PawnsFileSpan = S(0, 10);
+
   // Weakness of our pawn shelter in front of the king indexed by [rank]
   const Value ShelterWeakness[RANK_NB] =
   { V(100), V(0), V(27), V(73), V(92), V(101), V(101) };
@@ -188,6 +191,14 @@ namespace {
     
     if(fLeft < fRight)
         value += PawnsFileSpan * int(fRight - fLeft);
+
+    // In endgame it's better to have pawns on both wings. So give a bonus according
+    // to file distance between left and right outermost pawns.
+    if (pos.count<PAWN>(Us) > 1)
+    {
+        b = ~e->semiopenFiles[Us] & 0xFF;
+        value += PawnsFileSpan * int(msb(b) - lsb(b));
+    }
 
     return value;
   }
