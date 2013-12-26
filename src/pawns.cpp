@@ -58,7 +58,7 @@ namespace {
     S(34,68), S(83,166), S(0, 0), S( 0, 0) };
     
   // Bonus for file distance of the two outermost pawns
-  const Score PawnsFileSpan = S(0, 10);
+  const Score PawnsFileSpan = S(5, 10);
 
   // Weakness of our pawn shelter in front of the king indexed by [rank]
   const Value ShelterWeakness[RANK_NB] =
@@ -91,7 +91,6 @@ namespace {
     File f;
     bool passed, isolated, doubled, opposed, chain, backward, candidate;
     Score value = SCORE_ZERO;
-    int wingPawnFiles = 0;
     const Square* pl = pos.list<PAWN>(Us);
 
     Bitboard ourPawns = pos.pieces(Us, PAWN);
@@ -161,10 +160,7 @@ namespace {
         // full attack info to evaluate passed pawns. Only the frontmost passed
         // pawn on each file is considered a true passed pawn.
         if (passed && !doubled)
-        {
-            wingPawnFiles |= (1 << f);
             e->passedPawns[Us] |= s;
-        }
 
         // Score this pawn
         if (isolated)
@@ -182,7 +178,6 @@ namespace {
         if (candidate)
         {
             value += CandidatePassed[relative_rank(Us, s)];
-            wingPawnFiles |= (1 << f);
 
             if (!doubled)
                 e->candidatePawns[Us] |= s;
@@ -190,10 +185,10 @@ namespace {
     }
     
     // In endgame it's better to have pawns on both wings. So give a bonus according
-    // to file distance between left and right outermost wing pawns.
-    if (wingPawnFiles)
+    // to file distance between left and right outermost pawns.
+    if (pos.count<PAWN>(Us) > 1)
     {
-        b = wingPawnFiles & 0xFF;
+        b = ~e->semiopenFiles[Us] & 0xFF;
         value += PawnsFileSpan * int(msb(b) - lsb(b));
     }
 
