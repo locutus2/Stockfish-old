@@ -48,6 +48,8 @@ namespace {
     S(49, 46), S(49, 46), S(43, 46), S(30, 42) },
   { S(20, 28), S(29, 31), S(33, 31), S(33, 31),
     S(33, 31), S(33, 31), S(29, 31), S(20, 28) } };
+    
+  const Score WeakBackward = S( 0, 0);
 
   // Pawn chain membership bonus by file and rank (initialized by formula)
   Score ChainMember[FILE_NB][RANK_NB];
@@ -89,7 +91,7 @@ namespace {
     Bitboard b;
     Square s;
     File f;
-    bool passed, isolated, doubled, opposed, chain, backward, candidate;
+    bool passed, isolated, doubled, opposed, chain, backward, weakBackward, candidate;
     Score value = SCORE_ZERO;
     const Square* pl = pos.list<PAWN>(Us);
 
@@ -143,7 +145,10 @@ namespace {
 
             // If we have an enemy pawn in the same or next rank, the pawn is
             // backward because it cannot advance without being captured.
-            backward = (b | shift_bb<Up>(b)) & theirPawns;
+            b = (b | shift_bb<Up>(b)) & theirPawns;
+            //backward = (b | shift_bb<Up>(b)) & theirPawns;
+            backward = b;
+            weakBackward = more_than_one(rank_bb(backmost_sq(Us, b)) & b);
         }
 
         assert(opposed | passed | (pawn_attack_span(Us, s) & theirPawns));
@@ -170,7 +175,12 @@ namespace {
             value -= Doubled[f];
 
         if (backward)
+        {
             value -= Backward[opposed][f];
+            if(weakBackward)
+                value -= WeakBackward;
+        }
+        
 
         if (chain)
             value += ChainMember[f][relative_rank(Us, s)];
