@@ -24,6 +24,7 @@
 #include "bitcount.h"
 #include "pawns.h"
 #include "position.h"
+#include "ucioption.h"
 
 namespace {
 
@@ -49,7 +50,7 @@ namespace {
   { S(20, 28), S(29, 31), S(33, 31), S(33, 31),
     S(33, 31), S(33, 31), S(29, 31), S(20, 28) } };
     
-  const Score WeakBackward = S( 0, 0);
+  Score WeakBackward = S( 0, 0);
 
   // Pawn chain membership bonus by file and rank (initialized by formula)
   Score ChainMember[FILE_NB][RANK_NB];
@@ -146,7 +147,6 @@ namespace {
             // If we have an enemy pawn in the same or next rank, the pawn is
             // backward because it cannot advance without being captured.
             b = (b | shift_bb<Up>(b)) & theirPawns;
-            //backward = (b | shift_bb<Up>(b)) & theirPawns;
             backward = b;
             weakBackward = more_than_one(rank_bb(backmost_sq(Us, b)) & b);
         }
@@ -222,6 +222,8 @@ void init() {
           bonus = r * (r-1) * (r-2) + chainByFile[f] * (r/2 + 1);
           ChainMember[f][r] = make_score(bonus, bonus);
       }
+      
+  WeakBackward = make_score(int(Options["WeakBackwardMG"]), int(Options["WeakBackwardEG"]));
 }
 
 

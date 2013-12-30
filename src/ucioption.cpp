@@ -64,6 +64,8 @@ void init(OptionsMap& o) {
   o["Mobility (Endgame)"]          = Option(100, 0, 200, on_eval);
   o["Pawn Structure (Midgame)"]    = Option(100, 0, 200, on_eval);
   o["Pawn Structure (Endgame)"]    = Option(100, 0, 200, on_eval);
+  o["WeakBackwardMG"]              = Option(0, 0, 200, on_eval);
+  o["WeakBackwardEG"]              = Option(0, 0, 200, on_eval);
   o["Passed Pawns (Midgame)"]      = Option(100, 0, 200, on_eval);
   o["Passed Pawns (Endgame)"]      = Option(100, 0, 200, on_eval);
   o["Space"]                       = Option(100, 0, 200, on_eval);
