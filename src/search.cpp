@@ -467,6 +467,7 @@ namespace {
     assert(PvNode || (alpha == beta - 1));
     assert(depth > DEPTH_ZERO);
 
+    const Value alphaOrig = alpha;
     Move quietsSearched[64];
     StateInfo st;
     const TTEntry *tte;
@@ -551,7 +552,7 @@ namespace {
         ss->currentMove = ttMove; // Can be MOVE_NONE
 
         // If ttMove is quiet, update killers, history, and counter move on TT hit
-        if (ttValue >= beta && ttMove && !pos.capture_or_promotion(ttMove) && !inCheck)
+        if (ttValue > alphaOrig && ttMove && !pos.capture_or_promotion(ttMove) && !inCheck)
             update_stats(pos, ss, ttMove, depth, NULL, 0);
 
         return ttValue;
@@ -1030,7 +1031,7 @@ moves_loop: // When in check and at SpNode search starts from here
              depth, bestMove, ss->staticEval);
 
     // Quiet best move: update killers, history and countermoves
-    if (bestValue >= beta && !pos.capture_or_promotion(bestMove) && !inCheck)
+    if (bestValue > alphaOrig && !pos.capture_or_promotion(bestMove) && !inCheck)
         update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount - 1);
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
