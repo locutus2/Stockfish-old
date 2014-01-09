@@ -84,7 +84,6 @@ namespace {
   HistoryStats History;
   GainsStats Gains;
   CountermovesStats Countermoves;
-  CountermovesStats PvCountermoves;
 
   template <NodeType NT>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode);
@@ -306,7 +305,6 @@ namespace {
     History.clear();
     Gains.clear();
     Countermoves.clear();
-    PvCountermoves.clear();
 
     PVSize = Options["MultiPV"];
     Skill skill(Options["Skill Level"]);
@@ -713,20 +711,8 @@ namespace {
 moves_loop: // When in check and at SpNode search starts from here
 
     Square prevMoveSq = to_sq((ss-1)->currentMove);
-    Move countermoves[] = { PvCountermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
-                            PvCountermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second };
-    if(!countermoves[0])
-    {
-        countermoves[0] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first;
-        countermoves[1] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second;
-    }
-    else if(!countermoves[1])
-    {
-        if(countermoves[0] != Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first)
-            countermoves[1] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first;
-        else
-            countermoves[1] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second;
-    }
+    Move countermoves[] = { Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
+                            Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second };
     
     MovePicker mp(pos, ttMove, depth, History, countermoves, ss);
     CheckInfo ci(pos);
@@ -1294,7 +1280,7 @@ moves_loop: // When in check and at SpNode search starts from here
     // Increase history value of the cut-off move and decrease all the other
     // played quiet moves.
     Value bonus = Value(int(depth) * int(depth));
-    History.update(pos.moved_piece(move), to_sq(move), bonus);
+    History.update(pos.moved_piece(move), to_sq(move), bonus * (pvmove ? 2 : 1));
     for (int i = 0; i < quietsCnt; ++i)
     {
         Move m = quiets[i];
@@ -1304,10 +1290,7 @@ moves_loop: // When in check and at SpNode search starts from here
     if (is_ok((ss-1)->currentMove))
     {
         Square prevMoveSq = to_sq((ss-1)->currentMove);
-        if(pvmove)
-            PvCountermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
-        else
-            Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
+        Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
     }
   }
 
