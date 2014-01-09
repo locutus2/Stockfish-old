@@ -84,6 +84,7 @@ namespace {
   HistoryStats History;
   GainsStats Gains;
   CountermovesStats Countermoves;
+  CountermovesStats PvCountermoves;
 
   template <NodeType NT>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode);
@@ -94,7 +95,7 @@ namespace {
   void id_loop(Position& pos);
   Value value_to_tt(Value v, int ply);
   Value value_from_tt(Value v, int ply);
-  void update_stats(Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt);
+  void update_stats(Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt, bool pvmove);
   string uci_pv(const Position& pos, int depth, Value alpha, Value beta);
 
   struct Skill {
@@ -277,6 +278,7 @@ finalize:
   sync_cout << "bestmove " << move_to_uci(RootMoves[0].pv[0], RootPos.is_chess960())
             << " ponder "  << move_to_uci(RootMoves[0].pv[1], RootPos.is_chess960())
             << sync_endl;
+            
 }
 
 
@@ -304,6 +306,7 @@ namespace {
     History.clear();
     Gains.clear();
     Countermoves.clear();
+    PvCountermoves.clear();
 
     PVSize = Options["MultiPV"];
     Skill skill(Options["Skill Level"]);
@@ -553,7 +556,7 @@ namespace {
 
         // If ttMove is quiet, update killers, history, and counter move on TT hit
         if (ttValue > alphaOrig && ttMove && !pos.capture_or_promotion(ttMove) && !inCheck)
-            update_stats(pos, ss, ttMove, depth, NULL, 0);
+            update_stats(pos, ss, ttMove, depth, NULL, 0, ttValue < beta);
 
         return ttValue;
     }
@@ -710,9 +713,21 @@ namespace {
 moves_loop: // When in check and at SpNode search starts from here
 
     Square prevMoveSq = to_sq((ss-1)->currentMove);
-    Move countermoves[] = { Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
-                            Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second };
-
+    Move countermoves[] = { PvCountermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
+                            PvCountermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second };
+    if(!countermoves[0])
+    {
+        countermoves[0] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first;
+        countermoves[1] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second;
+    }
+    else if(!countermoves[1])
+    {
+        if(countermoves[0] != Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first)
+            countermoves[1] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first;
+        else
+            countermoves[1] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second;
+    }
+    
     MovePicker mp(pos, ttMove, depth, History, countermoves, ss);
     CheckInfo ci(pos);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
@@ -1032,7 +1047,7 @@ moves_loop: // When in check and at SpNode search starts from here
 
     // Quiet best move: update killers, history and countermoves
     if (bestValue > alphaOrig && !pos.capture_or_promotion(bestMove) && !inCheck)
-        update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount - 1);
+        update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount - 1, bestValue < beta);
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
@@ -1268,8 +1283,8 @@ moves_loop: // When in check and at SpNode search starts from here
   // update_stats() updates killers, history and countermoves stats after a fail-high
   // of a quiet move.
 
-  void update_stats(Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt) {
-
+  void update_stats(Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt, bool pvmove) {
+    
     if (ss->killers[0] != move)
     {
         ss->killers[1] = ss->killers[0];
@@ -1289,7 +1304,10 @@ moves_loop: // When in check and at SpNode search starts from here
     if (is_ok((ss-1)->currentMove))
     {
         Square prevMoveSq = to_sq((ss-1)->currentMove);
-        Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
+        if(pvmove)
+            PvCountermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
+        else
+            Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
     }
   }
 
