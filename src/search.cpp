@@ -708,10 +708,14 @@ namespace {
 
 moves_loop: // When in check and at SpNode search starts from here
 
-    Square prevMoveSq = to_sq((ss-1)->currentMove);
-    Move countermoves[] = { Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
-                            Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second };
-
+    Move countermoves[] = { MOVE_NONE, MOVE_NONE };
+    if(is_ok((ss-1)->currentMove))
+    {
+        Square prevMoveSq = to_sq((ss-1)->currentMove);
+        countermoves[0] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first;
+        countermoves[1] = Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second;
+    }
+    
     MovePicker mp(pos, ttMove, depth, History, countermoves, ss);
     CheckInfo ci(pos);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
