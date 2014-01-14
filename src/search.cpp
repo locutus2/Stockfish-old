@@ -889,10 +889,7 @@ moves_loop: // When in check and at SpNode search starts from here
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
 
-          if (   move == countermoves[0]
-              || move == countermoves[1]
-              || move == followupmoves[0]
-              || move == followupmoves[1])
+          if (move == countermoves[0] || move == countermoves[1])
               ss->reduction = std::max(DEPTH_ZERO, ss->reduction - ONE_PLY);
 
           Depth d = std::max(newDepth - ss->reduction, ONE_PLY);
@@ -1299,7 +1296,9 @@ moves_loop: // When in check and at SpNode search starts from here
         Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
     }
 
-    if (is_ok((ss-2)->currentMove) && (ss-1)->currentMove == (ss-1)->ttMove)
+    if (is_ok((ss-2)->currentMove) && (   (ss-1)->currentMove == (ss-1)->ttMove
+                                       || (ss-1)->currentMove == (ss-1)->killers[0]
+                                       || (ss-1)->currentMove == (ss-1)->killers[1]))
     {
         Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
         Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);
