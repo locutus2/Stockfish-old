@@ -164,16 +164,18 @@ Entry* probe(const Position& pos, Table& entries, Endgames& endgames) {
       e->evaluationFunction = &EvaluateKXK[BLACK];
       return e;
   }
-
+          
   if (!pos.pieces(PAWN) && !pos.pieces(ROOK) && !pos.pieces(QUEEN))
   {
       // Minor piece endgame with at least one minor piece per side and
-      // no pawns. Note that the case KmmK is already handled by KXK.
+      // no pawns (except KBBKN). Note that the case KmmK is already handled by KXK.
       assert((pos.pieces(WHITE, KNIGHT) | pos.pieces(WHITE, BISHOP)));
       assert((pos.pieces(BLACK, KNIGHT) | pos.pieces(BLACK, BISHOP)));
 
       if (   pos.count<BISHOP>(WHITE) + pos.count<KNIGHT>(WHITE) <= 2
-          && pos.count<BISHOP>(BLACK) + pos.count<KNIGHT>(BLACK) <= 2)
+          && pos.count<BISHOP>(BLACK) + pos.count<KNIGHT>(BLACK) <= 2
+          && !(pos.count<BISHOP>(WHITE) == 2 && pos.count<KNIGHT>(BLACK) == 1)
+          && !(pos.count<BISHOP>(BLACK) == 2 && pos.count<KNIGHT>(WHITE) == 1))
       {
           e->evaluationFunction = &EvaluateKmmKm[pos.side_to_move()];
           return e;
