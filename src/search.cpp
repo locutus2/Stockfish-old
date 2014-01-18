@@ -294,6 +294,7 @@ namespace {
 
     std::memset(ss-2, 0, 5 * sizeof(Stack));
     (ss-1)->currentMove = MOVE_NULL; // Hack to skip update gains
+    (ss-1)->currentMoveIsCaptureOrPromotion = false;
 
     depth = 0;
     BestMoveChanges = 0;
@@ -501,6 +502,7 @@ namespace {
     moveCount = quietCount = 0;
     bestValue = -VALUE_INFINITE;
     ss->currentMove = ss->ttMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    ss->currentMoveIsCaptureOrPromotion = false;
     ss->ply = (ss-1)->ply + 1;
     (ss+1)->skipNullMove = false; (ss+1)->reduction = DEPTH_ZERO;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
@@ -550,6 +552,7 @@ namespace {
     {
         TT.refresh(tte);
         ss->currentMove = ttMove; // Can be MOVE_NONE
+        ss->currentMoveIsCaptureOrPromotion = pos.capture_or_promotion(ttMove);
 
         // If ttMove is quiet, update killers, history, counter move and followup move on TT hit
         if (ttValue >= beta && ttMove && !pos.capture_or_promotion(ttMove) && !inCheck)
@@ -627,6 +630,7 @@ namespace {
         &&  pos.non_pawn_material(pos.side_to_move()))
     {
         ss->currentMove = MOVE_NULL;
+        ss->currentMoveIsCaptureOrPromotion = false;
 
         // Null move dynamic reduction based on depth
         Depth R = 3 * ONE_PLY + depth / 4;
@@ -684,6 +688,7 @@ namespace {
             if (pos.legal(move, ci.pinned))
             {
                 ss->currentMove = move;
+                ss->currentMoveIsCaptureOrPromotion = pos.capture_or_promotion(move);
                 pos.do_move(move, st, ci, pos.gives_check(move, ci));
                 value = -search<NonPV>(pos, ss+1, -rbeta, -rbeta+1, rdepth, !cutNode);
                 pos.undo_move(move);
@@ -712,7 +717,7 @@ moves_loop: // When in check and at SpNode search starts from here
     Square prevMoveSq = to_sq((ss-1)->currentMove);
     Move countermoves[] = { Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
                             Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second };
-                            
+
     Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
     Move followupmoves[] = { Followupmoves[pos.piece_on(prevOwnMoveSq)][prevOwnMoveSq].first,
                              Followupmoves[pos.piece_on(prevOwnMoveSq)][prevOwnMoveSq].second };
@@ -866,6 +871,7 @@ moves_loop: // When in check and at SpNode search starts from here
 
       pvMove = PvNode && moveCount == 1;
       ss->currentMove = move;
+      ss->currentMoveIsCaptureOrPromotion = pos.capture_or_promotion(move);
       if (!SpNode && !captureOrPromotion && quietCount < 64)
           quietsSearched[quietCount++] = move;
 
@@ -1072,6 +1078,7 @@ moves_loop: // When in check and at SpNode search starts from here
         oldAlpha = alpha;
 
     ss->currentMove = bestMove = MOVE_NONE;
+    ss->currentMoveIsCaptureOrPromotion = false;
     ss->ply = (ss-1)->ply + 1;
 
     // Check for an instant draw or if the maximum ply has been reached
@@ -1098,6 +1105,7 @@ moves_loop: // When in check and at SpNode search starts from here
                               : (tte->bound() &  BOUND_UPPER)))
     {
         ss->currentMove = ttMove; // Can be MOVE_NONE
+        ss->currentMoveIsCaptureOrPromotion = pos.capture_or_promotion(ttMove);
         return ttValue;
     }
 
@@ -1197,6 +1205,7 @@ moves_loop: // When in check and at SpNode search starts from here
           continue;
 
       ss->currentMove = move;
+      ss->currentMoveIsCaptureOrPromotion = pos.capture_or_promotion(move);
 
       // Make and search the move
       pos.do_move(move, st, ci, givesCheck);
@@ -1296,9 +1305,8 @@ moves_loop: // When in check and at SpNode search starts from here
         Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
     }
 
-    if (is_ok((ss-2)->currentMove) && (   (ss-1)->currentMove == (ss-1)->ttMove
-                                       || (ss-1)->currentMove == (ss-1)->killers[0]
-                                       || (ss-1)->currentMove == (ss-1)->killers[1]))
+    if (is_ok((ss-2)->currentMove) &&  (ss-1)->currentMove == (ss-1)->ttMove
+                                   && !(ss-1)->currentMoveIsCaptureOrPromotion)
     {
         Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
         Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);

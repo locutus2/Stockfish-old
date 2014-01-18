@@ -47,6 +47,7 @@ struct Stack {
   Depth reduction;
   Value staticEval;
   int skipNullMove;
+  bool currentMoveIsCaptureOrPromotion;
 };
 
 
