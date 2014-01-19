@@ -41,7 +41,6 @@ struct Stack {
   SplitPoint* splitPoint;
   int ply;
   Move currentMove;
-  Move ttMove;
   Move excludedMove;
   Move killers[2];
   Depth reduction;
