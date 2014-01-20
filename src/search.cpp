@@ -501,7 +501,7 @@ namespace {
 
     moveCount = quietCount = 0;
     bestValue = -VALUE_INFINITE;
-    ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    ss->currentMove = ss->ttMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->currentMoveIsCaptureOrPromotion = false;
     ss->ply = (ss-1)->ply + 1;
     (ss+1)->skipNullMove = false; (ss+1)->reduction = DEPTH_ZERO;
@@ -535,7 +535,7 @@ namespace {
     excludedMove = ss->excludedMove;
     posKey = excludedMove ? pos.exclusion_key() : pos.key();
     tte = TT.probe(posKey);
-    ttMove = RootNode ? RootMoves[PVIdx].pv[0] : tte ? tte->move() : MOVE_NONE;
+    ss->ttMove = ttMove = RootNode ? RootMoves[PVIdx].pv[0] : tte ? tte->move() : MOVE_NONE;
     ttValue = tte ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
 
     // At PV nodes we check for exact scores, whilst at non-PV nodes we check for
@@ -1305,12 +1305,12 @@ moves_loop: // When in check and at SpNode search starts from here
         Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
     }
 
-    if (is_ok((ss-2)->currentMove) && !(ss-1)->currentMoveIsCaptureOrPromotion)
+    if (is_ok((ss-2)->currentMove) &&  (ss-2)->currentMove == (ss-2)->ttMove
+                                   && !(ss-1)->currentMoveIsCaptureOrPromotion)
     {
         Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
         Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);
     }
-
   }
 
 
