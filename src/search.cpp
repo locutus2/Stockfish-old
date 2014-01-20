@@ -1305,8 +1305,8 @@ moves_loop: // When in check and at SpNode search starts from here
         Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
     }
 
-    if (is_ok((ss-2)->currentMove) &&  (ss-2)->currentMove == (ss-2)->ttMove
-                                   && !(ss-1)->currentMoveIsCaptureOrPromotion)
+    if (is_ok((ss-2)->currentMove) && !(ss-2)->currentMoveIsCaptureOrPromotion
+                                   &&  (ss-1)->currentMove == (ss-1)->ttMove)
     {
         Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
         Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);
