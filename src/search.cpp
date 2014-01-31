@@ -552,7 +552,7 @@ namespace {
         ss->currentMove = ttMove; // Can be MOVE_NONE
 
         // If ttMove is quiet, update killers, history, counter move and followup move on TT hit
-        if (ttValue >= beta && ttMove && !pos.capture_or_promotion(ttMove) && !inCheck)
+        if (ttValue >= beta && ttMove && !pos.capture_or_promotion(ttMove))
             update_stats(pos, ss, ttMove, depth, NULL, 0);
 
         return ttValue;
@@ -1036,7 +1036,7 @@ moves_loop: // When in check and at SpNode search starts from here
              depth, bestMove, ss->staticEval);
 
     // Quiet best move: update killers, history, countermoves and followupmoves
-    if (bestValue >= beta && !pos.capture_or_promotion(bestMove) && !inCheck)
+    if (bestValue >= beta && !pos.capture_or_promotion(bestMove))
         update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount - 1);
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
@@ -1144,7 +1144,7 @@ moves_loop: // When in check and at SpNode search starts from here
     // to search the moves. Because the depth is <= 0 here, only captures,
     // queen promotions and checks (only if depth >= DEPTH_QS_CHECKS) will
     // be generated.
-    MovePicker mp(pos, ttMove, depth, History, to_sq((ss-1)->currentMove));
+    MovePicker mp(pos, ttMove, depth, History, to_sq((ss-1)->currentMove), ss);
     CheckInfo ci(pos);
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
@@ -1275,32 +1275,43 @@ moves_loop: // When in check and at SpNode search starts from here
 
   void update_stats(Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt) {
 
-    if (ss->killers[0] != move)
+    if (pos.checkers())
     {
-        ss->killers[1] = ss->killers[0];
-        ss->killers[0] = move;
+        if (ss->checkKillers[0] != move)
+        {
+            ss->checkKillers[1] = ss->checkKillers[0];
+            ss->checkKillers[0] = move;
+        }
     }
-
-    // Increase history value of the cut-off move and decrease all the other
-    // played quiet moves.
-    Value bonus = Value(int(depth) * int(depth));
-    History.update(pos.moved_piece(move), to_sq(move), bonus);
-    for (int i = 0; i < quietsCnt; ++i)
+    else
     {
-        Move m = quiets[i];
-        History.update(pos.moved_piece(m), to_sq(m), -bonus);
-    }
+        if (ss->killers[0] != move)
+        {
+            ss->killers[1] = ss->killers[0];
+            ss->killers[0] = move;
+        }
+        
+        // Increase history value of the cut-off move and decrease all the other
+        // played quiet moves.
+        Value bonus = Value(int(depth) * int(depth));
+        History.update(pos.moved_piece(move), to_sq(move), bonus);
+        for (int i = 0; i < quietsCnt; ++i)
+        {
+            Move m = quiets[i];
+            History.update(pos.moved_piece(m), to_sq(m), -bonus);
+        }
 
-    if (is_ok((ss-1)->currentMove))
-    {
-        Square prevMoveSq = to_sq((ss-1)->currentMove);
-        Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
-    }
+        if (is_ok((ss-1)->currentMove))
+        {
+            Square prevMoveSq = to_sq((ss-1)->currentMove);
+            Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
+        }
 
-    if (is_ok((ss-2)->currentMove) && (ss-1)->currentMove == (ss-1)->ttMove)
-    {
-        Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
-        Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);
+        if (is_ok((ss-2)->currentMove) && (ss-1)->currentMove == (ss-1)->ttMove)
+        {
+            Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
+            Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);
+        }
     }
   }
 

@@ -44,6 +44,7 @@ struct Stack {
   Move ttMove;
   Move excludedMove;
   Move killers[2];
+  Move checkKillers[2];
   Depth reduction;
   Value staticEval;
   int skipNullMove;
