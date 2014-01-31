@@ -92,7 +92,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats&
 }
 
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats& h,
-                       Square sq, Search::Stack* s) : pos(p), history(h), ss(s), cur(moves), end(moves) {
+                       Square sq) : pos(p), history(h), ss(0), cur(moves), end(moves) {
 
   assert(d <= DEPTH_ZERO);
 
