@@ -880,7 +880,8 @@ moves_loop: // When in check and at SpNode search starts from here
           && !captureOrPromotion
           &&  move != ttMove
           &&  move != ss->killers[0]
-          &&  move != ss->killers[1])
+          &&  move != ss->killers[1]
+          && !more_than_one(pos.checkers()))
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
@@ -890,8 +891,7 @@ moves_loop: // When in check and at SpNode search starts from here
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
 
-          if(move == countermoves[0] || move == countermoves[1]
-             || (depth <= 16 * ONE_PLY && inCheck && (ss-1)->reduction))
+          if (move == countermoves[0] || move == countermoves[1])
               ss->reduction = std::max(DEPTH_ZERO, ss->reduction - ONE_PLY);
 
           Depth d = std::max(newDepth - ss->reduction, ONE_PLY);
@@ -1304,6 +1304,7 @@ moves_loop: // When in check and at SpNode search starts from here
         Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);
     }
   }
+
 
   // When playing with a strength handicap, choose best move among the MultiPV
   // set using a statistical rule dependent on 'level'. Idea by Heinz van Saanen.
