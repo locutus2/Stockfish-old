@@ -880,8 +880,7 @@ moves_loop: // When in check and at SpNode search starts from here
           && !captureOrPromotion
           &&  move != ttMove
           &&  move != ss->killers[0]
-          &&  move != ss->killers[1]
-          && (!givesCheck || pos.checkers() & to_sq(move)))
+          &&  move != ss->killers[1])
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
@@ -891,7 +890,9 @@ moves_loop: // When in check and at SpNode search starts from here
           else if (History[pos.piece_on(to_sq(move))][to_sq(move)] < 0)
               ss->reduction += ONE_PLY / 2;
 
-          if (move == countermoves[0] || move == countermoves[1])
+          if (   move == countermoves[0]
+              || move == countermoves[1]
+              || more_than_one(pos.checkers()))
               ss->reduction = std::max(DEPTH_ZERO, ss->reduction - ONE_PLY);
 
           Depth d = std::max(newDepth - ss->reduction, ONE_PLY);
