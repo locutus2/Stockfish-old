@@ -1,7 +1,7 @@
 /*
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
-  Copyright (C) 2008-2013 Marco Costalba, Joona Kiiski, Tord Romstad
+  Copyright (C) 2008-2014 Marco Costalba, Joona Kiiski, Tord Romstad
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ struct CheckInfo {
 struct StateInfo {
   Key pawnKey, materialKey;
   Value npMaterial[COLOR_NB];
-  int castleRights, rule50, pliesFromNull;
+  int castlingFlags, rule50, pliesFromNull;
   Score psq;
   Square epSquare;
 
@@ -81,7 +81,7 @@ public:
   static void init();
 
   // Text input/output
-  void set(const std::string& fen, bool isChess960, Thread* th);
+  void set(const std::string& fenStr, bool isChess960, Thread* th);
   const std::string fen() const;
   const std::string pretty(Move m = MOVE_NONE) const;
 
@@ -100,21 +100,20 @@ public:
   template<PieceType Pt> const Square* list(Color c) const;
 
   // Castling
-  int can_castle(CastleRight f) const;
+  int can_castle(CastlingFlag f) const;
   int can_castle(Color c) const;
-  bool castle_impeded(Color c, CastlingSide s) const;
-  Square castle_rook_square(Color c, CastlingSide s) const;
+  bool castling_impeded(Color c, CastlingSide s) const;
+  Square castling_rook_square(Color c, CastlingSide s) const;
 
   // Checking
   Bitboard checkers() const;
   Bitboard discovered_check_candidates() const;
-  Bitboard pinned_pieces() const;
+  Bitboard pinned_pieces(Color c) const;
 
   // Attacks to/from a given square
   Bitboard attackers_to(Square s) const;
   Bitboard attackers_to(Square s, Bitboard occ) const;
   Bitboard attacks_from(Piece p, Square s) const;
-  static Bitboard attacks_from(Piece p, Square s, Bitboard occ);
   template<PieceType> Bitboard attacks_from(Square s) const;
   template<PieceType> Bitboard attacks_from(Square s, Color c) const;
 
@@ -124,7 +123,7 @@ public:
   bool capture(Move m) const;
   bool capture_or_promotion(Move m) const;
   bool gives_check(Move m, const CheckInfo& ci) const;
-  bool passed_pawn_push(Move m) const;
+  bool advanced_pawn_push(Move m) const;
   Piece moved_piece(Move m) const;
   PieceType captured_piece_type() const;
 
@@ -142,7 +141,7 @@ public:
   void undo_null_move();
 
   // Static exchange evaluation
-  int see(Move m, int asymmThreshold = 0) const;
+  int see(Move m) const;
   int see_sign(Move m) const;
 
   // Accessing hash keys
@@ -171,11 +170,11 @@ public:
 private:
   // Initialization helpers (used while setting up a position)
   void clear();
-  void set_castle_right(Color c, Square rfrom);
+  void set_castling_flag(Color c, Square rfrom);
 
   // Helper functions
-  void do_castle(Square kfrom, Square kto, Square rfrom, Square rto);
-  Bitboard hidden_checkers(Square ksq, Color c) const;
+  void do_castling(Square kfrom, Square kto, Square rfrom, Square rto);
+  Bitboard check_blockers(Color c, Color kingColor) const;
   void put_piece(Square s, Color c, PieceType pt);
   void remove_piece(Square s, Color c, PieceType pt);
   void move_piece(Square from, Square to, Color c, PieceType pt);
@@ -198,9 +197,9 @@ private:
   int index[SQUARE_NB];
 
   // Other info
-  int castleRightsMask[SQUARE_NB];
-  Square castleRookSquare[COLOR_NB][CASTLING_SIDE_NB];
-  Bitboard castlePath[COLOR_NB][CASTLING_SIDE_NB];
+  int castlingFlagsMask[SQUARE_NB];
+  Square castlingRookSquare[COLOR_NB][CASTLING_SIDE_NB];
+  Bitboard castlingPath[COLOR_NB][CASTLING_SIDE_NB];
   StateInfo startState;
   int64_t nodes;
   int gamePly;
@@ -274,20 +273,20 @@ inline Square Position::king_square(Color c) const {
   return pieceList[c][KING][0];
 }
 
-inline int Position::can_castle(CastleRight f) const {
-  return st->castleRights & f;
+inline int Position::can_castle(CastlingFlag f) const {
+  return st->castlingFlags & f;
 }
 
 inline int Position::can_castle(Color c) const {
-  return st->castleRights & ((WHITE_OO | WHITE_OOO) << (2 * c));
+  return st->castlingFlags & ((WHITE_OO | WHITE_OOO) << (2 * c));
 }
 
-inline bool Position::castle_impeded(Color c, CastlingSide s) const {
-  return byTypeBB[ALL_PIECES] & castlePath[c][s];
+inline bool Position::castling_impeded(Color c, CastlingSide s) const {
+  return byTypeBB[ALL_PIECES] & castlingPath[c][s];
 }
 
-inline Square Position::castle_rook_square(Color c, CastlingSide s) const {
-  return castleRookSquare[c][s];
+inline Square Position::castling_rook_square(Color c, CastlingSide s) const {
+  return castlingRookSquare[c][s];
 }
 
 template<PieceType Pt>
@@ -304,7 +303,7 @@ inline Bitboard Position::attacks_from<PAWN>(Square s, Color c) const {
 }
 
 inline Bitboard Position::attacks_from(Piece p, Square s) const {
-  return attacks_from(p, s, byTypeBB[ALL_PIECES]);
+  return attacks_bb(p, s, byTypeBB[ALL_PIECES]);
 }
 
 inline Bitboard Position::attackers_to(Square s) const {
@@ -316,21 +315,20 @@ inline Bitboard Position::checkers() const {
 }
 
 inline Bitboard Position::discovered_check_candidates() const {
-  return hidden_checkers(king_square(~sideToMove), sideToMove);
+  return check_blockers(sideToMove, ~sideToMove);
 }
 
-inline Bitboard Position::pinned_pieces() const {
-  return hidden_checkers(king_square(sideToMove), ~sideToMove);
+inline Bitboard Position::pinned_pieces(Color c) const {
+  return check_blockers(c, c);
 }
 
 inline bool Position::pawn_passed(Color c, Square s) const {
   return !(pieces(~c, PAWN) & passed_pawn_mask(c, s));
 }
 
-inline bool Position::passed_pawn_push(Move m) const {
-
+inline bool Position::advanced_pawn_push(Move m) const {
   return   type_of(moved_piece(m)) == PAWN
-        && pawn_passed(sideToMove, to_sq(m));
+        && relative_rank(sideToMove, from_sq(m)) > RANK_4;
 }
 
 inline Key Position::key() const {
@@ -381,14 +379,14 @@ inline bool Position::is_chess960() const {
 inline bool Position::capture_or_promotion(Move m) const {
 
   assert(is_ok(m));
-  return type_of(m) ? type_of(m) != CASTLE : !empty(to_sq(m));
+  return type_of(m) != NORMAL ? type_of(m) != CASTLING : !empty(to_sq(m));
 }
 
 inline bool Position::capture(Move m) const {
 
-  // Note that castle is coded as "king captures the rook"
+  // Note that castling is encoded as "king captures the rook"
   assert(is_ok(m));
-  return (!empty(to_sq(m)) && type_of(m) != CASTLE) || type_of(m) == ENPASSANT;
+  return (!empty(to_sq(m)) && type_of(m) != CASTLING) || type_of(m) == ENPASSANT;
 }
 
 inline PieceType Position::captured_piece_type() const {
@@ -405,6 +403,7 @@ inline void Position::put_piece(Square s, Color c, PieceType pt) {
   byTypeBB[ALL_PIECES] |= s;
   byTypeBB[pt] |= s;
   byColorBB[c] |= s;
+  pieceCount[c][ALL_PIECES]++;
   index[s] = pieceCount[c][pt]++;
   pieceList[c][pt][index[s]] = s;
 }
@@ -433,6 +432,7 @@ inline void Position::remove_piece(Square s, Color c, PieceType pt) {
   byTypeBB[pt] ^= s;
   byColorBB[c] ^= s;
   /* board[s] = NO_PIECE; */ // Not needed, will be overwritten by capturing
+  pieceCount[c][ALL_PIECES]--;
   Square lastSquare = pieceList[c][pt][--pieceCount[c][pt]];
   index[lastSquare] = index[s];
   pieceList[c][pt][index[lastSquare]] = lastSquare;

@@ -1,7 +1,7 @@
 /*
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
-  Copyright (C) 2008-2013 Marco Costalba, Joona Kiiski, Tord Romstad
+  Copyright (C) 2008-2014 Marco Costalba, Joona Kiiski, Tord Romstad
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 /// For Windows, part of the configuration is detected automatically, but some
 /// switches need to be set manually:
 ///
-/// -DNDEBUG      | Disable debugging mode. Use always.
+/// -DNDEBUG      | Disable debugging mode. Always use this.
 ///
 /// -DNO_PREFETCH | Disable use of prefetch asm-instruction. A must if you want
 ///               | the executable to run on some very old machines.
@@ -97,7 +97,7 @@ const int MAX_PLY_PLUS_6 = MAX_PLY + 6;
 /// bit  0- 5: destination square (from 0 to 63)
 /// bit  6-11: origin square (from 0 to 63)
 /// bit 12-13: promotion piece type - 2 (from KNIGHT-2 to QUEEN-2)
-/// bit 14-15: special move flag: promotion (1), en passant (2), castle (3)
+/// bit 14-15: special move flag: promotion (1), en passant (2), castling (3)
 ///
 /// Special cases are MOVE_NONE and MOVE_NULL. We can sneak these in because in
 /// any normal move destination square is always different from origin square
@@ -112,17 +112,17 @@ enum MoveType {
   NORMAL,
   PROMOTION = 1 << 14,
   ENPASSANT = 2 << 14,
-  CASTLE    = 3 << 14
+  CASTLING  = 3 << 14
 };
 
-enum CastleRight {  // Defined as in PolyGlot book hash key
-  CASTLES_NONE,
+enum CastlingFlag {  // Defined as in PolyGlot book hash key
+  NO_CASTLING,
   WHITE_OO,
   WHITE_OOO   = WHITE_OO << 1,
   BLACK_OO    = WHITE_OO << 2,
   BLACK_OOO   = WHITE_OO << 3,
-  ALL_CASTLES = WHITE_OO | WHITE_OOO | BLACK_OO | BLACK_OOO,
-  CASTLE_RIGHT_NB = 16
+  ANY_CASTLING = WHITE_OO | WHITE_OOO | BLACK_OO | BLACK_OOO,
+  CASTLING_FLAG_NB = 16
 };
 
 enum CastlingSide {
@@ -138,10 +138,11 @@ enum Phase {
 };
 
 enum ScaleFactor {
-  SCALE_FACTOR_DRAW   = 0,
-  SCALE_FACTOR_NORMAL = 64,
-  SCALE_FACTOR_MAX    = 128,
-  SCALE_FACTOR_NONE   = 255
+  SCALE_FACTOR_DRAW    = 0,
+  SCALE_FACTOR_ONEPAWN = 48,
+  SCALE_FACTOR_NORMAL  = 64,
+  SCALE_FACTOR_MAX     = 128,
+  SCALE_FACTOR_NONE    = 255
 };
 
 enum Bound {
@@ -154,7 +155,7 @@ enum Bound {
 enum Value {
   VALUE_ZERO      = 0,
   VALUE_DRAW      = 0,
-  VALUE_KNOWN_WIN = 15000,
+  VALUE_KNOWN_WIN = 10000,
   VALUE_MATE      = 30000,
   VALUE_INFINITE  = 30001,
   VALUE_NONE      = 30002,
@@ -194,8 +195,8 @@ enum Depth {
   ONE_PLY = 2,
 
   DEPTH_ZERO          =  0 * ONE_PLY,
-  DEPTH_QS_CHECKS     = -1 * ONE_PLY,
-  DEPTH_QS_NO_CHECKS  = -2 * ONE_PLY,
+  DEPTH_QS_CHECKS     =  0 * ONE_PLY,
+  DEPTH_QS_NO_CHECKS  = -1 * ONE_PLY,
   DEPTH_QS_RECAPTURES = -5 * ONE_PLY,
 
   DEPTH_NONE = -127 * ONE_PLY
@@ -236,10 +237,11 @@ enum Rank {
 };
 
 
-/// Score enum keeps a midgame and an endgame value in a single integer (enum),
-/// first LSB 16 bits are used to store endgame value, while upper bits are used
-/// for midgame value. Compiler is free to choose the enum type as long as can
-/// keep its data, so ensure Score to be an integer type.
+/// The Score enum stores a middlegame and an endgame value in a single integer
+/// (enum). The least significant 16 bits are used to store the endgame value
+/// and the upper 16 bits are used to store the middlegame value. The compiler
+/// is free to choose the enum type as long as it can store the data, so we
+/// ensure that Score is an integer type by assigning some big int values.
 enum Score {
   SCORE_ZERO,
   SCORE_ENSURE_INTEGER_SIZE_P = INT_MAX,
@@ -248,14 +250,14 @@ enum Score {
 
 inline Score make_score(int mg, int eg) { return Score((mg << 16) + eg); }
 
-/// Extracting the signed lower and upper 16 bits it not so trivial because
+/// Extracting the signed lower and upper 16 bits is not so trivial because
 /// according to the standard a simple cast to short is implementation defined
 /// and so is a right shift of a signed integer.
 inline Value mg_value(Score s) { return Value(((s + 0x8000) & ~0xffff) / 0x10000); }
 
 /// On Intel 64 bit we have a small speed regression with the standard conforming
-/// version, so use a faster code in this case that, although not 100% standard
-/// compliant it seems to work for Intel and MSVC.
+/// version. Therefore, in this case we use faster code that, although not 100%
+/// standard compliant, seems to work for Intel and MSVC.
 #if defined(IS_64BIT) && (!defined(__GNUC__) || defined(__INTEL_COMPILER))
 
 inline Value eg_value(Score s) { return Value(int16_t(s & 0xffff)); }
@@ -323,11 +325,11 @@ inline bool operator<(const ExtMove& f, const ExtMove& s) {
 }
 
 inline Color operator~(Color c) {
-  return Color(c ^ 1);
+  return Color(c ^ BLACK);
 }
 
 inline Square operator~(Square s) {
-  return Square(s ^ 56); // Vertical flip SQ_A1 -> SQ_A8
+  return Square(s ^ SQ_A8); // Vertical flip SQ_A1 -> SQ_A8
 }
 
 inline Square operator|(File f, Rank r) {
@@ -346,8 +348,8 @@ inline Piece make_piece(Color c, PieceType pt) {
   return Piece((c << 3) | pt);
 }
 
-inline CastleRight make_castle_right(Color c, CastlingSide s) {
-  return CastleRight(WHITE_OO << ((s == QUEEN_SIDE) + 2 * c));
+inline CastlingFlag make_castling_flag(Color c, CastlingSide s) {
+  return CastlingFlag(WHITE_OO << ((s == QUEEN_SIDE) + 2 * c));
 }
 
 inline PieceType type_of(Piece p)  {
@@ -369,10 +371,6 @@ inline File file_of(Square s) {
 
 inline Rank rank_of(Square s) {
   return Rank(s >> 3);
-}
-
-inline Square mirror(Square s) {
-  return Square(s ^ 7); // Horizontal flip SQ_A1 -> SQ_H1
 }
 
 inline Square relative_square(Color c, Square s) {

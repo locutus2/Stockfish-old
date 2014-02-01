@@ -1,7 +1,7 @@
 /*
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
-  Copyright (C) 2008-2013 Marco Costalba, Joona Kiiski, Tord Romstad
+  Copyright (C) 2008-2014 Marco Costalba, Joona Kiiski, Tord Romstad
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ TranspositionTable TT; // Our global transposition table
 /// measured in megabytes. Transposition table consists of a power of 2 number
 /// of clusters and each cluster consists of ClusterSize number of TTEntry.
 
-void TranspositionTable::set_size(size_t mbSize) {
+void TranspositionTable::set_size(uint64_t mbSize) {
 
   assert(msb((mbSize << 20) / sizeof(TTEntry)) < 32);
 
@@ -83,13 +83,13 @@ const TTEntry* TranspositionTable::probe(const Key key) const {
 
 /// TranspositionTable::store() writes a new entry containing position key and
 /// valuable information of current position. The lowest order bits of position
-/// key are used to decide on which cluster the position will be placed.
-/// When a new entry is written and there are no empty entries available in cluster,
-/// it replaces the least valuable of entries. A TTEntry t1 is considered to be
-/// more valuable than a TTEntry t2 if t1 is from the current search and t2 is from
-/// a previous search, or if the depth of t1 is bigger than the depth of t2.
+/// key are used to decide in which cluster the position will be placed.
+/// When a new entry is written and there are no empty entries available in the
+/// cluster, it replaces the least valuable of the entries. A TTEntry t1 is considered
+/// to be more valuable than a TTEntry t2 if t1 is from the current search and t2
+/// is from a previous search, or if the depth of t1 is bigger than the depth of t2.
 
-void TranspositionTable::store(const Key key, Value v, Bound b, Depth d, Move m, Value statV, Value evalM) {
+void TranspositionTable::store(const Key key, Value v, Bound b, Depth d, Move m, Value statV) {
 
   int c1, c2, c3;
   TTEntry *tte, *replace;
@@ -117,5 +117,5 @@ void TranspositionTable::store(const Key key, Value v, Bound b, Depth d, Move m,
           replace = tte;
   }
 
-  replace->save(key32, v, b, d, m, generation, statV, evalM);
+  replace->save(key32, v, b, d, m, generation, statV);
 }

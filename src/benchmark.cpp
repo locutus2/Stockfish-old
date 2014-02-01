@@ -1,7 +1,7 @@
 /*
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
-  Copyright (C) 2008-2013 Marco Costalba, Joona Kiiski, Tord Romstad
+  Copyright (C) 2008-2014 Marco Costalba, Joona Kiiski, Tord Romstad
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -66,10 +66,10 @@ static const char* Defaults[] = {
 
 
 /// benchmark() runs a simple benchmark by letting Stockfish analyze a set
-/// of positions for a given limit each. There are five parameters; the
+/// of positions for a given limit each. There are five parameters: the
 /// transposition table size, the number of search threads that should
 /// be used, the limit value spent for each position (optional, default is
-/// depth 12), an optional file name where to look for positions in fen
+/// depth 13), an optional file name where to look for positions in FEN
 /// format (defaults are the positions defined above) and the type of the
 /// limit value: depth (default), time in secs or number of nodes.
 
@@ -150,7 +150,7 @@ void benchmark(const Position& current, istream& is) {
       }
   }
 
-  elapsed = Time::now() - elapsed + 1; // Assure positive to avoid a 'divide by zero'
+  elapsed = Time::now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
 
   cerr << "\n==========================="
        << "\nTotal time (ms) : " << elapsed
