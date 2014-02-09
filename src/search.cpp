@@ -858,9 +858,6 @@ moves_loop: // When in check and at SpNode search starts from here
                                     
       // Step 14. Make the move
       pos.do_move(move, st, ci, givesCheck);
-
-      const bool passed_pawn_push =    type_of(pos.piece_on(to_sq(move))) == PAWN
-                                    && pos.pawn_passed(~pos.side_to_move(), to_sq(move));
       
       // Step 15. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
@@ -869,8 +866,7 @@ moves_loop: // When in check and at SpNode search starts from here
           && !captureOrPromotion
           &&  move != ttMove
           &&  move != ss->killers[0]
-          &&  move != ss->killers[1]
-          && !passed_pawn_push)
+          &&  move != ss->killers[1])
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 
@@ -882,6 +878,8 @@ moves_loop: // When in check and at SpNode search starts from here
 
           if (move == countermoves[0] || move == countermoves[1])
               ss->reduction = std::max(DEPTH_ZERO, ss->reduction - ONE_PLY);
+          else if (more_than_one(pos.checkers()))
+              ss->reduction = std::max(DEPTH_ZERO, ss->reduction - ONE_PLY / 2);
 
           Depth d = std::max(newDepth - ss->reduction, ONE_PLY);
           if (SpNode)
