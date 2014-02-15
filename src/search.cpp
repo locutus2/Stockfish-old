@@ -53,6 +53,11 @@ using namespace Search;
 
 namespace {
 
+  const Depth MC_R = 2 * ONE_PLY;
+  const int MC_M = 1;
+  const int MC_C = 1;
+  const Value MC_Margin = Value(0);
+    
   // Set to true to force running with one thread. Used for debugging
   const bool FakeSplit = false;
 
@@ -659,7 +664,7 @@ namespace {
         }
     }
 
-    // Step 9. Multi-Cut (skipped when in check)
+    // Step 9. Prob-Cut (skipped when in check)
     // If we have a very good capture (i.e. SEE > seeValues[captured_piece_type])
     // and a reduced search returns a value much above beta, we can (almost) safely
     // prune the previous move.
@@ -689,7 +694,56 @@ namespace {
                     return value;
             }
     }
+    
+    // MultiCut at Cut nodes
+    if(!PvNode && cutNode && !inCheck && depth >= MC_R + ONE_PLY)
+    {
+        Square prevMoveSq = to_sq((ss-1)->currentMove);
+        Move countermoves[] = { Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
+                                Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].second };
 
+        Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
+        Move followupmoves[] = { Followupmoves[pos.piece_on(prevOwnMoveSq)][prevOwnMoveSq].first,
+                                 Followupmoves[pos.piece_on(prevOwnMoveSq)][prevOwnMoveSq].second };
+
+        MovePicker mp(pos, ttMove, depth, History, countermoves, followupmoves, ss);
+        CheckInfo ci(pos);
+
+        int moveCountMC = 0, failHighCount = 0;
+        Value valueMC;
+        while (    moveCountMC     < MC_M
+               &&  failHighCount < MC_C
+               && (move = mp.next_move<SpNode>()) != MOVE_NONE)
+        {
+          assert(is_ok(move));
+
+          if (move == excludedMove)
+              continue;
+      
+          // Check for legality just before making the move
+          if (!pos.legal(move, ci.pinned))
+              continue;
+
+          givesCheck =  type_of(move) == NORMAL && !ci.dcCandidates
+                  ? ci.checkSq[type_of(pos.piece_on(from_sq(move)))] & to_sq(move)
+                  : pos.gives_check(move, ci);
+                  
+          ++moveCountMC;
+          ss->currentMove = move;
+          pos.do_move(move, st, ci, givesCheck);
+          valueMC = - search<NonPV>(pos, ss+1, -beta-MC_Margin, -beta-MC_Margin+1, depth - MC_R - ONE_PLY, !cutNode);
+          pos.undo_move(move);
+          assert(valueMC > -VALUE_INFINITE && valueMC < VALUE_INFINITE);
+          if(valueMC >= beta + MC_Margin)
+              ++failHighCount;
+        }
+        
+        if(failHighCount >= MC_C)
+            return beta;
+    }
+
+
+   
     // Step 10. Internal iterative deepening (skipped when in check)
     if (    depth >= (PvNode ? 5 * ONE_PLY : 8 * ONE_PLY)
         && !ttMove
@@ -714,8 +768,9 @@ moves_loop: // When in check and at SpNode search starts from here
     Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
     Move followupmoves[] = { Followupmoves[pos.piece_on(prevOwnMoveSq)][prevOwnMoveSq].first,
                              Followupmoves[pos.piece_on(prevOwnMoveSq)][prevOwnMoveSq].second };
-
+    
     MovePicker mp(pos, ttMove, depth, History, countermoves, followupmoves, ss);
+    
     CheckInfo ci(pos);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
@@ -730,6 +785,8 @@ moves_loop: // When in check and at SpNode search starts from here
                            && (tte->bound() & BOUND_LOWER)
                            &&  tte->depth() >= depth - 3 * ONE_PLY;
 
+
+    
     // Step 11. Loop through moves
     // Loop through all pseudo-legal moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move<SpNode>()) != MOVE_NONE)
