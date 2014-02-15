@@ -38,7 +38,7 @@ namespace UCI {
 void on_logger(const Option& o) { start_logger(o); }
 void on_eval(const Option&) { Eval::init(); }
 void on_threads(const Option&) { Threads.read_uci_options(); }
-void on_hash_size(const Option& o) { TT.set_size(o); }
+void on_hash_size(const Option& o) { TT.resize(o); }
 void on_clear_hash(const Option&) { TT.clear(); }
 
 
@@ -83,7 +83,7 @@ void init(OptionsMap& o) {
   o["Emergency Base Time"]         = Option(60, 0, 30000);
   o["Emergency Move Time"]         = Option(30, 0, 5000);
   o["Minimum Thinking Time"]       = Option(20, 0, 5000);
-  o["Slow Mover"]                  = Option(70, 10, 1000);
+  o["Slow Mover"]                  = Option(80, 10, 1000);
   o["UCI_Chess960"]                = Option(false);
   o["UCI_AnalyseMode"]             = Option(false, on_eval);
 }
@@ -115,16 +115,16 @@ std::ostream& operator<<(std::ostream& os, const OptionsMap& om) {
 
 /// Option class constructors and conversion operators
 
-Option::Option(const char* v, Fn* f) : type("string"), min(0), max(0), idx(Options.size()), on_change(f)
+Option::Option(const char* v, OnChange f) : type("string"), min(0), max(0), idx(Options.size()), on_change(f)
 { defaultValue = currentValue = v; }
 
-Option::Option(bool v, Fn* f) : type("check"), min(0), max(0), idx(Options.size()), on_change(f)
+Option::Option(bool v, OnChange f) : type("check"), min(0), max(0), idx(Options.size()), on_change(f)
 { defaultValue = currentValue = (v ? "true" : "false"); }
 
-Option::Option(Fn* f) : type("button"), min(0), max(0), idx(Options.size()), on_change(f)
+Option::Option(OnChange f) : type("button"), min(0), max(0), idx(Options.size()), on_change(f)
 {}
 
-Option::Option(int v, int minv, int maxv, Fn* f) : type("spin"), min(minv), max(maxv), idx(Options.size()), on_change(f)
+Option::Option(int v, int minv, int maxv, OnChange f) : type("spin"), min(minv), max(maxv), idx(Options.size()), on_change(f)
 { std::ostringstream ss; ss << v; defaultValue = currentValue = ss.str(); }
 
 
@@ -156,7 +156,7 @@ Option& Option::operator=(const string& v) {
       currentValue = v;
 
   if (on_change)
-      (*on_change)(*this);
+      on_change(*this);
 
   return *this;
 }

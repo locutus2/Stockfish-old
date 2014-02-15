@@ -30,7 +30,7 @@ namespace {
     EVASION,     EVASIONS_S2,
     QSEARCH_0,   CAPTURES_S3, QUIET_CHECKS_S3,
     QSEARCH_1,   CAPTURES_S4,
-    PROBCUT,     CAPTURES_S5,
+    MULTICUT,    CAPTURES_S5,
     RECAPTURE,   CAPTURES_S6,
     STOP
   };
@@ -128,9 +128,9 @@ MovePicker::MovePicker(const Position& p, Move ttm, const HistoryStats& h, Piece
 
   assert(!pos.checkers());
 
-  stage = PROBCUT;
+  stage = MULTICUT;
 
-  // In ProbCut we generate only captures that are better than the parent's
+  // In MultiCut we generate only captures that are better than the parent's
   // captured piece.
   captureThreshold = PieceValue[MG][pt];
   ttMove = (ttm && pos.pseudo_legal(ttm) ? ttm : MOVE_NONE);
@@ -210,10 +210,10 @@ void MovePicker::score<EVASIONS>() {
 }
 
 
-/// generate_next() generates, scores and sorts the next bunch of moves, when
-/// there are no more moves to try for the current phase.
+/// generate_next_stage() generates, scores and sorts the next bunch of moves,
+/// when there are no more moves to try for the current stage.
 
-void MovePicker::generate_next() {
+void MovePicker::generate_next_stage() {
 
   cur = moves;
 
@@ -281,7 +281,7 @@ void MovePicker::generate_next() {
       end = generate<QUIET_CHECKS>(pos, moves);
       return;
 
-  case EVASION: case QSEARCH_0: case QSEARCH_1: case PROBCUT: case RECAPTURE:
+  case EVASION: case QSEARCH_0: case QSEARCH_1: case MULTICUT: case RECAPTURE:
       stage = STOP;
   case STOP:
       end = cur + 1; // Avoid another next_phase() call
@@ -305,11 +305,11 @@ Move MovePicker::next_move<false>() {
   while (true)
   {
       while (cur == end)
-          generate_next();
+          generate_next_stage();
 
       switch (stage) {
 
-      case MAIN_SEARCH: case EVASION: case QSEARCH_0: case QSEARCH_1: case PROBCUT:
+      case MAIN_SEARCH: case EVASION: case QSEARCH_0: case QSEARCH_1: case MULTICUT:
           ++cur;
           return ttMove;
 
