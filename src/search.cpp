@@ -54,9 +54,11 @@ using namespace Search;
 namespace {
 
   const Depth MC_R = 2 * ONE_PLY;
-  const int MC_M = 1;
-  const int MC_C = 1;
+  const Depth MC_MIN_DEPTH = MC_R + 2 * ONE_PLY;
+  const int MC_M = 2;
+  const int MC_C = 2;
   const Value MC_Margin = Value(0);
+  const bool MC_WITH_TT_MOVE = true;
     
   // Set to true to force running with one thread. Used for debugging
   const bool FakeSplit = false;
@@ -696,7 +698,9 @@ namespace {
     }
     
     // MultiCut at Cut nodes
-    if(!PvNode && cutNode && !inCheck && depth >= MC_R + ONE_PLY)
+    if(!PvNode && cutNode && !inCheck
+      && (!MC_WITH_TT_MOVE || ttMove != MOVE_NONE)
+      && depth >= MC_MIN_DEPTH )//MC_R + ONE_PLY)
     {
         Square prevMoveSq = to_sq((ss-1)->currentMove);
         Move countermoves[] = { Countermoves[pos.piece_on(prevMoveSq)][prevMoveSq].first,
@@ -711,8 +715,7 @@ namespace {
 
         int moveCountMC = 0, failHighCount = 0;
         Value valueMC;
-        while (    moveCountMC     < MC_M
-               &&  failHighCount < MC_C
+        while (    moveCountMC < MC_M
                && (move = mp.next_move<SpNode>()) != MOVE_NONE)
         {
           assert(is_ok(move));
@@ -735,11 +738,12 @@ namespace {
           pos.undo_move(move);
           assert(valueMC > -VALUE_INFINITE && valueMC < VALUE_INFINITE);
           if(valueMC >= beta + MC_Margin)
-              ++failHighCount;
+          {
+                if(++failHighCount >= MC_C)
+                    return beta;
+          }
         }
-        
-        if(failHighCount >= MC_C)
-            return beta;
+      
     }
 
 
