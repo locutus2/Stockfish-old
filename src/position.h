@@ -51,7 +51,7 @@ struct CheckInfo {
 struct StateInfo {
   Key pawnKey, materialKey;
   Value npMaterial[COLOR_NB];
-  int castlingFlags, rule50, pliesFromNull;
+  int castlingRights, rule50, pliesFromNull;
   Score psq;
   Square epSquare;
 
@@ -100,10 +100,10 @@ public:
   template<PieceType Pt> const Square* list(Color c) const;
 
   // Castling
-  int can_castle(CastlingFlag f) const;
   int can_castle(Color c) const;
-  bool castling_impeded(Color c, CastlingSide s) const;
-  Square castling_rook_square(Color c, CastlingSide s) const;
+  int can_castle(CastlingRight cr) const;
+  bool castling_impeded(CastlingRight cr) const;
+  Square castling_rook_square(CastlingRight cr) const;
 
   // Checking
   Bitboard checkers() const;
@@ -170,7 +170,7 @@ public:
 private:
   // Initialization helpers (used while setting up a position)
   void clear();
-  void set_castling_flag(Color c, Square rfrom);
+  void set_castling_right(Color c, Square rfrom);
 
   // Helper functions
   void do_castling(Square kfrom, Square kto, Square rfrom, Square rto);
@@ -197,9 +197,9 @@ private:
   int index[SQUARE_NB];
 
   // Other info
-  int castlingFlagsMask[SQUARE_NB];
-  Square castlingRookSquare[COLOR_NB][CASTLING_SIDE_NB];
-  Bitboard castlingPath[COLOR_NB][CASTLING_SIDE_NB];
+  int castlingRightsMask[SQUARE_NB];
+  Square castlingRookSquare[CASTLING_RIGHT_NB];
+  Bitboard castlingPath[CASTLING_RIGHT_NB];
   StateInfo startState;
   uint64_t nodes;
   int gamePly;
@@ -273,26 +273,26 @@ inline Square Position::king_square(Color c) const {
   return pieceList[c][KING][0];
 }
 
-inline int Position::can_castle(CastlingFlag f) const {
-  return st->castlingFlags & f;
+inline int Position::can_castle(CastlingRight cr) const {
+  return st->castlingRights & cr;
 }
 
 inline int Position::can_castle(Color c) const {
-  return st->castlingFlags & ((WHITE_OO | WHITE_OOO) << (2 * c));
+  return st->castlingRights & ((WHITE_OO | WHITE_OOO) << (2 * c));
 }
 
-inline bool Position::castling_impeded(Color c, CastlingSide s) const {
-  return byTypeBB[ALL_PIECES] & castlingPath[c][s];
+inline bool Position::castling_impeded(CastlingRight cr) const {
+  return byTypeBB[ALL_PIECES] & castlingPath[cr];
 }
 
-inline Square Position::castling_rook_square(Color c, CastlingSide s) const {
-  return castlingRookSquare[c][s];
+inline Square Position::castling_rook_square(CastlingRight cr) const {
+  return castlingRookSquare[cr];
 }
 
 template<PieceType Pt>
 inline Bitboard Position::attacks_from(Square s) const {
 
-  return  Pt == BISHOP || Pt == ROOK ? attacks_bb<Pt>(s, pieces())
+  return  Pt == BISHOP || Pt == ROOK ? attacks_bb<Pt>(s, byTypeBB[ALL_PIECES])
         : Pt == QUEEN  ? attacks_from<ROOK>(s) | attacks_from<BISHOP>(s)
         : StepAttacksBB[Pt][s];
 }

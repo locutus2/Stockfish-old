@@ -47,7 +47,7 @@ namespace Zobrist {
 
   Key psq[COLOR_NB][PIECE_TYPE_NB][SQUARE_NB];
   Key enpassant[FILE_NB];
-  Key castling[CASTLING_FLAG_NB];
+  Key castling[CASTLING_RIGHT_NB];
   Key side;
   Key exclusion;
 }
@@ -263,7 +263,7 @@ void Position::set(const string& fenStr, bool isChess960, Thread* th) {
       else
           continue;
 
-      set_castling_flag(c, rsq);
+      set_castling_right(c, rsq);
   }
 
   // 4. En passant square. Ignore if no pawn capture is possible
@@ -297,30 +297,30 @@ void Position::set(const string& fenStr, bool isChess960, Thread* th) {
 }
 
 
-/// Position::set_castling_flag() is a helper function used to set castling
-/// flags given the corresponding color and the rook starting square.
+/// Position::set_castling_right() is a helper function used to set castling
+/// rights given the corresponding color and the rook starting square.
 
-void Position::set_castling_flag(Color c, Square rfrom) {
+void Position::set_castling_right(Color c, Square rfrom) {
 
   Square kfrom = king_square(c);
   CastlingSide cs = kfrom < rfrom ? KING_SIDE : QUEEN_SIDE;
-  CastlingFlag cf = make_castling_flag(c, cs);
+  CastlingRight cr = (c | cs);
 
-  st->castlingFlags |= cf;
-  castlingFlagsMask[kfrom] |= cf;
-  castlingFlagsMask[rfrom] |= cf;
-  castlingRookSquare[c][cs] = rfrom;
+  st->castlingRights |= cr;
+  castlingRightsMask[kfrom] |= cr;
+  castlingRightsMask[rfrom] |= cr;
+  castlingRookSquare[cr] = rfrom;
 
   Square kto = relative_square(c, cs == KING_SIDE ? SQ_G1 : SQ_C1);
   Square rto = relative_square(c, cs == KING_SIDE ? SQ_F1 : SQ_D1);
 
   for (Square s = std::min(rfrom, rto); s <= std::max(rfrom, rto); ++s)
       if (s != kfrom && s != rfrom)
-          castlingPath[c][cs] |= s;
+          castlingPath[cr] |= s;
 
   for (Square s = std::min(kfrom, kto); s <= std::max(kfrom, kto); ++s)
       if (s != kfrom && s != rfrom)
-          castlingPath[c][cs] |= s;
+          castlingPath[cr] |= s;
 }
 
 
@@ -353,21 +353,21 @@ const string Position::fen() const {
   ss << (sideToMove == WHITE ? " w " : " b ");
 
   if (can_castle(WHITE_OO))
-      ss << (chess960 ? file_to_char(file_of(castling_rook_square(WHITE,  KING_SIDE)), false) : 'K');
+      ss << (chess960 ? to_char(file_of(castling_rook_square(WHITE |  KING_SIDE)), false) : 'K');
 
   if (can_castle(WHITE_OOO))
-      ss << (chess960 ? file_to_char(file_of(castling_rook_square(WHITE, QUEEN_SIDE)), false) : 'Q');
+      ss << (chess960 ? to_char(file_of(castling_rook_square(WHITE | QUEEN_SIDE)), false) : 'Q');
 
   if (can_castle(BLACK_OO))
-      ss << (chess960 ? file_to_char(file_of(castling_rook_square(BLACK,  KING_SIDE)),  true) : 'k');
+      ss << (chess960 ? to_char(file_of(castling_rook_square(BLACK |  KING_SIDE)),  true) : 'k');
 
   if (can_castle(BLACK_OOO))
-      ss << (chess960 ? file_to_char(file_of(castling_rook_square(BLACK, QUEEN_SIDE)),  true) : 'q');
+      ss << (chess960 ? to_char(file_of(castling_rook_square(BLACK | QUEEN_SIDE)),  true) : 'q');
 
   if (!can_castle(WHITE) && !can_castle(BLACK))
       ss << '-';
 
-  ss << (ep_square() == SQ_NONE ? " - " : " " + square_to_string(ep_square()) + " ")
+  ss << (ep_square() == SQ_NONE ? " - " : " " + to_string(ep_square()) + " ")
      << st->rule50 << " " << 1 + (gamePly - int(sideToMove == BLACK)) / 2;
 
   return ss.str();
@@ -401,7 +401,7 @@ const string Position::pretty(Move move) const {
      << std::setfill('0') << std::setw(16) << st->key << "\nCheckers: ";
 
   for (Bitboard b = checkers(); b; )
-      ss << square_to_string(pop_lsb(&b)) << " ";
+      ss << to_string(pop_lsb(&b)) << " ";
 
   ss << "\nLegal moves: ";
   for (MoveList<LEGAL> it(*this); *it; ++it)
@@ -791,12 +791,12 @@ void Position::do_move(Move m, StateInfo& newSt, const CheckInfo& ci, bool moveI
       st->epSquare = SQ_NONE;
   }
 
-  // Update castling flags if needed
-  if (st->castlingFlags && (castlingFlagsMask[from] | castlingFlagsMask[to]))
+  // Update castling rights if needed
+  if (st->castlingRights && (castlingRightsMask[from] | castlingRightsMask[to]))
   {
-      int cf = castlingFlagsMask[from] | castlingFlagsMask[to];
-      k ^= Zobrist::castling[st->castlingFlags & cf];
-      st->castlingFlags &= ~cf;
+      int cr = castlingRightsMask[from] | castlingRightsMask[to];
+      k ^= Zobrist::castling[st->castlingRights & cr];
+      st->castlingRights &= ~cr;
   }
 
   // Prefetch TT access as soon as we know the new hash key
@@ -1128,7 +1128,7 @@ void Position::clear() {
 
 Key Position::compute_key() const {
 
-  Key k = Zobrist::castling[st->castlingFlags];
+  Key k = Zobrist::castling[st->castlingRights];
 
   for (Bitboard b = pieces(); b; )
   {
@@ -1393,14 +1393,12 @@ bool Position::pos_is_ok(int* failedStep) const {
       for (Color c = WHITE; c <= BLACK; ++c)
           for (CastlingSide s = KING_SIDE; s <= QUEEN_SIDE; s = CastlingSide(s + 1))
           {
-              CastlingFlag cf = make_castling_flag(c, s);
-
-              if (!can_castle(cf))
+              if (!can_castle(c | s))
                   continue;
 
-              if (  (castlingFlagsMask[king_square(c)] & cf) != cf
-                  || piece_on(castlingRookSquare[c][s]) != make_piece(c, ROOK)
-                  || castlingFlagsMask[castlingRookSquare[c][s]] != cf)
+              if (  (castlingRightsMask[king_square(c)] & (c | s)) != (c | s)
+                  || piece_on(castlingRookSquare[c | s]) != make_piece(c, ROOK)
+                  || castlingRightsMask[castlingRookSquare[c | s]] != (c | s))
                   return false;
           }
 
