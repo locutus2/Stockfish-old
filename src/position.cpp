@@ -526,19 +526,18 @@ bool Position::legal(Move m, Bitboard pinned) const {
   // the move is made.
   if (type_of(m) == ENPASSANT)
   {
-      Color them = ~us;
-      Square to = to_sq(m);
-      Square capsq = to + pawn_push(them);
       Square ksq = king_square(us);
-      Bitboard b = (pieces() ^ from ^ capsq) | to;
+      Square to = to_sq(m);
+      Square capsq = to - pawn_push(us);
+      Bitboard occ = (pieces() ^ from ^ capsq) | to;
 
       assert(to == ep_square());
       assert(moved_piece(m) == make_piece(us, PAWN));
-      assert(piece_on(capsq) == make_piece(them, PAWN));
+      assert(piece_on(capsq) == make_piece(~us, PAWN));
       assert(piece_on(to) == NO_PIECE);
 
-      return   !(attacks_bb<  ROOK>(ksq, b) & pieces(them, QUEEN, ROOK))
-            && !(attacks_bb<BISHOP>(ksq, b) & pieces(them, QUEEN, BISHOP));
+      return   !(attacks_bb<  ROOK>(ksq, occ) & pieces(~us, QUEEN, ROOK))
+            && !(attacks_bb<BISHOP>(ksq, occ) & pieces(~us, QUEEN, BISHOP));
   }
 
   // If the moving piece is a king, check whether the destination
@@ -739,14 +738,10 @@ void Position::do_move(Move m, StateInfo& newSt, const CheckInfo& ci, bool moveI
   {
       assert(pc == make_piece(us, KING));
 
-      bool kingSide = to > from;
-      Square rfrom = to; // Castling is encoded as "king captures friendly rook"
-      Square rto = relative_square(us, kingSide ? SQ_F1 : SQ_D1);
-      to = relative_square(us, kingSide ? SQ_G1 : SQ_C1);
+      Square rfrom, rto;
+      do_castling<true>(from, to, rfrom, rto);
+
       captured = NO_PIECE_TYPE;
-
-      do_castling(from, to, rfrom, rto);
-
       st->psq += psq[us][ROOK][rto] - psq[us][ROOK][rfrom];
       k ^= Zobrist::psq[us][ROOK][rfrom] ^ Zobrist::psq[us][ROOK][rto];
   }
@@ -868,7 +863,7 @@ void Position::do_move(Move m, StateInfo& newSt, const CheckInfo& ci, bool moveI
   // Update the key with the final value
   st->key = k;
 
-  // Update checkers bitboard: piece must be already moved
+  // Update checkers bitboard: piece must be already moved due to attacks_from()
   st->checkersBB = 0;
 
   if (moveIsCheck)
@@ -882,7 +877,7 @@ void Position::do_move(Move m, StateInfo& newSt, const CheckInfo& ci, bool moveI
               st->checkersBB |= to;
 
           // Discovered checks
-          if (ci.dcCandidates && (ci.dcCandidates & from))
+          if (unlikely(ci.dcCandidates) && (ci.dcCandidates & from))
           {
               if (pt != ROOK)
                   st->checkersBB |= attacks_from<ROOK>(king_square(them)) & pieces(us, QUEEN, ROOK);
@@ -909,56 +904,49 @@ void Position::undo_move(Move m) {
   sideToMove = ~sideToMove;
 
   Color us = sideToMove;
-  Color them = ~us;
   Square from = from_sq(m);
   Square to = to_sq(m);
   PieceType pt = type_of(piece_on(to));
-  PieceType captured = st->capturedType;
 
   assert(empty(from) || type_of(m) == CASTLING);
-  assert(captured != KING);
+  assert(st->capturedType != KING);
 
   if (type_of(m) == PROMOTION)
   {
-      PieceType promotion = promotion_type(m);
-
-      assert(promotion == pt);
+      assert(pt == promotion_type(m));
       assert(relative_rank(us, to) == RANK_8);
-      assert(promotion >= KNIGHT && promotion <= QUEEN);
+      assert(promotion_type(m) >= KNIGHT && promotion_type(m) <= QUEEN);
 
-      remove_piece(to, us, promotion);
+      remove_piece(to, us, promotion_type(m));
       put_piece(to, us, PAWN);
       pt = PAWN;
   }
 
   if (type_of(m) == CASTLING)
   {
-      bool kingSide = to > from;
-      Square rfrom = to; // Castling is encoded as "king captures friendly rook"
-      Square rto = relative_square(us, kingSide ? SQ_F1 : SQ_D1);
-      to = relative_square(us, kingSide ? SQ_G1 : SQ_C1);
-      captured = NO_PIECE_TYPE;
-      pt = KING;
-      do_castling(to, from, rto, rfrom);
+      Square rfrom, rto;
+      do_castling<false>(from, to, rfrom, rto);
   }
   else
+  {
       move_piece(to, from, us, pt); // Put the piece back at the source square
 
-  if (captured)
-  {
-      Square capsq = to;
-
-      if (type_of(m) == ENPASSANT)
+      if (st->capturedType)
       {
-          capsq -= pawn_push(us);
+          Square capsq = to;
 
-          assert(pt == PAWN);
-          assert(to == st->previous->epSquare);
-          assert(relative_rank(us, to) == RANK_6);
-          assert(piece_on(capsq) == NO_PIECE);
+          if (type_of(m) == ENPASSANT)
+          {
+              capsq -= pawn_push(us);
+
+              assert(pt == PAWN);
+              assert(to == st->previous->epSquare);
+              assert(relative_rank(us, to) == RANK_6);
+              assert(piece_on(capsq) == NO_PIECE);
+          }
+
+          put_piece(capsq, ~us, st->capturedType); // Restore the captured piece
       }
-
-      put_piece(capsq, them, captured); // Restore the captured piece
   }
 
   // Finally point our state pointer back to the previous state
@@ -971,15 +959,20 @@ void Position::undo_move(Move m) {
 
 /// Position::do_castling() is a helper used to do/undo a castling move. This
 /// is a bit tricky, especially in Chess960.
+template<bool Do>
+void Position::do_castling(Square from, Square& to, Square& rfrom, Square& rto) {
 
-void Position::do_castling(Square kfrom, Square kto, Square rfrom, Square rto) {
+  bool kingSide = to > from;
+  rfrom = to; // Castling is encoded as "king captures friendly rook"
+  rto = relative_square(sideToMove, kingSide ? SQ_F1 : SQ_D1);
+  to  = relative_square(sideToMove, kingSide ? SQ_G1 : SQ_C1);
 
   // Remove both pieces first since squares could overlap in Chess960
-  remove_piece(kfrom, sideToMove, KING);
-  remove_piece(rfrom, sideToMove, ROOK);
-  board[kfrom] = board[rfrom] = NO_PIECE; // Since remove_piece doesn't do it for us
-  put_piece(kto, sideToMove, KING);
-  put_piece(rto, sideToMove, ROOK);
+  remove_piece(Do ?  from :  to, sideToMove, KING);
+  remove_piece(Do ? rfrom : rto, sideToMove, ROOK);
+  board[Do ? from : to] = board[Do ? rfrom : rto] = NO_PIECE; // Since remove_piece doesn't do it for us
+  put_piece(Do ?  to :  from, sideToMove, KING);
+  put_piece(Do ? rto : rfrom, sideToMove, ROOK);
 }
 
 
@@ -1183,44 +1176,30 @@ void Position::flip() {
 /// Position::pos_is_ok() performs some consistency checks for the position object.
 /// This is meant to be helpful when debugging.
 
-bool Position::pos_is_ok(int* failedStep) const {
+bool Position::pos_is_ok(int* step) const {
 
-  int dummy, *step = failedStep ? failedStep : &dummy;
-
-  // What features of the position should be verified?
+  // Which parts of the position should be verified?
   const bool all = false;
 
   const bool testBitboards       = all || false;
+  const bool testState           = all || false;
   const bool testKingCount       = all || false;
   const bool testKingCapture     = all || false;
-  const bool testState           = all || false;
-  const bool testCheckerCount    = all || false;
   const bool testPieceCounts     = all || false;
   const bool testPieceList       = all || false;
   const bool testCastlingSquares = all || false;
 
-  if (*step = 1, sideToMove != WHITE && sideToMove != BLACK)
+  if (step)
+      *step = 1;
+
+  if (   (sideToMove != WHITE && sideToMove != BLACK)
+      || piece_on(king_square(WHITE)) != W_KING
+      || piece_on(king_square(BLACK)) != B_KING
+      || (   ep_square() != SQ_NONE
+          && relative_rank(sideToMove, ep_square()) != RANK_6))
       return false;
 
-  if ((*step)++, piece_on(king_square(WHITE)) != W_KING)
-      return false;
-
-  if ((*step)++, piece_on(king_square(BLACK)) != B_KING)
-      return false;
-
-  if ((*step)++, ep_square() != SQ_NONE && relative_rank(sideToMove, ep_square()) != RANK_6)
-      return false;
-
-  if ((*step)++, testKingCount)
-      if (   std::count(board, board + SQUARE_NB, W_KING) != 1
-          || std::count(board, board + SQUARE_NB, B_KING) != 1)
-          return false;
-
-  if ((*step)++, testKingCapture)
-      if (attackers_to(king_square(~sideToMove)) & pieces(sideToMove))
-          return false;
-
-  if ((*step)++, testBitboards)
+  if (step && ++*step, testBitboards)
   {
       // The intersection of the white and black pieces must be empty
       if (pieces(WHITE) & pieces(BLACK))
@@ -1238,7 +1217,7 @@ bool Position::pos_is_ok(int* failedStep) const {
                   return false;
   }
 
-  if ((*step)++, testState)
+  if (step && ++*step, testState)
   {
       StateInfo si;
       set_state(&si);
@@ -1247,20 +1226,27 @@ bool Position::pos_is_ok(int* failedStep) const {
           || st->materialKey != si.materialKey
           || st->npMaterial[WHITE] != si.npMaterial[WHITE]
           || st->npMaterial[BLACK] != si.npMaterial[BLACK]
-          || st->psq != si.psq)
+          || st->psq != si.psq
+          || st->checkersBB != si.checkersBB)
           return false;
   }
 
-  if ((*step)++, testCheckerCount && popcount<Full>(st->checkersBB) > 2)
-      return false;
+  if (step && ++*step, testKingCount)
+      if (   std::count(board, board + SQUARE_NB, W_KING) != 1
+          || std::count(board, board + SQUARE_NB, B_KING) != 1)
+          return false;
 
-  if ((*step)++, testPieceCounts)
+  if (step && ++*step, testKingCapture)
+      if (attackers_to(king_square(~sideToMove)) & pieces(sideToMove))
+          return false;
+
+  if (step && ++*step, testPieceCounts)
       for (Color c = WHITE; c <= BLACK; ++c)
           for (PieceType pt = PAWN; pt <= KING; ++pt)
               if (pieceCount[c][pt] != popcount<Full>(pieces(c, pt)))
                   return false;
 
-  if ((*step)++, testPieceList)
+  if (step && ++*step, testPieceList)
       for (Color c = WHITE; c <= BLACK; ++c)
           for (PieceType pt = PAWN; pt <= KING; ++pt)
               for (int i = 0; i < pieceCount[c][pt];  ++i)
@@ -1268,7 +1254,7 @@ bool Position::pos_is_ok(int* failedStep) const {
                       || index[pieceList[c][pt][i]] != i)
                       return false;
 
-  if ((*step)++, testCastlingSquares)
+  if (step && ++*step, testCastlingSquares)
       for (Color c = WHITE; c <= BLACK; ++c)
           for (CastlingSide s = KING_SIDE; s <= QUEEN_SIDE; s = CastlingSide(s + 1))
           {
@@ -1281,6 +1267,5 @@ bool Position::pos_is_ok(int* failedStep) const {
                   return false;
           }
 
-  *step = 0;
   return true;
 }
