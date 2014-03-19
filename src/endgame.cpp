@@ -24,6 +24,8 @@
 #include "bitcount.h"
 #include "endgame.h"
 #include "movegen.h"
+#include "thread.h"
+#include "pawns.h"
 
 using std::string;
 
@@ -853,4 +855,29 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
   // Probe the KPK bitbase with the weakest side's pawn removed. If it's a draw,
   // it's probably at least a draw even with the pawn.
   return Bitbases::probe_kpk(wksq, psq, bksq, us) ? SCALE_FACTOR_NONE : SCALE_FACTOR_DRAW;
+}
+
+/// KRPs vs KRPs. If both sides have the same number of pawns and
+/// no passers or candidate passers exists consider the position as drawish.
+template<>
+ScaleFactor Endgame<KRPsKRPs>::operator()(const Position& pos) const {
+
+  assert(pos.non_pawn_material(WHITE) == RookValueMg);
+  assert(pos.non_pawn_material(BLACK) == RookValueMg);
+  assert(pos.count<PAWN>(WHITE) >= 1);
+  assert(pos.count<PAWN>(BLACK) >= 1);
+
+  if(pos.count<PAWN>(WHITE) == pos.count<PAWN>(BLACK))
+  {
+    Thread* thisThread = pos.this_thread();
+    Pawns::Entry* pi = Pawns::probe(pos, thisThread->pawnsTable);
+
+    if(   !pi->passedPawns[WHITE]
+       && !pi->passedPawns[BLACK]
+       && !pi->candidatePawns[WHITE]
+       && !pi->candidatePawns[BLACK])
+          return SCALE_FACTOR_DRAWISH_ROOK_ENDING;
+  }
+
+  return SCALE_FACTOR_NONE;
 }

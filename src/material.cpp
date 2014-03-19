@@ -65,6 +65,7 @@ namespace {
   Endgame<KQKRPs> ScaleKQKRPs[] = { Endgame<KQKRPs>(WHITE), Endgame<KQKRPs>(BLACK) };
   Endgame<KPsK>   ScaleKPsK[]   = { Endgame<KPsK>(WHITE),   Endgame<KPsK>(BLACK) };
   Endgame<KPKP>   ScaleKPKP[]   = { Endgame<KPKP>(WHITE),   Endgame<KPKP>(BLACK) };
+  Endgame<KRPsKRPs>   ScaleKRPsKRPs[]   = { Endgame<KRPsKRPs>(WHITE),   Endgame<KRPsKRPs>(BLACK) };
 
   // Helper templates used to detect a given material distribution
   template<Color Us> bool is_KXK(const Position& pos) {
@@ -87,6 +88,13 @@ namespace {
           && pos.count<QUEEN>(Us)  == 1
           && pos.count<ROOK>(Them) == 1
           && pos.count<PAWN>(Them) >= 1;
+  }
+  
+  bool is_KRPsKRPs(const Position& pos) {
+    return   pos.non_pawn_material(WHITE) == RookValueMg
+          && pos.non_pawn_material(BLACK) == RookValueMg
+          && pos.count<PAWN>(WHITE) >= 1
+          && pos.count<PAWN>(BLACK) >= 1;
   }
 
   /// imbalance() calculates the imbalance by comparing the piece count of each
@@ -188,6 +196,12 @@ Entry* probe(const Position& pos, Table& entries, Endgames& endgames) {
 
   else if (is_KQKRPs<BLACK>(pos))
       e->scalingFunction[BLACK] = &ScaleKQKRPs[BLACK];
+      
+  if(is_KRPsKRPs(pos))
+  {
+      e->scalingFunction[WHITE] = &ScaleKRPsKRPs[WHITE];
+      e->scalingFunction[BLACK] = &ScaleKRPsKRPs[BLACK];
+  }
 
   Value npm_w = pos.non_pawn_material(WHITE);
   Value npm_b = pos.non_pawn_material(BLACK);
