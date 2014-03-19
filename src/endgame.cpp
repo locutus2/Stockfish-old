@@ -870,10 +870,8 @@ ScaleFactor Endgame<KRPsKRPs>::operator()(const Position& pos) const {
   Thread* thisThread = pos.this_thread();
   Pawns::Entry* pi = Pawns::probe(pos, thisThread->pawnsTable);
 
-  if(   !pi->passedPawns[WHITE]
-     && !pi->passedPawns[BLACK]
-     && !pi->candidatePawns[WHITE]
-     && !pi->candidatePawns[BLACK])
+  if(   !pi->passedPawns[strongSide]
+     && !pi->candidatePawns[strongSide])
      return SCALE_FACTOR_DRAWISH_ROOK_ENDING;
 
   return SCALE_FACTOR_NONE;
