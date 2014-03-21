@@ -96,7 +96,7 @@ namespace {
     Bitboard ourPawns = pos.pieces(Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
-    e->passedPawns[Us] = e->candidatePawns[Us] = 0;
+    e->passedPawns[Us] = e->candidatePawns[Us] = e->backwardPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
     e->semiopenFiles[Us] = 0xFF;
     e->pawnAttacks[Us] = shift_bb<Right>(ourPawns) | shift_bb<Left>(ourPawns);
@@ -170,7 +170,10 @@ namespace {
             value -= Doubled[f];
 
         if (backward)
+        {
             value -= Backward[opposed][f];
+            e->backwardPawns[Us] |= s;
+        }
 
         if (connected)
             value += Connected[f][relative_rank(Us, s)];

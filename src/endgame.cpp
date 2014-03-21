@@ -867,13 +867,14 @@ ScaleFactor Endgame<KRPsKRPs>::operator()(const Position& pos) const {
   assert(pos.count<PAWN>(WHITE) >= 1);
   assert(pos.count<PAWN>(BLACK) >= 1);
 
-  if(pos.count<PAWN>(WHITE) + pos.count<PAWN>(BLACK) <= 6)
+  if(pos.count<PAWN>(WHITE) == pos.count<PAWN>(BLACK))
   {
       Thread* thisThread = pos.this_thread();
       Pawns::Entry* pi = Pawns::probe(pos, thisThread->pawnsTable);
 
-      if(   !pi->passedPawns[strongSide]
-         && !pi->candidatePawns[strongSide])
+      if(   !pi->passed_pawns(strongSide)
+         && !pi->candidate_pawns(strongSide)
+         && !pi->backward_pawns(weakSide))
          return SCALE_FACTOR_DRAWISH_ROOK_ENDING;
   }
 

@@ -38,6 +38,7 @@ struct Entry {
   Bitboard pawn_attacks(Color c) const { return pawnAttacks[c]; }
   Bitboard passed_pawns(Color c) const { return passedPawns[c]; }
   Bitboard candidate_pawns(Color c) const { return candidatePawns[c]; }
+  Bitboard backward_pawns(Color c) const { return backwardPawns[c]; }
   int pawns_on_same_color_squares(Color c, Square s) const { return pawnsOnSquares[c][!!(DarkSquares & s)]; }
   int semiopen(Color c, File f) const { return semiopenFiles[c] & (1 << int(f)); }
   int semiopen_on_side(Color c, File f, bool left) const {
@@ -61,6 +62,7 @@ struct Entry {
   Key key;
   Bitboard passedPawns[COLOR_NB];
   Bitboard candidatePawns[COLOR_NB];
+  Bitboard backwardPawns[COLOR_NB];
   Bitboard pawnAttacks[COLOR_NB];
   Square kingSquares[COLOR_NB];
   int minKPdistance[COLOR_NB];
