@@ -608,7 +608,9 @@ namespace {
         &&  eval >= beta
         &&  abs(beta) < VALUE_MATE_IN_MAX_PLY
         &&  pos.non_pawn_material(pos.side_to_move())
-        && (cutNode || !pos.queen_hanging(pos.side_to_move())))
+        && (   !tte
+            || !(tte->bound() & BOUND_UPPER)
+            || !pos.queen_hanging(pos.side_to_move())))
     {
         ss->currentMove = MOVE_NULL;
 
