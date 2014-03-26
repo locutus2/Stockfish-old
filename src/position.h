@@ -132,6 +132,7 @@ public:
   bool pawn_on_7th(Color c) const;
   bool bishop_pair(Color c) const;
   bool opposite_bishops() const;
+  bool queen_hanging(Color c) const;
 
   // Doing and undoing moves
   void do_move(Move m, StateInfo& st);
@@ -353,6 +354,13 @@ inline bool Position::opposite_bishops() const {
   return   pieceCount[WHITE][BISHOP] == 1
         && pieceCount[BLACK][BISHOP] == 1
         && opposite_colors(pieceList[WHITE][BISHOP][0], pieceList[BLACK][BISHOP][0]);
+}
+
+inline bool Position::queen_hanging(Color c) const {
+
+  return pieces(c, QUEEN) ?    attackers_to(lsb(pieces(c, QUEEN)))
+                            & (pieces(~c, PAWN, KNIGHT) | pieces(~c, BISHOP, ROOK))
+                          : false;
 }
 
 inline bool Position::bishop_pair(Color c) const {
