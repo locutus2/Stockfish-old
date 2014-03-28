@@ -203,6 +203,11 @@ namespace {
   const int RookCheck         = 8;
   const int BishopCheck       = 2;
   const int KnightCheck       = 3;
+  
+  // Bonuses for enemy's blocked checks (like discovered checks)
+  const int QueenBlockedCheck  = 2;
+  const int RookBlockedCheck   = 2;
+  const int BishopBlockedCheck = 2;
 
   // KingDanger[Color][attackUnits] contains the actual king danger weighted
   // scores, indexed by color and by a calculated integer number.
@@ -693,6 +698,25 @@ Value do_evaluate(const Position& pos) {
         if (b)
             attackUnits += KnightCheck * popcount<Max15>(b);
 
+        // Analyze the enemy's checks blocked by own pieces (including discovered checks)
+        b1 = attacks_bb<ROOK>  (ksq, pos.pieces() ^ pos.pieces(Them, KNIGHT, BISHOP));
+        b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Them, KNIGHT, ROOK));
+
+        // Enemy queen blocked checks
+        b = (b1 | b2) & pos.pieces(Them, QUEEN);
+        if (b)
+            attackUnits += QueenBlockedCheck * popcount<Max15>(b);
+
+        // Enemy rooks blocked checks
+        b = b1 & pos.pieces(Them, ROOK);
+        if (b)
+            attackUnits += RookBlockedCheck * popcount<Max15>(b);
+
+        // Enemy bishops blocked checks
+        b = b2 & pos.pieces(Them, BISHOP);
+        if (b)
+            attackUnits += BishopBlockedCheck * popcount<Max15>(b);
+            
         // To index KingDanger[] attackUnits must be in [0, 99] range
         attackUnits = std::min(99, std::max(0, attackUnits));
 
