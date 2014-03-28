@@ -205,9 +205,9 @@ namespace {
   const int KnightCheck       = 3;
   
   // Bonuses for enemy's blocked checks (like discovered checks)
-  const int QueenBlockedCheck  = 2;
-  const int RookBlockedCheck   = 2;
-  const int BishopBlockedCheck = 2;
+  const int QueenBlockedCheck  = 4;
+  const int RookBlockedCheck   = 4;
+  const int BishopBlockedCheck = 4;
 
   // KingDanger[Color][attackUnits] contains the actual king danger weighted
   // scores, indexed by color and by a calculated integer number.
