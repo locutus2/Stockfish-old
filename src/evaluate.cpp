@@ -697,7 +697,7 @@ Value do_evaluate(const Position& pos) {
             attackUnits += KnightCheck * popcount<Max15>(b);
 
         // Penalty for pinned pieces
-        b = ei.pinnedPieces[Us] && ~ei.attackedBy[Us][PAWN];
+        b = ei.pinnedPieces[Us] & ~ei.attackedBy[Us][PAWN];
         if(b)
         {
             if(b & ~pos.pieces(Us, PAWN))
