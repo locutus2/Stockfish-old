@@ -204,8 +204,8 @@ namespace {
   const int BishopCheck       = 2;
   const int KnightCheck       = 3;
   
-  const int UnsupportedPinnedMajorPiece = 2;
-  const int UnsupportedPinnedMinorPiece = 1;
+  const int UnsupportedPinnedMajorPiece = 3;
+  const int UnsupportedPinnedMinorPiece = 2;
 
   // KingDanger[Color][attackUnits] contains the actual king danger weighted
   // scores, indexed by color and by a calculated integer number.
