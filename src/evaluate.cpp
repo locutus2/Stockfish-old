@@ -204,7 +204,8 @@ namespace {
   const int BishopCheck       = 2;
   const int KnightCheck       = 3;
   
-  const int PinnedPiece = 2;
+  const int UnsupportedPinnedPiece = 2;
+  const int UnsupportedPinnedPawn  = 1;
 
   // KingDanger[Color][attackUnits] contains the actual king danger weighted
   // scores, indexed by color and by a calculated integer number.
@@ -696,8 +697,14 @@ Value do_evaluate(const Position& pos) {
             attackUnits += KnightCheck * popcount<Max15>(b);
 
         // Penalty for pinned pieces
-        if(ei.pinnedPieces[Us])
-            attackUnits += PinnedPiece;
+        b = ei.pinnedPieces[Us] && ~ei.attackedBy[Us][PAWN];
+        if(b)
+        {
+            if(b & ~pos.pieces(Us, PAWN))
+                attackUnits += UnsupportedPinnedPiece;
+            else
+                attackUnits += UnsupportedPinnedPawn;
+        }
 
         // To index KingDanger[] attackUnits must be in [0, 99] range
         attackUnits = std::min(99, std::max(0, attackUnits));
