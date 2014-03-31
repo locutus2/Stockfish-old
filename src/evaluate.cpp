@@ -204,8 +204,8 @@ namespace {
   const int BishopCheck       = 2;
   const int KnightCheck       = 3;
   
-  const int UnsupportedPinnedQueen = 2;
-  const int UnsupportedPinnedPiece = 1;
+  const int UnsupportedPinnedPawn  = 3;
+  const int UnsupportedPinnedPiece = 2;
 
   // KingDanger[Color][attackUnits] contains the actual king danger weighted
   // scores, indexed by color and by a calculated integer number.
@@ -700,8 +700,8 @@ Value do_evaluate(const Position& pos) {
         b = ei.pinnedPieces[Us] & ~ei.attackedBy[Us][PAWN];
         if(b)
         {
-            if(b & pos.pieces(Us, QUEEN))
-                attackUnits += UnsupportedPinnedQueen;
+            if(b & pos.pieces(Us, PAWN))
+                attackUnits += UnsupportedPinnedPawn;
             else
                 attackUnits += UnsupportedPinnedPiece;
         }
