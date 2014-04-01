@@ -205,7 +205,7 @@ namespace {
   const int KnightCheck       = 3;
   
   const int PinnedPiece       = 2;
-  const int PinnedKnight      = 1;
+  const int PinnedBishop      = 1;
 
   // KingDanger[Color][attackUnits] contains the actual king danger weighted
   // scores, indexed by color and by a calculated integer number.
@@ -636,10 +636,10 @@ Value do_evaluate(const Position& pos) {
 
         if(ei.pinnedPieces[Us])
         {
-            if(ei.pinnedPieces[Us] & ~pos.pieces(Us, KNIGHT))
+            if(ei.pinnedPieces[Us] & ~pos.pieces(Us, BISHOP))
                 attackUnits += PinnedPiece;
             else
-                attackUnits += PinnedKnight;
+                attackUnits += PinnedBishop;
         }
         
         // Analyse the enemy's safe queen contact checks. Firstly, find the
