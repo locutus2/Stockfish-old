@@ -629,7 +629,8 @@ Value do_evaluate(const Position& pos) {
         // the pawn shelter (current 'score' value).
         attackUnits =  std::min(20, (ei.kingAttackersCount[Them] * ei.kingAttackersWeight[Them]) / 2)
                      + 3 * (ei.kingAdjacentZoneAttacksCount[Them] + popcount<Max15>(undefended))
-                     + 2 * popcount<Max15>(ei.pinnedPieces[Us])
+                     + 2 * (ei.pinnedPieces[Us] != 0)
+                     + ((ei.pinnedPieces[Us] & pos.pieces(Us, QUEEN)) != 0)
                      - mg_value(score) / 32;
         
         // Analyse the enemy's safe queen contact checks. Firstly, find the
