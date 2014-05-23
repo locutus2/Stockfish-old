@@ -42,7 +42,6 @@ namespace Search {
   LimitsType Limits;
   std::vector<RootMove> RootMoves;
   Position RootPos;
-  Color RootColor;
   Time::point SearchTime;
   StateStackPtr SetupStates;
 }
@@ -94,7 +93,7 @@ namespace {
   void id_loop(Position& pos);
   Value value_to_tt(Value v, int ply);
   Value value_from_tt(Value v, int ply);
-  void update_stats(Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt);
+  void update_stats(const Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt);
   string uci_pv(const Position& pos, int depth, Value alpha, Value beta);
 
   struct Skill {
@@ -182,12 +181,11 @@ void Search::think() {
 
   static PolyglotBook book; // Defined static to initialize the PRNG only once
 
-  RootColor = RootPos.side_to_move();
-  TimeMgr.init(Limits, RootPos.game_ply(), RootColor);
+  TimeMgr.init(Limits, RootPos.game_ply(), RootPos.side_to_move());
 
   int cf = Options["Contempt Factor"] * PawnValueEg / 100; // From centipawns
-  DrawValue[ RootColor] = VALUE_DRAW - Value(cf);
-  DrawValue[~RootColor] = VALUE_DRAW + Value(cf);
+  DrawValue[ RootPos.side_to_move()] = VALUE_DRAW - Value(cf);
+  DrawValue[~RootPos.side_to_move()] = VALUE_DRAW + Value(cf);
 
   if (RootMoves.empty())
   {
@@ -216,8 +214,8 @@ void Search::think() {
       log << "\nSearching: "  << RootPos.fen()
           << "\ninfinite: "   << Limits.infinite
           << " ponder: "      << Limits.ponder
-          << " time: "        << Limits.time[RootColor]
-          << " increment: "   << Limits.inc[RootColor]
+          << " time: "        << Limits.time[RootPos.side_to_move()]
+          << " increment: "   << Limits.inc[RootPos.side_to_move()]
           << " moves to go: " << Limits.movestogo
           << "\n" << std::endl;
   }
@@ -226,14 +224,12 @@ void Search::think() {
   for (size_t i = 0; i < Threads.size(); ++i)
       Threads[i]->maxPly = 0;
 
-  Threads.sleepWhileIdle = Options["Idle Threads Sleep"];
   Threads.timer->run = true;
   Threads.timer->notify_one(); // Wake up the recurring timer
 
   id_loop(RootPos); // Let's start searching !
 
   Threads.timer->run = false; // Stop the timer
-  Threads.sleepWhileIdle = true; // Send idle threads to sleep
 
   if (Options["Write Search Log"])
   {
@@ -584,6 +580,10 @@ namespace {
         &&  abs(beta) < VALUE_MATE_IN_MAX_PLY
         && !pos.pawn_on_7th(pos.side_to_move()))
     {
+        if (   depth <= ONE_PLY
+            && eval + razor_margin(3 * ONE_PLY) <= alpha)
+            return qsearch<NonPV, false>(pos, ss, alpha, beta, DEPTH_ZERO);
+
         Value ralpha = alpha - razor_margin(depth);
         Value v = qsearch<NonPV, false>(pos, ss, ralpha, ralpha+1, DEPTH_ZERO);
         if (v <= ralpha)
@@ -885,7 +885,7 @@ moves_loop: // When in check and at SpNode search starts from here
 
           value = -search<NonPV, false>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          // Research at intermediate depth if reduction is very high
+          // Re-search at intermediate depth if reduction is very high
           if (value > alpha && ss->reduction >= 4 * ONE_PLY)
           {
               Depth d2 = std::max(newDepth - 2 * ONE_PLY, ONE_PLY);
@@ -1019,17 +1019,17 @@ moves_loop: // When in check and at SpNode search starts from here
     // must be mate or stalemate. If we are in a singular extension search then
     // return a fail low score.
     if (!moveCount)
-        return  excludedMove ? alpha
-              : inCheck ? mated_in(ss->ply) : DrawValue[pos.side_to_move()];
+        bestValue = excludedMove ? alpha
+                   :     inCheck ? mated_in(ss->ply) : DrawValue[pos.side_to_move()];
+
+    // Quiet best move: update killers, history, countermoves and followupmoves
+    else if (bestValue >= beta && !pos.capture_or_promotion(bestMove) && !inCheck)
+        update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount - 1);
 
     TT.store(posKey, value_to_tt(bestValue, ss->ply),
              bestValue >= beta  ? BOUND_LOWER :
              PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
              depth, bestMove, ss->staticEval);
-
-    // Quiet best move: update killers, history, countermoves and followupmoves
-    if (bestValue >= beta && !pos.capture_or_promotion(bestMove) && !inCheck)
-        update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount - 1);
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
@@ -1267,7 +1267,7 @@ moves_loop: // When in check and at SpNode search starts from here
   // update_stats() updates killers, history, countermoves and followupmoves stats after a fail-high
   // of a quiet move.
 
-  void update_stats(Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt) {
+  void update_stats(const Position& pos, Stack* ss, Move move, Depth depth, Move* quiets, int quietsCnt) {
 
     if (ss->killers[0] != move)
     {
@@ -1397,28 +1397,31 @@ void RootMove::extract_pv_from_tt(Position& pos) {
 
   StateInfo state[MAX_PLY_PLUS_6], *st = state;
   const TTEntry* tte;
-  int ply = 0;
-  Move m = pv[0];
+  int ply = 1;    // At root ply is 1...
+  Move m = pv[0]; // ...instead pv[] array starts from 0
+  Value expectedScore = score;
 
   pv.clear();
 
   do {
       pv.push_back(m);
 
-      assert(MoveList<LEGAL>(pos).contains(pv[ply]));
+      assert(MoveList<LEGAL>(pos).contains(pv[ply - 1]));
 
-      pos.do_move(pv[ply++], *st++);
+      pos.do_move(pv[ply++ - 1], *st++);
       tte = TT.probe(pos.key());
+      expectedScore = -expectedScore;
 
   } while (   tte
+           && expectedScore == value_from_tt(tte->value(), ply)
            && pos.pseudo_legal(m = tte->move()) // Local copy, TT could change
            && pos.legal(m, pos.pinned_pieces(pos.side_to_move()))
            && ply < MAX_PLY
-           && (!pos.is_draw() || ply < 2));
+           && (!pos.is_draw() || ply <= 2));
 
   pv.push_back(MOVE_NONE); // Must be zero-terminating
 
-  while (ply) pos.undo_move(pv[--ply]);
+  while (--ply) pos.undo_move(pv[ply - 1]);
 }
 
 
@@ -1430,21 +1433,21 @@ void RootMove::insert_pv_in_tt(Position& pos) {
 
   StateInfo state[MAX_PLY_PLUS_6], *st = state;
   const TTEntry* tte;
-  int ply = 0;
+  int idx = 0; // Ply starts from 1, we need to start from 0
 
   do {
       tte = TT.probe(pos.key());
 
-      if (!tte || tte->move() != pv[ply]) // Don't overwrite correct entries
-          TT.store(pos.key(), VALUE_NONE, BOUND_NONE, DEPTH_NONE, pv[ply], VALUE_NONE);
+      if (!tte || tte->move() != pv[idx]) // Don't overwrite correct entries
+          TT.store(pos.key(), VALUE_NONE, BOUND_NONE, DEPTH_NONE, pv[idx], VALUE_NONE);
 
-      assert(MoveList<LEGAL>(pos).contains(pv[ply]));
+      assert(MoveList<LEGAL>(pos).contains(pv[idx]));
 
-      pos.do_move(pv[ply++], *st++);
+      pos.do_move(pv[idx++], *st++);
 
-  } while (pv[ply] != MOVE_NONE);
+  } while (pv[idx] != MOVE_NONE);
 
-  while (ply) pos.undo_move(pv[--ply]);
+  while (idx) pos.undo_move(pv[--idx]);
 }
 
 
@@ -1462,7 +1465,7 @@ void Thread::idle_loop() {
   {
       // If we are not searching, wait for a condition to be signaled instead of
       // wasting CPU time polling for work.
-      while ((!searching && Threads.sleepWhileIdle) || exit)
+      while (!searching || exit)
       {
           if (exit)
           {
@@ -1537,8 +1540,7 @@ void Thread::idle_loop() {
 
           // Wake up the master thread so to allow it to return from the idle
           // loop in case we are the last slave of the split point.
-          if (    Threads.sleepWhileIdle
-              &&  this != sp->masterThread
+          if (    this != sp->masterThread
               &&  sp->slavesMask.none())
           {
               assert(!sp->masterThread->searching);
@@ -1547,8 +1549,7 @@ void Thread::idle_loop() {
 
           // After releasing the lock we can't access any SplitPoint related data
           // in a safe way because it could have been released under our feet by
-          // the sp master. Also accessing other Thread objects is unsafe because
-          // if we are exiting there is a chance that they are already freed.
+          // the sp master.
           sp->mutex.unlock();
 
           // Try to late join to another split point if none of its slaves has
