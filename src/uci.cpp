@@ -174,12 +174,14 @@ void UCI::loop(int argc, char* argv[]) {
           else
               Search::Limits.ponder = false;
       }
-      else if (token == "perft" && (is >> token)) // Read perft depth
+      else if (token == "perft" || token == "divide")
       {
+          int depth;
           stringstream ss;
 
+          is >> depth;
           ss << Options["Hash"]    << " "
-             << Options["Threads"] << " " << token << " current perft";
+             << Options["Threads"] << " " << depth << " current " << token;
 
           benchmark(pos, ss);
       }
@@ -202,8 +204,8 @@ void UCI::loop(int argc, char* argv[]) {
       else if (token == "flip")       pos.flip();
       else if (token == "bench")      benchmark(pos, is);
       else if (token == "d")          sync_cout << pos.pretty() << sync_endl;
-      else if (token == "eval")       sync_cout << Eval::trace(pos) << sync_endl;
       else if (token == "isready")    sync_cout << "readyok" << sync_endl;
+      else if (token == "eval")       sync_cout << Eval::trace(pos) << sync_endl;
       else
           sync_cout << "Unknown command: " << cmd << sync_endl;
 
