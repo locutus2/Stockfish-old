@@ -447,6 +447,8 @@ namespace {
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
+    
+    ss->distanceToPv = PvNode ? 0 : 1 + (ss-1)->distanceToPv;
 
     if (SpNode)
     {
@@ -851,7 +853,8 @@ moves_loop: // When in check and at SpNode search starts from here
           && !captureOrPromotion
           &&  move != ttMove
           &&  move != ss->killers[0]
-          &&  move != ss->killers[1])
+          &&  move != ss->killers[1]
+          && (moveCount > 1 || ss->distanceToPv * ONE_PLY > depth))
       {
           ss->reduction = reduction<PvNode>(improving, depth, moveCount);
 

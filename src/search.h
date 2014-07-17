@@ -39,6 +39,7 @@ namespace Search {
 struct Stack {
   SplitPoint* splitPoint;
   int ply;
+  int distanceToPv;
   Move currentMove;
   Move ttMove;
   Move excludedMove;
