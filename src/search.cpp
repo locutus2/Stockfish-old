@@ -1288,7 +1288,8 @@ moves_loop: // When in check and at SpNode search starts from here
         Countermoves.update(pos.piece_on(prevMoveSq), prevMoveSq, move);
     }
 
-    if (is_ok((ss-2)->currentMove) && to_sq((ss-2)->currentMove) == from_sq(move))
+    if (is_ok((ss-2)->currentMove) && (   to_sq((ss-2)->currentMove) == from_sq(move)
+                                       || (ss-1)->currentMove == (ss-1)->ttMove))
     {
         Square prevOwnMoveSq = to_sq((ss-2)->currentMove);
         Followupmoves.update(pos.piece_on(prevOwnMoveSq), prevOwnMoveSq, move);
