@@ -615,12 +615,12 @@ namespace {
         if (pos.count<PAWN>(Us) < pos.count<PAWN>(Them))
             ebonus += ebonus / 4;
 		
-		// Connected passed pawns are a dangerous long term threat
-		if (adjacent_files_bb(file_of(s)) & ei.pi->passed_pawns(Us))
-		{
-			mbonus += mbonus / 8;
-			ebonus += ebonus;
-		}
+        // Connected passed pawns are a dangerous long term threat
+        if (adjacent_files_bb(file_of(s)) & ei.pi->passed_pawns(Us))
+        {
+            mbonus += mbonus / 4;
+            ebonus += ebonus / 4;
+        }
 		
         score += make_score(mbonus, ebonus);
     }
