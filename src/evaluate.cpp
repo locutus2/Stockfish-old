@@ -617,7 +617,10 @@ namespace {
 		
 		// Connected passed pawns are a dangerous long term threat
 		if (adjacent_files_bb(file_of(s)) & ei.pi->passed_pawns(Us))
+		{
+			mbonus += mbonus / 8;
 			ebonus += ebonus;
+		}
 		
         score += make_score(mbonus, ebonus);
     }
