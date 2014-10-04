@@ -291,7 +291,7 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
   }
 
   if(blockedKingSide)
-      safety /= 2;
+      safety += 50;
       
   return safety;
 }
