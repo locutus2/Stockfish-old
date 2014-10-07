@@ -151,8 +151,8 @@ namespace {
   };
 
   // Assorted bonuses and penalties used by evaluation
-  const Score KingOnPawnOne    = S(0 , 64);
-  const Score KingOnPawnMany   = S(0 ,128);
+  const Score KingOnOne        = S(2 , 58);
+  const Score KingOnMany       = S(6 ,125);
   const Score RookOnPawn       = S(10, 28);
   const Score RookOpenFile     = S(43, 21);
   const Score RookSemiOpenFile = S(19, 10);
@@ -507,7 +507,7 @@ namespace {
                       & ei.attackedBy[Them][PAWN]
                       & (ei.attackedBy[Us][KNIGHT] | ei.attackedBy[Us][BISHOP]);
 
-    if(protectedEnemies)
+    if (protectedEnemies)
         score += Threat[Minor][type_of(pos.piece_on(lsb(protectedEnemies)))];
 
     // Enemies not defended by a pawn and under our attack
@@ -530,9 +530,9 @@ namespace {
         if (b)
             score += more_than_one(b) ? Hanging * popcount<Max15>(b) : Hanging;
 
-        b = weakEnemies & pos.pieces(Them, PAWN) & ei.attackedBy[Us][KING];
+        b = weakEnemies & ei.attackedBy[Us][KING];
         if (b)
-            score += more_than_one(b) ? KingOnPawnMany : KingOnPawnOne;
+            score += more_than_one(b) ? KingOnMany : KingOnOne;
     }
 
     if (Trace)
@@ -608,7 +608,7 @@ namespace {
 
                 mbonus += k * rr, ebonus += k * rr;
             }
-            else if(pos.pieces(Us) & blockSq)
+            else if (pos.pieces(Us) & blockSq)
                 mbonus += rr * 3 + r * 2 + 3, ebonus += rr + r * 2;
         } // rr != 0
 
@@ -633,13 +633,13 @@ namespace {
   }
 
 
-  // evaluate_unstoppable_pawns() scores the most advanced among the passed and
-  // candidate pawns. In case both players have no pieces but pawns, this is
-  // somewhat related to the possibility that pawns are unstoppable.
+  // evaluate_unstoppable_pawns() scores the most advanced passed pawn. In case
+  // both players have no pieces but pawns, this is somewhat related to the
+  // possibility that pawns are unstoppable.
 
   Score evaluate_unstoppable_pawns(Color us, const EvalInfo& ei) {
 
-    Bitboard b = ei.pi->passed_pawns(us) | ei.pi->candidate_pawns(us);
+    Bitboard b = ei.pi->passed_pawns(us);
 
     return b ? Unstoppable * int(relative_rank(us, frontmost_sq(us, b))) : SCORE_ZERO;
   }
