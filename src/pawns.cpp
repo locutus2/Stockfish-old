@@ -243,9 +243,13 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
       b  = theirPawns & file_bb(f);
       Rank rkThem = b ? relative_rank(Us, frontmost_sq(Them, b)) : RANK_1;
 
-      if(    rkUs == RANK_1 
-         ||  rkThem != rkUs + 1 
-         || (ourPawns & file_bb(f) & pawn_attacks(Them)))
+      if(    blockedKingSide
+	     && (     rkUs == RANK_1 
+             ||   rkThem != rkUs + 1 
+             || !(DistanceRingsBB[make_square(f, rkUs)][0] & ourPawns)
+             ||  (pawn_attacks(Us) & make_square(f, rkThem))
+             ||  (    (pawn_attack_span(Us, make_square(f, rkUs)) & theirPawns)
+                  && !(pawn_attack_span(Us, make_square(f, rkUs)) & ourPawns))))
           blockedKingSide = false;
           
       if (   (Edges & make_square(f, rkThem))
@@ -259,7 +263,7 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
   }
 
   if(blockedKingSide)
-      safety += 50;
+      safety += 200;
       
   return safety;
 }
