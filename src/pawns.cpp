@@ -91,7 +91,7 @@ namespace {
 
     Bitboard b, p, doubled, connected;
     Square s;
-    bool passed, isolated, opposed, phalanx, backward, unsupported, lever;
+    bool passed, isolated, opposed, phalanx, backward, veryWeakBackward, unsupported, lever;
     Score value = SCORE_ZERO;
     const Square* pl = pos.list<PAWN>(Us);
     const Bitboard* pawnAttacksBB = StepAttacksBB[make_piece(Us, PAWN)];
@@ -137,7 +137,7 @@ namespace {
         if (   (passed | isolated | connected)
             || (ourPawns & pawn_attack_span(Them, s))
             || (pos.attacks_from<PAWN>(s, Us) & theirPawns))
-            backward = false;
+            backward = veryWeakBackward = false;
         else
         {
             // We now know that there are no friendly pawns beside or behind this
@@ -149,7 +149,8 @@ namespace {
 
             // If we have an enemy pawn in the same or next rank, the pawn is
             // backward because it cannot advance without being captured.
-            backward = (b | shift_bb<Up>(b)) & theirPawns;
+            backward = (b = (b | shift_bb<Up>(b)) & theirPawns);
+			veryWeakBackward = backward && more_than_one(b & rank_bb(backmost_sq(Us, b)));
         }
 
         assert(opposed | passed | (pawn_attack_span(Us, s) & theirPawns));
@@ -171,7 +172,7 @@ namespace {
             value -= Doubled[f] / rank_distance(s, lsb(doubled));
 
         if (backward)
-            value -= Backward[opposed][f];
+            value -= Backward[opposed][f] * (!opposed && veryWeakBackward ? 2 : 1);
 
         if (connected)
             value += Connected[opposed][phalanx][relative_rank(Us, s)];
