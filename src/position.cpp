@@ -42,6 +42,8 @@ Value PieceValue[PHASE_NB][PIECE_NB] = {
 { VALUE_ZERO, PawnValueMg, KnightValueMg, BishopValueMg, RookValueMg, QueenValueMg },
 { VALUE_ZERO, PawnValueEg, KnightValueEg, BishopValueEg, RookValueEg, QueenValueEg } };
 
+Value PieceValueSEE[PIECE_NB] = { VALUE_ZERO, PawnValueMg, BishopValueMg, BishopValueMg, RookValueMg, QueenValueMg };
+
 static Score psq[COLOR_NB][PIECE_TYPE_NB][SQUARE_NB];
 
 namespace Zobrist {
@@ -143,6 +145,7 @@ void Position::init() {
   {
       PieceValue[MG][make_piece(BLACK, pt)] = PieceValue[MG][pt];
       PieceValue[EG][make_piece(BLACK, pt)] = PieceValue[EG][pt];
+	  PieceValueSEE[make_piece(BLACK, pt)]  = PieceValueSEE[pt];
 
       Score v = make_score(PieceValue[MG][pt], PieceValue[EG][pt]);
 
@@ -1043,7 +1046,7 @@ Value Position::see_sign(Move m) const {
   // Early return if SEE cannot be negative because captured piece value
   // is not less then capturing one. Note that king moves always return
   // here because king midgame value is set to 0.
-  if (PieceValue[MG][moved_piece(m)] <= PieceValue[MG][piece_on(to_sq(m))])
+  if (PieceValueSEE[moved_piece(m)] <= PieceValueSEE[piece_on(to_sq(m))])
       return VALUE_KNOWN_WIN;
 
   return see(m);
@@ -1062,7 +1065,7 @@ Value Position::see(Move m) const {
 
   from = from_sq(m);
   to = to_sq(m);
-  swapList[0] = PieceValue[MG][piece_on(to)];
+  swapList[0] = PieceValueSEE[piece_on(to)];
   stm = color_of(piece_on(from));
   occupied = pieces() ^ from;
 
@@ -1075,7 +1078,7 @@ Value Position::see(Move m) const {
   if (type_of(m) == ENPASSANT)
   {
       occupied ^= to - pawn_push(stm); // Remove the captured pawn
-      swapList[0] = PieceValue[MG][PAWN];
+      swapList[0] = PieceValueSEE[PAWN];
   }
 
   // Find all attackers to the destination square, with the moving piece
@@ -1100,7 +1103,7 @@ Value Position::see(Move m) const {
       assert(slIndex < 32);
 
       // Add the new entry to the swap list
-      swapList[slIndex] = -swapList[slIndex - 1] + PieceValue[MG][captured];
+      swapList[slIndex] = -swapList[slIndex - 1] + PieceValueSEE[captured];
 
       // Locate and remove the next least valuable attacker
       captured = min_attacker<PAWN>(byTypeBB, to, stmAttackers, occupied, attackers);
