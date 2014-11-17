@@ -151,6 +151,11 @@ namespace {
   const Score ThreatenedByPawn[] = {
     S(0, 0), S(0, 0), S(87, 118), S(84, 122), S(114, 203), S(121, 217)
   };
+  
+  // Bonus for knight forks threats. Indexed by by piece type.
+  const Score KnightForkThreat[PIECE_TYPE_NB] = {
+    S(0, 0), S(53, 53), S(76, 69), S(42, 40), S(76, 116), S(98, 123), S(100, 18)
+  };
 
   // Assorted bonuses and penalties used by evaluation
   const Score KingOnOne        = S( 2, 58);
@@ -501,7 +506,7 @@ namespace {
     enum { Defended, Weak };
     enum { Minor, Major };
 
-    Bitboard b, weak, defended;
+    Bitboard b, b1, weak, defended, targets;
     Score score = SCORE_ZERO;
 
     // Non-pawn enemies defended by a pawn and under our attack
@@ -545,6 +550,29 @@ namespace {
         if (b)
             score += more_than_one(b) ? KingOnMany : KingOnOne;
     }
+    
+    // Add bonus for each threatened piece by a possible safe knight fork. 
+    // Valid targets are king, queen, rook and any undefended piece or pawn.
+	b = ei.attackedBy[Us][KNIGHT] & ~pos.pieces(Us) & ~ei.attackedBy[Them][ALL_PIECES];
+	if(b)
+	{
+		targets =  (pos.pieces(Them) & ~ei.attackedBy[Them][ALL_PIECES])
+                       | pos.pieces(Them, ROOK, QUEEN) 
+                       | pos.pieces(Them, KING);
+		while(b)
+		{
+			Square s = pop_lsb(&b);
+			b1 = pos.attacks_from<KNIGHT>(s) & targets;
+			if(more_than_one(b1))
+			{
+				while(b1)
+				{
+					Square s1 = pop_lsb(&b1);
+					score += KnightForkThreat[type_of(pos.piece_on(s1))];
+				}
+			}
+		}
+	}
 
     if (Trace)
         Tracing::write(Tracing::THREAT, Us, score);
