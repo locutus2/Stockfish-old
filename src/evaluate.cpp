@@ -27,6 +27,7 @@
 #include "material.h"
 #include "pawns.h"
 #include "thread.h"
+#include "uci.h"
 
 namespace {
 
@@ -153,7 +154,7 @@ namespace {
   };
   
   // Bonus for knight forks threats. Indexed by by piece type.
-  const Score KnightForkThreat[PIECE_TYPE_NB] = {
+  Score KnightForkThreat[PIECE_TYPE_NB] = {
     S(0, 0), S(53, 53), S(76, 69), S(42, 40), S(76, 116), S(98, 123), S(100, 18)
   };
 
@@ -923,7 +924,16 @@ namespace Eval {
     return Tracing::do_trace(pos);
   }
 
-
+  void init_spsa()
+  {
+    KnightForkThreat[PAWN] = make_score(int(Options["pm"]), int(Options["pe"]));
+    KnightForkThreat[KNIGHT] = make_score(int(Options["nm"]), int(Options["ne"]));
+    KnightForkThreat[BISHOP] = make_score(int(Options["bm"]), int(Options["be"]));
+    KnightForkThreat[ROOK] = make_score(int(Options["rm"]), int(Options["re"]));
+    KnightForkThreat[QUEEN] = make_score(int(Options["qm"]), int(Options["qe"]));
+    KnightForkThreat[KING] = make_score(int(Options["km"]), int(Options["ke"]));
+  }
+  
   /// init() computes evaluation weights.
 
   void init() {
@@ -936,6 +946,8 @@ namespace Eval {
         t = int(std::min(Peak, std::min(0.4 * i * i, t + MaxSlope)));
         KingDanger[i] = apply_weight(make_score(t, 0), Weights[KingSafety]);
     }
+  
+    init_spsa();
   }
 
 } // namespace Eval

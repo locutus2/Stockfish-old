@@ -26,6 +26,7 @@
 #include "thread.h"
 #include "tt.h"
 #include "uci.h"
+#include "evaluate.h"
 
 using std::string;
 
@@ -35,6 +36,7 @@ namespace UCI {
 
 /// 'On change' actions, triggered by an option's value change
 void on_logger(const Option& o) { start_logger(o); }
+void on_spsa(const Option&) { Eval::init_spsa(); }
 void on_threads(const Option&) { Threads.read_uci_options(); }
 void on_hash_size(const Option& o) { TT.resize(o); }
 void on_clear_hash(const Option&) { TT.clear(); }
@@ -65,6 +67,20 @@ void init(OptionsMap& o) {
   o["Minimum Thinking Time"] << Option(20, 0, 5000);
   o["Slow Mover"]            << Option(80, 10, 1000);
   o["UCI_Chess960"]          << Option(false);
+  
+  o["pm"]       << Option(0, 0, 300, on_spsa);
+  o["pe"]       << Option(0, 0, 300, on_spsa);
+  o["nm"]       << Option(0, 0, 300, on_spsa);
+  o["ne"]       << Option(0, 0, 300, on_spsa);
+  o["bm"]       << Option(0, 0, 300, on_spsa);
+  o["be"]       << Option(0, 0, 300, on_spsa);
+  o["rm"]       << Option(0, 0, 300, on_spsa);
+  o["re"]       << Option(0, 0, 300, on_spsa);
+  o["qm"]       << Option(0, 0, 300, on_spsa);
+  o["qe"]       << Option(0, 0, 300, on_spsa);
+  o["km"]       << Option(0, 0, 300, on_spsa);
+  o["ke"]       << Option(0, 0, 300, on_spsa);
+  
 }
 
 
