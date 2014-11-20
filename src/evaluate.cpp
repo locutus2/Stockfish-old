@@ -154,7 +154,7 @@ namespace {
   
   // Bonus for knight forks threats. Indexed by by piece type.
   const Score KnightForkThreat[PIECE_TYPE_NB] = {
-    S(0, 0), S(49, 55), S(77, 71), S(40, 38), S(78, 111), S(102, 118), S(99, 19)
+    S(0, 0), S(53, 52), S(75, 67), S(41, 40), S(74, 116), S(100, 124), S(99, 19)
   };
 
   // Assorted bonuses and penalties used by evaluation
