@@ -68,18 +68,46 @@ void init(OptionsMap& o) {
   o["Slow Mover"]            << Option(80, 10, 1000);
   o["UCI_Chess960"]          << Option(false);
   
-  o["pm"]       << Option(0, 0, 300, on_spsa);
-  o["pe"]       << Option(0, 0, 300, on_spsa);
-  o["nm"]       << Option(0, 0, 300, on_spsa);
-  o["ne"]       << Option(0, 0, 300, on_spsa);
-  o["bm"]       << Option(0, 0, 300, on_spsa);
-  o["be"]       << Option(0, 0, 300, on_spsa);
-  o["rm"]       << Option(0, 0, 300, on_spsa);
-  o["re"]       << Option(0, 0, 300, on_spsa);
-  o["qm"]       << Option(0, 0, 300, on_spsa);
-  o["qe"]       << Option(0, 0, 300, on_spsa);
-  o["km"]       << Option(0, 0, 300, on_spsa);
-  o["ke"]       << Option(0, 0, 300, on_spsa);
+  o["ppm"]       << Option(0, 0, 600, on_spsa);
+  o["ppe"]       << Option(0, 0, 600, on_spsa);
+  o["npm"]       << Option(0, 0, 600, on_spsa);
+  o["npe"]       << Option(0, 0, 600, on_spsa);
+  o["bpm"]       << Option(0, 0, 600, on_spsa);
+  o["bpe"]       << Option(0, 0, 600, on_spsa);
+  o["rpm"]       << Option(0, 0, 600, on_spsa);
+  o["rpe"]       << Option(0, 0, 600, on_spsa);
+  o["qpm"]       << Option(0, 0, 600, on_spsa);
+  o["qpe"]       << Option(0, 0, 600, on_spsa);
+  o["kpm"]       << Option(0, 0, 600, on_spsa);
+  o["kpe"]       << Option(0, 0, 600, on_spsa);
+  o["nnm"]       << Option(0, 0, 600, on_spsa);
+  o["nne"]       << Option(0, 0, 600, on_spsa);
+  o["bnm"]       << Option(0, 0, 600, on_spsa);
+  o["bne"]       << Option(0, 0, 600, on_spsa);
+  o["rnm"]       << Option(0, 0, 600, on_spsa);
+  o["rne"]       << Option(0, 0, 600, on_spsa);
+  o["qnm"]       << Option(0, 0, 600, on_spsa);
+  o["qne"]       << Option(0, 0, 600, on_spsa);
+  o["knm"]       << Option(0, 0, 600, on_spsa);
+  o["kne"]       << Option(0, 0, 600, on_spsa);
+  o["bbm"]       << Option(0, 0, 600, on_spsa);
+  o["bbe"]       << Option(0, 0, 600, on_spsa);
+  o["rbm"]       << Option(0, 0, 600, on_spsa);
+  o["rbe"]       << Option(0, 0, 600, on_spsa);
+  o["qbm"]       << Option(0, 0, 600, on_spsa);
+  o["qbe"]       << Option(0, 0, 600, on_spsa);
+  o["kbm"]       << Option(0, 0, 600, on_spsa);
+  o["kbe"]       << Option(0, 0, 600, on_spsa);
+  o["rrm"]       << Option(0, 0, 600, on_spsa);
+  o["rre"]       << Option(0, 0, 600, on_spsa);
+  o["qrm"]       << Option(0, 0, 600, on_spsa);
+  o["qre"]       << Option(0, 0, 600, on_spsa);
+  o["krm"]       << Option(0, 0, 600, on_spsa);
+  o["kre"]       << Option(0, 0, 600, on_spsa);
+  o["qqm"]       << Option(0, 0, 600, on_spsa);
+  o["qqe"]       << Option(0, 0, 600, on_spsa);
+  o["kqm"]       << Option(0, 0, 600, on_spsa);
+  o["kqe"]       << Option(0, 0, 600, on_spsa);
   
 }
 

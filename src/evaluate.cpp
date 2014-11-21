@@ -152,10 +152,8 @@ namespace {
     S(0, 0), S(0, 0), S(87, 118), S(84, 122), S(114, 203), S(121, 217)
   };
   
-  // Bonus for knight forks threats. Indexed by by piece type.
-  Score KnightForkThreat[PIECE_TYPE_NB] = {
-    S(0, 0), S(53, 53), S(76, 69), S(42, 40), S(76, 116), S(98, 123), S(100, 18)
-  };
+  // Bonus for knight forks threats. Indexed by two piece types.
+  Score KnightForkThreat[PIECE_TYPE_NB][PIECE_TYPE_NB];
 
   // Assorted bonuses and penalties used by evaluation
   const Score KingOnOne        = S( 2, 58);
@@ -507,6 +505,7 @@ namespace {
     enum { Minor, Major };
 
     Bitboard b, b1, weak, defended, targets;
+    PieceType pt1, pt2;
     Score score = SCORE_ZERO;
 
     // Non-pawn enemies defended by a pawn
@@ -563,12 +562,10 @@ namespace {
 			Square s = pop_lsb(&b);
 			b1 = pos.attacks_from<KNIGHT>(s) & targets;
 			if(more_than_one(b1))
-			{
-				while(b1)
-				{
-					Square s1 = pop_lsb(&b1);
-					score += KnightForkThreat[type_of(pos.piece_on(s1))];
-				}
+			{               
+                pt1 = type_of(pos.piece_on(lsb(b1)));
+                pt2 = type_of(pos.piece_on(msb(b1)));
+				score += KnightForkThreat[pt1][pt2];
 			}
 		}
 	}
@@ -924,12 +921,26 @@ namespace Eval {
 
   void init_spsa()
   {
-    KnightForkThreat[PAWN] = make_score(int(Options["pm"]), int(Options["pe"]));
-    KnightForkThreat[KNIGHT] = make_score(int(Options["nm"]), int(Options["ne"]));
-    KnightForkThreat[BISHOP] = make_score(int(Options["bm"]), int(Options["be"]));
-    KnightForkThreat[ROOK] = make_score(int(Options["rm"]), int(Options["re"]));
-    KnightForkThreat[QUEEN] = make_score(int(Options["qm"]), int(Options["qe"]));
-    KnightForkThreat[KING] = make_score(int(Options["km"]), int(Options["ke"]));
+    KnightForkThreat[PAWN][PAWN]   = make_score(int(Options["ppm"]), int(Options["ppe"]));
+    KnightForkThreat[KNIGHT][PAWN] = KnightForkThreat[PAWN][KNIGHT] = make_score(int(Options["npm"]), int(Options["npe"]));
+    KnightForkThreat[BISHOP][PAWN] = KnightForkThreat[PAWN][BISHOP] = make_score(int(Options["bpm"]), int(Options["bpe"]));
+    KnightForkThreat[ROOK][PAWN]   = KnightForkThreat[PAWN][ROOK]   = make_score(int(Options["rpm"]), int(Options["rpe"]));
+    KnightForkThreat[QUEEN][PAWN]  = KnightForkThreat[PAWN][QUEEN]  = make_score(int(Options["qpm"]), int(Options["qpe"]));
+    KnightForkThreat[KING][PAWN]   = KnightForkThreat[PAWN][KING]   = make_score(int(Options["kpm"]), int(Options["kpe"]));
+    KnightForkThreat[KNIGHT][KNIGHT] = make_score(int(Options["nnm"]), int(Options["nne"]));
+    KnightForkThreat[BISHOP][KNIGHT] = KnightForkThreat[KNIGHT][BISHOP] = make_score(int(Options["bnm"]), int(Options["bne"]));
+    KnightForkThreat[ROOK][KNIGHT]   = KnightForkThreat[KNIGHT][ROOK]   = make_score(int(Options["rnm"]), int(Options["rne"]));
+    KnightForkThreat[QUEEN][KNIGHT]  = KnightForkThreat[KNIGHT][QUEEN]  = make_score(int(Options["qnm"]), int(Options["qne"]));
+    KnightForkThreat[KING][KNIGHT]   = KnightForkThreat[KNIGHT][KING]   = make_score(int(Options["knm"]), int(Options["kne"]));
+    KnightForkThreat[BISHOP][BISHOP] = make_score(int(Options["bbm"]), int(Options["bbe"]));
+    KnightForkThreat[ROOK][BISHOP]   = KnightForkThreat[BISHOP][ROOK]   = make_score(int(Options["rbm"]), int(Options["rbe"]));
+    KnightForkThreat[QUEEN][BISHOP]  = KnightForkThreat[BISHOP][QUEEN]  = make_score(int(Options["qbm"]), int(Options["qbe"]));
+    KnightForkThreat[KING][BISHOP]   = KnightForkThreat[BISHOP][KING]   = make_score(int(Options["kbm"]), int(Options["kbe"]));
+    KnightForkThreat[ROOK][ROOK]  = make_score(int(Options["rrm"]), int(Options["rre"]));
+    KnightForkThreat[QUEEN][ROOK] = KnightForkThreat[ROOK][QUEEN]  = make_score(int(Options["qrm"]), int(Options["qre"]));
+    KnightForkThreat[KING][ROOK]  = KnightForkThreat[ROOK][KING]   = make_score(int(Options["krm"]), int(Options["kre"]));
+    KnightForkThreat[QUEEN][QUEEN] = make_score(int(Options["qqm"]), int(Options["qqe"]));
+    KnightForkThreat[KING][QUEEN]  = KnightForkThreat[QUEEN][KING] = make_score(int(Options["kqm"]), int(Options["kqe"]));
   }
   
   /// init() computes evaluation weights.
