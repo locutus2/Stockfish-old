@@ -22,6 +22,7 @@
 
 #include "movepick.h"
 #include "thread.h"
+#include "uci.h"
 
 namespace {
 
@@ -61,8 +62,18 @@ namespace {
       std::swap(*begin, *std::max_element(begin, end));
       return begin;
   }
+  
+  int OrderCheck = 0;
+  int OrderDiscoveredCheck = 0;
+  int OrderDoubleCheck = 0;
 } // namespace
 
+void init_spsa()
+{
+    OrderCheck = int(Options["OrderCheck"]);
+    OrderDiscoveredCheck = int(Options["OrderDiscoveredCheck"]);
+    OrderDoubleCheck = int(Options["OrderDoubleCheck"]);
+}
 
 /// Constructors of the MovePicker class. As arguments we pass information
 /// to help it to return the (presumably) good moves first, to decide which
@@ -171,12 +182,26 @@ void MovePicker::score<CAPTURES>() {
 template<>
 void MovePicker::score<QUIETS>() {
 
+  CheckInfo ci(pos);
+  bool givesCheck, discoveredCheck, doubleCheck;
   Move m;
 
   for (ExtMove* it = moves; it != end; ++it)
   {
       m = it->move;
       it->value = history[pos.moved_piece(m)][to_sq(m)];
+      
+      givesCheck =  type_of(m) == NORMAL && !ci.dcCandidates
+                  ? ci.checkSq[type_of(pos.piece_on(from_sq(m)))] & to_sq(m)
+                  : pos.gives_check(m, ci);
+      discoveredCheck = givesCheck && (ci.dcCandidates & from_sq(m));
+      doubleCheck = discoveredCheck && (ci.checkSq[type_of(pos.piece_on(from_sq(m)))] & to_sq(m));
+      if(doubleCheck)
+        it->value += OrderDoubleCheck;
+      else if(discoveredCheck)
+        it->value += OrderDiscoveredCheck;
+      else if(givesCheck)
+        it->value += OrderCheck;
   }
 }
 
