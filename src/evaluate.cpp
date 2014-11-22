@@ -413,6 +413,7 @@ namespace {
         attackUnits =  std::min(20, (ei.kingAttackersCount[Them] * ei.kingAttackersWeight[Them]) / 2)
                      + 3 * (ei.kingAdjacentZoneAttacksCount[Them] + popcount<Max15>(undefended))
                      + 2 * (ei.pinnedPieces[Us] != 0)
+                     + 2 * pos.opposite_bishops()
                      - mg_value(score) / 32
                      - !pos.count<QUEEN>(Them) * 15;
 
