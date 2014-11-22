@@ -151,9 +151,15 @@ namespace {
     S(0, 0), S(0, 0), S(87, 118), S(84, 122), S(114, 203), S(121, 217)
   };
   
-  // Bonus for knight forks threats. Indexed by by piece type.
-  const Score KnightForkThreat[PIECE_TYPE_NB] = {
-    S(0, 0), S(49, 55), S(77, 71), S(40, 38), S(78, 111), S(102, 118), S(99, 19)
+  // Bonus for knight forks threats. Indexed by two piece type.
+  const Score KnightForkThreat[PIECE_TYPE_NB][PIECE_TYPE_NB] = {
+    {},
+    { S(0, 0), S(106, 103), S(136, 121), S(96, 95),   S(138, 166), S(151, 174), S(149, 69) },
+    { S(0, 0), S(136, 121), S(148, 136), S(118, 112), S(153, 192), S(178, 193), S(173, 88) },
+    { S(0, 0), S(96, 95),   S(118, 112), S(80, 81),   S(121, 157), S(149, 164), S(144, 61) },
+    { S(0, 0), S(138, 166), S(153, 192), S(121, 157), S(153, 230), S(172, 240), S(177, 130) },
+    { S(0, 0), S(151, 174), S(178, 193), S(149, 164), S(172, 240), S(199, 246), S(199, 144) },
+    { S(0, 0), S(149, 69),  S(173, 88),  S(144, 61),  S(177, 130), S(199, 144), S(0, 0) }
   };
 
   // Assorted bonuses and penalties used by evaluation
@@ -506,6 +512,7 @@ namespace {
     enum { Minor, Major };
 
     Bitboard b, b1, weak, defended, targets;
+    PieceType pt1, pt2;
     Score score = SCORE_ZERO;
 
     // Non-pawn enemies defended by a pawn
@@ -563,11 +570,9 @@ namespace {
 			b1 = pos.attacks_from<KNIGHT>(s) & targets;
 			if(more_than_one(b1))
 			{
-				while(b1)
-				{
-					Square s1 = pop_lsb(&b1);
-					score += KnightForkThreat[type_of(pos.piece_on(s1))];
-				}
+				pt1 = type_of(pos.piece_on(lsb(b1)));
+                pt2 = type_of(pos.piece_on(msb(b1)));
+				score += KnightForkThreat[pt1][pt2];
 			}
 		}
 	}
