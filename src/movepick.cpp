@@ -22,7 +22,6 @@
 
 #include "movepick.h"
 #include "thread.h"
-#include "uci.h"
 
 namespace {
 
@@ -35,6 +34,10 @@ namespace {
     RECAPTURE,   CAPTURES_S6,
     STOP
   };
+     
+  const int OrderCheck = 0;
+  const int OrderDiscoveredCheck = 0;
+  const int OrderDoubleCheck = 0;
 
   // Our insertion sort, which is guaranteed (and also needed) to be stable
   void insertion_sort(ExtMove* begin, ExtMove* end)
@@ -62,18 +65,7 @@ namespace {
       std::swap(*begin, *std::max_element(begin, end));
       return begin;
   }
-  
-  int OrderCheck = 0;
-  int OrderDiscoveredCheck = 0;
-  int OrderDoubleCheck = 0;
 } // namespace
-
-void init_spsa()
-{
-    OrderCheck = int(Options["OrderCheck"]);
-    OrderDiscoveredCheck = int(Options["OrderDiscoveredCheck"]);
-    OrderDoubleCheck = int(Options["OrderDoubleCheck"]);
-}
 
 /// Constructors of the MovePicker class. As arguments we pass information
 /// to help it to return the (presumably) good moves first, to decide which

@@ -28,8 +28,6 @@
 #include "search.h"
 #include "types.h"
 
-void init_spsa();
-
 
 /// The Stats struct stores moves statistics. According to the template parameter
 /// the class can store History, Gains and Countermoves. History records how often
