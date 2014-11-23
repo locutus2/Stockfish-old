@@ -35,9 +35,9 @@ namespace {
     STOP
   };
      
-  const int OrderCheck = 0;
-  const int OrderDiscoveredCheck = 0;
-  const int OrderDoubleCheck = 0;
+  const int OrderCheck = 49;
+  const int OrderDiscoveredCheck = 48;
+  const int OrderDoubleCheck = 54;
 
   // Our insertion sort, which is guaranteed (and also needed) to be stable
   void insertion_sort(ExtMove* begin, ExtMove* end)
