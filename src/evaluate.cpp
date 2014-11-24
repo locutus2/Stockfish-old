@@ -184,8 +184,9 @@ namespace {
   // of the enemy attack are added up into an integer, which is used as an
   // index to KingDanger[].
   //
-  // KingAttackWeights[PieceType] contains king attack weights by piece type
-  const int KingAttackWeights[] = { 0, 0, 2, 2, 3, 5 };
+  // KingAttackWeights[PieceType] contains king attack weights by piece type.
+  // Use index zero for opposite colored bishop.
+  const int KingAttackWeights[] = { 3, 0, 2, 2, 3, 5 };
 
   // Bonuses for enemy's safe checks
   const int QueenContactCheck = 24;
@@ -289,7 +290,7 @@ namespace {
         if (b & ei.kingRing[Them])
         {
             ei.kingAttackersCount[Us]++;
-            ei.kingAttackersWeight[Us] += KingAttackWeights[Pt];
+            ei.kingAttackersWeight[Us] += KingAttackWeights[Pt == BISHOP && pos.opposite_bishops() ? 0 : Pt];
             Bitboard bb = b & ei.attackedBy[Them][KING];
             if (bb)
                 ei.kingAdjacentZoneAttacksCount[Us] += popcount<Max15>(bb);
@@ -413,7 +414,6 @@ namespace {
         attackUnits =  std::min(20, (ei.kingAttackersCount[Them] * ei.kingAttackersWeight[Them]) / 2)
                      + 3 * (ei.kingAdjacentZoneAttacksCount[Them] + popcount<Max15>(undefended))
                      + 2 * (ei.pinnedPieces[Us] != 0)
-                     + 2 * (pos.opposite_bishops() && (ei.attackedBy[Them][BISHOP] & ei.kingRing[Us]))
                      - mg_value(score) / 32
                      - !pos.count<QUEEN>(Them) * 15;
 
