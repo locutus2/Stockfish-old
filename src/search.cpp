@@ -298,6 +298,7 @@ namespace {
     Stack stack[MAX_PLY+4], *ss = stack+2; // To allow referencing (ss-2) and (ss+2)
     Depth depth;
     Value bestValue, alpha, beta, delta;
+    bool failHigh, failLow;
 
     std::memset(ss-2, 0, 5 * sizeof(Stack));
 
@@ -333,6 +334,8 @@ namespace {
         // MultiPV loop. We perform a full root search for each PV line
         for (PVIdx = 0; PVIdx < std::min(multiPV, RootMoves.size()) && !Signals.stop; ++PVIdx)
         {
+            failHigh = failLow = false;
+            
             // Reset aspiration window starting size
             if (depth >= 5 * ONE_PLY)
             {
@@ -377,16 +380,20 @@ namespace {
                 // re-search, otherwise exit the loop.
                 if (bestValue <= alpha)
                 {
-                    beta = (alpha + beta) / 2;
+                    beta = failHigh ? beta : (alpha + beta) / 2;
                     alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
                     Signals.failedLowAtRoot = true;
                     Signals.stopOnPonderhit = false;
+                    failLow  = true;
+                    failHigh = false;
                 }
                 else if (bestValue >= beta)
                 {
-                    alpha = (alpha + beta) / 2;
+                    alpha = failLow ? alpha : (alpha + beta) / 2;
                     beta = std::min(bestValue + delta, VALUE_INFINITE);
+                    failLow  = false;
+                    failHigh = true;
                 }
                 else
                     break;
