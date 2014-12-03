@@ -380,7 +380,7 @@ namespace {
                 // re-search, otherwise exit the loop.
                 if (bestValue <= alpha)
                 {
-                    beta = failHigh ? (alpha + beta) / 2 : bestValue + 1;
+                    beta = failHigh ? (alpha + beta) / 2 : std::min((alpha + beta) / 2, bestValue + delta);
                     alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
                     Signals.failedLowAtRoot = true;
@@ -390,7 +390,7 @@ namespace {
                 }
                 else if (bestValue >= beta)
                 {
-                    alpha = failLow ? (alpha + beta) / 2 : bestValue - 1;
+                    alpha = failLow ? (alpha + beta) / 2 : std::max((alpha + beta) / 2, bestValue - delta);
                     beta = std::min(bestValue + delta, VALUE_INFINITE);
                     failLow  = false;
                     failHigh = true;
