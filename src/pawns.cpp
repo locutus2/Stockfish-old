@@ -261,7 +261,7 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
           safety += 200;
       else
           safety -=  ShelterWeakness[rkUs]
-                   + StormDanger[std::min(int(f), int(FILE_H - f))]
+                   + StormDanger[std::min(f, FILE_H - f)]
                                 [rkUs   == RANK_1   ? 0 :
                                  rkThem != rkUs + 1 ? 1 : 2][rkThem];
   }
