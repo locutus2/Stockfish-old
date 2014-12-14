@@ -36,6 +36,7 @@ namespace UCI {
 
 /// 'On change' actions, triggered by an option's value change
 void on_clear_hash(const Option&) { TT.clear(); }
+void on_spsa(const Option&) { Pawns::init_spsa(); }
 void on_hash_size(const Option& o) { TT.resize(o); }
 void on_logger(const Option& o) { start_logger(o); }
 void on_threads(const Option&) { Threads.read_uci_options(); }
@@ -71,6 +72,108 @@ void init(OptionsMap& o) {
   o["SyzygyProbeDepth"]      << Option(1, 1, 100);
   o["Syzygy50MoveRule"]      << Option(true);
   o["SyzygyProbeLimit"]      << Option(6, 0, 6);
+  
+  o["maxSafety"]       << Option(0, 0, 600, on_spsa);
+  
+  o["sw00"]       << Option(0, 0, 300, on_spsa);
+  o["sw01"]       << Option(0, 0, 300, on_spsa);
+  o["sw02"]       << Option(0, 0, 300, on_spsa);
+  o["sw03"]       << Option(0, 0, 300, on_spsa);
+  o["sw04"]       << Option(0, 0, 300, on_spsa);
+  o["sw05"]       << Option(0, 0, 300, on_spsa);
+  o["sw06"]       << Option(0, 0, 300, on_spsa);
+  
+  o["sw10"]       << Option(0, 0, 300, on_spsa);
+  o["sw11"]       << Option(0, 0, 300, on_spsa);
+  o["sw12"]       << Option(0, 0, 300, on_spsa);
+  o["sw13"]       << Option(0, 0, 300, on_spsa);
+  o["sw14"]       << Option(0, 0, 300, on_spsa);
+  o["sw15"]       << Option(0, 0, 300, on_spsa);
+  o["sw16"]       << Option(0, 0, 300, on_spsa);
+  
+  o["sw20"]       << Option(0, 0, 300, on_spsa);
+  o["sw21"]       << Option(0, 0, 300, on_spsa);
+  o["sw22"]       << Option(0, 0, 300, on_spsa);
+  o["sw23"]       << Option(0, 0, 300, on_spsa);
+  o["sw24"]       << Option(0, 0, 300, on_spsa);
+  o["sw25"]       << Option(0, 0, 300, on_spsa);
+  o["sw26"]       << Option(0, 0, 300, on_spsa);
+  
+  o["sw30"]       << Option(0, 0, 300, on_spsa);
+  o["sw31"]       << Option(0, 0, 300, on_spsa);
+  o["sw32"]       << Option(0, 0, 300, on_spsa);
+  o["sw33"]       << Option(0, 0, 300, on_spsa);
+  o["sw34"]       << Option(0, 0, 300, on_spsa);
+  o["sw35"]       << Option(0, 0, 300, on_spsa);
+  o["sw36"]       << Option(0, 0, 300, on_spsa);
+ 
+  o["sd001"]       << Option(0, 0, 300, on_spsa);
+  o["sd002"]       << Option(0, 0, 300, on_spsa);
+  o["sd003"]       << Option(0, 0, 300, on_spsa);
+  o["sd004"]       << Option(0, 0, 300, on_spsa);
+  o["sd010"]       << Option(0, 0, 300, on_spsa);
+  o["sd011"]       << Option(0, 0, 300, on_spsa);
+  o["sd012"]       << Option(0, 0, 300, on_spsa);
+  o["sd013"]       << Option(0, 0, 300, on_spsa);
+  o["sd014"]       << Option(0, 0, 300, on_spsa);
+  o["sd022"]       << Option(0, 0, 300, on_spsa);
+  o["sd023"]       << Option(0, 0, 300, on_spsa);
+  o["sd024"]       << Option(0, 0, 300, on_spsa);
+  o["sd031"]       << Option(0, 0, 300, on_spsa);
+  o["sd032"]       << Option(0, 0, 300, on_spsa);
+  o["sd033"]       << Option(0, 0, 300, on_spsa);
+  o["sd034"]       << Option(0, 0, 300, on_spsa);
+  
+  o["sd101"]       << Option(0, 0, 300, on_spsa);
+  o["sd102"]       << Option(0, 0, 300, on_spsa);
+  o["sd103"]       << Option(0, 0, 300, on_spsa);
+  o["sd104"]       << Option(0, 0, 300, on_spsa);
+  o["sd110"]       << Option(0, 0, 300, on_spsa);
+  o["sd111"]       << Option(0, 0, 300, on_spsa);
+  o["sd112"]       << Option(0, 0, 300, on_spsa);
+  o["sd113"]       << Option(0, 0, 300, on_spsa);
+  o["sd114"]       << Option(0, 0, 300, on_spsa);
+  o["sd122"]       << Option(0, 0, 300, on_spsa);
+  o["sd123"]       << Option(0, 0, 300, on_spsa);
+  o["sd124"]       << Option(0, 0, 300, on_spsa);
+  o["sd131"]       << Option(0, 0, 300, on_spsa);
+  o["sd132"]       << Option(0, 0, 300, on_spsa);
+  o["sd133"]       << Option(0, 0, 300, on_spsa);
+  o["sd134"]       << Option(0, 0, 300, on_spsa);
+  
+  o["sd201"]       << Option(0, 0, 300, on_spsa);
+  o["sd202"]       << Option(0, 0, 300, on_spsa);
+  o["sd203"]       << Option(0, 0, 300, on_spsa);
+  o["sd204"]       << Option(0, 0, 300, on_spsa);
+  o["sd210"]       << Option(0, 0, 300, on_spsa);
+  o["sd211"]       << Option(0, 0, 300, on_spsa);
+  o["sd212"]       << Option(0, 0, 300, on_spsa);
+  o["sd213"]       << Option(0, 0, 300, on_spsa);
+  o["sd214"]       << Option(0, 0, 300, on_spsa);
+  o["sd222"]       << Option(0, 0, 300, on_spsa);
+  o["sd223"]       << Option(0, 0, 300, on_spsa);
+  o["sd224"]       << Option(0, 0, 300, on_spsa);
+  o["sd231"]       << Option(0, 0, 300, on_spsa);
+  o["sd232"]       << Option(0, 0, 300, on_spsa);
+  o["sd233"]       << Option(0, 0, 300, on_spsa);
+  o["sd234"]       << Option(0, 0, 300, on_spsa);
+  
+  o["sd301"]       << Option(0, 0, 300, on_spsa);
+  o["sd302"]       << Option(0, 0, 300, on_spsa);
+  o["sd303"]       << Option(0, 0, 300, on_spsa);
+  o["sd304"]       << Option(0, 0, 300, on_spsa);
+  o["sd310"]       << Option(0, 0, 300, on_spsa);
+  o["sd311"]       << Option(0, 0, 300, on_spsa);
+  o["sd312"]       << Option(0, 0, 300, on_spsa);
+  o["sd313"]       << Option(0, 0, 300, on_spsa);
+  o["sd314"]       << Option(0, 0, 300, on_spsa);
+  o["sd322"]       << Option(0, 0, 300, on_spsa);
+  o["sd323"]       << Option(0, 0, 300, on_spsa);
+  o["sd324"]       << Option(0, 0, 300, on_spsa);
+  o["sd331"]       << Option(0, 0, 300, on_spsa);
+  o["sd332"]       << Option(0, 0, 300, on_spsa);
+  o["sd333"]       << Option(0, 0, 300, on_spsa);
+  o["sd334"]       << Option(0, 0, 300, on_spsa);
 }
 
 

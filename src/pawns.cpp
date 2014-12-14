@@ -24,6 +24,7 @@
 #include "bitcount.h"
 #include "pawns.h"
 #include "position.h"
+#include "uci.h"
 
 namespace {
 
@@ -60,27 +61,42 @@ namespace {
   // Unsupported pawn penalty
   const Score UnsupportedPawnPenalty = S(20, 10);
 
-  // Weakness of our pawn shelter in front of the king indexed by [rank]
-  const Value ShelterWeakness[RANK_NB] =
-  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) };
+  // Weakness of our pawn shelter in front of the king indexed by [file pair][rank]
+  Value ShelterWeakness[][RANK_NB] = {
+  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) },
+  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) },
+  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) },
+  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) } };
 
   // Danger of enemy pawns moving toward our king indexed by
-  // [edge files][no friendly pawn | pawn unblocked | pawn blocked][rank of enemy pawn]
-  const Value StormDanger[][3][RANK_NB] = {
+  // [file pairs][no friendly pawn | pawn unblocked | pawn blocked | blocked by king][rank of enemy pawn]
+  Value StormDanger[][4][RANK_NB] = {
   { { V( 0),  V(64), V(128), V(51), V(26) },
     { V(26),  V(32), V( 96), V(38), V(20) },
-    { V( 0),  V( 0), V(160), V(25), V(13) } },
+    { V( 0),  V( 0), V( 80), V(13), V( 7) },
+    { V( 0),  V(200), V(200), V(51), V(26) } },
   { { V( 0),  V(64), V(128), V(51), V(26) },
     { V(26),  V(32), V( 96), V(38), V(20) },
-    { V( 0),  V( 0), V( 80), V(13), V( 7) } } };
+    { V( 0),  V( 0), V(160), V(25), V(13) },
+    { V( 0),  V(64), V(128), V(51), V(26) }	},
+  { { V( 0),  V(64), V(128), V(51), V(26) },
+    { V(26),  V(32), V( 96), V(38), V(20) },
+    { V( 0),  V( 0), V(160), V(25), V(13) },
+    { V( 0),  V(64), V(128), V(51), V(26) }	},
+  { { V( 0),  V(64), V(128), V(51), V(26) },
+    { V(26),  V(32), V( 96), V(38), V(20) },
+    { V( 0),  V( 0), V(160), V(25), V(13) },
+    { V( 0),  V(64), V(128), V(51), V(26) }	} };
 
   // Max bonus for king safety. Corresponds to start position with all the pawns
   // in front of the king and no enemy pawn on the horizon.
-  const Value MaxSafetyBonus = V(263);
+  Value MaxSafetyBonus = V(263);
 
   #undef S
   #undef V
 
+ 
+  
   template<Color Us>
   Score evaluate(const Position& pos, Pawns::Entry* e) {
 
@@ -207,6 +223,110 @@ void init()
           }
 }
 
+ void init_spsa()
+  {
+	MaxSafetyBonus          = Value(int(Options["maxSafety"]));
+	
+	ShelterWeakness[0][0]   = Value(int(Options["sw00"]));
+	ShelterWeakness[0][1]   = Value(int(Options["sw01"]));
+	ShelterWeakness[0][2]   = Value(int(Options["sw02"]));
+	ShelterWeakness[0][3]   = Value(int(Options["sw03"]));
+	ShelterWeakness[0][4]   = Value(int(Options["sw04"]));
+	ShelterWeakness[0][5]   = Value(int(Options["sw05"]));
+	ShelterWeakness[0][6]   = Value(int(Options["sw06"]));
+	
+	ShelterWeakness[1][0]   = Value(int(Options["sw10"]));
+	ShelterWeakness[1][1]   = Value(int(Options["sw11"]));
+	ShelterWeakness[1][2]   = Value(int(Options["sw12"]));
+	ShelterWeakness[1][3]   = Value(int(Options["sw13"]));
+	ShelterWeakness[1][4]   = Value(int(Options["sw14"]));
+	ShelterWeakness[1][5]   = Value(int(Options["sw15"]));
+	ShelterWeakness[1][6]   = Value(int(Options["sw16"]));
+	
+	ShelterWeakness[2][0]   = Value(int(Options["sw20"]));
+	ShelterWeakness[2][1]   = Value(int(Options["sw21"]));
+	ShelterWeakness[2][2]   = Value(int(Options["sw22"]));
+	ShelterWeakness[2][3]   = Value(int(Options["sw23"]));
+	ShelterWeakness[2][4]   = Value(int(Options["sw24"]));
+	ShelterWeakness[2][5]   = Value(int(Options["sw25"]));
+	ShelterWeakness[2][6]   = Value(int(Options["sw26"]));
+	
+	ShelterWeakness[3][0]   = Value(int(Options["sw30"]));
+	ShelterWeakness[3][1]   = Value(int(Options["sw31"]));
+	ShelterWeakness[3][2]   = Value(int(Options["sw32"]));
+	ShelterWeakness[3][3]   = Value(int(Options["sw33"]));
+	ShelterWeakness[3][4]   = Value(int(Options["sw34"]));
+	ShelterWeakness[3][5]   = Value(int(Options["sw35"]));
+	ShelterWeakness[3][6]   = Value(int(Options["sw36"]));
+	
+	StormDanger[0][0][1] = Value(int(Options["sd001"]));
+	StormDanger[0][0][2] = Value(int(Options["sd002"]));
+	StormDanger[0][0][3] = Value(int(Options["sd003"]));
+	StormDanger[0][0][4] = Value(int(Options["sd004"]));
+	StormDanger[0][1][0] = Value(int(Options["sd010"]));
+	StormDanger[0][1][1] = Value(int(Options["sd011"]));
+	StormDanger[0][1][2] = Value(int(Options["sd012"]));
+	StormDanger[0][1][3] = Value(int(Options["sd013"]));
+	StormDanger[0][1][4] = Value(int(Options["sd014"]));
+	StormDanger[0][2][2] = Value(int(Options["sd022"]));
+	StormDanger[0][2][3] = Value(int(Options["sd023"]));
+	StormDanger[0][2][4] = Value(int(Options["sd024"]));
+	StormDanger[0][3][1] = Value(int(Options["sd031"]));
+	StormDanger[0][3][2] = Value(int(Options["sd032"]));
+	StormDanger[0][3][3] = Value(int(Options["sd033"]));
+	StormDanger[0][3][4] = Value(int(Options["sd034"]));
+
+	StormDanger[1][0][1] = Value(int(Options["sd101"]));
+	StormDanger[1][0][2] = Value(int(Options["sd102"]));
+	StormDanger[1][0][3] = Value(int(Options["sd103"]));
+	StormDanger[1][0][4] = Value(int(Options["sd104"]));
+	StormDanger[1][1][0] = Value(int(Options["sd110"]));
+	StormDanger[1][1][1] = Value(int(Options["sd111"]));
+	StormDanger[1][1][2] = Value(int(Options["sd112"]));
+	StormDanger[1][1][3] = Value(int(Options["sd113"]));
+	StormDanger[1][1][4] = Value(int(Options["sd114"]));
+	StormDanger[1][2][2] = Value(int(Options["sd122"]));
+	StormDanger[1][2][3] = Value(int(Options["sd123"]));
+	StormDanger[1][2][4] = Value(int(Options["sd124"]));
+	StormDanger[1][3][1] = Value(int(Options["sd131"]));
+	StormDanger[1][3][2] = Value(int(Options["sd132"]));
+	StormDanger[1][3][3] = Value(int(Options["sd133"]));
+	StormDanger[1][3][4] = Value(int(Options["sd134"]));
+	
+	StormDanger[2][0][1] = Value(int(Options["sd201"]));
+	StormDanger[2][0][2] = Value(int(Options["sd202"]));
+	StormDanger[2][0][3] = Value(int(Options["sd203"]));
+	StormDanger[2][0][4] = Value(int(Options["sd204"]));
+	StormDanger[2][1][0] = Value(int(Options["sd210"]));
+	StormDanger[2][1][1] = Value(int(Options["sd211"]));
+	StormDanger[2][1][2] = Value(int(Options["sd212"]));
+	StormDanger[2][1][3] = Value(int(Options["sd213"]));
+	StormDanger[2][1][4] = Value(int(Options["sd214"]));
+	StormDanger[2][2][2] = Value(int(Options["sd222"]));
+	StormDanger[2][2][3] = Value(int(Options["sd223"]));
+	StormDanger[2][2][4] = Value(int(Options["sd224"]));
+	StormDanger[2][3][1] = Value(int(Options["sd231"]));
+	StormDanger[2][3][2] = Value(int(Options["sd232"]));
+	StormDanger[2][3][3] = Value(int(Options["sd233"]));
+	StormDanger[2][3][4] = Value(int(Options["sd234"]));
+	
+	StormDanger[3][0][1] = Value(int(Options["sd301"]));
+	StormDanger[3][0][2] = Value(int(Options["sd302"]));
+	StormDanger[3][0][3] = Value(int(Options["sd303"]));
+	StormDanger[3][0][4] = Value(int(Options["sd304"]));
+	StormDanger[3][1][0] = Value(int(Options["sd310"]));
+	StormDanger[3][1][1] = Value(int(Options["sd311"]));
+	StormDanger[3][1][2] = Value(int(Options["sd312"]));
+	StormDanger[3][1][3] = Value(int(Options["sd313"]));
+	StormDanger[3][1][4] = Value(int(Options["sd314"]));
+	StormDanger[3][2][2] = Value(int(Options["sd322"]));
+	StormDanger[3][2][3] = Value(int(Options["sd323"]));
+	StormDanger[3][2][4] = Value(int(Options["sd324"]));
+	StormDanger[3][3][1] = Value(int(Options["sd331"]));
+	StormDanger[3][3][2] = Value(int(Options["sd332"]));
+	StormDanger[3][3][3] = Value(int(Options["sd333"]));
+	StormDanger[3][3][4] = Value(int(Options["sd334"]));
+  }
 
 /// probe() takes a position as input, computes a Entry object, and returns a
 /// pointer to it. The result is also stored in a hash table, so we don't have
@@ -233,7 +353,7 @@ template<Color Us>
 Value Entry::shelter_storm(const Position& pos, Square ksq) {
 
   const Color Them = (Us == WHITE ? BLACK : WHITE);
-  const Bitboard Edges = (FileABB | FileHBB) & (Rank2BB | Rank3BB);
+  //const Bitboard Edges = (FileABB | FileHBB) & (Rank2BB | Rank3BB);
 
   Bitboard b = pos.pieces(PAWN) & (in_front_bb(Us, rank_of(ksq)) | rank_bb(ksq));
   Bitboard ourPawns = b & pos.pieces(Us);
@@ -249,14 +369,10 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
       b  = theirPawns & file_bb(f);
       Rank rkThem = b ? relative_rank(Us, frontmost_sq(Them, b)) : RANK_1;
 
-      if (   (Edges & make_square(f, rkThem))
-          && file_of(ksq) == f
-          && relative_rank(Us, ksq) == rkThem - 1)
-          safety += 200;
-      else
-          safety -=  ShelterWeakness[rkUs]
-                   + StormDanger[f == FILE_A || f == FILE_H]
-                                [rkUs   == RANK_1   ? 0 :
+	  safety -=  ShelterWeakness[std::min(f, FILE_H - f)][rkUs]
+			   + StormDanger[std::min(f, FILE_H - f)]
+							[file_of(ksq) == f && relative_rank(Us, ksq) == rkThem - 1 ? 3 :
+							 rkUs   == RANK_1   ? 0 :
                                  rkThem != rkUs + 1 ? 1 : 2][rkThem];
   }
 
