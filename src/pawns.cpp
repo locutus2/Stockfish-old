@@ -61,36 +61,35 @@ namespace {
   // Unsupported pawn penalty
   const Score UnsupportedPawnPenalty = S(20, 10);
 
-  // Weakness of our pawn shelter in front of the king indexed by [file pair][rank]
+  // Weakness of our pawn shelter in front of the king by [distance from edge][rank]
   Value ShelterWeakness[][RANK_NB] = {
-  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) },
-  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) },
-  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) },
-  { V(100), V(0), V(27), V(73), V(92), V(101), V(101) } };
+  { V(101), V(10), V(24), V(68), V(90), V( 95), V(102) },
+  { V(105), V( 1), V(30), V(76), V(95), V(100), V(105) },
+  { V( 99), V( 0), V(32), V(72), V(92), V(101), V(100) },
+  { V( 94), V( 1), V(31), V(68), V(89), V( 98), V(106) } };
 
-  // Danger of enemy pawns moving toward our king indexed by
-  // [file pairs][no friendly pawn | pawn unblocked | pawn blocked | blocked by king][rank of enemy pawn]
+  // Danger of enemy pawns moving toward our king by [type][distance from edge][rank]
   Value StormDanger[][4][RANK_NB] = {
-  { { V( 0),  V(64), V(128), V(51), V(26) },
-    { V(26),  V(32), V( 96), V(38), V(20) },
-    { V( 0),  V( 0), V( 80), V(13), V( 7) },
-    { V( 0),  V(200), V(200), V(51), V(26) } },
-  { { V( 0),  V(64), V(128), V(51), V(26) },
-    { V(26),  V(32), V( 96), V(38), V(20) },
-    { V( 0),  V( 0), V(160), V(25), V(13) },
-    { V( 0),  V(64), V(128), V(51), V(26) }	},
-  { { V( 0),  V(64), V(128), V(51), V(26) },
-    { V(26),  V(32), V( 96), V(38), V(20) },
-    { V( 0),  V( 0), V(160), V(25), V(13) },
-    { V( 0),  V(64), V(128), V(51), V(26) }	},
-  { { V( 0),  V(64), V(128), V(51), V(26) },
-    { V(26),  V(32), V( 96), V(38), V(20) },
-    { V( 0),  V( 0), V(160), V(25), V(13) },
-    { V( 0),  V(64), V(128), V(51), V(26) }	} };
+  { { V( 0),  V(  61), V( 128), V(47), V(27) },
+    { V( 0),  V(  66), V( 131), V(49), V(27) },
+    { V( 0),  V(  62), V( 126), V(52), V(23) },
+    { V( 0),  V(  63), V( 128), V(52), V(26) } },
+  { { V(25),  V(  33), V(  95), V(39), V(21) },
+    { V(24),  V(  33), V(  97), V(42), V(22) },
+    { V(24),  V(  33), V(  93), V(35), V(23) },
+    { V(26),  V(  27), V(  96), V(37), V(22) } },
+  { { V( 0),  V(   0), V(  80), V(14), V( 8) },
+    { V( 0),  V(   0), V( 163), V(28), V(12) },
+    { V( 0),  V(   0), V( 163), V(25), V(15) },
+    { V( 0),  V(   0), V( 161), V(24), V(14) } },
+  { { V( 0),  V(-300), V(-300), V(54), V(23) },
+    { V( 0),  V(  67), V( 128), V(46), V(24) },
+    { V( 0),  V(  64), V( 130), V(50), V(29) },
+    { V( 0),  V(  63), V( 127), V(51), V(24) } } };
 
   // Max bonus for king safety. Corresponds to start position with all the pawns
   // in front of the king and no enemy pawn on the horizon.
-  Value MaxSafetyBonus = V(263);
+  Value MaxSafetyBonus = V(261);
 
   #undef S
   #undef V
@@ -223,8 +222,8 @@ void init()
           }
 }
 
- void init_spsa()
-  {
+void init_spsa()
+{
 	MaxSafetyBonus          = Value(int(Options["maxSafety"]));
 	
 	ShelterWeakness[0][0]   = Value(int(Options["sw00"]));
@@ -263,11 +262,11 @@ void init()
 	StormDanger[0][0][2] = Value(int(Options["sd002"]));
 	StormDanger[0][0][3] = Value(int(Options["sd003"]));
 	StormDanger[0][0][4] = Value(int(Options["sd004"]));
-	StormDanger[0][1][0] = Value(int(Options["sd010"]));
 	StormDanger[0][1][1] = Value(int(Options["sd011"]));
 	StormDanger[0][1][2] = Value(int(Options["sd012"]));
 	StormDanger[0][1][3] = Value(int(Options["sd013"]));
 	StormDanger[0][1][4] = Value(int(Options["sd014"]));
+    StormDanger[0][2][1] = Value(int(Options["sd021"]));
 	StormDanger[0][2][2] = Value(int(Options["sd022"]));
 	StormDanger[0][2][3] = Value(int(Options["sd023"]));
 	StormDanger[0][2][4] = Value(int(Options["sd024"]));
@@ -276,7 +275,8 @@ void init()
 	StormDanger[0][3][3] = Value(int(Options["sd033"]));
 	StormDanger[0][3][4] = Value(int(Options["sd034"]));
 
-	StormDanger[1][0][1] = Value(int(Options["sd101"]));
+	StormDanger[1][0][0] = Value(int(Options["sd100"]));
+    StormDanger[1][0][1] = Value(int(Options["sd101"]));
 	StormDanger[1][0][2] = Value(int(Options["sd102"]));
 	StormDanger[1][0][3] = Value(int(Options["sd103"]));
 	StormDanger[1][0][4] = Value(int(Options["sd104"]));
@@ -285,27 +285,26 @@ void init()
 	StormDanger[1][1][2] = Value(int(Options["sd112"]));
 	StormDanger[1][1][3] = Value(int(Options["sd113"]));
 	StormDanger[1][1][4] = Value(int(Options["sd114"]));
+    StormDanger[1][2][0] = Value(int(Options["sd120"]));
+	StormDanger[1][2][1] = Value(int(Options["sd121"]));
 	StormDanger[1][2][2] = Value(int(Options["sd122"]));
 	StormDanger[1][2][3] = Value(int(Options["sd123"]));
 	StormDanger[1][2][4] = Value(int(Options["sd124"]));
+    StormDanger[1][3][0] = Value(int(Options["sd130"]));
 	StormDanger[1][3][1] = Value(int(Options["sd131"]));
 	StormDanger[1][3][2] = Value(int(Options["sd132"]));
 	StormDanger[1][3][3] = Value(int(Options["sd133"]));
 	StormDanger[1][3][4] = Value(int(Options["sd134"]));
 	
-	StormDanger[2][0][1] = Value(int(Options["sd201"]));
 	StormDanger[2][0][2] = Value(int(Options["sd202"]));
 	StormDanger[2][0][3] = Value(int(Options["sd203"]));
 	StormDanger[2][0][4] = Value(int(Options["sd204"]));
-	StormDanger[2][1][0] = Value(int(Options["sd210"]));
-	StormDanger[2][1][1] = Value(int(Options["sd211"]));
 	StormDanger[2][1][2] = Value(int(Options["sd212"]));
 	StormDanger[2][1][3] = Value(int(Options["sd213"]));
 	StormDanger[2][1][4] = Value(int(Options["sd214"]));
 	StormDanger[2][2][2] = Value(int(Options["sd222"]));
 	StormDanger[2][2][3] = Value(int(Options["sd223"]));
 	StormDanger[2][2][4] = Value(int(Options["sd224"]));
-	StormDanger[2][3][1] = Value(int(Options["sd231"]));
 	StormDanger[2][3][2] = Value(int(Options["sd232"]));
 	StormDanger[2][3][3] = Value(int(Options["sd233"]));
 	StormDanger[2][3][4] = Value(int(Options["sd234"]));
@@ -314,11 +313,11 @@ void init()
 	StormDanger[3][0][2] = Value(int(Options["sd302"]));
 	StormDanger[3][0][3] = Value(int(Options["sd303"]));
 	StormDanger[3][0][4] = Value(int(Options["sd304"]));
-	StormDanger[3][1][0] = Value(int(Options["sd310"]));
 	StormDanger[3][1][1] = Value(int(Options["sd311"]));
 	StormDanger[3][1][2] = Value(int(Options["sd312"]));
 	StormDanger[3][1][3] = Value(int(Options["sd313"]));
 	StormDanger[3][1][4] = Value(int(Options["sd314"]));
+    StormDanger[3][2][1] = Value(int(Options["sd321"]));
 	StormDanger[3][2][2] = Value(int(Options["sd322"]));
 	StormDanger[3][2][3] = Value(int(Options["sd323"]));
 	StormDanger[3][2][4] = Value(int(Options["sd324"]));
@@ -353,15 +352,20 @@ template<Color Us>
 Value Entry::shelter_storm(const Position& pos, Square ksq) {
 
   const Color Them = (Us == WHITE ? BLACK : WHITE);
+<<<<<<< HEAD
   //const Bitboard Edges = (FileABB | FileHBB) & (Rank2BB | Rank3BB);
+=======
+
+  enum { NoFriendlyPawn, Unblocked, BlockedByPawn, BlockedByKing };
+>>>>>>> master
 
   Bitboard b = pos.pieces(PAWN) & (in_front_bb(Us, rank_of(ksq)) | rank_bb(ksq));
   Bitboard ourPawns = b & pos.pieces(Us);
   Bitboard theirPawns = b & pos.pieces(Them);
   Value safety = MaxSafetyBonus;
-  File kf = std::max(FILE_B, std::min(FILE_G, file_of(ksq)));
+  File center = std::max(FILE_B, std::min(FILE_G, file_of(ksq)));
 
-  for (File f = kf - File(1); f <= kf + File(1); ++f)
+  for (File f = center - File(1); f <= center + File(1); ++f)
   {
       b = ourPawns & file_bb(f);
       Rank rkUs = b ? relative_rank(Us, backmost_sq(Us, b)) : RANK_1;
@@ -369,11 +373,20 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
       b  = theirPawns & file_bb(f);
       Rank rkThem = b ? relative_rank(Us, frontmost_sq(Them, b)) : RANK_1;
 
+<<<<<<< HEAD
 	  safety -=  ShelterWeakness[std::min(f, FILE_H - f)][rkUs]
 			   + StormDanger[std::min(f, FILE_H - f)]
 							[file_of(ksq) == f && relative_rank(Us, ksq) == rkThem - 1 ? 3 :
 							 rkUs   == RANK_1   ? 0 :
                                  rkThem != rkUs + 1 ? 1 : 2][rkThem];
+=======
+      safety -=  ShelterWeakness[std::min(f, FILE_H - f)][rkUs]
+               + StormDanger
+                 [f == file_of(ksq) && rkThem == relative_rank(Us, ksq) + 1 ? BlockedByKing  :
+                  rkUs   == RANK_1                                          ? NoFriendlyPawn :
+                  rkThem == rkUs + 1                                        ? BlockedByPawn  : Unblocked]
+                 [std::min(f, FILE_H - f)][rkThem];
+>>>>>>> master
   }
 
   return safety;
