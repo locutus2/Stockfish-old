@@ -27,6 +27,7 @@
 #include "tt.h"
 #include "uci.h"
 #include "syzygy/tbprobe.h"
+#include "evaluate.h"
 
 using std::string;
 
@@ -36,7 +37,7 @@ namespace UCI {
 
 /// 'On change' actions, triggered by an option's value change
 void on_clear_hash(const Option&) { TT.clear(); }
-void on_spsa(const Option&) { Pawns::init_spsa(); }
+void on_spsa(const Option&) { Eval::init_spsa(); Pawns::init_spsa(); }
 void on_hash_size(const Option& o) { TT.resize(o); }
 void on_logger(const Option& o) { start_logger(o); }
 void on_threads(const Option&) { Threads.read_uci_options(); }
@@ -111,11 +112,11 @@ void init(OptionsMap& o) {
   o["sd002"]       << Option(0, 0, 300, on_spsa);
   o["sd003"]       << Option(0, 0, 300, on_spsa);
   o["sd004"]       << Option(0, 0, 300, on_spsa);
-  o["sd010"]       << Option(0, 0, 300, on_spsa);
   o["sd011"]       << Option(0, 0, 300, on_spsa);
   o["sd012"]       << Option(0, 0, 300, on_spsa);
   o["sd013"]       << Option(0, 0, 300, on_spsa);
   o["sd014"]       << Option(0, 0, 300, on_spsa);
+  o["sd021"]       << Option(0, 0, 300, on_spsa);
   o["sd022"]       << Option(0, 0, 300, on_spsa);
   o["sd023"]       << Option(0, 0, 300, on_spsa);
   o["sd024"]       << Option(0, 0, 300, on_spsa);
@@ -124,6 +125,7 @@ void init(OptionsMap& o) {
   o["sd033"]       << Option(0, 0, 300, on_spsa);
   o["sd034"]       << Option(0, 0, 300, on_spsa);
   
+  o["sd100"]       << Option(0, 0, 300, on_spsa);
   o["sd101"]       << Option(0, 0, 300, on_spsa);
   o["sd102"]       << Option(0, 0, 300, on_spsa);
   o["sd103"]       << Option(0, 0, 300, on_spsa);
@@ -133,40 +135,39 @@ void init(OptionsMap& o) {
   o["sd112"]       << Option(0, 0, 300, on_spsa);
   o["sd113"]       << Option(0, 0, 300, on_spsa);
   o["sd114"]       << Option(0, 0, 300, on_spsa);
+  o["sd120"]       << Option(0, 0, 300, on_spsa);
+  o["sd121"]       << Option(0, 0, 300, on_spsa);
   o["sd122"]       << Option(0, 0, 300, on_spsa);
   o["sd123"]       << Option(0, 0, 300, on_spsa);
   o["sd124"]       << Option(0, 0, 300, on_spsa);
+  o["sd130"]       << Option(0, 0, 300, on_spsa);
   o["sd131"]       << Option(0, 0, 300, on_spsa);
   o["sd132"]       << Option(0, 0, 300, on_spsa);
   o["sd133"]       << Option(0, 0, 300, on_spsa);
   o["sd134"]       << Option(0, 0, 300, on_spsa);
   
-  o["sd201"]       << Option(0, 0, 300, on_spsa);
   o["sd202"]       << Option(0, 0, 300, on_spsa);
   o["sd203"]       << Option(0, 0, 300, on_spsa);
   o["sd204"]       << Option(0, 0, 300, on_spsa);
-  o["sd210"]       << Option(0, 0, 300, on_spsa);
-  o["sd211"]       << Option(0, 0, 300, on_spsa);
   o["sd212"]       << Option(0, 0, 300, on_spsa);
   o["sd213"]       << Option(0, 0, 300, on_spsa);
   o["sd214"]       << Option(0, 0, 300, on_spsa);
   o["sd222"]       << Option(0, 0, 300, on_spsa);
   o["sd223"]       << Option(0, 0, 300, on_spsa);
   o["sd224"]       << Option(0, 0, 300, on_spsa);
-  o["sd231"]       << Option(0, 0, 300, on_spsa);
   o["sd232"]       << Option(0, 0, 300, on_spsa);
   o["sd233"]       << Option(0, 0, 300, on_spsa);
   o["sd234"]       << Option(0, 0, 300, on_spsa);
   
-  o["sd301"]       << Option(0, 0, 300, on_spsa);
-  o["sd302"]       << Option(0, 0, 300, on_spsa);
+  o["sd301"]       << Option(0, -600, 0, on_spsa);
+  o["sd302"]       << Option(0, -600, 0, on_spsa);
   o["sd303"]       << Option(0, 0, 300, on_spsa);
   o["sd304"]       << Option(0, 0, 300, on_spsa);
-  o["sd310"]       << Option(0, 0, 300, on_spsa);
   o["sd311"]       << Option(0, 0, 300, on_spsa);
   o["sd312"]       << Option(0, 0, 300, on_spsa);
   o["sd313"]       << Option(0, 0, 300, on_spsa);
   o["sd314"]       << Option(0, 0, 300, on_spsa);
+  o["sd321"]       << Option(0, 0, 300, on_spsa);
   o["sd322"]       << Option(0, 0, 300, on_spsa);
   o["sd323"]       << Option(0, 0, 300, on_spsa);
   o["sd324"]       << Option(0, 0, 300, on_spsa);
@@ -174,6 +175,32 @@ void init(OptionsMap& o) {
   o["sd332"]       << Option(0, 0, 300, on_spsa);
   o["sd333"]       << Option(0, 0, 300, on_spsa);
   o["sd334"]       << Option(0, 0, 300, on_spsa);
+  
+  o["KingSafetyWeight"] << Option(0, 0, 600, on_spsa);
+	
+  o["KingAttackWeights2"] << Option(0, 0, 20, on_spsa);
+  o["KingAttackWeights3"] << Option(0, 0, 20, on_spsa);
+  o["KingAttackWeights4"] << Option(0, 0, 20, on_spsa);
+  o["KingAttackWeights5"] << Option(0, 0, 20, on_spsa);
+
+	o["QueenContactCheck"] << Option(0, 0, 50, on_spsa);
+    o["RookContactCheck"] << Option(0, 0, 50, on_spsa);
+    o["QueenCheck"] << Option(0, 0, 50, on_spsa);
+    o["RookCheck"] << Option(0, 0, 50, on_spsa);
+    o["BishopCheck"] << Option(0, 0, 50, on_spsa);
+    o["KnightCheck"] << Option(0, 0, 50, on_spsa);
+	
+	o["AUmax"] << Option(0, 0, 50, on_spsa);
+    o["AUattackFactor"] << Option(0, 0, 256, on_spsa);
+    o["AUzone"] << Option(0, 0, 20, on_spsa);
+    o["AUundefended"] << Option(0, 0, 20, on_spsa);
+    o["AUpinned"] << Option(0, 0, 20, on_spsa);
+    o["AUscoreFactor"] << Option(0, 0, 256, on_spsa);
+    o["AUnoQueen"] << Option(0, 0, 50, on_spsa);
+	
+	o["KDMaxSlope"] << Option(0, 0, 2000, on_spsa);
+    o["KDPeak"] << Option(0, 0, 2000, on_spsa);
+	o["KDFactor"] << Option(0, 0, 2000, on_spsa);
 }
 
 
