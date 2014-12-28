@@ -352,12 +352,8 @@ template<Color Us>
 Value Entry::shelter_storm(const Position& pos, Square ksq) {
 
   const Color Them = (Us == WHITE ? BLACK : WHITE);
-<<<<<<< HEAD
-  //const Bitboard Edges = (FileABB | FileHBB) & (Rank2BB | Rank3BB);
-=======
 
   enum { NoFriendlyPawn, Unblocked, BlockedByPawn, BlockedByKing };
->>>>>>> master
 
   Bitboard b = pos.pieces(PAWN) & (in_front_bb(Us, rank_of(ksq)) | rank_bb(ksq));
   Bitboard ourPawns = b & pos.pieces(Us);
@@ -373,20 +369,12 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
       b  = theirPawns & file_bb(f);
       Rank rkThem = b ? relative_rank(Us, frontmost_sq(Them, b)) : RANK_1;
 
-<<<<<<< HEAD
-	  safety -=  ShelterWeakness[std::min(f, FILE_H - f)][rkUs]
-			   + StormDanger[std::min(f, FILE_H - f)]
-							[file_of(ksq) == f && relative_rank(Us, ksq) == rkThem - 1 ? 3 :
-							 rkUs   == RANK_1   ? 0 :
-                                 rkThem != rkUs + 1 ? 1 : 2][rkThem];
-=======
       safety -=  ShelterWeakness[std::min(f, FILE_H - f)][rkUs]
                + StormDanger
                  [f == file_of(ksq) && rkThem == relative_rank(Us, ksq) + 1 ? BlockedByKing  :
                   rkUs   == RANK_1                                          ? NoFriendlyPawn :
                   rkThem == rkUs + 1                                        ? BlockedByPawn  : Unblocked]
                  [std::min(f, FILE_H - f)][rkThem];
->>>>>>> master
   }
 
   return safety;
