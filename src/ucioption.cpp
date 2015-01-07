@@ -27,6 +27,8 @@
 #include "tt.h"
 #include "uci.h"
 #include "syzygy/tbprobe.h"
+#include "pawns.h"
+#include "evaluate.h"
 
 using std::string;
 
@@ -35,6 +37,7 @@ UCI::OptionsMap Options; // Global object
 namespace UCI {
 
 /// 'On change' actions, triggered by an option's value change
+void on_spsa(const Option&) { Pawns::init_spsa(); Eval::init_spsa(); }
 void on_clear_hash(const Option&) { TT.clear(); }
 void on_hash_size(const Option& o) { TT.resize(o); }
 void on_logger(const Option& o) { start_logger(o); }
@@ -71,6 +74,77 @@ void init(OptionsMap& o) {
   o["SyzygyProbeDepth"]      << Option(1, 1, 100);
   o["Syzygy50MoveRule"]      << Option(true);
   o["SyzygyProbeLimit"]      << Option(6, 0, 6);
+  
+  o["PawnWeightMG"]		<< Option(0, 0, 600, on_spsa);
+  o["PawnWeightEG"]		<< Option(0, 0, 600, on_spsa);
+  
+  o["ConnectedSeed1"]		<< Option(0, 0, 600, on_spsa);
+  o["ConnectedSeed2"]		<< Option(0, 0, 600, on_spsa);
+  o["ConnectedSeed3"]		<< Option(0, 0, 600, on_spsa);
+  o["ConnectedSeed4"]		<< Option(0, 0, 600, on_spsa);
+  o["ConnectedSeed5"]		<< Option(0, 0, 600, on_spsa);
+  o["ConnectedSeed6"]		<< Option(0, 0, 600, on_spsa);
+  o["ConnectedSeed7"]		<< Option(0, 0, 600, on_spsa);
+  o["ConnectedPhalanx"]		<< Option(0, 0, 256, on_spsa);
+  o["ConnectedMG"]		    << Option(0, 0, 256, on_spsa);
+  
+  o["Doubled0MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Doubled0EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Doubled1MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Doubled1EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Doubled2MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Doubled2EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Doubled3MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Doubled3EG"]		<< Option(0, 0, 256, on_spsa);
+  
+  o["Isolated00MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated00EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated01MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated01EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated02MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated02EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated03MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated03EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated10MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated10EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated11MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated11EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated12MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated12EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated13MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Isolated13EG"]		<< Option(0, 0, 256, on_spsa);
+  
+  o["Backward00MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward00EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward01MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward01EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward02MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward02EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward03MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward03EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward10MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward10EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward11MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward11EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward12MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward12EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward13MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Backward13EG"]		<< Option(0, 0, 256, on_spsa);
+  
+  o["Lever1MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever1EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever2MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever2EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever3MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever3EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever4MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever4EG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever5MG"]		<< Option(0, 0, 256, on_spsa);
+  o["Lever5EG"]		<< Option(0, 0, 256, on_spsa);
+	
+  o["UnsupportedMG"]		<< Option(0, 0, 256, on_spsa);
+  o["UnsupportedEG"]		<< Option(0, 0, 256, on_spsa);
+	
 }
 
 

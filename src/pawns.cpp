@@ -25,6 +25,7 @@
 #include "pawns.h"
 #include "position.h"
 #include "thread.h"
+#include "uci.h"
 
 namespace {
 
@@ -32,19 +33,19 @@ namespace {
   #define S(mg, eg) make_score(mg, eg)
 
   // Doubled pawn penalty by file
-  const Score Doubled[FILE_NB] = {
+  Score Doubled[FILE_NB] = {
     S(13, 43), S(20, 48), S(23, 48), S(23, 48),
     S(23, 48), S(23, 48), S(20, 48), S(13, 43) };
 
   // Isolated pawn penalty by opposed flag and file
-  const Score Isolated[2][FILE_NB] = {
+  Score Isolated[2][FILE_NB] = {
   { S(37, 45), S(54, 52), S(60, 52), S(60, 52),
     S(60, 52), S(60, 52), S(54, 52), S(37, 45) },
   { S(25, 30), S(36, 35), S(40, 35), S(40, 35),
     S(40, 35), S(40, 35), S(36, 35), S(25, 30) } };
 
   // Backward pawn penalty by opposed flag and file
-  const Score Backward[2][FILE_NB] = {
+  Score Backward[2][FILE_NB] = {
   { S(30, 42), S(43, 46), S(49, 46), S(49, 46),
     S(49, 46), S(49, 46), S(43, 46), S(30, 42) },
   { S(20, 28), S(29, 31), S(33, 31), S(33, 31),
@@ -54,12 +55,12 @@ namespace {
   Score Connected[2][2][RANK_NB];
 
   // Levers bonus by rank
-  const Score Lever[RANK_NB] = {
+  Score Lever[RANK_NB] = {
     S( 0, 0), S( 0, 0), S(0, 0), S(0, 0),
     S(20,20), S(40,40), S(0, 0), S(0, 0) };
 
   // Unsupported pawn penalty
-  const Score UnsupportedPawnPenalty = S(20, 10);
+  Score UnsupportedPawnPenalty = S(20, 10);
 
   // Weakness of our pawn shelter in front of the king by [distance from edge][rank]
   const Value ShelterWeakness[][RANK_NB] = {
@@ -207,19 +208,68 @@ namespace Pawns {
 /// hard-coded tables, when makes sense, we prefer to calculate them with a formula
 /// to reduce independent parameters and to allow easier tuning and better insight.
 
+int Seed[RANK_NB] = { 0, 6, 15, 10, 57, 75, 135, 258 };
+int ConnectedPhalanx = 64;
+int ConnectedMG = 64;
+
 void init()
 {
-  static const int Seed[RANK_NB] = { 0, 6, 15, 10, 57, 75, 135, 258 };
+  //static const int Seed[RANK_NB] = { 0, 6, 15, 10, 57, 75, 135, 258 };
 
   for (int opposed = 0; opposed <= 1; ++opposed)
       for (int phalanx = 0; phalanx <= 1; ++phalanx)
           for (Rank r = RANK_2; r < RANK_8; ++r)
           {
-              int bonus = Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0);
-              Connected[opposed][phalanx][r] = make_score(bonus / 2, bonus >> opposed);
+              int bonus = Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) * ConnectedPhalanx / 128 : 0);
+              Connected[opposed][phalanx][r] = make_score(bonus * ConnectedMG / 128, bonus >> opposed);
           }
 }
 
+void init_spsa()
+{
+	Seed[1] = Options["ConnectedSeed1"];
+	Seed[2] = Options["ConnectedSeed2"];
+	Seed[3] = Options["ConnectedSeed3"];
+	Seed[4] = Options["ConnectedSeed4"];
+	Seed[5] = Options["ConnectedSeed5"];
+	Seed[6] = Options["ConnectedSeed6"];
+	Seed[7] = Options["ConnectedSeed7"];
+	ConnectedPhalanx = Options["ConnectedPhalanx"];
+	ConnectedMG = Options["ConnectedMG"];
+	
+	Doubled[0] = Doubled[7] = make_score(Options["Doubled0MG"], Options["Doubled0EG"]);
+	Doubled[1] = Doubled[6] = make_score(Options["Doubled1MG"], Options["Doubled1EG"]);
+	Doubled[2] = Doubled[5] = make_score(Options["Doubled2MG"], Options["Doubled2EG"]);
+	Doubled[3] = Doubled[4] = make_score(Options["Doubled3MG"], Options["Doubled3EG"]);
+	
+	Isolated[0][0] = Isolated[0][7] = make_score(Options["Isolated00MG"], Options["Isolated00EG"]);
+	Isolated[0][1] = Isolated[0][6] = make_score(Options["Isolated01MG"], Options["Isolated01EG"]);
+	Isolated[0][2] = Isolated[0][5] = make_score(Options["Isolated02MG"], Options["Isolated02EG"]);
+	Isolated[0][3] = Isolated[0][4] = make_score(Options["Isolated03MG"], Options["Isolated03EG"]);
+	Isolated[1][0] = Isolated[1][7] = make_score(Options["Isolated10MG"], Options["Isolated10EG"]);
+	Isolated[1][1] = Isolated[1][6] = make_score(Options["Isolated11MG"], Options["Isolated11EG"]);
+	Isolated[1][2] = Isolated[1][5] = make_score(Options["Isolated12MG"], Options["Isolated12EG"]);
+	Isolated[1][3] = Isolated[1][4] = make_score(Options["Isolated13MG"], Options["Isolated13EG"]);
+	
+	Backward[0][0] = Backward[0][7] = make_score(Options["Backward00MG"], Options["Backward00EG"]);
+	Backward[0][1] = Backward[0][6] = make_score(Options["Backward01MG"], Options["Backward01EG"]);
+	Backward[0][2] = Backward[0][5] = make_score(Options["Backward02MG"], Options["Backward02EG"]);
+	Backward[0][3] = Backward[0][4] = make_score(Options["Backward03MG"], Options["Backward03EG"]);
+	Backward[1][0] = Backward[1][7] = make_score(Options["Backward10MG"], Options["Backward10EG"]);
+	Backward[1][1] = Backward[1][6] = make_score(Options["Backward11MG"], Options["Backward11EG"]);
+	Backward[1][2] = Backward[1][5] = make_score(Options["Backward12MG"], Options["Backward12EG"]);
+	Backward[1][3] = Backward[1][4] = make_score(Options["Backward13MG"], Options["Backward13EG"]);
+	
+	Lever[1] = make_score(Options["Lever1MG"], Options["Lever1EG"]);
+	Lever[2] = make_score(Options["Lever2MG"], Options["Lever2EG"]);
+	Lever[3] = make_score(Options["Lever3MG"], Options["Lever3EG"]);
+	Lever[4] = make_score(Options["Lever4MG"], Options["Lever4EG"]);
+	Lever[5] = make_score(Options["Lever5MG"], Options["Lever5EG"]);
+	
+	UnsupportedPawnPenalty = make_score(Options["UnsupportedMG"], Options["UnsupportedEG"]);
+	
+	init();
+}
 
 /// Pawns::probe() looks up the current position's pawns configuration in
 /// the pawns hash table. It returns a pointer to the Entry if the position

@@ -28,6 +28,7 @@ namespace Eval {
 
 const Value Tempo = Value(17); // Must be visible to search
 
+void init_spsa();
 void init();
 Value evaluate(const Position& pos);
 std::string trace(const Position& pos);

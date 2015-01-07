@@ -27,6 +27,7 @@
 #include "evaluate.h"
 #include "material.h"
 #include "pawns.h"
+#include "uci.h"
 
 namespace {
 
@@ -90,7 +91,7 @@ namespace {
 
   // Evaluation weights, indexed by evaluation term
   enum { Mobility, PawnStructure, PassedPawns, Space, KingSafety };
-  const struct Weight { int mg, eg; } Weights[] = {
+  struct Weight { int mg, eg; } Weights[] = {
     {289, 344}, {233, 201}, {221, 273}, {46, 0}, {321, 0}
   };
 
@@ -902,4 +903,9 @@ namespace Eval {
     }
   }
 
+  void init_spsa()
+  {
+	Weights[PawnStructure].mg = Options["PawnWeightMG"];
+	Weights[PawnStructure].eg = Options["PawnWeightEG"];
+  }
 } // namespace Eval
