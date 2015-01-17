@@ -25,6 +25,7 @@
 #include "pawns.h"
 #include "position.h"
 #include "thread.h"
+#include "uci.h"
 
 namespace {
 
@@ -44,11 +45,15 @@ namespace {
     S(40, 35), S(40, 35), S(36, 35), S(25, 30) } };
 
   // Backward pawn penalty by opposed flag and file
-  const Score Backward[2][FILE_NB] = {
+  const Score BackwardFile[2][FILE_NB] = {
   { S(30, 42), S(43, 46), S(49, 46), S(49, 46),
     S(49, 46), S(49, 46), S(43, 46), S(30, 42) },
   { S(20, 28), S(29, 31), S(33, 31), S(33, 31),
     S(33, 31), S(33, 31), S(29, 31), S(20, 28) } };
+
+  Score BackwardRank[2][RANK_NB] = {
+  { S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0) },
+  { S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0) } };
 
   // Connected pawn bonus by opposed, phalanx flags and rank
   Score Connected[2][2][RANK_NB];
@@ -184,7 +189,7 @@ namespace {
             score -= Doubled[f] / distance<Rank>(s, frontmost_sq(Us, doubled));
 
         if (backward)
-            score -= Backward[opposed][f];
+            score -= BackwardFile[opposed][f] + BackwardRank[opposed][relative_rank(Us, s)];
 
         if (connected)
             score += Connected[opposed][phalanx][relative_rank(Us, s)];
@@ -218,6 +223,15 @@ void init()
               int bonus = Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0);
               Connected[opposed][phalanx][r] = make_score(bonus / 2, bonus >> opposed);
           }
+
+  BackwardRank[0][1] = make_score(int(Options["b01mg"]), int(Options["b01eg"]));
+  BackwardRank[0][2] = make_score(int(Options["b02mg"]), int(Options["b02eg"]));
+  BackwardRank[0][3] = make_score(int(Options["b03mg"]), int(Options["b03eg"]));
+  BackwardRank[0][4] = make_score(int(Options["b04mg"]), int(Options["b04eg"]));
+  BackwardRank[1][1] = make_score(int(Options["b11mg"]), int(Options["b11eg"]));
+  BackwardRank[1][2] = make_score(int(Options["b12mg"]), int(Options["b12eg"]));
+  BackwardRank[1][3] = make_score(int(Options["b13mg"]), int(Options["b13eg"]));
+  BackwardRank[1][4] = make_score(int(Options["b14mg"]), int(Options["b14eg"]));
 }
 
 
