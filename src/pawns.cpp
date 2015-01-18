@@ -44,11 +44,15 @@ namespace {
     S(40, 35), S(40, 35), S(36, 35), S(25, 30) } };
 
   // Backward pawn penalty by opposed flag and file
-  const Score Backward[2][FILE_NB] = {
+  const Score BackwardFile[2][FILE_NB] = {
   { S(30, 42), S(43, 46), S(49, 46), S(49, 46),
     S(49, 46), S(49, 46), S(43, 46), S(30, 42) },
   { S(20, 28), S(29, 31), S(33, 31), S(33, 31),
     S(33, 31), S(33, 31), S(29, 31), S(20, 28) } };
+
+  const Score BackwardRank[2][RANK_NB] = {
+  { S(0, 0), S(-1, 3), S( 2, 1), S (9, -2), S(2,  1) },
+  { S(0, 0), S( 1, 0), S(-3, 1), S(-2, -3), S(1, -2) } };
 
   // Connected pawn bonus by opposed, phalanx flags and rank
   Score Connected[2][2][RANK_NB];
@@ -184,7 +188,7 @@ namespace {
             score -= Doubled[f] / distance<Rank>(s, frontmost_sq(Us, doubled));
 
         if (backward)
-            score -= Backward[opposed][f];
+            score -= BackwardFile[opposed][f] + BackwardRank[opposed][relative_rank(Us, s)];
 
         if (connected)
             score += Connected[opposed][phalanx][relative_rank(Us, s)];
