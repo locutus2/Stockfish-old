@@ -50,6 +50,8 @@ namespace {
   { S(20, 28), S(29, 31), S(33, 31), S(33, 31),
     S(33, 31), S(33, 31), S(29, 31), S(20, 28) } };
 
+  const Score BackwardRank = S(4, 4);
+
   // Connected pawn bonus by opposed, phalanx flags and rank
   Score Connected[2][2][RANK_NB];
 
@@ -184,7 +186,7 @@ namespace {
             score -= Doubled[f] / distance<Rank>(s, frontmost_sq(Us, doubled));
 
         if (backward)
-            score -= Backward[opposed][f];
+            score -= Backward[opposed][f] + (5 - 2 * relative_rank(Us, s)) * BackwardRank;
 
         if (connected)
             score += Connected[opposed][phalanx][relative_rank(Us, s)];
