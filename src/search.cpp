@@ -834,7 +834,8 @@ moves_loop: // When in check and at SpNode search starts from here
       if (   !captureOrPromotion
           && !inCheck
           && !dangerous
-          &&  bestValue > VALUE_MATED_IN_MAX_PLY)
+          &&  bestValue > VALUE_MATED_IN_MAX_PLY
+          && !(PvNode && (move == ss->killers[0] || move == ss->killers[1])))
       {
           // Move count based pruning
           if (   depth < 16 * ONE_PLY
