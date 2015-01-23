@@ -76,7 +76,8 @@ void init(OptionsMap& o) {
   o["Syzygy50MoveRule"]      << Option(true);
   o["SyzygyProbeLimit"]      << Option(6, 0, 6);
 
-  o["EndgameScale"]          << Option(128, 0, 256, on_eval);
+  o["EndgameScaleAhead"]           << Option(128, 0, 256, on_eval);
+  o["EndgameScaleBehind"]          << Option(128, 0, 256, on_eval);
 }
 
 
