@@ -27,6 +27,7 @@
 #include "evaluate.h"
 #include "material.h"
 #include "pawns.h"
+#include "uci.h"
 
 namespace {
 
@@ -93,6 +94,8 @@ namespace {
   const struct Weight { int mg, eg; } Weights[] = {
     {289, 344}, {233, 201}, {221, 273}, {46, 0}, {321, 0}
   };
+
+  int EndgameScale = 128;
 
   #define V(v) Value(v)
   #define S(mg, eg) make_score(mg, eg)
@@ -772,6 +775,8 @@ namespace {
                  sf = ei.pi->pawn_span(strongSide) ? ScaleFactor(56) : ScaleFactor(38);
     }
 
+    sf = ScaleFactor(sf * EndgameScale / 128);
+
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     Value v =  mg_value(score) * int(ei.mi->game_phase())
              + eg_value(score) * int(PHASE_MIDGAME - ei.mi->game_phase()) * sf / SCALE_FACTOR_NORMAL;
@@ -900,6 +905,8 @@ namespace Eval {
         t = std::min(Peak, std::min(0.025 * i * i, t + MaxSlope));
         KingDanger[i] = apply_weight(make_score(int(t), 0), Weights[KingSafety]);
     }
+
+    EndgameScale = int(Options["EndgameScale"]);
   }
 
 } // namespace Eval
