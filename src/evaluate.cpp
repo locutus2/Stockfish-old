@@ -95,8 +95,7 @@ namespace {
     {289, 344}, {233, 201}, {221, 273}, {46, 0}, {321, 0}
   };
 
-  int EndgameScaleAhead = 128;
-  int EndgameScaleBehind = 128;
+  int EndgameScale = 128;
 
   #define V(v) Value(v)
   #define S(mg, eg) make_score(mg, eg)
@@ -776,7 +775,7 @@ namespace {
                  sf = ei.pi->pawn_span(strongSide) ? ScaleFactor(56) : ScaleFactor(38);
     }
 
-    sf = ScaleFactor(sf * (eg_value(score) > 0 ? EndgameScaleAhead : EndgameScaleBehind) / 128);
+    sf = ScaleFactor(sf * EndgameScale / 128);
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     Value v =  mg_value(score) * int(ei.mi->game_phase())
@@ -907,8 +906,7 @@ namespace Eval {
         KingDanger[i] = apply_weight(make_score(int(t), 0), Weights[KingSafety]);
     }
 
-    EndgameScaleAhead = int(Options["EndgameScaleAhead"]);
-    EndgameScaleBehind = int(Options["EndgameScaleBehind"]);
+    EndgameScale = int(Options["EndgameScale"]);
   }
 
 } // namespace Eval
