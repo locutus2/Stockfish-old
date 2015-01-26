@@ -772,7 +772,7 @@ namespace {
                  sf = ei.pi->pawn_span(strongSide) ? ScaleFactor(56) : ScaleFactor(38);
     }
 
-    sf = ScaleFactor(sf * 7 / 8);
+    sf = ScaleFactor(sf * 13 / 16);
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     Value v =  mg_value(score) * int(ei.mi->game_phase())
