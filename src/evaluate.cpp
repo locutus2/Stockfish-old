@@ -43,6 +43,11 @@ namespace {
     // contains all squares attacked by the given color.
     Bitboard attackedBy[COLOR_NB][PIECE_TYPE_NB];
 
+    // doubleAttackedBy[color] is a bitboard representing all squares
+    // attacked by two pieces of a given color, excluding the case if only
+    // pawns attacks.
+    Bitboard doubleAttackedBy[COLOR_NB];
+
     // kingRing[color] is the zone around the king which is considered
     // by the king safety evaluation. This consists of the squares directly
     // adjacent to the king, and the three (or two, for a king on an edge file)
@@ -220,6 +225,7 @@ namespace {
 
     Bitboard b = ei.attackedBy[Them][KING] = pos.attacks_from<KING>(pos.king_square(Them));
     ei.attackedBy[Us][ALL_PIECES] = ei.attackedBy[Us][PAWN] = ei.pi->pawn_attacks(Us);
+    ei.doubleAttackedBy[Us] = 0;
 
     // Init king safety tables only if we are going to use them
     if (pos.non_pawn_material(Us) >= QueenValueMg)
@@ -286,6 +292,7 @@ namespace {
         if (ei.pinnedPieces[Us] & s)
             b &= LineBB[pos.king_square(Us)][s];
 
+        ei.doubleAttackedBy[Us] |= ei.attackedBy[Us][ALL_PIECES] & b;
         ei.attackedBy[Us][ALL_PIECES] |= ei.attackedBy[Us][Pt] |= b;
 
         if (b & ei.kingRing[Them])
@@ -551,7 +558,9 @@ namespace {
                     | (~pos.pieces() & shift_bb<Up>(pos.pieces(Us, PAWN) & rank_bb(SecondRank))))
         & ~pos.pieces()
         & ~ei.attackedBy[Them][PAWN]
-        & (ei.attackedBy[Us][PAWN] | ~ei.attackedBy[Them][ALL_PIECES]);
+        & (     ei.attackedBy[Us][PAWN]
+           |   ~ei.attackedBy[Them][ALL_PIECES]
+           | ( ~ei.doubleAttackedBy[Them] & ei.attackedBy[Us][ALL_PIECES]));
     b = pos.pieces(Them) & (shift_bb<Left>(b) | shift_bb<Right>(b)) & ~ei.attackedBy[Us][PAWN];
     if(b)
         score += popcount<Max15>(b) * PawnAttackThreat;
@@ -715,6 +724,8 @@ namespace {
     init_eval_info<WHITE>(pos, ei);
     init_eval_info<BLACK>(pos, ei);
 
+    ei.doubleAttackedBy[WHITE] |=  ei.attackedBy[WHITE][ALL_PIECES] & ei.attackedBy[WHITE][KING];
+    ei.doubleAttackedBy[BLACK] |=  ei.attackedBy[BLACK][ALL_PIECES] & ei.attackedBy[BLACK][KING];
     ei.attackedBy[WHITE][ALL_PIECES] |= ei.attackedBy[WHITE][KING];
     ei.attackedBy[BLACK][ALL_PIECES] |= ei.attackedBy[BLACK][KING];
 
