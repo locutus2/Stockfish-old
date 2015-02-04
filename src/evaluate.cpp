@@ -556,7 +556,7 @@ namespace {
         & (ei.attackedBy[Us][PAWN] | ~ei.attackedBy[Them][ALL_PIECES]);
 
     b =  (shift_bb<Left>(b) | shift_bb<Right>(b))
-       &  pos.pieces(Them)
+       &  pos.pieces(Them, KNIGHT, BISHOP)
        & ~ei.attackedBy[Us][PAWN];
 
     if(b)
