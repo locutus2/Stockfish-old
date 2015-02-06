@@ -553,7 +553,7 @@ namespace {
 
     b &=  ~pos.pieces()
         & ~ei.attackedBy[Them][PAWN]
-        & (ei.attackedBy[Us][PAWN] | ei.attackedBy[Us][QUEEN] | ~ei.attackedBy[Them][ALL_PIECES]);
+        & (ei.attackedBy[Us][PAWN] | ei.attackedBy[Us][ROOK] | ~ei.attackedBy[Them][ALL_PIECES]);
 
     b =  (shift_bb<Left>(b) | shift_bb<Right>(b))
        &  pos.pieces(Them)
