@@ -495,16 +495,18 @@ namespace {
 
     const Color Them        = (Us == WHITE ? BLACK    : WHITE);
     const Square Up         = (Us == WHITE ? DELTA_N  : DELTA_S);
-    const Square Left       = (Us == WHITE ? DELTA_NW : DELTA_SE);
-    const Square Right      = (Us == WHITE ? DELTA_NE : DELTA_SW);
+    const Square LeftDown   = (Us == WHITE ? DELTA_SW : DELTA_NE);
+    const Square RightDown  = (Us == WHITE ? DELTA_SE : DELTA_NW);
     const Bitboard TRank2BB = (Us == WHITE ? Rank2BB  : Rank7BB);
     const Bitboard TRank7BB = (Us == WHITE ? Rank7BB  : Rank2BB);
 
     enum { Defended, Weak };
     enum { Minor, Major };
 
-    Bitboard b, weak, defended;
+    Bitboard b, b1, weak, defended;
     Score score = SCORE_ZERO;
+    Square s;
+    Move move;
 
     // Non-pawn enemies defended by a pawn
     defended =  (pos.pieces(Them) ^ pos.pieces(Them, PAWN))
@@ -550,17 +552,30 @@ namespace {
     // Add bonus for safe pawn pushes which attacks an enemy piece
     b = pos.pieces(Us, PAWN) & ~TRank7BB;
     b = shift_bb<Up>(b | (shift_bb<Up>(b & TRank2BB) & ~pos.pieces()));
+    b &= ~pos.pieces();
 
-    b &=  ~pos.pieces()
-        & ~ei.attackedBy[Them][PAWN]
-        & (ei.attackedBy[Us][PAWN] | ~ei.attackedBy[Them][ALL_PIECES]);
+    b1 = pos.pieces(Them) ^ pos.pieces(Them, PAWN);
+    b &= shift_bb<LeftDown>(b1) | shift_bb<RightDown>(b1);
 
-    b =  (shift_bb<Left>(b) | shift_bb<Right>(b))
-       &  pos.pieces(Them)
-       & ~ei.attackedBy[Us][PAWN];
+    b1 = b &  ~ei.attackedBy[Them][PAWN]
+           & (~ei.attackedBy[Them][ALL_PIECES] | ei.attackedBy[Us][PAWN]);
 
-    if(b)
-        score += popcount<Max15>(b) * PawnAttackThreat;
+    if(b1)
+       score += popcount<Max15>(b1) * PawnAttackThreat;
+
+    b ^= b1;
+    b &= ~ei.attackedBy[Them][PAWN] | ei.attackedBy[Us][PAWN];
+
+    while(b)
+    {
+       s = pop_lsb(&b);
+       if(pos.pieces(Us, PAWN) & (s - pawn_push(Us)))
+          move = make_move(s - pawn_push(Us), s);
+       else
+          move = make_move(s - 2 * pawn_push(Us), s);
+       if(pos.see_sign(move) >= 0)
+          score += PawnAttackThreat;
+    }
 
     if (Trace)
         Tracing::write(Tracing::THREAT, Us, score);
