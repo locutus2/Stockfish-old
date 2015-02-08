@@ -255,6 +255,9 @@ namespace {
             bonus += bonus + bonus / 2;
         else
             bonus += bonus / 2;
+
+        if(ei.pi->pawn_double_attacks(Us) & s)
+            bonus += bonus / 2;
     }
 
     return make_score(bonus * 2, bonus / 2);
