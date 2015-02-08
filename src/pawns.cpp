@@ -101,6 +101,8 @@ namespace {
     const Square Up    = (Us == WHITE ? DELTA_N  : DELTA_S);
     const Square Right = (Us == WHITE ? DELTA_NE : DELTA_SW);
     const Square Left  = (Us == WHITE ? DELTA_NW : DELTA_SE);
+    const Square RightThem = (Us == WHITE ? DELTA_SE : DELTA_NW);
+    const Square LeftThem  = (Us == WHITE ? DELTA_SW : DELTA_NE);
 
     Bitboard b, p, doubled, connected;
     Square s;
@@ -111,6 +113,7 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(Us  , PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
+    Bitboard pawnDoubleAttacksThem = shift_bb<RightThem>(theirPawns) | shift_bb<LeftThem>(theirPawns);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -174,7 +177,11 @@ namespace {
 
         // Score this pawn
         if (isolated)
+        {
             score -= Isolated[opposed][f];
+            if(pawnDoubleAttacksThem & (s + pawn_push(Us)))
+               score -= Isolated[opposed][f] / 2;
+        }
 
         if (unsupported && !isolated)
             score -= UnsupportedPawnPenalty;
