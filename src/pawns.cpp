@@ -113,7 +113,7 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(Us  , PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
-    Bitboard pawnDoubleAttacksThem = shift_bb<RightThem>(theirPawns) | shift_bb<LeftThem>(theirPawns);
+    Bitboard pawnDoubleAttacksThem = shift_bb<RightThem>(theirPawns) & shift_bb<LeftThem>(theirPawns);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
