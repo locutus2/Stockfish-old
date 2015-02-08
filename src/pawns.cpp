@@ -101,6 +101,8 @@ namespace {
     const Square Up    = (Us == WHITE ? DELTA_N  : DELTA_S);
     const Square Right = (Us == WHITE ? DELTA_NE : DELTA_SW);
     const Square Left  = (Us == WHITE ? DELTA_NW : DELTA_SE);
+    const Square RightThem = (Us == WHITE ? DELTA_SE : DELTA_NW);
+    const Square LeftThem  = (Us == WHITE ? DELTA_SW : DELTA_NE);
 
     Bitboard b, p, doubled, connected;
     Square s;
@@ -111,6 +113,7 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(Us  , PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
+    Bitboard pawnDoubleAttacksThem = shift_bb<RightThem>(theirPawns) & shift_bb<LeftThem>(theirPawns);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -183,7 +186,7 @@ namespace {
             score -= Doubled[f] / distance<Rank>(s, frontmost_sq(Us, doubled));
 
         if (backward)
-            score -= Backward[opposed][f];
+            score -= Backward[opposed][f] * (pawnDoubleAttacksThem & (s + pawn_push(Us)) ? 2 : 1);
 
         if (connected)
             score += Connected[opposed][phalanx][relative_rank(Us, s)];
