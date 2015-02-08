@@ -186,7 +186,11 @@ namespace {
             score -= Doubled[f] / distance<Rank>(s, frontmost_sq(Us, doubled));
 
         if (backward)
-            score -= Backward[opposed][f] * (pawnDoubleAttacksThem & (s + pawn_push(Us)) ? 2 : 1);
+        {
+            score -= Backward[opposed][f];
+            if(pawnDoubleAttacksThem & (s + pawn_push(Us)))
+               score -= Backward[opposed][f] / 2;
+        }
 
         if (connected)
             score += Connected[opposed][phalanx][relative_rank(Us, s)];
