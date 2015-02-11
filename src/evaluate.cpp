@@ -163,7 +163,10 @@ namespace {
   const Score TrappedRook        = S(92,  0);
   const Score Unstoppable        = S( 0, 20);
   const Score Hanging            = S(31, 26);
-  Score PawnAttackThreat   = S(20, 20);
+
+  Score PawnAttackThreat[] = {
+    S(0, 0), S(0, 0), S(20, 20), S(20, 20), S(20, 20), S(20, 20), S(20, 20)
+  };
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -560,8 +563,8 @@ namespace {
        &  pos.pieces(Them)
        & ~ei.attackedBy[Us][PAWN];
 
-    if (b)
-        score += popcount<Max15>(b) * PawnAttackThreat;
+    while(b)
+        score += PawnAttackThreat[type_of(pos.piece_on(pop_lsb(&b)))];
 
     if (Trace)
         Tracing::write(Tracing::THREAT, Us, score);
@@ -923,7 +926,11 @@ namespace Eval {
         KingDanger[i] = apply_weight(make_score(t / 10, 0), Weights[KingSafety]);
     }
 
-    PawnAttackThreat = make_score(int(Options["PawnAttackThreatMg"]), int(Options["PawnAttackThreatEg"]));
+    PawnAttackThreat[KNIGHT] = make_score(int(Options["PawnAttackThreatKnightMg"]), int(Options["PawnAttackThreatKnightEg"]));
+    PawnAttackThreat[BISHOP] = make_score(int(Options["PawnAttackThreatBishopMg"]), int(Options["PawnAttackThreatBishopEg"]));
+    PawnAttackThreat[ROOK] = make_score(int(Options["PawnAttackThreatRookMg"]), int(Options["PawnAttackThreatRookEg"]));
+    PawnAttackThreat[QUEEN] = make_score(int(Options["PawnAttackThreatQueenMg"]), int(Options["PawnAttackThreatQueenEg"]));
+    PawnAttackThreat[KING] = make_score(int(Options["PawnAttackThreatKingMg"]), int(Options["PawnAttackThreatKingEg"]));
   }
 
 } // namespace Eval

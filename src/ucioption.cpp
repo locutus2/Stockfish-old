@@ -75,8 +75,18 @@ void init(OptionsMap& o) {
   o["SyzygyProbeDepth"]      << Option(1, 1, 100);
   o["Syzygy50MoveRule"]      << Option(true);
   o["SyzygyProbeLimit"]      << Option(6, 0, 6);
-  o["PawnAttackThreatMg"]    << Option(20, 0, 100, on_eval);
-  o["PawnAttackThreatEg"]    << Option(20, 0, 100, on_eval);
+
+  o["PawnAttackThreatKnightMg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatKnightEg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatBishopMg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatBishopEg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatRookMg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatRookEg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatQueenMg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatQueenEg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatKingMg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatKingEg"]    << Option(20, 0, 100, on_eval);
+
 }
 
 
