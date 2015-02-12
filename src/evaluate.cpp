@@ -162,8 +162,13 @@ namespace {
   const Score TrappedRook        = S(92,  0);
   const Score Unstoppable        = S( 0, 20);
   const Score Hanging            = S(31, 26);
-  const Score PawnAttackThreat   = S(20, 20);
   const Score PawnSafePush       = S( 5 , 5);
+
+  // PawnAttackThreat[PieceType] contains a bonus according to which piece
+  // type is attacked by a safe pawn pawn.
+  const Score PawnAttackThreat[] = {
+    S(0, 0), S(0, 0), S(24, 21), S(24, 21), S(18, 29), S(32, 27), S(17, 24)
+  };
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -564,8 +569,8 @@ namespace {
        &  pos.pieces(Them)
        & ~ei.attackedBy[Us][PAWN];
 
-    if (b)
-        score += popcount<Max15>(b) * PawnAttackThreat;
+    while(b)
+        score += PawnAttackThreat[type_of(pos.piece_on(pop_lsb(&b)))];
 
     if (Trace)
         Tracing::write(Tracing::THREAT, Us, score);
