@@ -163,6 +163,7 @@ namespace {
   const Score TrappedRook        = S(92,  0);
   const Score Unstoppable        = S( 0, 20);
   const Score Hanging            = S(31, 26);
+  Score PawnSafePush             = S( 5,  5);
 
   Score PawnAttackThreat[] = {
     S(0, 0), S(0, 0), S(20, 20), S(20, 20), S(20, 20), S(20, 20), S(20, 20)
@@ -551,14 +552,18 @@ namespace {
             score += more_than_one(b) ? KingOnMany : KingOnOne;
     }
 
-    // Add bonus for safe pawn pushes which attacks an enemy piece
+    // Add a small bonus for safe pawn pushes
     b = pos.pieces(Us, PAWN) & ~TRank7BB;
     b = shift_bb<Up>(b | (shift_bb<Up>(b & TRank2BB) & ~pos.pieces()));
 
     b &=  ~pos.pieces()
         & ~ei.attackedBy[Them][PAWN]
-        & (ei.attackedBy[Us][PAWN] | ~ei.attackedBy[Them][ALL_PIECES]);
+        & (ei.attackedBy[Us][ALL_PIECES] | ~ei.attackedBy[Them][ALL_PIECES]);
 
+    if (b)
+        score += popcount<Full>(b) * PawnSafePush;
+
+    // Add another bonus if the pawn push attacks an enemy piece
     b =  (shift_bb<Left>(b) | shift_bb<Right>(b))
        &  pos.pieces(Them)
        & ~ei.attackedBy[Us][PAWN];
@@ -931,6 +936,8 @@ namespace Eval {
     PawnAttackThreat[ROOK] = make_score(int(Options["PawnAttackThreatRookMg"]), int(Options["PawnAttackThreatRookEg"]));
     PawnAttackThreat[QUEEN] = make_score(int(Options["PawnAttackThreatQueenMg"]), int(Options["PawnAttackThreatQueenEg"]));
     PawnAttackThreat[KING] = make_score(int(Options["PawnAttackThreatKingMg"]), int(Options["PawnAttackThreatKingEg"]));
+
+    PawnSafePush = make_score(int(Options["PawnSafePushMg"]), int(Options["PawnSafePushEg"]));
   }
 
 } // namespace Eval

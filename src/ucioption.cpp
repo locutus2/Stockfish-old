@@ -80,12 +80,15 @@ void init(OptionsMap& o) {
   o["PawnAttackThreatKnightEg"]    << Option(20, 0, 100, on_eval);
   o["PawnAttackThreatBishopMg"]    << Option(20, 0, 100, on_eval);
   o["PawnAttackThreatBishopEg"]    << Option(20, 0, 100, on_eval);
-  o["PawnAttackThreatRookMg"]    << Option(20, 0, 100, on_eval);
-  o["PawnAttackThreatRookEg"]    << Option(20, 0, 100, on_eval);
-  o["PawnAttackThreatQueenMg"]    << Option(20, 0, 100, on_eval);
-  o["PawnAttackThreatQueenEg"]    << Option(20, 0, 100, on_eval);
-  o["PawnAttackThreatKingMg"]    << Option(20, 0, 100, on_eval);
-  o["PawnAttackThreatKingEg"]    << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatRookMg"]      << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatRookEg"]      << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatQueenMg"]     << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatQueenEg"]     << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatKingMg"]      << Option(20, 0, 100, on_eval);
+  o["PawnAttackThreatKingEg"]      << Option(20, 0, 100, on_eval);
+
+  o["PawnSafePushMg"]    << Option(5, 0, 100, on_eval);
+  o["PawnSafePushEg"]    << Option(5, 0, 100, on_eval);
 
 }
 
