@@ -167,7 +167,7 @@ namespace {
   // PawnAttackThreat[PieceType] contains a bonus according to which piece
   // type is attacked by a safe pawn pawn.
   const Score PawnAttackThreat[] = {
-    S(0, 0), S(0, 0), S(24, 21), S(24, 21), S(18, 29), S(32, 27), S(17, 24)
+    S(0, 0), S(0, 0), S(28, 21), S(26, 22), S(20, 20), S(27, 15), S(22, 17)
   };
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
