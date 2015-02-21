@@ -190,13 +190,14 @@ namespace {
   // KingAttackWeights[PieceType] contains king attack weights by piece type
   const int KingAttackWeights[] = { 0, 0, 7, 5, 4, 1 };
 
-  // Bonuses for enemy's safe checks
-  const int QueenContactCheck = 89;
-  const int RookContactCheck  = 71;
-  const int QueenCheck        = 50;
-  const int RookCheck         = 37;
-  const int BishopCheck       = 6;
-  const int KnightCheck       = 14;
+  // Bonuses for enemy's safe checks and check threats
+  const int QueenContactCheck       = 89;
+  const int QueenContactCheckThreat = 8;
+  const int RookContactCheck        = 71;
+  const int QueenCheck              = 50;
+  const int RookCheck               = 37;
+  const int BishopCheck             = 6;
+  const int KnightCheck             = 14;
 
   // KingDanger[attackUnits] contains the actual king danger weighted
   // scores, indexed by a calculated integer number.
@@ -420,6 +421,8 @@ namespace {
                      - mg_value(score) / 8
                      - !pos.count<QUEEN>(Them) * 60;
 
+        safe = ~(ei.attackedBy[Us][ALL_PIECES] | pos.pieces(Them));
+
         // Analyse the enemy's safe queen contact checks. Firstly, find the
         // undefended squares around the king reachable by the enemy queen...
         b = undefended & ei.attackedBy[Them][QUEEN] & ~pos.pieces(Them);
@@ -431,6 +434,29 @@ namespace {
 
             if (b)
                 attackUnits += QueenContactCheck * popcount<Max15>(b);
+        }
+
+        // If no queen contact checks exists analyse the enemy's safe queen moves which threats a queen contact check.
+        if(!b && ei.attackedBy[Them][QUEEN])
+        {
+            b1 = undefended & ~pos.pieces(Them) & ~ei.attackedBy[Them][QUEEN];
+            b1 &=  ei.attackedBy[Them][PAWN]   | ei.attackedBy[Them][KNIGHT]
+                 | ei.attackedBy[Them][BISHOP] | ei.attackedBy[Them][ROOK];
+
+            if(b1)
+            {
+                b = 0;
+                while(b1)
+                {
+                    Square s = pop_lsb(&b1);
+                    b |= pos.attacks_from<QUEEN>(s);
+                }
+
+                b &= safe & ei.attackedBy[Them][QUEEN] & ~pos.attacks_from<QUEEN>(ksq);
+
+                if(b)
+                    attackUnits += QueenContactCheckThreat * popcount<Max15>(b);
+            }
         }
 
         // Analyse the enemy's safe rook contact checks. Firstly, find the
@@ -451,8 +477,6 @@ namespace {
         }
 
         // Analyse the enemy's safe distance checks for sliders and knights
-        safe = ~(ei.attackedBy[Us][ALL_PIECES] | pos.pieces(Them));
-
         b1 = pos.attacks_from<ROOK  >(ksq) & safe;
         b2 = pos.attacks_from<BISHOP>(ksq) & safe;
 
