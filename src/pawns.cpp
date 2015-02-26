@@ -203,7 +203,7 @@ namespace {
                 score += Connected[opposed][phalanx][relative_rank(Us, s)] / 2;
             }
             if(innerLongChain & s)
-                score += Connected[opposed][phalanx][relative_rank(Us, s)] / 4;
+                score += Connected[opposed][phalanx][relative_rank(Us, s)] / 8;
         }
 
         if (lever)
