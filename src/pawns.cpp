@@ -105,10 +105,12 @@ namespace {
   template<Color Us>
   Score evaluate(const Position& pos, Pawns::Entry* e) {
 
-    const Color  Them  = (Us == WHITE ? BLACK    : WHITE);
-    const Square Up    = (Us == WHITE ? DELTA_N  : DELTA_S);
-    const Square Right = (Us == WHITE ? DELTA_NE : DELTA_SW);
-    const Square Left  = (Us == WHITE ? DELTA_NW : DELTA_SE);
+    const Color  Them      = (Us == WHITE ? BLACK    : WHITE);
+    const Square Up        = (Us == WHITE ? DELTA_N  : DELTA_S);
+    const Square Right     = (Us == WHITE ? DELTA_NE : DELTA_SW);
+    const Square Left      = (Us == WHITE ? DELTA_NW : DELTA_SE);
+    const Square RightDown = (Us == WHITE ? DELTA_SE : DELTA_NW);
+    const Square LeftDown  = (Us == WHITE ? DELTA_SW : DELTA_NE);;
 
     Bitboard b, p, doubled, connected, supported;
     Square s;
@@ -119,6 +121,8 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(Us  , PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
+    Bitboard longChain  =   (shift_bb<Left >(ourPawns) & shift_bb<RightDown>(ourPawns))
+                          | (shift_bb<Right>(ourPawns) & shift_bb<LeftDown >(ourPawns));
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -198,6 +202,8 @@ namespace {
                 //apex bonus: pawn on s is supported twice
                 score += Connected[opposed][phalanx][relative_rank(Us, s)] / 2;
             }
+            if(innerLongChain & s)
+                score += Connected[opposed][phalanx][relative_rank(Us, s)] / 4;
         }
 
         if (lever)
