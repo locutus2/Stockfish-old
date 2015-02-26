@@ -119,10 +119,10 @@ namespace {
     const Square* pl = pos.list<PAWN>(Us);
     const Bitboard* pawnAttacksBB = StepAttacksBB[make_piece(Us, PAWN)];
 
-    Bitboard ourPawns   = pos.pieces(Us  , PAWN);
-    Bitboard theirPawns = pos.pieces(Them, PAWN);
-    Bitboard longChain  =   (shift_bb<Left >(ourPawns) & shift_bb<RightDown>(ourPawns))
-                          | (shift_bb<Right>(ourPawns) & shift_bb<LeftDown >(ourPawns));
+    Bitboard ourPawns        = pos.pieces(Us  , PAWN);
+    Bitboard theirPawns      = pos.pieces(Them, PAWN);
+    Bitboard innerLongChain  =   (shift_bb<Left >(ourPawns) & shift_bb<RightDown>(ourPawns))
+                               | (shift_bb<Right>(ourPawns) & shift_bb<LeftDown >(ourPawns));
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
