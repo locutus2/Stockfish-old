@@ -75,7 +75,7 @@ void init(OptionsMap& o) {
   o["Syzygy50MoveRule"]      << Option(true);
   o["SyzygyProbeLimit"]      << Option(6, 0, 6);
 
-  o["CMH"]                   << Option(64, 0, 256, on_search);
+  o["CMH"]                   << Option(128, 0, 512, on_search);
 }
 
 
