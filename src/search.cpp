@@ -74,6 +74,8 @@ namespace {
   int FutilityMoveCounts[2][16];  // [improving][depth]
   Depth Reductions[2][2][64][64]; // [pv][improving][depth][moveNumber]
 
+  int CMH = 64;
+
   template <bool PvNode> inline Depth reduction(bool i, Depth d, int mn) {
     return Reductions[PvNode][i][std::min(d, 63 * ONE_PLY)][std::min(mn, 63)];
   }
@@ -140,6 +142,8 @@ void Search::init() {
       FutilityMoveCounts[0][d] = int(2.4 + 0.773 * pow(d + 0.00, 1.8));
       FutilityMoveCounts[1][d] = int(2.9 + 1.045 * pow(d + 0.49, 1.8));
   }
+
+  CMH = int(Options["CMH"]);
 }
 
 
@@ -1360,6 +1364,8 @@ moves_loop: // When in check and at SpNode search starts from here
         Square prevMoveSq = to_sq((ss-1)->currentMove);
         Piece prevMovePiece = pos.piece_on(prevMoveSq);
         Countermoves.update(prevMovePiece, prevMoveSq, move);
+
+        bonus = bonus * CMH / 64;
 
         HistoryStats& cmh = CounterMovesHistory[prevMovePiece][prevMoveSq];
         cmh.update(pos.moved_piece(move), to_sq(move), bonus);
