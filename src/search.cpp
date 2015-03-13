@@ -1424,6 +1424,8 @@ moves_loop: // When in check and at SpNode search starts from here
         Piece prevMovePiece = pos.piece_on(prevMoveSq);
         Countermoves.update(prevMovePiece, prevMoveSq, move);
 
+        bonus = bonus * 33 / 32;
+
         HistoryStats& cmh = CounterMovesHistory[prevMovePiece][prevMoveSq];
         cmh.update(pos.moved_piece(move), to_sq(move), bonus);
         for (int i = 0; i < quietsCnt; ++i)
