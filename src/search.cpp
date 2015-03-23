@@ -1439,6 +1439,10 @@ moves_loop: // When in check and at SpNode search starts from here
     {
         Square prevPrevSq = to_sq((ss-2)->currentMove);
         Followupmoves.update(pos.piece_on(prevPrevSq), prevPrevSq, move);
+
+        Value bonus2 = Value(((depth+1) / ONE_PLY) * ((depth+1) / ONE_PLY));
+        HistoryStats& cmh2 = CounterMovesHistory[pos.piece_on(prevPrevSq)][prevPrevSq];
+        cmh2.update(pos.piece_on(prevSq), prevSq, -bonus2);
     }
   }
 
