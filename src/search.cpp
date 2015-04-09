@@ -1144,8 +1144,8 @@ moves_loop: // When in check and at SpNode search starts from here
                    :     inCheck ? mated_in(ss->ply) : DrawValue[pos.side_to_move()];
 
     // Quiet best move: update killers, history and countermoves
-    else if (bestValue >= beta && !pos.capture_or_promotion(bestMove))
-        update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount - 1);
+    else if (bestMove != MOVE_NONE && !pos.capture_or_promotion(bestMove))
+        update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount);
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               bestValue >= beta ? BOUND_LOWER :
@@ -1430,10 +1430,13 @@ moves_loop: // When in check and at SpNode search starts from here
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
     {
-        History.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        if(quiets[i] != move)
+        {
+            History.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
 
-        if (is_ok((ss-1)->currentMove))
-            cmh.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+            if (is_ok((ss-1)->currentMove))
+                cmh.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        }
     }
 
     // Extra penalty for TT move in previous ply when it gets refuted
