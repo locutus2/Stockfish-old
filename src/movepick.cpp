@@ -227,7 +227,7 @@ void MovePicker::generate_next_stage() {
   case QUIETS_2_S1:
       cur = endMoves;
       endMoves = endQuiets;
-      if (depth >= 2 * ONE_PLY)
+      if (depth >= 4 * ONE_PLY)
           insertion_sort(cur, endMoves);
       break;
 
