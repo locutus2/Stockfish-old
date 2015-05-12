@@ -680,7 +680,7 @@ namespace {
         &&  type_of(move) == NORMAL)
     {
         Square to = to_sq(move);
-        Gains.update(pos.piece_on(to), to, -(ss-1)->staticEval - ss->staticEval);
+        Gains.update(pos.piece_on(to), to, (-(ss-1)->staticEval - ss->staticEval) / 4);
     }
 
     // Step 6. Razoring (skipped when in check)
