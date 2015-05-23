@@ -169,6 +169,7 @@ namespace {
   const Score BishopPawns        = S( 8, 12);
   const Score MinorBehindPawn    = S(16,  0);
   const Score TrappedRook        = S(92,  0);
+  const Score TrappedKnight      = S(60, 60);
   const Score Unstoppable        = S( 0, 20);
   const Score Hanging            = S(31, 26);
   const Score PawnAttackThreat   = S(20, 20);
@@ -334,6 +335,14 @@ namespace {
                     score -= !pos.empty(s + d + pawn_push(Us))                ? TrappedBishopA1H1 * 4
                             : pos.piece_on(s + d + d) == make_piece(Us, PAWN) ? TrappedBishopA1H1 * 2
                                                                               : TrappedBishopA1H1;
+            }
+            
+            if(     Pt == KNIGHT && mob == 0
+               && !(ei.pinnedPieces[Us] & s) && !(b & pos.pieces(Us, KING)))
+            {
+               const Square Down = (Us == WHITE ? DELTA_S : DELTA_N);
+               if(!(b & pos.pieces(Us, PAWN) & ~shift_bb<Down>(pos.pieces(Them, PAWN))))
+                    score -= TrappedKnight;
             }
         }
 
