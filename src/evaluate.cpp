@@ -771,7 +771,8 @@ namespace {
         if ((b = ei.pi->passed_pawns(BLACK)) != 0)
             score -= int(relative_rank(BLACK, frontmost_sq(BLACK, b))) * Unstoppable;
 
-        score += (pos.is_opposition() == (pos.side_to_move() == BLACK) ? Opposition : -Opposition);
+        if(pos.is_opposition())
+            score += (pos.side_to_move() == BLACK ? Opposition : -Opposition);
     }
 
     // Evaluate space for both sides, only during opening
