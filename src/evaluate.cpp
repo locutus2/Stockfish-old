@@ -173,6 +173,7 @@ namespace {
   const Score Hanging            = S(31, 26);
   const Score PawnAttackThreat   = S(20, 20);
   const Score PawnSafePush       = S( 5,  5);
+  const Score Opposition         = S( 0, 62);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -760,7 +761,7 @@ namespace {
     score +=  evaluate_passed_pawns<WHITE, Trace>(pos, ei)
             - evaluate_passed_pawns<BLACK, Trace>(pos, ei);
 
-    // If both sides have only pawns, score for potential unstoppable pawns
+    // If both sides have only pawns, score for potential unstoppable pawns and opposition
     if (!pos.non_pawn_material(WHITE) && !pos.non_pawn_material(BLACK))
     {
         Bitboard b;
@@ -769,6 +770,8 @@ namespace {
 
         if ((b = ei.pi->passed_pawns(BLACK)) != 0)
             score -= int(relative_rank(BLACK, frontmost_sq(BLACK, b))) * Unstoppable;
+
+        score += (pos.is_opposition() == (pos.side_to_move() == BLACK) ? Opposition : -Opposition);
     }
 
     // Evaluate space for both sides, only during opening

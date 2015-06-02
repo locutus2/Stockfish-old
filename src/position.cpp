@@ -1081,6 +1081,15 @@ bool Position::is_draw() const {
   return false;
 }
 
+/// Position::is_opposition() tests whether the two kings are in opposition.
+
+bool Position::is_opposition() const {
+
+  Square wksq = king_square(WHITE);
+  Square bksq = king_square(BLACK);
+
+  return distance<File>(wksq, bksq) % 2 == 0 && distance<Rank>(wksq,bksq) % 2 == 0;
+}
 
 /// Position::flip() flips position with the white and black sides reversed. This
 /// is only useful for debugging e.g. for finding evaluation symmetry bugs.

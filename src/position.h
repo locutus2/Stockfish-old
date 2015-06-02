@@ -171,6 +171,7 @@ public:
   void set_nodes_searched(uint64_t n);
   bool is_draw() const;
   int rule50_count() const;
+  bool is_opposition() const;
   Score psq_score() const;
   Value non_pawn_material(Color c) const;
 
