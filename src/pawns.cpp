@@ -91,6 +91,9 @@ namespace {
     { V( 0),  V(  65), V( 142), V(48), V(32) },
     { V( 0),  V(  60), V( 126), V(51), V(19) } } };
 
+  // Bonus for flanking storming pawns pair on the 4th rank (like e4,h4 against a white king on g1)
+  const Value FlankingStormingPawns = Value(64);
+
   // Max bonus for king safety. Corresponds to start position with all the pawns
   // in front of the king and no enemy pawn on the horizon.
   const Value MaxSafetyBonus = V(258);
@@ -278,6 +281,12 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
                   rkThem == rkUs + 1                                        ? BlockedByPawn  : Unblocked]
                  [std::min(f, FILE_H - f)][rkThem];
   }
+
+  if(   (file_of(ksq) >= FILE_F && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_H4))
+                                && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_E4)))
+     || (file_of(ksq) <= FILE_C && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_A4))
+                                && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_D4))))
+      safety -= FlankingStormingPawns;
 
   return safety;
 }
