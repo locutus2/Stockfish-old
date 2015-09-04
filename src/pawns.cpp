@@ -98,7 +98,7 @@ namespace {
   { 1ULL << SQ_H5 | 1ULL << SQ_E5, 1ULL << SQ_A5 | 1ULL << SQ_D5, 0} };
 
   // Bonus for flanking storming pawns pair on the 4th rank (like e4,h4 against a white king on g1)
-  const Value FlankingStormingPawns = Value(96);
+  const Value FlankingStormingPawns = Value(32);
 
   // Max bonus for king safety. Corresponds to start position with all the pawns
   // in front of the king and no enemy pawn on the horizon.
