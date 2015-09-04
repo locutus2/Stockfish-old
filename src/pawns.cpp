@@ -91,6 +91,12 @@ namespace {
     { V( 0),  V(  65), V( 142), V(48), V(32) },
     { V( 0),  V(  60), V( 126), V(51), V(19) } } };
 
+  // Mask for detecting flanking storming pawns. 
+  // Indexed by color and king position: [color][king side|queen side|center]
+  const Bitboard FlankingStormingPawnsMask[COLOR_NB][3] = {
+  { 1ULL << SQ_H4 | 1ULL << SQ_E4, 1ULL << SQ_A4 | 1ULL << SQ_D4, 0},
+  { 1ULL << SQ_H5 | 1ULL << SQ_E5, 1ULL << SQ_A5 | 1ULL << SQ_D5, 0} };
+
   // Bonus for flanking storming pawns pair on the 4th rank (like e4,h4 against a white king on g1)
   const Value FlankingStormingPawns = Value(64);
 
@@ -259,6 +265,7 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
   const Color Them = (Us == WHITE ? BLACK : WHITE);
 
   enum { NoFriendlyPawn, Unblocked, BlockedByPawn, BlockedByKing };
+  enum { KingSide, QueenSide, Center };
 
   Bitboard b = pos.pieces(PAWN) & (in_front_bb(Us, rank_of(ksq)) | rank_bb(ksq));
   Bitboard ourPawns = b & pos.pieces(Us);
@@ -282,11 +289,11 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
                  [std::min(f, FILE_H - f)][rkThem];
   }
 
-  if(   (file_of(ksq) >= FILE_F && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_H4))
-                                && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_E4)))
-     || (file_of(ksq) <= FILE_C && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_A4))
-                                && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_D4))))
-      safety -= FlankingStormingPawns;
+  int kingPosition = file_of(ksq) >= FILE_F ? KingSide  : 
+                     file_of(ksq) <= FILE_C ? QueenSide : Center;
+  b = pos.pieces(Them, PAWN) & FlankingStormingPawnsMask[Us][kingPosition];
+  if(more_than_one(b))
+     safety -= FlankingStormingPawns;
 
   return safety;
 }
