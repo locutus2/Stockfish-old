@@ -801,7 +801,7 @@ Value Eval::evaluate(const Position& pos) {
   int p    = pos.count<PAWN>(WHITE) + pos.count<PAWN>(BLACK);
   int pp   = popcount<Max15>(ei.pi->passed_pawns(WHITE) | ei.pi->passed_pawns(BLACK));
   int v_eg = 1 + abs(int(eg_value(score)));
-  sf = ScaleFactor(std::max(sf / 2, sf - 7 * SCALE_FACTOR_NORMAL * (14 - p - 2 * pp) / v_eg));
+  sf = ScaleFactor(std::max(sf / 2, sf - 7 * SCALE_FACTOR_NORMAL * (14 - p - 3 * pp) / v_eg));
 
   // Interpolate between a middlegame and a (scaled by 'sf') endgame score
   Value v =  mg_value(score) * int(me->game_phase())
