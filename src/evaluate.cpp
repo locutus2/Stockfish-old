@@ -170,6 +170,23 @@ namespace {
     { V(7), V(14), V(37), V(63), V(134), V(189) }
   };
 
+  Score PassedFile[] = {
+    S( 15,  15), S( 5,  5), S(-5, -5), S(-15, -15),
+    S(-15, -15), S(-5, -5), S( 5,  5), S( 15,  15)
+  };
+
+  Score PassedFileTune[] = {S( 15,  15), S( 5,  5), S(-5, -5), S(-15, -15)};
+
+  void post_update()
+  {
+    PassedFile[FILE_A] = PassedFile[FILE_H] = PassedFileTune[0];
+    PassedFile[FILE_B] = PassedFile[FILE_G] = PassedFileTune[1];
+    PassedFile[FILE_C] = PassedFile[FILE_F] = PassedFileTune[2];
+    PassedFile[FILE_D] = PassedFile[FILE_E] = PassedFileTune[3];
+  }
+
+  TUNE(SetRange(-50,50), PassedFileTune, post_update);
+
   const Score ThreatenedByHangingPawn = S(40, 60);
 
   // Assorted bonuses and penalties used by evaluation
@@ -639,7 +656,7 @@ namespace {
         if (pos.count<PAWN>(Us) < pos.count<PAWN>(Them))
             ebonus += ebonus / 4;
 
-        score += make_score(mbonus, ebonus);
+        score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
     }
 
     if (DoTrace)
