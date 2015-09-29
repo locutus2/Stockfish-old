@@ -848,7 +848,7 @@ moves_loop: // When in check and at SpNode search starts from here
                   : pos.gives_check(move, ci);
 
       // Step 12. Extend checks
-      if (givesCheck && (pos.capture(move) || pos.see_sign(move) >= VALUE_ZERO))
+      if (givesCheck && ((depth < 4 * ONE_PLY && pos.capture(move)) || pos.see_sign(move) >= VALUE_ZERO))
           extension = ONE_PLY;
 
       // Singular extension search. If all moves but one fail low on a search of
