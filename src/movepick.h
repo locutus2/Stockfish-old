@@ -78,9 +78,9 @@ public:
   MovePicker(const MovePicker&) = delete;
   MovePicker& operator=(const MovePicker&) = delete;
 
-  MovePicker(const Position&, Move, Depth, const HistoryStats&, const CounterMovesHistoryStats&, Square);
-  MovePicker(const Position&, Move, const HistoryStats&, const CounterMovesHistoryStats&, Value);
-  MovePicker(const Position&, Move, Depth, const HistoryStats&, const CounterMovesHistoryStats&, Move, Search::Stack*);
+  MovePicker(const Position&, Move, Depth, const HistoryStats&, const HistoryStats&, const CounterMovesHistoryStats&, Square);
+  MovePicker(const Position&, Move, const HistoryStats&, const HistoryStats&, const CounterMovesHistoryStats&, Value);
+  MovePicker(const Position&, Move, Depth, const HistoryStats&, const HistoryStats&, const CounterMovesHistoryStats&, Move, Search::Stack*);
 
   template<bool SpNode> Move next_move();
 
@@ -92,6 +92,7 @@ private:
 
   const Position& pos;
   const HistoryStats& history;
+  const HistoryStats& fromHistory;
   const CounterMovesHistoryStats& counterMovesHistory;
   Search::Stack* ss;
   Move countermove;

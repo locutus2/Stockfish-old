@@ -67,9 +67,9 @@ namespace {
 /// search captures, promotions and some checks) and how important good move
 /// ordering is at the current node.
 
-MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats& h,
+MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats& h, const HistoryStats& fh,
                        const CounterMovesHistoryStats& cmh, Move cm, Search::Stack* s)
-           : pos(p), history(h), counterMovesHistory(cmh), ss(s), countermove(cm), depth(d) {
+           : pos(p), history(h), fromHistory(fh), counterMovesHistory(cmh), ss(s), countermove(cm), depth(d) {
 
   assert(d > DEPTH_ZERO);
 
@@ -78,9 +78,9 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats&
   endMoves += (ttMove != MOVE_NONE);
 }
 
-MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats& h,
+MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats& h, const HistoryStats& fh,
                        const CounterMovesHistoryStats& cmh, Square s)
-           : pos(p), history(h), counterMovesHistory(cmh) {
+           : pos(p), history(h), fromHistory(fh), counterMovesHistory(cmh) {
 
   assert(d <= DEPTH_ZERO);
 
@@ -104,9 +104,9 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const HistoryStats&
   endMoves += (ttMove != MOVE_NONE);
 }
 
-MovePicker::MovePicker(const Position& p, Move ttm, const HistoryStats& h,
+MovePicker::MovePicker(const Position& p, Move ttm, const HistoryStats& h, const HistoryStats& fh,
                        const CounterMovesHistoryStats& cmh, Value th)
-           : pos(p), history(h), counterMovesHistory(cmh), threshold(th) {
+           : pos(p), history(h), fromHistory(fh), counterMovesHistory(cmh), threshold(th) {
 
   assert(!pos.checkers());
 
@@ -146,6 +146,7 @@ void MovePicker::score<QUIETS>() {
 
   for (auto& m : *this)
       m.value =  history[pos.moved_piece(m)][to_sq(m)]
+               + fromHistory[pos.moved_piece(m)][from_sq(m)] / 8
                + cmh[pos.moved_piece(m)][to_sq(m)] * 3;
 }
 
