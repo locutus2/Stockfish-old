@@ -146,7 +146,7 @@ void MovePicker::score<QUIETS>() {
 
   for (auto& m : *this)
       m.value =  history[pos.moved_piece(m)][to_sq(m)]
-               + fromHistory[pos.moved_piece(m)][from_sq(m)] / 8
+               + fromHistory[pos.moved_piece(m)][from_sq(m)] / 4
                + cmh[pos.moved_piece(m)][to_sq(m)] * 3;
 }
 
