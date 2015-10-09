@@ -800,8 +800,9 @@ Value Eval::evaluate(const Position& pos) {
 
   // Scale endgame by number of pawns
   int p = pos.count<PAWN>(WHITE) + pos.count<PAWN>(BLACK);
+  int attacks = popcount<Max15>(ei.attackedBy[strongSide][ALL_PIECES] & pos.pieces(~strongSide));
   int v_eg = 1 + abs(int(eg_value(score)));
-  sf = ScaleFactor(std::max(sf / 2, sf - 8 * SCALE_FACTOR_NORMAL * (12 - p) / v_eg));
+  sf = ScaleFactor(std::max(sf / 2, sf - 8 * SCALE_FACTOR_NORMAL * (12 - p - attacks) / v_eg));
 
   // Interpolate between a middlegame and a (scaled by 'sf') endgame score
   Value v =  mg_value(score) * int(me->game_phase())
