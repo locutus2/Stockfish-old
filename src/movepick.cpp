@@ -22,6 +22,14 @@
 
 #include "movepick.h"
 #include "thread.h"
+#include "tune.h"
+
+int limitH = 324, decayH = 0, weightH = 32;
+int limitCMH = 324, decayCMH = 512 - 324, weightCMH = 64;
+
+TUNE(SetRange(0, 1024), limitH, limitCMH);
+TUNE(SetRange(0, 512), decayH, decayCMH);
+TUNE(SetRange(0, 256), weightH, weightCMH);
 
 namespace {
 

@@ -28,6 +28,8 @@
 #include "search.h"
 #include "types.h"
 
+extern int limitH, decayH, weightH;
+extern int limitCMH, decayCMH, weightCMH;
 
 /// The Stats struct stores moves statistics. According to the template parameter
 /// the class can store History and Countermoves. History records how often
@@ -53,18 +55,18 @@ struct Stats {
 
   void updateH(Piece pc, Square to, Value v) {
 
-    if (abs(int(v)) >= 324) 
+    if (abs(int(v)) >= limitH)
         return;
-    table[pc][to] -= table[pc][to] * abs(int(v)) / 324;
-    table[pc][to] += int(v) * 32;
+    table[pc][to] -= table[pc][to] * abs(int(v)) / (limitH + decayH);
+    table[pc][to] += int(v) * weightH;
   }
 
   void updateCMH(Piece pc, Square to, Value v) {
 
-    if (abs(int(v)) >= 324) 
+    if (abs(int(v)) >= limitCMH)
         return;
-    table[pc][to] -= table[pc][to] * abs(int(v)) / 512;
-    table[pc][to] += int(v) * 64;
+    table[pc][to] -= table[pc][to] * abs(int(v)) / (limitCMH + decayCMH);
+    table[pc][to] += int(v) * weightCMH;
   }
 
 private:
