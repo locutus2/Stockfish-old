@@ -893,13 +893,13 @@ moves_loop: // When in check search starts from here
           if (   depth < 16 * ONE_PLY
               && moveCount >= FutilityMoveCounts[improving][depth])
               continue;
-              
-             // History Score Pruning
-		  if (depth <= 3 * ONE_PLY
-			  && thisThread->History[pos.moved_piece(move)][to_sq(move)] < VALUE_ZERO
-			  && CounterMovesHistory[pos.piece_on(prevMoveSq)][prevMoveSq]
-			  [pos.moved_piece(move)][to_sq(move)] < VALUE_ZERO)
-			  continue;
+
+          // History Score Pruning
+          if (   depth <= 3 * ONE_PLY
+              && thisThread->History[pos.moved_piece(move)][to_sq(move)] < VALUE_ZERO
+              && CounterMovesHistory[pos.piece_on(prevMoveSq)][prevMoveSq]
+                                    [pos.moved_piece(move)][to_sq(move)] < VALUE_ZERO)
+              continue;
 
           predictedDepth = newDepth - reduction<PvNode>(improving, depth, moveCount);
 
