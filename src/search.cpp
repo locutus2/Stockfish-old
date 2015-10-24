@@ -895,7 +895,7 @@ moves_loop: // When in check search starts from here
               continue;
 
           // History Score Pruning
-          if (   depth <= 3 * ONE_PLY
+          if (   depth <= int(msb(ss->ply)) * ONE_PLY
               && thisThread->History[pos.moved_piece(move)][to_sq(move)] < VALUE_ZERO
               && CounterMovesHistory[pos.piece_on(prevMoveSq)][prevMoveSq]
                                     [pos.moved_piece(move)][to_sq(move)] < VALUE_ZERO)
