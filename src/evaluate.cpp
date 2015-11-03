@@ -274,9 +274,6 @@ namespace {
           : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(Us, ROOK, QUEEN))
                          : pos.attacks_from<Pt>(s);
 
-        if (ei.pinnedPieces[Us] & s)
-            b &= LineBB[pos.square<KING>(Us)][s];
-
         ei.attackedBy[Us][ALL_PIECES] |= ei.attackedBy[Us][Pt] |= b;
 
         if (b & ei.kingRing[Them])
@@ -287,6 +284,9 @@ namespace {
             if (bb)
                 ei.kingAdjacentZoneAttacksCount[Us] += popcount<Max15>(bb);
         }
+
+        if (ei.pinnedPieces[Us] & s)
+            b &= LineBB[pos.square<KING>(Us)][s];
 
         if (Pt == QUEEN)
             b &= ~(  ei.attackedBy[Them][KNIGHT]
