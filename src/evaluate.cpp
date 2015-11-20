@@ -146,18 +146,20 @@ namespace {
     Rank4BB | Rank5BB | Rank6BB, Rank5BB | Rank4BB | Rank3BB
   };
 
-  // Outpost[knight/bishop][supported by pawn] contains bonuses for knights and
-  // bishops outposts, bigger if outpost piece is supported by a pawn.
+  // Outpost[knight/bishop/rook][supported by pawn] contains bonuses for knights, bishops and
+  // rooks outposts, bigger if outpost piece is supported by a pawn.
   const Score Outpost[][2] = {
     { S(42,11), S(63,17) }, // Knights
-    { S(18, 5), S(27, 8) }  // Bishops
+    { S(18, 5), S(27, 8) }, // Bishops
+    { S(18, 5), S(27, 8) }  // Rooks
   };
 
-  // ReachableOutpost[knight/bishop][supported by pawn] contains bonuses for knights and
-  // bishops which can reach a outpost square in one move, bigger if outpost square is supported by a pawn.
+  // ReachableOutpost[knight/bishop/rook][supported by pawn] contains bonuses for knights, bishops and
+  // rooks which can reach a outpost square in one move, bigger if outpost square is supported by a pawn.
   const Score ReachableOutpost[][2] = {
     { S(21, 5), S(31, 8) }, // Knights
-    { S( 8, 2), S(13, 4) }  // Bishops
+    { S( 8, 2), S(13, 4) }, // Bishops
+    { S( 8, 2), S(13, 4) }  // Rooks
   };
 
   // Threat[minor/rook][attacked PieceType] contains
@@ -309,19 +311,22 @@ namespace {
 
         mobility[Us] += MobilityBonus[Pt][mob];
 
-        if (Pt == BISHOP || Pt == KNIGHT)
+        if (Pt != QUEEN)
         {
             // Bonus for outpost squares
             bb = OutpostMask[Us] & ~ei.pi->pawn_attacks_span(Them);
             if (bb & s)
-                score += Outpost[Pt == BISHOP][!!(ei.attackedBy[Us][PAWN] & s)];
+                score += Outpost[Pt - KNIGHT][!!(ei.attackedBy[Us][PAWN] & s)];
             else
             {
                 bb &= b & ~pos.pieces(Us);
                 if (bb)
-                   score += ReachableOutpost[Pt == BISHOP][!!(ei.attackedBy[Us][PAWN] & bb)];
+                   score += ReachableOutpost[Pt - KNIGHT][!!(ei.attackedBy[Us][PAWN] & bb)];
             }
+        }
 
+        if (Pt == BISHOP || Pt == KNIGHT)
+        {
             // Bonus when behind a pawn
             if (    relative_rank(Us, s) < RANK_5
                 && (pos.pieces(PAWN) & (s + pawn_push(Us))))
