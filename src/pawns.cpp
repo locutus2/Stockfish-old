@@ -33,18 +33,18 @@ namespace {
 
   // Doubled pawn penalty by file
   const Score Doubled[FILE_NB] = {
-    S(13, 43), S(20, 48), S(23, 48), S(23, 48),
-    S(23, 48), S(23, 48), S(20, 48), S(13, 43) };
+    S(10, 11), S(11, 94), S(33, 89), S(17, 24),
+    S(10, 46), S(24, 53), S(35, 11), S(19, 11) };
 
   // Isolated pawn penalty by opposed flag and file
   const Score Isolated[2][FILE_NB] = {
-  { S(37, 45), S(54, 52), S(60, 52), S(60, 52),
-    S(60, 52), S(60, 52), S(54, 52), S(37, 45) },
-  { S(25, 30), S(36, 35), S(40, 35), S(40, 35),
-    S(40, 35), S(40, 35), S(36, 35), S(25, 30) } };
+  { S(49, 37), S(77, 77), S(54, 39), S(49, 56),
+    S(112, 47), S(63, 3), S(32, 51), S(25, 61) },
+  { S(6, 34), S(37, 32), S(33, 10), S(29, 4),
+    S(61, 37), S(49, 56), S(37, 58), S(30, 26) } };
 
   // Backward pawn penalty by opposed flag
-  const Score Backward[2] = { S(67, 42), S(49, 24) };
+  const Score Backward[2] = { S(70, 38), S(13, 14) };
 
   // Connected pawn bonus by opposed, phalanx, twice supported and rank
   Score Connected[2][2][2][RANK_NB];
@@ -52,10 +52,10 @@ namespace {
   // Levers bonus by rank
   const Score Lever[RANK_NB] = {
     S( 0, 0), S( 0, 0), S(0, 0), S(0, 0),
-    S(20,20), S(40,40), S(0, 0), S(0, 0) };
+    S(30,19), S(23,75), S(0, 0), S(0, 0) };
 
   // Unsupported pawn penalty
-  const Score UnsupportedPawnPenalty = S(20, 10);
+  const Score UnsupportedPawnPenalty = S(8, 11);
 
   // Center bind bonus: Two pawns controlling the same central square
   const Bitboard CenterBindMask[COLOR_NB] = {
@@ -63,7 +63,7 @@ namespace {
     (FileDBB | FileEBB) & (Rank4BB | Rank3BB | Rank2BB)
   };
 
-  const Score CenterBind = S(16, 0);
+  const Score CenterBind = S(17, 0);
 
   // Weakness of our pawn shelter in front of the king by [distance from edge][rank]
   const Value ShelterWeakness[][RANK_NB] = {
@@ -216,16 +216,16 @@ namespace Pawns {
 
 void init()
 {
-  static const int Seed[RANK_NB] = { 0, 6, 15, 10, 57, 75, 135, 258 };
+  static const int Seed[RANK_NB] = { 0, 1, 5, 16, 66, 124, 138, 444 };
 
   for (int opposed = 0; opposed <= 1; ++opposed)
       for (int phalanx = 0; phalanx <= 1; ++phalanx)
           for (int apex = 0; apex <= 1; ++apex)
               for (Rank r = RANK_2; r < RANK_8; ++r)
   {
-      int v = (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
+      int v = (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) * 3 / 8 : 0)) >> opposed;
       v += (apex ? v / 2 : 0);
-      Connected[opposed][phalanx][apex][r] = make_score(3 * v / 2, v);
+      Connected[opposed][phalanx][apex][r] = make_score(11 * v / 8, 5 * v / 8);
   }
 }
 
