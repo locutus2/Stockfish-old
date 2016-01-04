@@ -65,10 +65,23 @@ private:
   T table[PIECE_NB][SQUARE_NB];
 };
 
+template<typename T>
+struct StatsArray {
+
+  const T& operator[](Phase ph) const { return table[ph]; }
+  T& operator[](Phase ph) { return table[ph]; }
+  void clear() { std::memset(table, 0, sizeof(table)); }
+
+private:
+  T table[PHASE_MIDGAME + 1];
+};
+
 typedef Stats<Move> MovesStats;
 typedef Stats<Value, false> HistoryStats;
 typedef Stats<Value,  true> CounterMovesStats;
+typedef Stats<Value,  true> GamePhaseStats;
 typedef Stats<CounterMovesStats> CounterMovesHistoryStats;
+typedef StatsArray<GamePhaseStats> GamePhaseHistoryStats;
 
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
@@ -85,7 +98,7 @@ public:
 
   MovePicker(const Position&, Move, Depth, const HistoryStats&, Square);
   MovePicker(const Position&, Move, const HistoryStats&, Value);
-  MovePicker(const Position&, Move, Depth, const HistoryStats&, const CounterMovesStats&, Move, Search::Stack*);
+  MovePicker(const Position&, Move, Depth, const HistoryStats&, const GamePhaseStats&, const CounterMovesStats&, Move, Search::Stack*);
 
   Move next_move();
 
@@ -98,6 +111,7 @@ private:
   const Position& pos;
   const HistoryStats& history;
   const CounterMovesStats* counterMovesHistory;
+  const GamePhaseStats* gamePhaseHistory;
   Search::Stack* ss;
   Move countermove;
   Depth depth;

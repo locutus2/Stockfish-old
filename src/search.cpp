@@ -130,6 +130,7 @@ namespace {
   EasyMoveManager EasyMove;
   Value DrawValue[COLOR_NB];
   CounterMovesHistoryStats CounterMovesHistory;
+  GamePhaseHistoryStats GamePhaseHistory;
 
   template <NodeType NT>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode);
@@ -181,6 +182,7 @@ void Search::clear() {
 
   TT.clear();
   CounterMovesHistory.clear();
+  GamePhaseHistory.clear();
 
   for (Thread* th : Threads)
   {
@@ -854,8 +856,9 @@ moves_loop: // When in check search starts from here
     Square prevSq = to_sq((ss-1)->currentMove);
     Move cm = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
     const CounterMovesStats& cmh = CounterMovesHistory[pos.piece_on(prevSq)][prevSq];
+    const GamePhaseStats& gph = GamePhaseHistory[pos.game_phase()];
 
-    MovePicker mp(pos, ttMove, depth, thisThread->history, cmh, cm, ss);
+    MovePicker mp(pos, ttMove, depth, thisThread->history, gph, cmh, cm, ss);
     CheckInfo ci(pos);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
@@ -1423,9 +1426,11 @@ moves_loop: // When in check search starts from here
 
     Square prevSq = to_sq((ss-1)->currentMove);
     CounterMovesStats& cmh = CounterMovesHistory[pos.piece_on(prevSq)][prevSq];
+    GamePhaseStats& gph = GamePhaseHistory[pos.game_phase()];
     Thread* thisThread = pos.this_thread();
 
     thisThread->history.update(pos.moved_piece(move), to_sq(move), bonus);
+    gph.update(pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
     {
@@ -1437,6 +1442,7 @@ moves_loop: // When in check search starts from here
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->history.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        gph.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
 
         if (is_ok((ss-1)->currentMove))
             cmh.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
