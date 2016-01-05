@@ -79,7 +79,7 @@ private:
 typedef Stats<Move> MovesStats;
 typedef Stats<Value, false> HistoryStats;
 typedef Stats<Value,  true> CounterMovesStats;
-typedef Stats<Value,  false> GamePhaseStats;
+typedef Stats<Value, false> GamePhaseStats;
 typedef Stats<CounterMovesStats> CounterMovesHistoryStats;
 typedef StatsArray<GamePhaseStats> GamePhaseHistoryStats;
 
