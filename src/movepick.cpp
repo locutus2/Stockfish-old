@@ -141,8 +141,8 @@ template<>
 void MovePicker::score<QUIETS>() {
 
   for (auto& m : *this)
-      m.value =  history[pos.moved_piece(m)][to_sq(m)] / 2
-               + (*gamePhaseHistory)[pos.moved_piece(m)][to_sq(m)]
+      m.value =  history[pos.moved_piece(m)][to_sq(m)]
+               + (*gamePhaseHistory)[pos.moved_piece(m)][to_sq(m)] / 2
                + (*counterMovesHistory)[pos.moved_piece(m)][to_sq(m)];
 }
 
