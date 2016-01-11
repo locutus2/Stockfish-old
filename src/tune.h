@@ -83,6 +83,15 @@ inline void set_conditions() { Conditions.set(); }
 /// You can also set the range directly, and restore the default at the end
 ///
 ///   TUNE(SetRange(-100, 100), myScore, SetDefaultRange);
+///
+/// In case update function is slow and you have many parameters, you can add:
+///
+///   UPDATE_ON_LAST();
+///
+/// And the values update, including post update function call, will be done only
+/// once, after the engine receives the last UCI option, that is the one defined
+/// and created as the last one, so the GUI should send the options in the same
+/// order in which have been defined.
 
 class Tune {
 
@@ -139,7 +148,7 @@ class Tune {
   template<typename T, size_t N, typename... Args>
   int add(const SetRange& range, std::string&& names, T (&value)[N], Args&&... args) {
     for (size_t i = 0; i < N; i++)
-        add(range, next(names, i == N - 1) + "_" + std::to_string(i), value[i]);
+        add(range, next(names, i == N - 1) + "[" + std::to_string(i) + "]", value[i]);
     return add(range, std::move(names), args...);
   }
 
@@ -166,6 +175,7 @@ public:
   }
   static void init() { for (auto& e : instance().list) e->init_option(); read_options(); } // Deferred, due to UCI::Options access
   static void read_options() { for (auto& e : instance().list) e->read_option(); }
+  static bool update_on_last;
 };
 
 // Some macro magic :-) we define a dummy int variable that compiler initializes calling Tune::add()
@@ -173,6 +183,8 @@ public:
 #define UNIQUE2(x, y) x ## y
 #define UNIQUE(x, y) UNIQUE2(x, y) // Two indirection levels to expand __LINE__
 #define TUNE(...) int UNIQUE(p, __LINE__) = Tune::add(STRINGIFY((__VA_ARGS__)), __VA_ARGS__)
+
+#define UPDATE_ON_LAST() bool UNIQUE(p, __LINE__) = Tune::update_on_last = true
 
 // Some macro to tune toggling of boolean conditions
 #define CONDITION(x) (Conditions.binary[__COUNTER__] || (x))

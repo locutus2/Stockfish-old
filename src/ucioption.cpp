@@ -170,6 +170,8 @@ Option& Option::operator=(const string& v) {
 #include <iostream>
 #include <sstream>
 
+bool Tune::update_on_last;
+const UCI::Option* LastOption = nullptr;
 BoolConditions Conditions;
 static std::map<std::string, int> TuneResults;
 
@@ -192,7 +194,11 @@ string Tune::next(string& names, bool pop) {
   return name;
 }
 
-static void on_tune(const UCI::Option&) { Tune::read_options(); }
+static void on_tune(const UCI::Option& o) {
+
+  if (!Tune::update_on_last || LastOption == &o)
+      Tune::read_options();
+}
 
 static void make_option(const string& n, int v, const SetRange& r) {
 
@@ -204,6 +210,7 @@ static void make_option(const string& n, int v, const SetRange& r) {
       v = TuneResults[n];
 
   Options[n] << UCI::Option(v, r(v).first, r(v).second, on_tune);
+  LastOption = &Options[n];
 
   // Print formatted parameters, ready to be copy-pasted in fishtest
   std::cout << n << ","
@@ -266,12 +273,14 @@ void BoolConditions::set() {
 
 // Init options with tuning session results instead of default values. Useful to
 // get correct bench signature after a tuning session or to test tuned values.
-// Just copy fishtest tuning results in a tune_result.txt file and extract the
+// Just copy fishtest tuning results in a result.txt file and extract the
 // values with:
 //
-//  cat tune_result.txt | sed 's/^param: \([^,]*\), best: \([^,]*\).*/  TuneResults["\1"] = int(\2);/'
+// cat results.txt | sed 's/^param: \([^,]*\), best: \([^,]*\).*/  TuneResults["\1"] = int(round(\2));/'
 //
 // Then paste the output below, as the function body
+
+#include <cmath>
 
 void Tune::read_results() {
 
