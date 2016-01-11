@@ -577,6 +577,10 @@ void Thread::search() {
                 rootMoves.end(), skill.best_move(multiPV)));
 }
 
+int A = 16432, B = 0;
+
+TUNE(SetRange(-100000, 100000), A);
+TUNE(SetRange(-10000, 10000), B);
 
 namespace {
 
@@ -942,7 +946,8 @@ moves_loop: // When in check search starts from here
       {
           // Move count based pruning
           if (   depth < 16 * ONE_PLY
-              && moveCount >= FutilityMoveCounts[improving][depth])
+              && moveCount >= FutilityMoveCounts[improving][depth]
+              && cmh[pos.moved_piece(move)][to_sq(move)] < A + B * depth / ONE_PLY)
               continue;
 
           // History based pruning
