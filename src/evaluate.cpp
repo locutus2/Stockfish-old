@@ -190,8 +190,15 @@ namespace {
     S(-27,-12), S( 1, -8), S( 3, 10), S( 12, 10)
   };
 
+  // MinorBehindPawn[own/opponent pawn][Rank] contains bonuses for minor behind a pawn.
+  Score MinorBehindPawn[][RANK_NB] = {
+    { S( 16,  0), S( 16,  0), S( 16,  0), S( 16,  0) },
+    { S( 16,  0), S( 16,  0), S( 16,  0), S( 16,  0) }
+  };
+
+  TUNE(SetRange(-50, 50), MinorBehindPawn);
+
   // Assorted bonuses and penalties used by evaluation
-  const Score MinorBehindPawn     = S(16,  0);
   const Score BishopPawns         = S( 8, 12);
   const Score RookOnPawn          = S( 7, 27);
   const Score TrappedRook         = S(92,  0);
@@ -317,7 +324,7 @@ namespace {
             // Bonus when behind a pawn
             if (    relative_rank(Us, s) < RANK_5
                 && (pos.pieces(PAWN) & (s + pawn_push(Us))))
-                score += MinorBehindPawn;
+                score += MinorBehindPawn[!(pos.pieces(Us, PAWN) & (s + pawn_push(Us)))][relative_rank(Us, s)];
 
             // Penalty for pawns on the same color square as the bishop
             if (Pt == BISHOP)
