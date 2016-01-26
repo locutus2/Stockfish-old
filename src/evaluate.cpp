@@ -191,7 +191,7 @@ namespace {
   };
 
   // MinorBehindPawn[own/opponent pawn][Rank] contains bonuses for minor behind a pawn.
-  Score MinorBehindPawn[][RANK_NB] = {
+  Score MinorBehindPawn[2][4] = {
     { S( 16,  0), S( 16,  0), S( 16,  0), S( 16,  0) },
     { S( 16,  0), S( 16,  0), S( 16,  0), S( 16,  0) }
   };
