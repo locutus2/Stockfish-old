@@ -1129,6 +1129,9 @@ moves_loop: // When in check search starts from here
                   assert(value >= beta); // Fail high
                   break;
               }
+
+              if(!captureOrPromotion)
+                  update_stats(pos, ss, move, depth, quietsSearched, quietCount);
           }
       }
 
