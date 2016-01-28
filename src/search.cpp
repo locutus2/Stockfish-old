@@ -1130,8 +1130,8 @@ moves_loop: // When in check search starts from here
                   break;
               }
 
-              if(!captureOrPromotion)
-                  update_stats(pos, ss, move, depth, quietsSearched, quietCount);
+              if(!captureOrPromotion && depth > ONE_PLY)
+                  update_stats(pos, ss, move, depth / 2, quietsSearched, quietCount);
           }
       }
 
