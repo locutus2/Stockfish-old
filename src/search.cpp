@@ -960,7 +960,7 @@ moves_loop: // When in check search starts from here
               && moveCount >= FutilityMoveCounts[improving][depth]
               &&        cmh[pos.moved_piece(move)][to_sq(move)]
                 +   3 * thisThread->history[pos.moved_piece(move)][to_sq(move)]
-                + 803 * moveCount <= 35227)
+                + 803 * moveCount <= 26775)
               continue;
 
           // History based pruning
