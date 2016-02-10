@@ -181,7 +181,7 @@ namespace {
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S(16,  0);
   const Score BishopPawns         = S( 8, 12);
-  const Score RookOnPawn          = S( 7, 27);
+  const Score RookOnPawn          = S( 9, 36);
   const Score TrappedRook         = S(92,  0);
   const Score Checked             = S(20, 20);
   const Score ThreatByHangingPawn = S(70, 63);
@@ -328,10 +328,11 @@ namespace {
 
         if (Pt == ROOK)
         {
-            // Bonus for aligning with enemy pawns on the same rank/file
+            // Bonus for aligning with weak enemy pawns on the same rank/file
             if (relative_rank(Us, s) >= RANK_5)
             {
-                Bitboard alignedPawns = pos.pieces(Them, PAWN) & PseudoAttacks[ROOK][s];
+                Bitboard alignedPawns =  pos.pieces(Them, PAWN) & PseudoAttacks[ROOK][s]
+                                      & (ei.attackedBy[Us][PAWN] | ~ei.attackedBy[Them][PAWN] | ei.pinnedPieces[Them]);;
                 if (alignedPawns)
                     score += RookOnPawn * popcount<Max15>(alignedPawns);
             }
