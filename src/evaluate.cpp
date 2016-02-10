@@ -332,7 +332,7 @@ namespace {
             if (relative_rank(Us, s) >= RANK_5)
             {
                 Bitboard alignedPawns =  pos.pieces(Them, PAWN) & PseudoAttacks[ROOK][s]
-                                      & (ei.attackedBy[Us][PAWN] | ~ei.attackedBy[Them][PAWN] | ei.pinnedPieces[Them]);;
+                                      & (ei.attackedBy[Us][PAWN] | ~ei.attackedBy[Them][PAWN] | ei.pinnedPieces[Them]);
                 if (alignedPawns)
                     score += RookOnPawn * popcount<Max15>(alignedPawns);
             }
