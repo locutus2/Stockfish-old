@@ -189,6 +189,9 @@ namespace {
   const Score ThreatByPawnPush    = S(31, 19);
   const Score Unstoppable         = S( 0, 20);
 
+  // King safety bonus for attacking opposite colored bishops
+  const Score OppositeBishopAttacksKing = S(16, 0);
+
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
   // happen in Chess960 games.
@@ -454,6 +457,9 @@ namespace {
             attackUnits += KnightCheck * popcount<Max15>(b);
             score -= Checked;
         }
+
+        if((ei.kingRing[Us] & ei.attackedBy[Them][BISHOP]) && pos.opposite_bishops())
+            score -= OppositeBishopAttacksKing;
 
         // Finally, extract the king danger score from the KingDanger[]
         // array and subtract the score from the evaluation.
