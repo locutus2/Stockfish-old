@@ -278,8 +278,7 @@ Move MovePicker::next_move() {
           move = *cur++;
           if (   move != ttMove
               && move != killers[0]
-              && move != killers[1]
-              && move != killers[2])
+              && move != killers[1])
               return move;
           break;
 
