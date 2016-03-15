@@ -213,7 +213,6 @@ void Search::clear() {
   for (Thread* th : Threads)
   {
       th->history.clear();
-      th->counterMoves.clear();
   }
 
   Threads.main()->previousScore = VALUE_INFINITE;
@@ -869,11 +868,10 @@ moves_loop: // When in check search starts from here
 
     Square prevSq = to_sq((ss-1)->currentMove);
     Square ownPrevSq = to_sq((ss-2)->currentMove);
-    Move cm = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
     const CounterMoveStats& cmh = CounterMoveHistory[pos.piece_on(prevSq)][prevSq];
     const CounterMoveStats& fmh = CounterMoveHistory[pos.piece_on(ownPrevSq)][ownPrevSq];
 
-    MovePicker mp(pos, ttMove, depth, thisThread->history, cmh, fmh, cm, ss);
+    MovePicker mp(pos, ttMove, depth, thisThread->history, cmh, fmh, ss);
     CheckInfo ci(pos);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
@@ -1152,7 +1150,7 @@ moves_loop: // When in check search starts from here
         bestValue = excludedMove ? alpha
                    :     inCheck ? mated_in(ss->ply) : DrawValue[pos.side_to_move()];
 
-    // Quiet best move: update killers, history and countermoves
+    // Quiet best move: update killers and history
     else if (bestMove && !pos.capture_or_promotion(bestMove))
         update_stats(pos, ss, bestMove, depth, quietsSearched, quietCount);
 
@@ -1427,7 +1425,7 @@ moves_loop: // When in check search starts from here
   }
 
 
-  // update_stats() updates killers, history, countermove and countermove plus
+  // update_stats() updates killers, history and countermove plus
   // follow-up move history when a new quiet best move is found.
 
   void update_stats(const Position& pos, Stack* ss, Move move,
@@ -1450,10 +1448,7 @@ moves_loop: // When in check search starts from here
     thisThread->history.update(pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
-    {
-        thisThread->counterMoves.update(pos.piece_on(prevSq), prevSq, move);
         cmh.update(pos.moved_piece(move), to_sq(move), bonus);
-    }
 
     if (is_ok((ss-2)->currentMove))
         fmh.update(pos.moved_piece(move), to_sq(move), bonus);
