@@ -365,43 +365,25 @@ namespace {
   template<>
   Score evaluate_pieces< true, WHITE, KING>(const Position&, EvalInfo&, Score*, const Bitboard*) { return SCORE_ZERO; }
 
+  // evaluate_king_attackers() assign bonuses and penalties for attacks against the king of a given color and square
 
-  // evaluate_king() assigns bonuses and penalties to a king of a given color
+  template<Color Us>
+  Score evaluate_king_attackers(const Position& pos, const EvalInfo& ei, Square ksq, int attackUnits) {
 
-  template<Color Us, bool DoTrace>
-  Score evaluate_king(const Position& pos, const EvalInfo& ei) {
+        const Color Them = (Us == WHITE ? BLACK : WHITE);
 
-    const Color Them = (Us == WHITE ? BLACK : WHITE);
+        Bitboard undefended, b, b1, b2, safe;
+        Score score = SCORE_ZERO;
 
-    Bitboard undefended, b, b1, b2, safe;
-    int attackUnits;
-    const Square ksq = pos.square<KING>(Us);
-
-    // King shelter and enemy pawns storm
-    Score score = ei.pi->king_safety<Us>(pos, ksq);
-
-    // Main king safety evaluation
-    if (ei.kingAttackersCount[Them])
-    {
         // Find the attacked squares around the king which have no defenders
         // apart from the king itself.
         undefended =  ei.attackedBy[Them][ALL_PIECES]
-                    & ei.attackedBy[Us][KING]
+                    & pos.attacks_from<KING>(ksq)
                     & ~(  ei.attackedBy[Us][PAWN]   | ei.attackedBy[Us][KNIGHT]
                         | ei.attackedBy[Us][BISHOP] | ei.attackedBy[Us][ROOK]
                         | ei.attackedBy[Us][QUEEN]);
 
-        // Initialize the 'attackUnits' variable, which is used later on as an
-        // index into the KingDanger[] array. The initial value is based on the
-        // number and types of the enemy's attacking pieces, the number of
-        // attacked and undefended squares around our king and the quality of
-        // the pawn shelter (current 'score' value).
-        attackUnits =  std::min(72, ei.kingAttackersCount[Them] * ei.kingAttackersWeight[Them])
-                     +  9 * ei.kingAdjacentZoneAttacksCount[Them]
-                     + 27 * popcount<Max15>(undefended)
-                     + 11 * !!ei.pinnedPieces[Us]
-                     - 64 * !pos.count<QUEEN>(Them)
-                     - mg_value(score) / 8;
+        attackUnits += 27 * popcount<Max15>(undefended);
 
         // Analyse the enemy's safe queen contact checks. Firstly, find the
         // undefended squares around the king reachable by the enemy queen...
@@ -442,6 +424,48 @@ namespace {
         // Finally, extract the king danger score from the KingDanger[]
         // array and subtract the score from the evaluation.
         score -= KingDanger[std::max(std::min(attackUnits, 399), 0)];
+
+        return score;
+  }
+
+  // evaluate_king() assigns bonuses and penalties to a king of a given color
+
+  template<Color Us, bool DoTrace>
+  Score evaluate_king(const Position& pos, const EvalInfo& ei) {
+
+    const Color Them = (Us == WHITE ? BLACK : WHITE);
+
+    int attackUnits;
+    const Square ksq = pos.square<KING>(Us);
+    Score attackScore;
+
+    // King shelter and enemy pawns storm
+    Score score = ei.pi->king_safety<Us>(pos, ksq);
+
+    // Main king safety evaluation
+    if (ei.kingAttackersCount[Them])
+    {
+        // Initialize the 'attackUnits' variable, which is used later on as an
+        // index into the KingDanger[] array. The initial value is based on the
+        // number and types of the enemy's attacking pieces, the number of
+        // attacked and undefended squares around our king and the quality of
+        // the pawn shelter (current 'score' value).
+        attackUnits =  std::min(72, ei.kingAttackersCount[Them] * ei.kingAttackersWeight[Them])
+                      +  9 * ei.kingAdjacentZoneAttacksCount[Them]
+                      + 11 * !!ei.pinnedPieces[Us]
+                      - 64 * !pos.count<QUEEN>(Them)
+                      - mg_value(score) / 8;
+
+        attackScore = evaluate_king_attackers<Us>(pos, ei, ksq, attackUnits);
+
+        // If we can castle use the attackScore after the castling if it is bigger
+        if (pos.can_castle(MakeCastling<Us, KING_SIDE>::right))
+            attackScore = std::max(attackScore, evaluate_king_attackers<Us>(pos, ei, relative_square(Us, SQ_G1), attackUnits));
+
+        if (pos.can_castle(MakeCastling<Us, QUEEN_SIDE>::right))
+            attackScore = std::max(attackScore, evaluate_king_attackers<Us>(pos, ei, relative_square(Us, SQ_C1), attackUnits));
+
+        score += attackScore;
     }
 
     if (DoTrace)
