@@ -144,8 +144,8 @@ void MovePicker::score<QUIETS>() {
 
   for (auto& m : *this)
       m.value =  history[pos.moved_piece(m)][to_sq(m)]
-               + (*counterMoveHistory )[pos.moved_piece(m)][to_sq(m)]
-               + (*followupMoveHistory)[pos.moved_piece(m)][to_sq(m)];
+               + std::max((*counterMoveHistory )[pos.moved_piece(m)][to_sq(m)],
+                          (*followupMoveHistory)[pos.moved_piece(m)][to_sq(m)]);
 }
 
 template<>
