@@ -1455,7 +1455,7 @@ moves_loop: // When in check search starts from here
         cmh.update(pos.moved_piece(move), to_sq(move), bonus);
     }
 
-    if (is_ok((ss-2)->currentMove) && !pos.captured_piece_type())
+    if (is_ok((ss-2)->currentMove) && (ss-1)->moveCount == 1)
         fmh.update(pos.moved_piece(move), to_sq(move), bonus);
 
     // Decrease all the other played quiet moves
@@ -1466,7 +1466,7 @@ moves_loop: // When in check search starts from here
         if (is_ok((ss-1)->currentMove))
             cmh.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
 
-        if (is_ok((ss-2)->currentMove) && !pos.captured_piece_type())
+        if (is_ok((ss-2)->currentMove) && (ss-1)->moveCount == 1)
             fmh.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
 
