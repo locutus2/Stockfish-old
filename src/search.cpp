@@ -1173,6 +1173,9 @@ moves_loop: // When in check search starts from here
         if ((ss-3)->cms) // prevFmh
             (ss-3)->cms->update(pos.piece_on(prevSq), prevSq, bonus);
 
+        if ((ss-4)->cms) // prevCmh2
+            (ss-4)->cms->update(pos.piece_on(prevSq), prevSq, bonus);
+
         if ((ss-5)->cms) // prevFmh2
             (ss-5)->cms->update(pos.piece_on(prevSq), prevSq, bonus);
     }
@@ -1451,6 +1454,7 @@ moves_loop: // When in check search starts from here
     Square prevSq = to_sq((ss-1)->currentMove);
     CounterMoveStats * cmh  = (ss-1)->cms;
     CounterMoveStats * fmh  = (ss-2)->cms;
+    CounterMoveStats * cmh2 = (ss-3)->cms;
     CounterMoveStats * fmh2 = (ss-4)->cms;
     Thread* thisThread = pos.this_thread();
 
@@ -1464,6 +1468,9 @@ moves_loop: // When in check search starts from here
 
     if (fmh)
         fmh->update(pos.moved_piece(move), to_sq(move), bonus);
+
+    if (cmh2)
+        cmh2->update(pos.moved_piece(move), to_sq(move), bonus);
 
     if (fmh2)
         fmh2->update(pos.moved_piece(move), to_sq(move), bonus);
@@ -1479,6 +1486,9 @@ moves_loop: // When in check search starts from here
         if (fmh)
             fmh->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
 
+        if (cmh2)
+            cmh2->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+
         if (fmh2)
             fmh2->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
@@ -1492,6 +1502,9 @@ moves_loop: // When in check search starts from here
 
         if ((ss-3)->cms) // prevFmh
             (ss-3)->cms->update(pos.piece_on(prevSq), prevSq, -bonus - 2 * (depth + 1) / ONE_PLY);
+
+        if ((ss-4)->cms) // prevCmh2
+            (ss-4)->cms->update(pos.piece_on(prevSq), prevSq, -bonus - 2 * (depth + 1) / ONE_PLY);
 
         if ((ss-5)->cms) // prevFmh2
             (ss-5)->cms->update(pos.piece_on(prevSq), prevSq, -bonus - 2 * (depth + 1) / ONE_PLY);
