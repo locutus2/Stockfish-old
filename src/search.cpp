@@ -1176,7 +1176,7 @@ moves_loop: // When in check search starts from here
         if ((ss-5)->cms) // prevFmh2
             (ss-5)->cms->update(pos.piece_on(prevSq), prevSq, bonus);
 
-        if ((ss-7)->cms) // prevFmh2
+        if ((ss-7)->cms) // prevFmh3
             (ss-7)->cms->update(pos.piece_on(prevSq), prevSq, bonus);
     }
 
