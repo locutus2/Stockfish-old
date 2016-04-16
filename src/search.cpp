@@ -388,12 +388,12 @@ void MainThread::search() {
 
 void Thread::search() {
 
-  Stack stack[MAX_PLY+7], *ss = stack+5; // To allow referencing (ss-5) and (ss+2)
+  Stack stack[MAX_PLY+9], *ss = stack+7; // To allow referencing (ss-7) and (ss+2)
   Value bestValue, alpha, beta, delta;
   Move easyMove = MOVE_NONE;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
 
-  std::memset(ss-5, 0, 8 * sizeof(Stack));
+  std::memset(ss-7, 0, 10 * sizeof(Stack));
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -1175,6 +1175,9 @@ moves_loop: // When in check search starts from here
 
         if ((ss-5)->cms) // prevFmh2
             (ss-5)->cms->update(pos.piece_on(prevSq), prevSq, bonus);
+
+        if ((ss-7)->cms) // prevFmh2
+            (ss-7)->cms->update(pos.piece_on(prevSq), prevSq, bonus);
     }
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
@@ -1452,6 +1455,7 @@ moves_loop: // When in check search starts from here
     CounterMoveStats * cmh  = (ss-1)->cms;
     CounterMoveStats * fmh  = (ss-2)->cms;
     CounterMoveStats * fmh2 = (ss-4)->cms;
+    CounterMoveStats * fmh3 = (ss-6)->cms;
     Thread* thisThread = pos.this_thread();
 
     thisThread->history.update(pos.moved_piece(move), to_sq(move), bonus);
@@ -1468,6 +1472,9 @@ moves_loop: // When in check search starts from here
     if (fmh2)
         fmh2->update(pos.moved_piece(move), to_sq(move), bonus);
 
+    if (fmh3)
+        fmh3->update(pos.moved_piece(move), to_sq(move), bonus);
+
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
     {
@@ -1481,6 +1488,9 @@ moves_loop: // When in check search starts from here
 
         if (fmh2)
             fmh2->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+
+        if (fmh3)
+            fmh3->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
 
     // Extra penalty for a quiet TT move in previous ply when it gets refuted
@@ -1495,6 +1505,9 @@ moves_loop: // When in check search starts from here
 
         if ((ss-5)->cms) // prevFmh2
             (ss-5)->cms->update(pos.piece_on(prevSq), prevSq, -bonus - 2 * (depth + 1) / ONE_PLY);
+
+        if ((ss-7)->cms) // prevFmh3
+            (ss-7)->cms->update(pos.piece_on(prevSq), prevSq, -bonus - 2 * (depth + 1) / ONE_PLY);
     }
   }
 

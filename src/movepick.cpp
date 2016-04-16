@@ -143,11 +143,13 @@ void MovePicker::score<QUIETS>() {
   const CounterMoveStats* cmh  = (ss-1)->cms;
   const CounterMoveStats* fmh  = (ss-2)->cms;
   const CounterMoveStats* fmh2 = (ss-4)->cms;
+  const CounterMoveStats* fmh3 = (ss-6)->cms;
   for (auto& m : *this)
       m.value =  history[pos.moved_piece(m)][to_sq(m)]
                + (cmh  ? (*cmh )[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO)
                + (fmh  ? (*fmh )[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO)
-               + (fmh2 ? (*fmh2)[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO);
+               + (fmh2 ? (*fmh2)[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO)
+               + (fmh3 ? (*fmh3)[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO);
 }
 
 template<>
