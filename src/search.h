@@ -30,6 +30,9 @@
 #include "position.h"
 #include "types.h"
 
+template<typename T, bool CM> struct Stats;
+typedef Stats<Value, true> CounterMoveStats;
+
 namespace Search {
 
 /// Stack struct keeps track of the information we need to remember from nodes
@@ -45,6 +48,7 @@ struct Stack {
   Value staticEval;
   bool skipEarlyPruning;
   int moveCount;
+  CounterMoveStats* counterMoves;
 };
 
 /// RootMove struct is used for moves at the root of the tree. For each root move
