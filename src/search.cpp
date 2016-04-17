@@ -790,7 +790,7 @@ namespace {
         &&  pos.non_pawn_material(pos.side_to_move()))
     {
         ss->currentMove = MOVE_NULL;
-        ss->counterMoves = &CounterMoveHistory[NO_PIECE][to_sq((ss-1)->currentMove)];;
+        ss->counterMoves = &CounterMoveHistory[NO_PIECE][to_sq((ss-1)->currentMove)];
 
         assert(eval - beta >= 0);
 
