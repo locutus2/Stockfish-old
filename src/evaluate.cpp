@@ -189,6 +189,7 @@ namespace {
   const Score Hanging             = S(48, 27);
   const Score ThreatByPawnPush    = S(38, 22);
   const Score Unstoppable         = S( 0, 20);
+  const Score BadKingMobility     = S( 0, 60);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -446,6 +447,13 @@ namespace {
         // Finally, extract the king danger score from the KingDanger[]
         // array and subtract the score from the evaluation.
         score -= KingDanger[std::max(std::min(attackUnits, 399), 0)];
+    }
+    else if (pos.non_pawn_material(Us) < QueenValueMg)
+    {
+        safe = ~(pos.pieces(Us) | ei.attackedBy[Them][ALL_PIECES]);
+        b = pos.attacks_from<KING>(ksq) & safe;
+        if(!b)
+            score -= BadKingMobility;
     }
 
     if (DoTrace)
