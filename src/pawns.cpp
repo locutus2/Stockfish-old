@@ -93,9 +93,9 @@ namespace {
     const Square Right = (Us == WHITE ? DELTA_NE : DELTA_SW);
     const Square Left  = (Us == WHITE ? DELTA_NW : DELTA_SE);
 
-    Bitboard b, neighbours, stoppers, doubled, supported, phalanx;
+    Bitboard b, neighbours, stoppers, doubled, supported, phalanx, opposed;
     Square s;
-    bool opposed, lever, connected, backward;
+    bool lever, connected, backward;
     Score score = SCORE_ZERO;
     const Square* pl = pos.squares<PAWN>(Us);
     const Bitboard* pawnAttacksBB = StepAttacksBB[make_piece(Us, PAWN)];
@@ -118,7 +118,6 @@ namespace {
         File f = file_of(s);
 
         e->semiopenFiles[Us] &= ~(1 << f);
-        e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
 
         // Flag the pawn
         opposed    = theirPawns & forward_bb(Us, s);
@@ -129,6 +128,11 @@ namespace {
         phalanx    = neighbours & rank_bb(s);
         supported  = neighbours & rank_bb(s - Up);
         connected  = supported | phalanx;
+
+        b = pawn_attack_span(Us, s);
+        if(opposed)
+            b &= pawn_attack_span(Them, backmost_sq(Us, opposed) + pawn_push(Us));
+        e->pawnAttacksSpan[Us] |= b;
 
         // A pawn is backward when it is behind all pawns of the same color on the
         // adjacent files and cannot be safely advanced.
@@ -155,16 +159,16 @@ namespace {
 
         // Score this pawn
         if (!neighbours)
-            score -= Isolated[opposed];
+            score -= Isolated[!!opposed];
 
         else if (backward)
-            score -= Backward[opposed];
+            score -= Backward[!!opposed];
 
         else if (!supported)
             score -= Unsupported[more_than_one(neighbours & pawnAttacksBB[s])];
 
         if (connected)
-            score += Connected[opposed][!!phalanx][more_than_one(supported)][relative_rank(Us, s)];
+            score += Connected[!!opposed][!!phalanx][more_than_one(supported)][relative_rank(Us, s)];
 
         if (doubled)
             score -= Doubled / distance<Rank>(s, frontmost_sq(Us, doubled));
