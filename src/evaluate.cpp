@@ -190,6 +190,7 @@ namespace {
   const Score WeakQueen           = S(35,  0);
   const Score Hanging             = S(48, 27);
   const Score ThreatByPawnPush    = S(38, 22);
+  const Score ThreatBoundedKnight = S( 0, 20);
   const Score Unstoppable         = S( 0, 20);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
@@ -230,6 +231,7 @@ namespace {
     Bitboard b = ei.attackedBy[Them][KING] = pos.attacks_from<KING>(pos.square<KING>(Them));
     ei.attackedBy[Them][ALL_PIECES] |= b;
     ei.attackedBy[Us][ALL_PIECES] |= ei.attackedBy[Us][PAWN] = ei.pi->pawn_attacks(Us);
+    ei.attackedBy[Us][DOUBLE_ATTACK] = b & ei.attackedBy[Us][PAWN];
 
     // Init king safety tables only if we are going to use them
     if (pos.non_pawn_material(Us) >= QueenValueMg)
@@ -272,6 +274,7 @@ namespace {
         if (ei.pinnedPieces[Us] & s)
             b &= LineBB[pos.square<KING>(Us)][s];
 
+        ei.attackedBy[Us][DOUBLE_ATTACK] |= b & ei.attackedBy[Us][ALL_PIECES];
         ei.attackedBy[Us][ALL_PIECES] |= ei.attackedBy[Us][Pt] |= b;
 
         if (b & ei.kingRing[Them])
@@ -538,6 +541,13 @@ namespace {
         if (b)
             score += ThreatByKing[more_than_one(b)];
     }
+
+    // Bonus if a knight can't move because of it is the only defender of an attacked pawn.
+    b =     pos.pieces(Them, PAWN) & ei.attackedBy[Them][KNIGHT]
+         & ~ei.attackedBy[Them][DOUBLE_ATTACK]
+         & ~ei.attackedBy[Us][PAWN] & ei.attackedBy[Us][ALL_PIECES];
+    if(b)
+       score += ThreatBoundedKnight * popcount(b);
 
     // Bonus if some pawns can safely push and attack an enemy piece
     b = pos.pieces(Us, PAWN) & ~TRank7BB;
