@@ -231,7 +231,6 @@ namespace {
     Bitboard b = ei.attackedBy[Them][KING] = pos.attacks_from<KING>(pos.square<KING>(Them));
     ei.attackedBy[Them][ALL_PIECES] |= b;
     ei.attackedBy[Us][ALL_PIECES] |= ei.attackedBy[Us][PAWN] = ei.pi->pawn_attacks(Us);
-    ei.attackedBy[Us][DOUBLE_ATTACK] = b & ei.attackedBy[Us][PAWN];
 
     // Init king safety tables only if we are going to use them
     if (pos.non_pawn_material(Us) >= QueenValueMg)
@@ -781,6 +780,8 @@ Value Eval::evaluate(const Position& pos) {
   ei.attackedBy[WHITE][ALL_PIECES] = ei.attackedBy[BLACK][ALL_PIECES] = 0;
   eval_init<WHITE>(pos, ei);
   eval_init<BLACK>(pos, ei);
+  ei.attackedBy[WHITE][DOUBLE_ATTACK] = ei.attackedBy[WHITE][KING] & ei.attackedBy[WHITE][PAWN];
+  ei.attackedBy[BLACK][DOUBLE_ATTACK] = ei.attackedBy[BLACK][KING] & ei.attackedBy[BLACK][PAWN];
 
   // Pawns blocked or on ranks 2 and 3 will be excluded from the mobility area
   Bitboard blockedPawns[] = {
