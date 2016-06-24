@@ -80,7 +80,7 @@ public:
   MovePicker& operator=(const MovePicker&) = delete;
 
   MovePicker(const Position&, Move, Value);
-  MovePicker(const Position&, Move, Depth, Square);
+  MovePicker(const Position&, Move, Depth);
   MovePicker(const Position&, Move, Depth, Search::Stack*);
 
   Move next_move();

@@ -31,7 +31,6 @@ namespace {
     QSEARCH_WITH_CHECKS, QCAPTURES_1, CHECKS,
     QSEARCH_WITHOUT_CHECKS, QCAPTURES_2,
     PROBCUT, PROBCUT_CAPTURES,
-    RECAPTURE, RECAPTURES,
     STOP
   };
 
@@ -80,7 +79,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, Search::Stack* s)
   endMoves += (ttMove != MOVE_NONE);
 }
 
-MovePicker::MovePicker(const Position& p, Move ttm, Depth d, Square s)
+MovePicker::MovePicker(const Position& p, Move ttm, Depth d)
            : pos(p) {
 
   assert(d <= DEPTH_ZERO);
@@ -91,15 +90,8 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, Square s)
   else if (d > DEPTH_QS_NO_CHECKS)
       stage = QSEARCH_WITH_CHECKS;
 
-  else if (d > DEPTH_QS_RECAPTURES)
-      stage = QSEARCH_WITHOUT_CHECKS;
-
   else
-  {
-      stage = RECAPTURE;
-      recaptureSquare = s;
-      ttm = MOVE_NONE;
-  }
+      stage = QSEARCH_WITHOUT_CHECKS;
 
   ttMove = ttm && pos.pseudo_legal(ttm) ? ttm : MOVE_NONE;
   endMoves += (ttMove != MOVE_NONE);
@@ -186,7 +178,7 @@ void MovePicker::generate_next_stage() {
   switch (++stage) {
 
   case GOOD_CAPTURES: case QCAPTURES_1: case QCAPTURES_2:
-  case PROBCUT_CAPTURES: case RECAPTURES:
+  case PROBCUT_CAPTURES:
       endMoves = generate<CAPTURES>(pos, moves);
       score<CAPTURES>();
       break;
@@ -228,7 +220,7 @@ void MovePicker::generate_next_stage() {
       break;
 
   case EVASION: case QSEARCH_WITH_CHECKS: case QSEARCH_WITHOUT_CHECKS:
-  case PROBCUT: case RECAPTURE: case STOP:
+  case PROBCUT: case STOP:
       stage = STOP;
       break;
 
@@ -303,12 +295,6 @@ Move MovePicker::next_move() {
            if (move != ttMove && pos.see(move) > threshold)
                return move;
            break;
-
-      case RECAPTURES:
-          move = pick_best(cur++, endMoves);
-          if (to_sq(move) == recaptureSquare)
-              return move;
-          break;
 
       case CHECKS:
           move = *cur++;
