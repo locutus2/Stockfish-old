@@ -346,6 +346,7 @@ void Thread::search() {
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
   completedDepth = DEPTH_ZERO;
+  widenSearch = false;
 
   if (mainThread)
   {
@@ -355,6 +356,9 @@ void Thread::search() {
       mainThread->bestMoveChanges = 0;
       TT.new_search();
   }
+
+  Value averageScore1 = VALUE_ZERO, averageScore2 = VALUE_ZERO;
+  int iterations = 0;
 
   size_t multiPV = Options["MultiPV"];
   Skill skill(Options["Skill Level"]);
@@ -455,6 +459,11 @@ void Thread::search() {
 
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin(), rootMoves.begin() + PVIdx + 1);
+
+          ++iterations;
+          averageScore1 = (averageScore1 * (std::min(iterations, 5) - 1) + rootMoves[0].score) / std::min(iterations, 5);
+          averageScore2 = (averageScore2 * (std::min(iterations,10) - 1) + rootMoves[0].score) / std::min(iterations, 10);
+          widenSearch = averageScore1 < averageScore2;
 
           if (!mainThread)
               continue;
@@ -923,7 +932,7 @@ moves_loop: // When in check search starts from here
               && (!fmh2 || (*fmh2)[moved_piece][to_sq(move)] < VALUE_ZERO || (cmh && fmh)))
               continue;
 
-          predictedDepth = std::max(newDepth - reduction<PvNode>(improving, depth, moveCount), DEPTH_ZERO);
+          predictedDepth = std::max(newDepth - reduction<PvNode>(improving || thisThread->widenSearch, depth, moveCount), DEPTH_ZERO);
 
           // Futility pruning: parent node
           if (   predictedDepth < 7 * ONE_PLY
