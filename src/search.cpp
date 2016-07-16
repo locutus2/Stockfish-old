@@ -880,7 +880,7 @@ moves_loop: // When in check search starts from here
                   : pos.gives_check(move, ci);
 
       moveCountPruning =   depth < 16 * ONE_PLY
-                        && moveCount >= FutilityMoveCounts[improving][depth];
+                        && moveCount >= FutilityMoveCounts[improving][depth] + thisThread->widenSearch;
 
       // Step 12. Extend checks
       if (    givesCheck
@@ -932,7 +932,7 @@ moves_loop: // When in check search starts from here
               && (!fmh2 || (*fmh2)[moved_piece][to_sq(move)] < VALUE_ZERO || (cmh && fmh)))
               continue;
 
-          predictedDepth = std::max(newDepth - reduction<PvNode>(improving || thisThread->widenSearch, depth, moveCount), DEPTH_ZERO);
+          predictedDepth = std::max(newDepth - reduction<PvNode>(improving, depth, moveCount), DEPTH_ZERO);
 
           // Futility pruning: parent node
           if (   predictedDepth < 7 * ONE_PLY
