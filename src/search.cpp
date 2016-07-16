@@ -880,7 +880,7 @@ moves_loop: // When in check search starts from here
                   : pos.gives_check(move, ci);
 
       moveCountPruning =   depth < 16 * ONE_PLY
-                        && moveCount >= FutilityMoveCounts[improving][depth] + thisThread->widenSearch;
+                        && moveCount >= FutilityMoveCounts[improving][depth];
 
       // Step 12. Extend checks
       if (    givesCheck
@@ -962,7 +962,7 @@ moves_loop: // When in check search starts from here
 
       // Step 15. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
-      if (    depth >= 3 * ONE_PLY
+      if (    depth >= (3 + thisThread->widenSearch) * ONE_PLY
           &&  moveCount > 1
           && !captureOrPromotion)
       {
