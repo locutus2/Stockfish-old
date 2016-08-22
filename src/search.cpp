@@ -1131,7 +1131,7 @@ moves_loop: // When in check search starts from here
             (ss-3)->counterMoves->update(pos.piece_on(prevSq), prevSq, bonus);
 
         if ((ss-5)->counterMoves)
-            (ss-5)->counterMoves->update(pos.piece_on(prevSq), prevSq, bonus);
+            (ss-5)->counterMoves->update(pos.piece_on(prevSq), prevSq, bonus / 2);
     }
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
@@ -1405,6 +1405,7 @@ moves_loop: // When in check search starts from here
 
     Color c = pos.side_to_move();
     Value bonus = Value((depth / ONE_PLY) * (depth / ONE_PLY) + 2 * depth / ONE_PLY - 2);
+    Value bonus2 = bonus / 2;
 
     Square prevSq = to_sq((ss-1)->currentMove);
     CounterMoveStats* cmh  = (ss-1)->counterMoves;
@@ -1425,7 +1426,7 @@ moves_loop: // When in check search starts from here
         fmh->update(pos.moved_piece(move), to_sq(move), bonus);
 
     if (fmh2)
-        fmh2->update(pos.moved_piece(move), to_sq(move), bonus);
+        fmh2->update(pos.moved_piece(move), to_sq(move), bonus2);
 
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
@@ -1440,7 +1441,7 @@ moves_loop: // When in check search starts from here
             fmh->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
 
         if (fmh2)
-            fmh2->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+            fmh2->update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus2);
     }
 
     // Extra penalty for a quiet TT move in previous ply when it gets refuted
@@ -1453,7 +1454,7 @@ moves_loop: // When in check search starts from here
             (ss-3)->counterMoves->update(pos.piece_on(prevSq), prevSq, -bonus - 2 * (depth + 1) / ONE_PLY - 1);
 
         if ((ss-5)->counterMoves)
-            (ss-5)->counterMoves->update(pos.piece_on(prevSq), prevSq, -bonus - 2 * (depth + 1) / ONE_PLY - 1);
+            (ss-5)->counterMoves->update(pos.piece_on(prevSq), prevSq, -bonus2 - (depth + 1) / ONE_PLY - 1);
     }
   }
 
