@@ -563,6 +563,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning;
     Piece moved_piece;
     int moveCount, quietCount;
+    Bitboard hanging[COLOR_NB] = {0, 0};
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -684,7 +685,7 @@ namespace {
     {
         // Never assume anything on values stored in TT
         if ((ss->staticEval = eval = tte->eval()) == VALUE_NONE)
-            eval = ss->staticEval = evaluate(pos);
+            eval = ss->staticEval = evaluate(pos, hanging);
 
         // Can ttValue be used as a better position evaluation?
         if (ttValue != VALUE_NONE)
@@ -694,7 +695,7 @@ namespace {
     else
     {
         eval = ss->staticEval =
-        (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
+        (ss-1)->currentMove != MOVE_NULL ? evaluate(pos, hanging)
                                          : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
         tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE,
@@ -711,7 +712,8 @@ namespace {
         &&  ttMove == MOVE_NONE)
     {
         if (   depth <= ONE_PLY
-            && eval + razor_margin[3 * ONE_PLY] <= alpha)
+            && eval + razor_margin[3 * ONE_PLY] <= alpha
+            && !hanging[pos.side_to_move()])
             return qsearch<NonPV, false>(pos, ss, alpha, beta, DEPTH_ZERO);
 
         Value ralpha = alpha - razor_margin[depth];

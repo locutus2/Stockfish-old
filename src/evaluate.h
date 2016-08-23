@@ -36,6 +36,9 @@ std::string trace(const Position& pos);
 
 template<bool DoTrace = false>
 Value evaluate(const Position& pos);
+
+template<bool DoTrace = false>
+Value evaluate(const Position& pos, Bitboard hanging[COLOR_NB]);
 }
 
 #endif // #ifndef EVALUATE_H_INCLUDED

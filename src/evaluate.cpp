@@ -495,7 +495,7 @@ namespace {
   };
 
   template<Color Us, bool DoTrace>
-  Score evaluate_threats(const Position& pos, const EvalInfo& ei) {
+  Score evaluate_threats(const Position& pos, const EvalInfo& ei, Bitboard hanging[COLOR_NB]) {
 
     const Color Them        = (Us == WHITE ? BLACK    : WHITE);
     const Square Up         = (Us == WHITE ? DELTA_N  : DELTA_S);
@@ -550,7 +550,8 @@ namespace {
         while (b)
             score += Threat[Rook ][type_of(pos.piece_on(pop_lsb(&b)))];
 
-        score += Hanging * popcount(weak & ~ei.attackedBy[Them][ALL_PIECES]);
+        hanging[Them] = weak & ~ei.attackedBy[Them][ALL_PIECES];
+        score += Hanging * popcount(hanging[Them]);
 
         b = weak & ei.attackedBy[Us][KING];
         if (b)
@@ -773,7 +774,7 @@ namespace {
 /// of the position from the point of view of the side to move.
 
 template<bool DoTrace>
-Value Eval::evaluate(const Position& pos) {
+Value Eval::evaluate(const Position& pos, Bitboard hanging[COLOR_NB]) {
 
   assert(!pos.checkers());
 
@@ -828,8 +829,8 @@ Value Eval::evaluate(const Position& pos) {
           - evaluate_king<BLACK, DoTrace>(pos, ei);
 
   // Evaluate tactical threats, we need full attack information including king
-  score +=  evaluate_threats<WHITE, DoTrace>(pos, ei)
-          - evaluate_threats<BLACK, DoTrace>(pos, ei);
+  score +=  evaluate_threats<WHITE, DoTrace>(pos, ei, hanging)
+          - evaluate_threats<BLACK, DoTrace>(pos, ei, hanging);
 
   // Evaluate passed pawns, we need full attack information including king
   score +=  evaluate_passed_pawns<WHITE, DoTrace>(pos, ei)
@@ -877,6 +878,13 @@ Value Eval::evaluate(const Position& pos) {
 
   return (pos.side_to_move() == WHITE ? v : -v) + Eval::Tempo; // Side to move point of view
 }
+
+template<bool DoTrace>
+Value Eval::evaluate(const Position& pos) {
+    Bitboard hanging[COLOR_NB];
+    return evaluate<DoTrace>(pos, hanging);
+}
+
 
 // Explicit template instantiations
 template Value Eval::evaluate<true >(const Position&);
