@@ -726,6 +726,7 @@ namespace {
         &&  depth < 7 * ONE_PLY
         &&  eval - futility_margin(depth) >= beta
         &&  eval < VALUE_KNOWN_WIN  // Do not return unproven wins
+        && !hanging[~pos.side_to_move()]
         &&  pos.non_pawn_material(pos.side_to_move()))
         return eval - futility_margin(depth);
 
@@ -909,7 +910,6 @@ moves_loop: // When in check search starts from here
           && !inCheck
           && !givesCheck
           && !pos.advanced_pawn_push(move)
-          && !(hanging[pos.side_to_move()] & from_sq(move))
           &&  bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           // Move count based pruning
