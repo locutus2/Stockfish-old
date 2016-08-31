@@ -71,7 +71,7 @@ struct PositionStats {
   void clear() { std::memset(table, 0, sizeof(table)); }
 
 private:
-  int getKey(const Position& pos) const { return pos.pawn_key() & (N - 1);}
+  int getKey(const Position& pos) const { return pos.material_key() & (N - 1);}
   T table[N];
 };
 
