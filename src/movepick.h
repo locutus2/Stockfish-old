@@ -61,10 +61,26 @@ private:
   T table[PIECE_NB][SQUARE_NB];
 };
 
+template<typename T, int KeyLen>
+struct PositionStats {
+
+  static const int N = 1 << KeyLen;
+
+  const T& operator[](const Position& pos) const { return table[getKey(pos)]; }
+  T& operator[](const Position& pos) { return table[getKey(pos)]; }
+  void clear() { std::memset(table, 0, sizeof(table)); }
+
+private:
+  int getKey(const Position& pos) const { return pos.pawn_key() & (N - 1);}
+  T table[N];
+};
+
+
 typedef Stats<Move> MoveStats;
 typedef Stats<Value, false> HistoryStats;
 typedef Stats<Value,  true> CounterMoveStats;
 typedef Stats<CounterMoveStats> CounterMoveHistoryStats;
+typedef PositionStats<CounterMoveStats, 9> PositionHistoryStats;
 
 struct FromToStats {
 

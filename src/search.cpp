@@ -215,6 +215,7 @@ void Search::clear() {
       th->history.clear();
       th->counterMoves.clear();
       th->fromTo.clear();
+      th->positionHistory.clear();
   }
 
   Threads.main()->previousScore = VALUE_INFINITE;
@@ -1448,6 +1449,7 @@ moves_loop: // When in check search starts from here
     Thread* thisThread = pos.this_thread();
     thisThread->fromTo.update(c, move, bonus);
     thisThread->history.update(pos.moved_piece(move), to_sq(move), bonus);
+    thisThread->positionHistory[pos].update(pos.moved_piece(move), to_sq(move), bonus);
     update_cm_stats(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     if ((ss-1)->counterMoves)
@@ -1461,6 +1463,7 @@ moves_loop: // When in check search starts from here
     {
         thisThread->fromTo.update(c, quiets[i], -bonus);
         thisThread->history.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        thisThread->positionHistory[pos].update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
         update_cm_stats(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }
