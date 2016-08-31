@@ -143,6 +143,7 @@ void MovePicker::score<QUIETS>() {
 
   const HistoryStats& history = pos.this_thread()->history;
   const FromToStats& fromTo = pos.this_thread()->fromTo;
+  const CounterMoveStats& pHistory = pos.this_thread()->positionHistory[pos];
 
   const CounterMoveStats* cm = (ss-1)->counterMoves;
   const CounterMoveStats* fm = (ss-2)->counterMoves;
@@ -152,6 +153,7 @@ void MovePicker::score<QUIETS>() {
 
   for (auto& m : *this)
       m.value =      history[pos.moved_piece(m)][to_sq(m)]
+               +    pHistory[pos.moved_piece(m)][to_sq(m)]
                + (cm ? (*cm)[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO)
                + (fm ? (*fm)[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO)
                + (f2 ? (*f2)[pos.moved_piece(m)][to_sq(m)] : VALUE_ZERO)

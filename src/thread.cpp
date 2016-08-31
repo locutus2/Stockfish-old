@@ -38,6 +38,7 @@ Thread::Thread() {
   maxPly = callsCnt = 0;
   history.clear();
   counterMoves.clear();
+  positionHistory.clear();
   idx = Threads.size(); // Start from 0
 
   std::unique_lock<Mutex> lk(mutex);
