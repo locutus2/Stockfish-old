@@ -80,7 +80,7 @@ typedef Stats<Move> MoveStats;
 typedef Stats<Value, false> HistoryStats;
 typedef Stats<Value,  true> CounterMoveStats;
 typedef Stats<CounterMoveStats> CounterMoveHistoryStats;
-typedef PositionStats<CounterMoveStats, 9> PositionHistoryStats;
+typedef PositionStats<CounterMoveStats, 10> PositionHistoryStats;
 
 struct FromToStats {
 
