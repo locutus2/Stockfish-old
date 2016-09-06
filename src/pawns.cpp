@@ -47,6 +47,9 @@ namespace {
   // Doubled pawn penalty
   const Score Doubled = S(18,38);
 
+  // Penalty for each pawn island
+  const Score PawnIslands = S(10, 25);
+
   // Lever bonus by rank
   const Score Lever[RANK_NB] = {
     S( 0,  0), S( 0,  0), S(0, 0), S(0, 0),
@@ -171,6 +174,9 @@ namespace {
         if (lever)
             score += Lever[relative_rank(Us, s)];
     }
+
+    b = e->semiopenFiles[Us];
+    score -= PawnIslands * popcount(b & ~(b >> 1));
 
     return score;
   }
