@@ -961,6 +961,10 @@ moves_loop: // When in check search starts from here
                    && (     mp.see_sign() < 0
                        || (!mp.see_sign() && pos.see_sign(move) < VALUE_ZERO)))
               continue;
+          else if (   depth >= 3 * ONE_PLY
+                   && depth <  5 * ONE_PLY
+                   && pos.see_sign(move) < -PawnValueMg * 2 * int(depth - 2 * ONE_PLY) / ONE_PLY)
+              continue;
       }
 
       // Speculative prefetch as early as possible
