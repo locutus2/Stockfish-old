@@ -962,7 +962,7 @@ moves_loop: // When in check search starts from here
                        || (!mp.see_sign() && pos.see_sign(move) < VALUE_ZERO)))
               continue;
           else if (   depth >= 3 * ONE_PLY
-                   && depth <  7 * ONE_PLY
+                   && depth <  8 * ONE_PLY
                    && pos.see_sign(move) < -PawnValueMg * 2 * int(depth - 2 * ONE_PLY) / ONE_PLY)
               continue;
       }
