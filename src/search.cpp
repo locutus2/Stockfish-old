@@ -960,6 +960,9 @@ moves_loop: // When in check search starts from here
           continue;
       }
 
+      if(moveCount == 30)
+          cutNode = false;
+
       ss->currentMove = move;
       ss->counterMoves = &thisThread->counterMoveHistory[moved_piece][to_sq(move)];
 
