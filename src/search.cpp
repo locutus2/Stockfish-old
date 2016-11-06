@@ -960,7 +960,7 @@ moves_loop: // When in check search starts from here
           continue;
       }
 
-      if(moveCount == 30)
+      if(moveCount == 20)
           cutNode = false;
 
       ss->currentMove = move;
