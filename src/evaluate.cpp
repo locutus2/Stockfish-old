@@ -614,7 +614,7 @@ namespace {
         assert(pos.pawn_passed(Us, s));
         assert(!(pos.pieces(PAWN) & forward_bb(Us, s)));
 
-        bb = forward_bb(Us, s) & (ei.attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
+        bb = forward_bb(Us, s) & (ei.attackedBy[Them][ALL_PIECES] | pos.pieces(Them)) & ~ei.attackedBy[Us][PAWN];
         score -= HinderPassedPawn * popcount(bb);
 
         int r = relative_rank(Us, s) - RANK_2;
