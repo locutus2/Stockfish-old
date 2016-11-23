@@ -485,7 +485,7 @@ namespace {
 
     // King tropism: firstly, find squares that opponent attacks in our king flank
     File kf = file_of(ksq);
-    b = ei.attackedBy[Them][ALL_PIECES] & ~ei.attackedBy[Us][PAWN] & KingFlank[Us][kf];
+    b = ei.attackedBy[Them][ALL_PIECES] & KingFlank[Us][kf];
 
     assert(((Us == WHITE ? b << 4 : b >> 4) & b) == 0);
     assert(popcount(Us == WHITE ? b << 4 : b >> 4) == popcount(b));
@@ -493,7 +493,8 @@ namespace {
     // Secondly, add the squares which are attacked twice in that flank and
     // which are not defended by our pawns.
     b =  (Us == WHITE ? b << 4 : b >> 4)
-       | (b & ei.attackedBy2[Them]);
+       | (b & ei.attackedBy2[Them] & ~ei.attackedBy[Us][PAWN])
+       | (b & ei.attackedBy[Us][KING]);
 
     score -= CloseEnemies * popcount(b);
 
