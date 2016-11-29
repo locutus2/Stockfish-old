@@ -578,7 +578,7 @@ namespace {
                 score += ThreatByRank * (int)relative_rank(Them, s);
         }
 
-        bb &= ei.attackedBy2[Us] & ~ei.attackedBy[Them][PAWN];
+        bb &= ei.attackedBy2[Us] & ~ei.attackedBy2[Them];
         if (bb)
             score += DoubleThreat * popcount(bb);
 
