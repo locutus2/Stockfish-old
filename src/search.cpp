@@ -215,6 +215,7 @@ void Search::clear() {
       th->counterMoves.clear();
       th->fromTo.clear();
       th->counterMoveHistory.clear();
+      th->threatMoveHistory.clear();
       th->resetCalls = true;
   }
 
@@ -617,6 +618,7 @@ namespace {
 
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->counterMoves = nullptr;
+    ss->threatMoves = nullptr;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -772,6 +774,8 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        else if(is_ok((ss+1)->currentMove))
+            ss->threatMoves = &thisThread->threatMoveHistory[pos.moved_piece((ss+1)->currentMove)][to_sq((ss+1)->currentMove)];
     }
 
     // Step 9. ProbCut (skipped when in check)
@@ -1398,6 +1402,7 @@ moves_loop: // When in check search starts from here
     CounterMoveStats* cmh  = (ss-1)->counterMoves;
     CounterMoveStats* fmh1 = (ss-2)->counterMoves;
     CounterMoveStats* fmh2 = (ss-4)->counterMoves;
+    CounterMoveStats* tm   =     ss->threatMoves;
 
     if (cmh)
         cmh->update(pc, s, bonus);
@@ -1407,6 +1412,9 @@ moves_loop: // When in check search starts from here
 
     if (fmh2)
         fmh2->update(pc, s, bonus);
+
+    if (tm)
+        tm->update(pc, s, bonus);
   }
 
 
