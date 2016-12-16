@@ -162,7 +162,7 @@ namespace {
   Value DrawValue[COLOR_NB];
 
   template <NodeType NT>
-  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning);
+  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning, bool resetThreatMoves = true);
 
   template <NodeType NT, bool InCheck>
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth);
@@ -542,7 +542,7 @@ namespace {
   // search<>() is the main search function for both PV and non-PV nodes
 
   template <NodeType NT>
-  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning) {
+  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning, bool resetThreatMoves) {
 
     const bool PvNode = NT == PV;
     const bool rootNode = PvNode && (ss-1)->ply == 0;
@@ -618,9 +618,11 @@ namespace {
 
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->counterMoves = nullptr;
-    ss->threatMoves = nullptr;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
+
+    if(resetThreatMoves)
+        ss->threatMoves = nullptr;
 
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
@@ -774,7 +776,7 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
-        else if(is_ok((ss+1)->currentMove))
+        else if(!ss->threatMoves && is_ok((ss+1)->currentMove))
             ss->threatMoves = &thisThread->threatMoveHistory[pos.moved_piece((ss+1)->currentMove)][to_sq((ss+1)->currentMove)];
     }
 
@@ -813,7 +815,7 @@ namespace {
         && (PvNode || ss->staticEval + 256 >= beta))
     {
         Depth d = (3 * depth / (4 * ONE_PLY) - 2) * ONE_PLY;
-        search<NT>(pos, ss, alpha, beta, d, cutNode, true);
+        search<NT>(pos, ss, alpha, beta, d, cutNode, true, false);
 
         tte = TT.probe(posKey, ttHit);
         ttMove = ttHit ? tte->move() : MOVE_NONE;
