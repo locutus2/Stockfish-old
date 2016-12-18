@@ -36,7 +36,7 @@
 /// Countermoves store the move that refute a previous one. Entries are stored
 /// using only the moving piece and destination square, hence two moves with
 /// different origin but same destination and piece will be considered identical.
-template<typename T, bool CM = false>
+template<typename T, bool CM = false, bool TM = false>
 struct Stats {
 
   static const Value Max = Value(1 << 28);
@@ -51,7 +51,7 @@ struct Stats {
         return;
 
     table[pc][to] -= table[pc][to] * abs(int(v)) / (CM ? 936 : 324);
-    table[pc][to] += int(v) * 32;
+    table[pc][to] += int(v) * (TM ? 64 : 32);
   }
 
 private:
@@ -62,6 +62,8 @@ typedef Stats<Move> MoveStats;
 typedef Stats<Value, false> HistoryStats;
 typedef Stats<Value,  true> CounterMoveStats;
 typedef Stats<CounterMoveStats> CounterMoveHistoryStats;
+typedef Stats<Value,  true, true> ThreatMoveStats;
+typedef Stats<ThreatMoveStats> ThreatMoveHistoryStats;
 
 struct FromToStats {
 

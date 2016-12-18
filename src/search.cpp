@@ -1402,7 +1402,7 @@ moves_loop: // When in check search starts from here
     CounterMoveStats* cmh  = (ss-1)->counterMoves;
     CounterMoveStats* fmh1 = (ss-2)->counterMoves;
     CounterMoveStats* fmh2 = (ss-4)->counterMoves;
-    CounterMoveStats* tm   =     ss->threatMoves;
+    ThreatMoveStats*  tm   =     ss->threatMoves;
 
     if (cmh)
         cmh->update(pc, s, bonus);

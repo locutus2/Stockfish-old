@@ -146,7 +146,7 @@ void MovePicker::score<QUIETS>() {
   const CounterMoveStats* cm = (ss-1)->counterMoves;
   const CounterMoveStats* fm = (ss-2)->counterMoves;
   const CounterMoveStats* f2 = (ss-4)->counterMoves;
-  const CounterMoveStats* tm =     ss->threatMoves;
+  const ThreatMoveStats*  tm =     ss->threatMoves;
 
   Color c = pos.side_to_move();
 

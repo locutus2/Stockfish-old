@@ -38,7 +38,8 @@ namespace Search {
 
 struct Stack {
   Move* pv;
-  CounterMoveStats* counterMoves, *threatMoves;
+  CounterMoveStats* counterMoves;
+  ThreatMoveStats*  threatMoves;
   int ply;
   Move currentMove;
   Move excludedMove;

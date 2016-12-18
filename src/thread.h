@@ -72,7 +72,8 @@ public:
   HistoryStats history;
   MoveStats counterMoves;
   FromToStats fromTo;
-  CounterMoveHistoryStats counterMoveHistory, threatMoveHistory;
+  CounterMoveHistoryStats counterMoveHistory;
+  ThreatMoveHistoryStats  threatMoveHistory;
 };
 
 
