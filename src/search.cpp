@@ -687,6 +687,7 @@ namespace {
     if (inCheck)
     {
         ss->staticEval = eval = VALUE_NONE;
+        ss->threatMoves = nullptr;
         goto moves_loop;
     }
 
@@ -713,6 +714,8 @@ namespace {
 
     if (skipEarlyPruning)
         goto moves_loop;
+
+    ss->threatMoves = nullptr;
 
     // Step 6. Razoring (skipped when in check)
     if (   !PvNode
@@ -772,6 +775,8 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        else if(is_ok((ss+1)->currentMove))
+            ss->threatMoves = &thisThread->counterMoveHistory[pos.moved_piece((ss+1)->currentMove)][to_sq((ss+1)->currentMove)];
     }
 
     // Step 9. ProbCut (skipped when in check)
@@ -1396,6 +1401,7 @@ moves_loop: // When in check search starts from here
     CounterMoveStats* cmh  = (ss-1)->counterMoves;
     CounterMoveStats* fmh1 = (ss-2)->counterMoves;
     CounterMoveStats* fmh2 = (ss-4)->counterMoves;
+    CounterMoveStats* tm   =     ss->threatMoves;
 
     if (cmh)
         cmh->update(pc, s, bonus);
@@ -1405,6 +1411,9 @@ moves_loop: // When in check search starts from here
 
     if (fmh2)
         fmh2->update(pc, s, bonus);
+
+    if (tm)
+        tm->update(pc, s, bonus);
   }
 
 
