@@ -200,6 +200,7 @@ namespace {
   const Score PawnlessFlank       = S(20, 80);
   const Score HinderPassedPawn    = S( 7,  0);
   const Score ThreatByRank        = S(16,  3);
+  const Score PawnNotDefendable   = S( 0, 10);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -692,6 +693,29 @@ namespace {
   }
 
 
+  // evaluate_pawn_endgame() computes evaluation of danger for enemy pawns of capturing by king
+
+  template<Color Us>
+  Score evaluate_pawn_endgame(const Position& pos, const EvalInfo& ei) {
+
+      const Color Them = (Us == WHITE ? BLACK : WHITE);
+
+      Score score = SCORE_ZERO;
+      Square ksqUs = pos.square<KING>(Us);
+      Square ksqThem = pos.square<KING>(Them);
+
+      Bitboard b = pos.pieces(Them, PAWN) & ~ei.attackedBy[Them][PAWN];
+      while(b)
+      {
+          Square s = pop_lsb(&b);
+          int dist = distance(ksqThem, s) - distance(ksqUs, s) - (pos.side_to_move() == Them);
+          if(dist > 0)
+              score += PawnNotDefendable * dist;
+      }
+
+      return score;
+  }
+
   // evaluate_space() computes the space evaluation for a given side. The
   // space evaluation is a simple bonus based on the number of safe squares
   // available for minor pieces on the central four files on ranks 2--4. Safe
@@ -859,6 +883,13 @@ Value Eval::evaluate(const Position& pos) {
   if (pos.non_pawn_material(WHITE) + pos.non_pawn_material(BLACK) >= 12222)
       score +=  evaluate_space<WHITE>(pos, ei)
               - evaluate_space<BLACK>(pos, ei);
+
+  // Evaluate pawn endgames
+  if(!pos.non_pawn_material(WHITE) && !pos.non_pawn_material(BLACK))
+  {
+      score +=   evaluate_pawn_endgame<WHITE>(pos, ei)
+               - evaluate_pawn_endgame<BLACK>(pos, ei);
+  }
 
   // Evaluate position potential for the winning side
   score += evaluate_initiative(pos, ei.pi->pawn_asymmetry(), eg_value(score));
