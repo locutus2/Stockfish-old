@@ -66,10 +66,10 @@ namespace {
       { V( 1),  V(  64), V( 143), V(26), V(13) },
       { V( 1),  V(  47), V( 110), V(44), V(24) },
       { V( 0),  V(  72), V( 127), V(50), V(31) } },
-    { { V(22),  V(  45), V( 104), V(62), V( 6) },
-      { V(31),  V(  30), V(  99), V(39), V(19) },
-      { V(23),  V(  29), V(  96), V(41), V(15) },
-      { V(21),  V(  23), V( 116), V(41), V(15) } },
+    { { V(19),  V(  45), V( 104), V(62), V( 6) },
+      { V(28),  V(  30), V(  99), V(39), V(19) },
+      { V(20),  V(  29), V(  96), V(41), V(15) },
+      { V(18),  V(  23), V( 116), V(41), V(15) } },
     { { V( 0),  V(   0), V(  79), V(23), V( 1) },
       { V( 0),  V(   0), V( 148), V(27), V( 2) },
       { V( 0),  V(   0), V( 161), V(16), V( 1) },
@@ -80,6 +80,9 @@ namespace {
       { V( 0),  V(  53), V( 127), V(56), V(14) } }
 
   };
+
+  // Penalty for unopposed backward pawn in king shelter
+  const Value BackwardShelterPawn = V(35);
 
   // Max bonus for king safety. Corresponds to start position with all the pawns
   // in front of the king and no enemy pawn on the horizon.
@@ -106,7 +109,7 @@ namespace {
     Bitboard ourPawns   = pos.pieces(Us  , PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
-    e->passedPawns[Us]   = e->pawnAttacksSpan[Us] = 0;
+    e->passedPawns[Us]   = e->pawnAttacksSpan[Us] = e->backwardPawns[Us] = 0;
     e->semiopenFiles[Us] = 0xFF;
     e->kingSquares[Us]   = SQ_NONE;
     e->pawnAttacks[Us]   = shift<Right>(ourPawns) | shift<Left>(ourPawns);
@@ -160,7 +163,10 @@ namespace {
             score -= Isolated[opposed];
 
         else if (backward)
+        {
+            e->backwardPawns[Us] |= s;
             score -= Backward[opposed];
+        }
 
         else if (!supported)
             score -= Unsupported;
@@ -246,6 +252,9 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
 
       b  = theirPawns & file_bb(f);
       Rank rkThem = b ? relative_rank(Us, frontmost_sq(Them, b)) : RANK_1;
+
+      if(rkThem == RANK_1 && (backward_pawns(Us) & make_square(f, relative_rank(Us, rkUs))))
+          safety -= BackwardShelterPawn;
 
       safety -=  ShelterWeakness[std::min(f, FILE_H - f)][rkUs]
                + StormDanger
