@@ -66,10 +66,10 @@ namespace {
       { V( 1),  V(  64), V( 143), V(26), V(13) },
       { V( 1),  V(  47), V( 110), V(44), V(24) },
       { V( 0),  V(  72), V( 127), V(50), V(31) } },
-    { { V(16),  V(  45), V( 104), V(62), V( 6) },
-      { V(25),  V(  30), V(  99), V(39), V(19) },
-      { V(17),  V(  29), V(  96), V(41), V(15) },
-      { V(15),  V(  23), V( 116), V(41), V(15) } },
+    { { V(21),  V(  45), V( 104), V(62), V( 6) },
+      { V(30),  V(  30), V(  99), V(39), V(19) },
+      { V(22),  V(  29), V(  96), V(41), V(15) },
+      { V(20),  V(  23), V( 116), V(41), V(15) } },
     { { V( 0),  V(   0), V(  79), V(23), V( 1) },
       { V( 0),  V(   0), V( 148), V(27), V( 2) },
       { V( 0),  V(   0), V( 161), V(16), V( 1) },
@@ -82,7 +82,7 @@ namespace {
   };
 
   // Penalty for unopposed backward pawn in king shelter
-  const Value BackwardShelterPawn = V(70);
+  const Value BackwardShelterPawn = V(12);
 
   // Max bonus for king safety. Corresponds to start position with all the pawns
   // in front of the king and no enemy pawn on the horizon.
