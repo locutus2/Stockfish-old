@@ -131,6 +131,7 @@ inline Bitboard shift(Bitboard b) {
   return  D == NORTH      ?  b             << 8 : D == SOUTH      ?  b             >> 8
         : D == NORTH_EAST ? (b & ~FileHBB) << 9 : D == SOUTH_EAST ? (b & ~FileHBB) >> 7
         : D == NORTH_WEST ? (b & ~FileABB) << 7 : D == SOUTH_WEST ? (b & ~FileABB) >> 9
+        : D == WEST       ? (b & ~FileABB) >> 1 : D == EAST       ? (b & ~FileHBB) << 1
         : 0;
 }
 

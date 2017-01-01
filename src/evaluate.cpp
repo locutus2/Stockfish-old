@@ -202,6 +202,7 @@ namespace {
   const Score Hanging             = S(48, 27);
   const Score ThreatByPawnPush    = S(38, 22);
   const Score HinderPassedPawn    = S( 7,  0);
+  const Score PawnNotDefendable   = S( 0,  5);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -686,6 +687,79 @@ namespace {
     return score;
   }
 
+  // evaluate_pawn_endgame() computes evaluation of danger for enemy pawns of
+  // captured by king using breadth first search.
+  Score evaluate_pawn_endgame(const Position& pos, const EvalInfo& ei) {
+
+      Score score = SCORE_ZERO;
+      Bitboard wKing = pos.pieces(WHITE, KING), wKingAll = wKing;
+      Bitboard bKing = pos.pieces(BLACK, KING), bKingAll = bKing;
+      Bitboard wPawns = pos.pieces(WHITE, PAWN) & ~ei.attackedBy[WHITE][PAWN];
+      Bitboard bPawns = pos.pieces(BLACK, PAWN) & ~ei.attackedBy[BLACK][PAWN];
+      Bitboard wKingNext = pos.attacks_from<KING>(pos.square<KING>(WHITE));
+      Bitboard bKingNext = pos.attacks_from<KING>(pos.square<KING>(BLACK));
+      Bitboard wb = 0, bb = 0;
+
+      while ((wKing && bPawns) || (bKing && wPawns))
+      {
+          if(pos.side_to_move() == WHITE)
+          {
+              // Pawn captures of white king
+              wb |= wKing & bPawns & ~(bKingNext | bKingAll);
+              bPawns &= ~wKing;
+
+              // Moves of white king
+              wKingAll |= wKing = wKingNext & ~(wKingAll | ei.attackedBy[BLACK][PAWN] | pos.pieces(WHITE, PAWN) | bKingNext | bKingAll);
+              wKingNext =  shift<NORTH>(wKing)      | shift<SOUTH>(wKing)
+                         | shift<WEST >(wKing)      | shift<EAST >(wKing)
+                         | shift<NORTH_WEST>(wKing) | shift<SOUTH_WEST>(wKing)
+                         | shift<NORTH_EAST>(wKing) | shift<SOUTH_EAST>(wKing);
+
+              // Pawn captures of black king
+              bb |= bKing & wPawns & ~(wKingNext | wKingAll);
+              wPawns &= ~bKing;
+
+              // Moves of black king
+              bKingAll |= bKing = bKingNext & ~(bKingAll | ei.attackedBy[WHITE][PAWN] | pos.pieces(BLACK, PAWN) | wKingNext | wKingAll);
+              bKingNext =  shift<NORTH>(bKing)      | shift<SOUTH>(bKing)
+                         | shift<WEST >(bKing)      | shift<EAST >(bKing)
+                         | shift<NORTH_WEST>(bKing) | shift<SOUTH_WEST>(bKing)
+                         | shift<NORTH_EAST>(bKing) | shift<SOUTH_EAST>(bKing);
+          }
+          else
+          {
+              // Pawn captures of black king
+              bb |= bKing & wPawns & ~(wKingNext | wKingAll);
+              wPawns &= ~bKing;
+
+              // Moves of black king
+              bKingAll |= bKing = bKingNext & ~(bKingAll | ei.attackedBy[WHITE][PAWN] | pos.pieces(BLACK, PAWN) | wKingNext | wKingAll);
+              bKingNext =  shift<NORTH>(bKing)      | shift<SOUTH>(bKing)
+                         | shift<WEST >(bKing)      | shift<EAST >(bKing)
+                         | shift<NORTH_WEST>(bKing) | shift<SOUTH_WEST>(bKing)
+                         | shift<NORTH_EAST>(bKing) | shift<SOUTH_EAST>(bKing);
+
+              // Pawn captures of white king
+              wb |= wKing & bPawns & ~(bKingNext | bKingAll);
+              bPawns &= ~wKing;
+
+              // Moves of white king
+              wKingAll |= wKing = wKingNext & ~(wKingAll | ei.attackedBy[BLACK][PAWN] | pos.pieces(WHITE, PAWN) | bKingNext | bKingAll);
+              wKingNext =  shift<NORTH>(wKing)      | shift<SOUTH>(wKing)
+                         | shift<WEST >(wKing)      | shift<EAST >(wKing)
+                         | shift<NORTH_WEST>(wKing) | shift<SOUTH_WEST>(wKing)
+                         | shift<NORTH_EAST>(wKing) | shift<SOUTH_EAST>(wKing);
+          }
+      }
+
+      if (wb)
+          score += PawnNotDefendable * popcount(wb);
+
+      if (bb)
+          score -= PawnNotDefendable * popcount(bb);
+
+      return score;
+  }
 
   // evaluate_space() computes the space evaluation for a given side. The
   // space evaluation is a simple bonus based on the number of safe squares
@@ -854,6 +928,10 @@ Value Eval::evaluate(const Position& pos) {
   if (pos.non_pawn_material(WHITE) + pos.non_pawn_material(BLACK) >= 12222)
       score +=  evaluate_space<WHITE>(pos, ei)
               - evaluate_space<BLACK>(pos, ei);
+
+  // Pawn end games
+  if(!pos.non_pawn_material(WHITE) && !pos.non_pawn_material(BLACK))
+     score += evaluate_pawn_endgame(pos, ei);
 
   // Evaluate position potential for the winning side
   score += evaluate_initiative(pos, ei.pi->pawn_asymmetry(), eg_value(score));
