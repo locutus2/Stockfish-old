@@ -878,19 +878,19 @@ moves_loop: // When in check search starts from here
                         && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY];
 
       // Step 12. Extend checks
-      if (    givesCheck
-          && !moveCountPruning
-          &&  pos.see_ge(move, VALUE_ZERO))
-          extension = ONE_PLY / 2;
+      if (   givesCheck
+          && pos.see_ge(move, VALUE_ZERO))
+          extension = moveCountPruning ? ONE_PLY / 2 : ONE_PLY;
 
       // Singular extension search. If all moves but one fail low on a search of
       // (alpha-s, beta-s), and just one fails high on (alpha, beta), then that move
       // is singular and should be extended. To verify this we do a reduced search
       // on all the other moves but the ttMove and if the result is lower than
       // ttValue minus a margin then we extend the ttMove.
-      if (    singularExtensionNode
-          &&  move == ttMove
-          &&  pos.legal(move))
+      if (   singularExtensionNode
+          && move == ttMove
+          && extension < ONE_PLY
+          && pos.legal(move))
       {
           Value rBeta = std::max(ttValue - 2 * depth / ONE_PLY, -VALUE_MATE);
           Depth d = (depth / (2 * ONE_PLY)) * ONE_PLY;
