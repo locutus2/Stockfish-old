@@ -571,6 +571,7 @@ namespace {
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
+    Thread* neighbourThread = Threads[(thisThread->idx + 1) % Threads.size()];
     inCheck = pos.checkers();
     moveCount = quietCount =  ss->moveCount = 0;
     ss->history = VALUE_ZERO;
@@ -621,7 +622,7 @@ namespace {
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
-    ss->counterMoves = nullptr;
+    ss->counterMoves = ss->counterMovesFromNeighbour = nullptr;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -749,7 +750,7 @@ namespace {
         &&  pos.non_pawn_material(pos.side_to_move()))
     {
         ss->currentMove = MOVE_NULL;
-        ss->counterMoves = nullptr;
+        ss->counterMoves = ss->counterMovesFromNeighbour = nullptr;
 
         assert(eval - beta >= 0);
 
@@ -957,6 +958,7 @@ moves_loop: // When in check search starts from here
 
       ss->currentMove = move;
       ss->counterMoves = &thisThread->counterMoveHistory[moved_piece][to_sq(move)];
+      ss->counterMovesFromNeighbour = &neighbourThread->counterMoveHistory[moved_piece][to_sq(move)];
 
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1402,6 +1404,22 @@ moves_loop: // When in check search starts from here
 
     if (fmh2)
         fmh2->update(pc, s, bonus);
+        
+    if(Threads.size() >= 2)
+    {
+        cmh  = (ss-1)->counterMovesFromNeighbour;
+        fmh1 = (ss-2)->counterMovesFromNeighbour;
+        fmh2 = (ss-4)->counterMovesFromNeighbour;
+    
+        if (cmh)
+            cmh->update(pc, s, bonus);
+    
+        if (fmh1)
+            fmh1->update(pc, s, bonus);
+    
+        if (fmh2)
+            fmh2->update(pc, s, bonus);
+    }
   }
 
 
