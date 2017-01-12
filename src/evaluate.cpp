@@ -430,7 +430,7 @@ namespace {
         b = undefended & ei.attackedBy[Them][QUEEN] & ~pos.pieces(Them);
 
         // ...and keep squares supported by another enemy piece
-        kingDanger += QueenContactCheck * popcount(b & ei.attackedBy2[Them]);
+        kingDanger += QueenContactCheck * popcount(b &= ei.attackedBy2[Them]);
 
         // Check if even a queen contact mate is possible
         if(b)
