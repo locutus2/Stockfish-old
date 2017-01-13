@@ -216,6 +216,7 @@ namespace {
 
   // Penalties for enemy's safe checks
   const int QueenContactCheck = 997;
+  const int QueenContactMate  = 997;
   const int QueenCheck        = 745;
   const int RookCheck         = 688;
   const int BishopCheck       = 588;
@@ -431,7 +432,20 @@ namespace {
         b = undefended & ei.attackedBy[Them][QUEEN] & ~pos.pieces(Them);
 
         // ...and keep squares supported by another enemy piece
-        kingDanger += QueenContactCheck * popcount(b & ei.attackedBy2[Them]);
+        kingDanger += QueenContactCheck * popcount(b &= ei.attackedBy2[Them]);
+
+        // Check if even a queen contact mate is possible
+        if(b)
+        {
+            b1 =   ei.attackedBy[Us][KING]
+                & ~pos.pieces(Us)
+                & ~ei.attackedBy2[Them]
+                & ~(ei.attackedBy[Them][ALL_PIECES] & ~ei.attackedBy[Them][QUEEN]);
+
+            while(b)
+                if(!(b1 & ~PseudoAttacks[QUEEN][pop_lsb(&b)]))
+                    kingDanger += QueenContactMate;
+        }
 
         // Analyse the safe enemy's checks which are possible on next move...
         safe  = ~(ei.attackedBy[Us][ALL_PIECES] | pos.pieces(Them));
