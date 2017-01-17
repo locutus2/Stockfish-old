@@ -37,7 +37,7 @@ struct HistoryStats {
 
   Value get(Color c, Move m) const { return table[c][from_sq(m)][to_sq(m)]; }
   void clear() { std::memset(table, 0, sizeof(table)); }
-  void update(Color c, Move m, Value v) {
+  void update(Color c, Move m, Value v, int moveCount) {
 
     if (abs(int(v)) >= 324)
         return;
@@ -46,7 +46,7 @@ struct HistoryStats {
     Square to = to_sq(m);
 
     table[c][from][to] -= table[c][from][to] * abs(int(v)) / 324;
-    table[c][from][to] += int(v) * 32;
+    table[c][from][to] += int(v) * (1 + msb(moveCount)) * 16;
   }
 
 private:
