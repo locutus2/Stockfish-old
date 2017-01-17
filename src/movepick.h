@@ -46,7 +46,7 @@ struct HistoryStats {
     Square to = to_sq(m);
 
     table[c][from][to] -= table[c][from][to] * abs(int(v)) / 324;
-    table[c][from][to] += int(v) * (1 + msb(moveCount)) * 16;
+    table[c][from][to] += int(v) * (31 + msb(moveCount));
   }
 
 private:
