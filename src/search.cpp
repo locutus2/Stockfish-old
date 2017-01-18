@@ -1129,7 +1129,8 @@ moves_loop: // When in check search starts from here
     // Bonus for prior countermove that caused the fail low
     else if (    depth >= 3 * ONE_PLY
              && !pos.captured_piece()
-             && is_ok((ss-1)->currentMove))
+             && is_ok((ss-1)->currentMove)
+             && (ss-1)->moveCount > 0)
         update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, bonus(depth, (ss-1)->moveCount));
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
