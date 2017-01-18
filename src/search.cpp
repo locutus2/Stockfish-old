@@ -155,8 +155,8 @@ namespace {
 
   const size_t HalfDensitySize = std::extent<decltype(HalfDensity)>::value;
 
-  Value bonus(Depth depth)   { int d = depth / ONE_PLY ; return  Value(d * d + 2 * d - 2); }
-  Value penalty(Depth depth) { int d = depth / ONE_PLY ; return -Value(d * d + 4 * d + 1); }
+  Value bonus(Depth depth, int moveCount)   { int d = depth / ONE_PLY ; return  Value(d * d + 2 * d - 2) * (31 + msb(moveCount)); }
+  Value penalty(Depth depth, int moveCount) { int d = depth / ONE_PLY ; return -Value(d * d + 4 * d + 1) * (31 + msb(moveCount)); }
 
   EasyMoveManager EasyMove;
   Value DrawValue[COLOR_NB];
@@ -645,11 +645,11 @@ namespace {
         if (ttValue >= beta && ttMove)
         {
             if (!pos.capture_or_promotion(ttMove))
-                update_stats(pos, ss, ttMove, nullptr, 0, bonus(depth));
+                update_stats(pos, ss, ttMove, nullptr, 0, bonus(depth, 1));
 
             // Extra penalty for a quiet TT move in previous ply when it gets refuted
             if ((ss-1)->moveCount == 1 && !pos.captured_piece())
-                update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, penalty(depth));
+                update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, penalty(depth, (ss-1)->moveCount));
         }
         return ttValue;
     }
@@ -1120,17 +1120,17 @@ moves_loop: // When in check search starts from here
 
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, bonus(depth));
+            update_stats(pos, ss, bestMove, quietsSearched, quietCount, bonus(depth, moveCount));
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
-            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, penalty(depth));
+            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, penalty(depth, (ss-1)->moveCount));
     }
     // Bonus for prior countermove that caused the fail low
     else if (    depth >= 3 * ONE_PLY
              && !pos.captured_piece()
              && is_ok((ss-1)->currentMove))
-        update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, bonus(depth));
+        update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, bonus(depth, (ss-1)->moveCount));
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               bestValue >= beta ? BOUND_LOWER :
