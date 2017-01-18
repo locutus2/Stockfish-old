@@ -28,7 +28,6 @@
 #include "position.h"
 #include "types.h"
 
-
 /// HistoryStats records how often quiet moves have been successful or unsuccessful
 /// during the current search, and is used for reduction and move ordering decisions.
 struct HistoryStats {
