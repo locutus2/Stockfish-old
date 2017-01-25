@@ -346,6 +346,8 @@ void Thread::search() {
   Move easyMove = MOVE_NONE;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
 
+  allowNullmovePruning = Threads.size() < 7 || idx % 7 != 1;
+
   std::memset(ss-4, 0, 7 * sizeof(Stack));
 
   bestValue = delta = alpha = -VALUE_INFINITE;
@@ -742,6 +744,7 @@ namespace {
 
     // Step 8. Null move search with verification search (is omitted in PV nodes)
     if (   !PvNode
+        &&  thisThread->allowNullmovePruning
         &&  eval >= beta
         && (ss->staticEval >= beta - 35 * (depth / ONE_PLY - 6) || depth >= 13 * ONE_PLY)
         &&  pos.non_pawn_material(pos.side_to_move()))

@@ -72,6 +72,7 @@ public:
   MoveStats counterMoves;
   HistoryStats history;
   CounterMoveHistoryStats counterMoveHistory;
+  bool allowNullmovePruning;
 };
 
 

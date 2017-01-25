@@ -38,6 +38,7 @@ Thread::Thread() {
   maxPly = callsCnt = 0;
   tbHits = 0;
   idx = Threads.size(); // Start from 0
+  allowNullmovePruning = true;
 
   std::unique_lock<Mutex> lk(mutex);
   searching = true;
