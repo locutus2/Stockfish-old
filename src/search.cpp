@@ -216,6 +216,7 @@ void Search::clear() {
   {
       th->counterMoves.clear();
       th->history.clear();
+      th->nullmoveHistory.clear();
       th->counterMoveHistory.clear();
       th->resetCalls = true;
   }
@@ -764,8 +765,9 @@ namespace {
 
         assert(eval - beta >= 0);
 
+        Value nullmoveHistory = thisThread->nullmoveHistory.get(~pos.side_to_move(), (ss-1)->currentMove);
         // Null move dynamic reduction based on depth and value
-        Depth R = ((823 + 67 * depth / ONE_PLY) / 256 + std::min((eval - beta) / PawnValueMg, 3)) * ONE_PLY;
+        Depth R = std::max(((823 + 67 * depth / ONE_PLY) / 256 + std::min((eval - beta) / PawnValueMg, 3) + (nullmoveHistory + 4000) / 8000), 1) * ONE_PLY;
 
         pos.do_null_move(st);
         nullValue = depth-R < ONE_PLY ? -qsearch<NonPV, false>(pos, ss+1, -beta, -beta+1)
@@ -779,15 +781,22 @@ namespace {
                 nullValue = beta;
 
             if (depth < 12 * ONE_PLY && abs(beta) < VALUE_KNOWN_WIN)
+            {
+                thisThread->nullmoveHistory.update(~pos.side_to_move(), (ss-1)->currentMove, stat_bonus(depth));
                 return nullValue;
+            }
 
             // Do verification search at high depths
             Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta)
                                         :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, true);
 
             if (v >= beta)
+            {
+                thisThread->nullmoveHistory.update(~pos.side_to_move(), (ss-1)->currentMove, stat_bonus(depth));
                 return nullValue;
+            }
         }
+        thisThread->nullmoveHistory.update(~pos.side_to_move(), (ss-1)->currentMove, -stat_bonus(depth));
     }
 
     // Step 9. ProbCut (skipped when in check)
