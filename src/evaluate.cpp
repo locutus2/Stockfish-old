@@ -292,6 +292,10 @@ namespace {
             ei.kingAdjacentZoneAttacksCount[Us] += popcount(b & ei.attackedBy[Them][KING]);
         }
 
+        if (Pt == ROOK)
+            b &= ei.attackedBy2[Us] | ~(  ei.attackedBy[Them][KNIGHT]
+                                        | ei.attackedBy[Them][BISHOP]);
+
         if (Pt == QUEEN)
             b &= ~(  ei.attackedBy[Them][KNIGHT]
                    | ei.attackedBy[Them][BISHOP]
