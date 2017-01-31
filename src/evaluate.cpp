@@ -293,8 +293,8 @@ namespace {
         }
 
         if (Pt == ROOK)
-            b &= ei.attackedBy2[Us] | ~(  ei.attackedBy[Them][KNIGHT]
-                                        | ei.attackedBy[Them][BISHOP]);
+            b &=   (pos.pieces(Them) ^ pos.pieces(Them, PAWN))
+                | ~(ei.attackedBy[Them][KNIGHT] | ei.attackedBy[Them][BISHOP]);
 
         if (Pt == QUEEN)
             b &= ~(  ei.attackedBy[Them][KNIGHT]
