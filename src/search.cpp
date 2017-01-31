@@ -765,9 +765,11 @@ namespace {
 
         assert(eval - beta >= 0);
 
-        Value nullmoveHistory = thisThread->nullmoveHistory.get(~pos.side_to_move(), (ss-1)->currentMove);
-        // Null move dynamic reduction based on depth and value
-        Depth R = std::max((823 + 67 * depth / ONE_PLY) / 256 + std::min((eval - beta) / PawnValueMg, 3) + nullmoveHistory / 8000, 1) * ONE_PLY;
+        // Null move dynamic reduction based on depth, value and nullmove history
+        Value nmh = thisThread->nullmoveHistory.get(~pos.side_to_move(), (ss-1)->currentMove);
+        Depth R = std::max(  (823 + 67 * depth / ONE_PLY) / 256
+                           + std::min((eval - beta) / PawnValueMg, 3)
+                           + (nmh - 2000) / 8000, 1) * ONE_PLY;
 
         pos.do_null_move(st);
         nullValue = depth-R < ONE_PLY ? -qsearch<NonPV, false>(pos, ss+1, -beta, -beta+1)
