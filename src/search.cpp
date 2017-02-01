@@ -759,7 +759,7 @@ namespace {
         &&  eval >= beta
         && (ss->staticEval >= beta - 35 * (depth / ONE_PLY - 6) || depth >= 13 * ONE_PLY)
         &&  pos.non_pawn_material(pos.side_to_move())
-        &&  thisThread->nullmoveHistory.get(~pos.side_to_move(), (ss-1)->currentMove) > -10000)
+        && (depth < 13 * ONE_PLY || thisThread->nullmoveHistory.get(~pos.side_to_move(), (ss-1)->currentMove) > -10000))
     {
         ss->currentMove = MOVE_NULL;
         ss->counterMoves = nullptr;
