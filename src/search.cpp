@@ -756,10 +756,9 @@ namespace {
 
     // Step 8. Null move search with verification search (is omitted in PV nodes)
     if (   !PvNode
-        &&  eval >= beta
+        && (eval >= beta || (eval >= beta - 25 && thisThread->nullmoveHistory.get(~pos.side_to_move(), (ss-1)->currentMove) > 10000))
         && (ss->staticEval >= beta - 35 * (depth / ONE_PLY - 6) || depth >= 13 * ONE_PLY)
-        &&  pos.non_pawn_material(pos.side_to_move())
-        && (depth < 13 * ONE_PLY || thisThread->nullmoveHistory.get(~pos.side_to_move(), (ss-1)->currentMove) > -10000))
+        &&  pos.non_pawn_material(pos.side_to_move()))
     {
         ss->currentMove = MOVE_NULL;
         ss->counterMoves = nullptr;
