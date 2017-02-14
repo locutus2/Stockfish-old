@@ -173,7 +173,7 @@ namespace {
   Value value_to_tt(Value v, int ply);
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
-  void update_cm_stats(Stack* ss, Piece pc, Square s, Value bonus);
+  void update_cm_stats(Stack* ss, Piece pc, Square s, Value bonus, Thread* thisThread);
   void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, Value bonus);
   void check_time();
 
@@ -622,6 +622,7 @@ namespace {
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    ss->movedPiece = NO_PIECE;
     ss->counterMoves = nullptr;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
@@ -654,14 +655,14 @@ namespace {
 
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
-                    update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+                    update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY), thisThread);
             }
             // Penalty for a quiet ttMove that fails low
             else if (!pos.capture_or_promotion(ttMove))
             {
                 Value penalty = -stat_bonus(depth + ONE_PLY);
                 thisThread->history.update(pos.side_to_move(), ttMove, penalty);
-                update_cm_stats(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
+                update_cm_stats(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty, thisThread);
             }
         }
         return ttValue;
@@ -760,6 +761,7 @@ namespace {
         &&  pos.non_pawn_material(pos.side_to_move()))
     {
         ss->currentMove = MOVE_NULL;
+        ss->movedPiece = NO_PIECE;
         ss->counterMoves = nullptr;
 
         assert(eval - beta >= 0);
@@ -810,6 +812,7 @@ namespace {
             if (pos.legal(move))
             {
                 ss->currentMove = move;
+                ss->movedPiece = pos.moved_piece(move);
                 ss->counterMoves = &thisThread->counterMoveHistory[pos.moved_piece(move)][to_sq(move)];
                 pos.do_move(move, st);
                 value = -search<NonPV>(pos, ss+1, -rbeta, -rbeta+1, rdepth, !cutNode, false);
@@ -969,6 +972,7 @@ moves_loop: // When in check search starts from here
 
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
+      ss->movedPiece = moved_piece;
       ss->counterMoves = &thisThread->counterMoveHistory[moved_piece][to_sq(move)];
 
       // Step 14. Make the move
@@ -1137,13 +1141,13 @@ moves_loop: // When in check search starts from here
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
-            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+            update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY), thisThread);
     }
     // Bonus for prior countermove that caused the fail low
     else if (    depth >= 3 * ONE_PLY
              && !pos.captured_piece()
              && is_ok((ss-1)->currentMove))
-        update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
+        update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth), thisThread);
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               bestValue >= beta ? BOUND_LOWER :
@@ -1187,6 +1191,7 @@ moves_loop: // When in check search starts from here
     }
 
     ss->currentMove = bestMove = MOVE_NONE;
+    ss->movedPiece = NO_PIECE;
     ss->ply = (ss-1)->ply + 1;
 
     // Check for an instant draw or if the maximum ply has been reached
@@ -1313,6 +1318,7 @@ moves_loop: // When in check search starts from here
           continue;
 
       ss->currentMove = move;
+      ss->movedPiece = pos.moved_piece(move);
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
@@ -1400,7 +1406,7 @@ moves_loop: // When in check search starts from here
 
   // update_cm_stats() updates countermove and follow-up move history
 
-  void update_cm_stats(Stack* ss, Piece pc, Square s, Value bonus) {
+  void update_cm_stats(Stack* ss, Piece pc, Square s, Value bonus, Thread *thisThread) {
 
     CounterMoveStats* cmh  = (ss-1)->counterMoves;
     CounterMoveStats* fmh1 = (ss-2)->counterMoves;
@@ -1410,7 +1416,10 @@ moves_loop: // When in check search starts from here
         cmh->update(pc, s, bonus);
 
     if (fmh1)
+    {
         fmh1->update(pc, s, bonus);
+        thisThread->counterMoveHistory[pc][s].update((ss-2)->movedPiece, to_sq((ss-2)->currentMove), bonus);
+    }
 
     if (fmh2)
         fmh2->update(pc, s, bonus);
@@ -1431,7 +1440,7 @@ moves_loop: // When in check search starts from here
     Color c = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
     thisThread->history.update(c, move, bonus);
-    update_cm_stats(ss, pos.moved_piece(move), to_sq(move), bonus);
+    update_cm_stats(ss, pos.moved_piece(move), to_sq(move), bonus, thisThread);
 
     if ((ss-1)->counterMoves)
     {
@@ -1443,7 +1452,7 @@ moves_loop: // When in check search starts from here
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->history.update(c, quiets[i], -bonus);
-        update_cm_stats(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        update_cm_stats(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus, thisThread);
     }
   }
 

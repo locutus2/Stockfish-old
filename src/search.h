@@ -46,6 +46,7 @@ struct Stack {
   Value staticEval;
   Value history;
   int moveCount;
+  Piece movedPiece;
 };
 
 
