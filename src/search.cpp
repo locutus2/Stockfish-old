@@ -1418,7 +1418,7 @@ moves_loop: // When in check search starts from here
     if (fmh1)
     {
         fmh1->update(pc, s, bonus);
-        thisThread->counterMoveHistory[pc][s].update((ss-2)->movedPiece, to_sq((ss-2)->currentMove), bonus);
+        thisThread->counterMoveHistory[pc][s].small_update((ss-2)->movedPiece, to_sq((ss-2)->currentMove), bonus);
     }
 
     if (fmh2)
