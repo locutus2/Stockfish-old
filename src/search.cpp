@@ -837,6 +837,10 @@ moves_loop: // When in check search starts from here
     const CounterMoveStats* fmh  = (ss-2)->counterMoves;
     const CounterMoveStats* fmh2 = (ss-4)->counterMoves;
 
+    if(  !ttMove && !pos.capture(ss->killers[0])
+       && cmh    && (*cmh)[pos.moved_piece(ss->killers[0])][to_sq(ss->killers[0])] > VALUE_ZERO)
+        ttMove = ss->killers[0];
+
     MovePicker mp(pos, ttMove, depth, ss);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
