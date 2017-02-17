@@ -837,8 +837,7 @@ moves_loop: // When in check search starts from here
     const CounterMoveStats* fmh  = (ss-2)->counterMoves;
     const CounterMoveStats* fmh2 = (ss-4)->counterMoves;
 
-    if(  !ttMove && !pos.capture(ss->killers[0])
-       && cmh    && (*cmh)[pos.moved_piece(ss->killers[0])][to_sq(ss->killers[0])] > VALUE_ZERO)
+    if (!ttMove && cutNode && ss->killers[0] == thisThread->counterMoves[pos.piece_on(prevSq)][prevSq])
         ttMove = ss->killers[0];
 
     MovePicker mp(pos, ttMove, depth, ss);
