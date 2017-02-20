@@ -175,12 +175,10 @@ namespace {
   // pawns or pieces which are not pawn-defended.
   const Score ThreatByKing[2] = { S(3, 62), S(9, 138) };
 
-  // Passed[og/mg/eg/lg][Rank] contains opening, midgame, endgame and late endgame bonuses for passed pawns.
-  // We don't use a Score because we process the components independently.
+  // Passed[0/1][Rank] contains operning and late endgame bonuses for passed pawns.
+  // We don't use a Score because we process the two components independently.
   const Value Passed[][RANK_NB] = {
     { V(5), V( 5), V(31), V(73), V(166), V(252) },
-    { V(5), V( 7), V(33), V(73), V(166), V(252) },
-    { V(6), V(11), V(35), V(73), V(166), V(252) },
     { V(7), V(14), V(38), V(73), V(166), V(252) }
   };
 
@@ -641,7 +639,7 @@ namespace {
         int r = relative_rank(Us, s) - RANK_2;
         int rr = r * (r - 1);
 
-        Value obonus = Passed[OP][r], mbonus = Passed[MG][r], ebonus = Passed[EG][r], lbonus = Passed[LG][r];
+        Value mbonus = Passed[0][r], ebonus = Passed[1][r];
 
         if (rr)
         {
@@ -650,15 +648,10 @@ namespace {
             // Adjust bonus based on the king's proximity
             ebonus +=  distance(pos.square<KING>(Them), blockSq) * 5 * rr
                      - distance(pos.square<KING>(Us  ), blockSq) * 2 * rr;
-            lbonus +=  distance(pos.square<KING>(Them), blockSq) * 5 * rr
-                     - distance(pos.square<KING>(Us  ), blockSq) * 2 * rr;
 
             // If blockSq is not the queening square then consider also a second push
             if (relative_rank(Us, blockSq) != RANK_8)
-            {
                 ebonus -= distance(pos.square<KING>(Us), blockSq + pawn_push(Us)) * rr;
-                lbonus -= distance(pos.square<KING>(Us), blockSq + pawn_push(Us)) * rr;
-            }
 
             // If the pawn is free to advance, then increase the bonus
             if (pos.empty(blockSq))
@@ -688,18 +681,18 @@ namespace {
                 else if (defendedSquares & blockSq)
                     k += 4;
 
-                obonus += k * rr, mbonus += k * rr, ebonus += k * rr, lbonus += k * rr;
+                mbonus += k * rr, ebonus += k * rr;
             }
             else if (pos.pieces(Us) & blockSq)
-                obonus += rr + r * 2, mbonus += rr + r * 2, ebonus += rr + r * 2, lbonus += rr + r * 2;
+                mbonus += rr + r * 2, ebonus += rr + r * 2;
         } // rr != 0
 
         // Scale down bonus for candidate passers which need more than one
         // pawn push to become passed.
         if (!pos.pawn_passed(Us, s + pawn_push(Us)))
-            obonus /= 2, mbonus /= 2, ebonus /= 2, lbonus /= 2;
+            mbonus /= 2, ebonus /= 2;
 
-        score += make_score(obonus, mbonus, ebonus, lbonus) + PassedFile[file_of(s)];
+        score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
     }
 
     if (DoTrace)
@@ -751,7 +744,7 @@ namespace {
   // evaluate_initiative() computes the initiative correction value for the
   // position, i.e., second order bonus/malus based on the known attacking/defending
   // status of the players.
-  Score evaluate_initiative(const Position& pos, int asymmetry, Score score) {
+  Score evaluate_initiative(const Position& pos, int asymmetry, Value eg) {
 
     int kingDistance =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                       - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
@@ -764,12 +757,9 @@ namespace {
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
     // that the endgame score will never change sign after the bonus.
-    Value eg = eg_value(score);
-    Value lg = lg_value(score);
-    int value_eg = ((eg > 0) - (eg < 0)) * std::max(initiative, -abs(eg));
-    int value_lg = ((lg > 0) - (lg < 0)) * std::max(initiative, -abs(lg));
+    int value = ((eg > 0) - (eg < 0)) * std::max(initiative, -abs(eg));
 
-    return make_score(0, 0, value_eg, value_lg);
+    return make_score(0, value);
   }
 
 
@@ -901,7 +891,7 @@ Value Eval::evaluate(const Position& pos) {
               - evaluate_space<BLACK>(pos, ei);
 
   // Evaluate position potential for the winning side
-  score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), score);
+  score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), eg_value(score));
 
   // Evaluate scale factor for the winning side
   ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
