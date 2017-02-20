@@ -100,12 +100,7 @@ Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
   }
 };
 
-TUNE(SetRange(-100, 100), Bonus[PAWN]);
-TUNE(SetRange(-300, 200), Bonus[KNIGHT]);
-TUNE(SetRange(-100, 100), Bonus[BISHOP]);
-TUNE(SetRange(-100, 100), Bonus[ROOK]);
-TUNE(SetRange(-200, 100), Bonus[QUEEN]);
-TUNE(SetRange(-100, 400), Bonus[KING]);
+TUNE(SetRange(100), Bonus[PAWN]);
 
 #undef S
 
