@@ -72,6 +72,7 @@ inline void set_conditions() { Conditions.set(); }
 /// if you have:
 ///
 ///   const Score myScore = S(10, 15);
+///   const Score myScore = S(10, 15, 20, 50);
 ///   const Value myValue[][2] = { { V(100), V(20) }, { V(7), V(78) } };
 ///
 /// If you have a my_post_update() function to run after values have been updated,
