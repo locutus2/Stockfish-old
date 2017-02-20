@@ -133,7 +133,7 @@ void MovePicker::score<CAPTURES>() {
   // badCaptures[] array, but instead of doing it now we delay until the move
   // has been picked up, saving some SEE calls in case we get a cutoff.
   for (auto& m : *this)
-      m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
+      m.value =  PieceValue[OP][pos.piece_on(to_sq(m))]
                - Value(200 * relative_rank(pos.side_to_move(), to_sq(m)));
 }
 
@@ -163,7 +163,7 @@ void MovePicker::score<EVASIONS>() {
 
   for (auto& m : *this)
       if (pos.capture(m))
-          m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
+          m.value =  PieceValue[OP][pos.piece_on(to_sq(m))]
                    - Value(type_of(pos.moved_piece(m))) + HistoryStats::Max;
       else
           m.value = history.get(c, m);

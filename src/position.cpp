@@ -368,7 +368,7 @@ void Position::set_state(StateInfo* si) const {
   for (Piece pc : Pieces)
   {
       if (type_of(pc) != PAWN && type_of(pc) != KING)
-          si->nonPawnMaterial[color_of(pc)] += pieceCount[pc] * PieceValue[MG][pc];
+          si->nonPawnMaterial[color_of(pc)] += pieceCount[pc] * PieceValue[OP][pc];
 
       for (int cnt = 0; cnt < pieceCount[pc]; ++cnt)
           si->materialKey ^= Zobrist::psq[pc][cnt];
@@ -457,7 +457,7 @@ Phase Position::game_phase() const {
 
   npm = std::max(EndgameLimit, std::min(npm, MidgameLimit));
 
-  return Phase(((npm - EndgameLimit) * PHASE_MIDGAME) / (MidgameLimit - EndgameLimit));
+  return Phase(((npm - EndgameLimit) * MAX_PHASE) / (MidgameLimit - EndgameLimit));
 }
 
 
@@ -752,7 +752,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
           st->pawnKey ^= Zobrist::psq[captured][capsq];
       }
       else
-          st->nonPawnMaterial[them] -= PieceValue[MG][captured];
+          st->nonPawnMaterial[them] -= PieceValue[OP][captured];
 
       // Update board and piece lists
       remove_piece(captured, capsq);
@@ -822,7 +822,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
           st->psq += PSQT::psq[promotion][to] - PSQT::psq[pc][to];
 
           // Update material
-          st->nonPawnMaterial[us] += PieceValue[MG][promotion];
+          st->nonPawnMaterial[us] += PieceValue[OP][promotion];
       }
 
       // Update pawn hash key and prefetch access to pawnsTable
@@ -1019,11 +1019,11 @@ bool Position::see_ge(Move m, Value v) const {
   if (type_of(m) == ENPASSANT)
   {
       occupied = SquareBB[to - pawn_push(~stm)]; // Remove the captured pawn
-      balance = PieceValue[MG][PAWN];
+      balance = PieceValue[OP][PAWN];
   }
   else
   {
-      balance = PieceValue[MG][piece_on(to)];
+      balance = PieceValue[OP][piece_on(to)];
       occupied = 0;
   }
 
@@ -1033,7 +1033,7 @@ bool Position::see_ge(Move m, Value v) const {
   if (nextVictim == KING)
       return true;
 
-  balance -= PieceValue[MG][nextVictim];
+  balance -= PieceValue[OP][nextVictim];
 
   if (balance >= v)
       return true;
@@ -1063,8 +1063,8 @@ bool Position::see_ge(Move m, Value v) const {
       if (nextVictim == KING)
           return relativeStm == bool(attackers & pieces(~stm));
 
-      balance += relativeStm ?  PieceValue[MG][nextVictim]
-                             : -PieceValue[MG][nextVictim];
+      balance += relativeStm ?  PieceValue[OP][nextVictim]
+                             : -PieceValue[OP][nextVictim];
 
       relativeStm = !relativeStm;
 

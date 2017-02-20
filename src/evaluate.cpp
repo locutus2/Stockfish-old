@@ -42,8 +42,10 @@ namespace {
     double to_cp(Value v) { return double(v) / PawnValueEg; }
 
     void add(int idx, Color c, Score s) {
+      scores[idx][c][OP] = to_cp(op_value(s));
       scores[idx][c][MG] = to_cp(mg_value(s));
       scores[idx][c][EG] = to_cp(eg_value(s));
+      scores[idx][c][LG] = to_cp(lg_value(s));
     }
 
     void add(int idx, Score w, Score b = SCORE_ZERO) {
@@ -53,15 +55,21 @@ namespace {
     std::ostream& operator<<(std::ostream& os, Term t) {
 
       if (t == MATERIAL || t == IMBALANCE || t == Term(PAWN) || t == TOTAL)
-          os << "  ---   --- |   ---   --- | ";
+          os << "  ---   ---   ---   --- |   ---   ---   ---   --- | ";
       else
-          os << std::setw(5) << scores[t][WHITE][MG] << " "
-             << std::setw(5) << scores[t][WHITE][EG] << " | "
+          os << std::setw(5) << scores[t][WHITE][OP] << " "
+             << std::setw(5) << scores[t][WHITE][MG] << " "
+             << std::setw(5) << scores[t][WHITE][EG] << " "
+             << std::setw(5) << scores[t][WHITE][LG] << " | "
+             << std::setw(5) << scores[t][BLACK][OP] << " "
              << std::setw(5) << scores[t][BLACK][MG] << " "
-             << std::setw(5) << scores[t][BLACK][EG] << " | ";
+             << std::setw(5) << scores[t][BLACK][EG] << " "
+             << std::setw(5) << scores[t][BLACK][LG] << " | ";
 
-      os << std::setw(5) << scores[t][WHITE][MG] - scores[t][BLACK][MG] << " "
-         << std::setw(5) << scores[t][WHITE][EG] - scores[t][BLACK][EG] << " \n";
+      os << std::setw(5) << scores[t][WHITE][OP] - scores[t][BLACK][OP] << " "
+         << std::setw(5) << scores[t][WHITE][MG] - scores[t][BLACK][MG] << " "
+         << std::setw(5) << scores[t][WHITE][EG] - scores[t][BLACK][EG] << " "
+         << std::setw(5) << scores[t][WHITE][LG] - scores[t][BLACK][LG] << " \n";
 
       return os;
     }
@@ -168,10 +176,12 @@ namespace {
   // pawns or pieces which are not pawn-defended.
   const Score ThreatByKing[2] = { S(3, 62), S(9, 138) };
 
-  // Passed[mg/eg][Rank] contains midgame and endgame bonuses for passed pawns.
-  // We don't use a Score because we process the two components independently.
+  // Passed[og/mg/eg/lg][Rank] contains opening, midgame, endgame and late endgame bonuses for passed pawns.
+  // We don't use a Score because we process the components independently.
   const Value Passed[][RANK_NB] = {
     { V(5), V( 5), V(31), V(73), V(166), V(252) },
+    { V(5), V( 7), V(33), V(73), V(166), V(252) },
+    { V(6), V(11), V(35), V(73), V(166), V(252) },
     { V(7), V(14), V(38), V(73), V(166), V(252) }
   };
 
@@ -627,7 +637,7 @@ namespace {
         int r = relative_rank(Us, s) - RANK_2;
         int rr = r * (r - 1);
 
-        Value mbonus = Passed[MG][r], ebonus = Passed[EG][r];
+        Value obonus = Passed[OP][r], mbonus = Passed[MG][r], ebonus = Passed[EG][r], lbonus = Passed[LG][r];
 
         if (rr)
         {
@@ -636,10 +646,15 @@ namespace {
             // Adjust bonus based on the king's proximity
             ebonus +=  distance(pos.square<KING>(Them), blockSq) * 5 * rr
                      - distance(pos.square<KING>(Us  ), blockSq) * 2 * rr;
+            lbonus +=  distance(pos.square<KING>(Them), blockSq) * 5 * rr
+                     - distance(pos.square<KING>(Us  ), blockSq) * 2 * rr;
 
             // If blockSq is not the queening square then consider also a second push
             if (relative_rank(Us, blockSq) != RANK_8)
+            {
                 ebonus -= distance(pos.square<KING>(Us), blockSq + pawn_push(Us)) * rr;
+                lbonus -= distance(pos.square<KING>(Us), blockSq + pawn_push(Us)) * rr;
+            }
 
             // If the pawn is free to advance, then increase the bonus
             if (pos.empty(blockSq))
@@ -669,18 +684,18 @@ namespace {
                 else if (defendedSquares & blockSq)
                     k += 4;
 
-                mbonus += k * rr, ebonus += k * rr;
+                obonus += k * rr, mbonus += k * rr, ebonus += k * rr, lbonus += k * rr;
             }
             else if (pos.pieces(Us) & blockSq)
-                mbonus += rr + r * 2, ebonus += rr + r * 2;
+                obonus += rr + r * 2, mbonus += rr + r * 2, ebonus += rr + r * 2, lbonus += rr + r * 2;
         } // rr != 0
 
         // Scale down bonus for candidate passers which need more than one pawn
         // push to become passed.
         if (!pos.pawn_passed(Us, s + pawn_push(Us)))
-            mbonus /= 2, ebonus /= 2;
+            obonus /= 2, mbonus /= 2, ebonus /= 2, lbonus /= 2;
 
-        score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
+        score += make_score(obonus, mbonus, ebonus, lbonus) + PassedFile[file_of(s)];
     }
 
     if (DoTrace)
@@ -733,7 +748,7 @@ namespace {
   // evaluate_initiative() computes the initiative correction value for the
   // position, i.e., second order bonus/malus based on the known attacking/defending
   // status of the players.
-  Score evaluate_initiative(const Position& pos, int asymmetry, Value eg) {
+  Score evaluate_initiative(const Position& pos, int asymmetry, Score score) {
 
     int kingDistance =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                       - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
@@ -746,9 +761,12 @@ namespace {
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
     // that the endgame score will never change sign after the bonus.
-    int value = ((eg > 0) - (eg < 0)) * std::max(initiative, -abs(eg));
+    Value eg = eg_value(score);
+    Value lg = lg_value(score);
+    int value_eg = ((eg > 0) - (eg < 0)) * std::max(initiative, -abs(eg));
+    int value_lg = ((lg > 0) - (lg < 0)) * std::max(initiative, -abs(lg));
 
-    return make_score(0, value);
+    return make_score(0, 0, value_eg, value_lg);
   }
 
 
@@ -785,7 +803,38 @@ namespace {
     return sf;
   }
 
+  /// interpolate() calculates from the four score values
+  /// (opening, midgame, endgame, late endgame) depended on game phase
+  /// the combined evaluation of a position. The scale factor is used
+  /// for the endgame and late endgame score.
+
+  Value interpolate(Phase phase, Score score, ScaleFactor sf)
+  {
+      Value v = VALUE_ZERO;
+      if(phase >= PHASE_MIDGAME)
+      {
+          v =  op_value(score) * int(phase - PHASE_MIDGAME)
+             + mg_value(score) * int(PHASE_OPENING - phase);
+          v /= int(PHASE_OPENING) - int(PHASE_MIDGAME);
+      }
+      else if(phase >= PHASE_ENDGAME)
+      {
+          v =  mg_value(score) * int(phase - PHASE_ENDGAME)
+             + eg_value(score) * int(PHASE_MIDGAME - v) * sf / SCALE_FACTOR_NORMAL;
+          v /= int(PHASE_MIDGAME) - int(PHASE_ENDGAME);
+      }
+      else
+      {
+          v = (eg_value(score) * int(phase - PHASE_LATE_ENDGAME)
+             + lg_value(score) * int(PHASE_ENDGAME - phase)) * sf / SCALE_FACTOR_NORMAL;
+          v /= int(PHASE_ENDGAME) - int(PHASE_LATE_ENDGAME);
+      }
+
+      return v;
+  }
+
 } // namespace
+
 
 
 /// evaluate() is the main evaluation function. It returns a static evaluation
@@ -818,7 +867,7 @@ Value Eval::evaluate(const Position& pos) {
   score += ei.pe->pawns_score();
 
   // Early exit if score is high
-  v = (mg_value(score) + eg_value(score)) / 2;
+  v = interpolate(ei.me->game_phase(), score, SCALE_FACTOR_NORMAL);
   if (abs(v) > LazyThreshold)
      return pos.side_to_move() == WHITE ? v : -v;
 
@@ -849,16 +898,12 @@ Value Eval::evaluate(const Position& pos) {
               - evaluate_space<BLACK>(pos, ei);
 
   // Evaluate position potential for the winning side
-  score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), eg_value(score));
+  score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), score);
 
   // Evaluate scale factor for the winning side
   ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
 
-  // Interpolate between a middlegame and a (scaled by 'sf') endgame score
-  v =  mg_value(score) * int(ei.me->game_phase())
-     + eg_value(score) * int(PHASE_MIDGAME - ei.me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
-
-  v /= int(PHASE_MIDGAME);
+  v = interpolate(ei.me->game_phase(), score, sf);
 
   // In case of tracing add all remaining individual evaluation terms
   if (DoTrace)
@@ -880,7 +925,6 @@ Value Eval::evaluate(const Position& pos) {
 template Value Eval::evaluate<true >(const Position&);
 template Value Eval::evaluate<false>(const Position&);
 
-
 /// trace() is like evaluate(), but instead of returning a value, it returns
 /// a string (suitable for outputting to stdout) that contains the detailed
 /// descriptions and values of each evaluation term. Useful for debugging.
@@ -894,9 +938,9 @@ std::string Eval::trace(const Position& pos) {
 
   std::stringstream ss;
   ss << std::showpoint << std::noshowpos << std::fixed << std::setprecision(2)
-     << "      Eval term |    White    |    Black    |    Total    \n"
-     << "                |   MG    EG  |   MG    EG  |   MG    EG  \n"
-     << "----------------+-------------+-------------+-------------\n"
+     << "      Eval term |        White            |        Black            |        Total    \n"
+     << "                |   OP    MG    EG    LG  |   OP    MG    EG    LG  |   OP    MG    EG    LG  \n"
+     << "----------------+-------------------------+-------------------------+-------------------------\n"
      << "       Material | " << Term(MATERIAL)
      << "      Imbalance | " << Term(IMBALANCE)
      << "          Pawns | " << Term(PAWN)
@@ -909,7 +953,7 @@ std::string Eval::trace(const Position& pos) {
      << "        Threats | " << Term(THREAT)
      << "   Passed pawns | " << Term(PASSED)
      << "          Space | " << Term(SPACE)
-     << "----------------+-------------+-------------+-------------\n"
+     << "----------------+-------------------------+-------------------------+-------------------------\n"
      << "          Total | " << Term(TOTAL);
 
   ss << "\nTotal Evaluation: " << to_cp(v) << " (white side)\n";
