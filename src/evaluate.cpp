@@ -772,6 +772,18 @@ namespace {
     return sf;
   }
 
+  /// interpolate() calculates from the midgame and endgame score depended on game phase
+  /// and the endgame scaleing factor the combined evaluation of a position. 
+
+  Value interpolate(Phase phase, Score score, ScaleFactor sf)
+  {
+      Value v;
+      v =  mg_value(score) * int(phase)
+         + eg_value(score) * int(PHASE_MIDGAME - phase) * sf / SCALE_FACTOR_NORMAL;
+      v /= int(PHASE_MIDGAME);
+      return v;
+  }
+
 } // namespace
 
 
@@ -805,7 +817,7 @@ Value Eval::evaluate(const Position& pos) {
   score += ei.pe->pawns_score();
 
   // Early exit if score is high
-  v = (mg_value(score) + eg_value(score)) / 2;
+  v = interpolate(ei.me->game_phase(), score, SCALE_FACTOR_NORMAL);
   if (abs(v) > LazyThreshold)
      return pos.side_to_move() == WHITE ? v : -v;
 
@@ -842,10 +854,7 @@ Value Eval::evaluate(const Position& pos) {
   ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
 
   // Interpolate between a middlegame and a (scaled by 'sf') endgame score
-  v =  mg_value(score) * int(ei.me->game_phase())
-     + eg_value(score) * int(PHASE_MIDGAME - ei.me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
-
-  v /= int(PHASE_MIDGAME);
+  v = interpolate(ei.me->game_phase(), score, sf);
 
   // In case of tracing add all remaining individual evaluation terms
   if (DoTrace)
