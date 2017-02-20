@@ -250,7 +250,7 @@ template<> void Tune::Entry<Score>::read_option() {
       value = make_score(op_value(value), Options["m" + name], eg_value(value), lg_value(value));
 
   if (Options.count("e" + name))
-      value = make_score(op_value(value), mg_value(value), Options["e" + name], lg_value(value);
+      value = make_score(op_value(value), mg_value(value), Options["e" + name], lg_value(value));
 
   if (Options.count("l" + name))
       value = make_score(op_value(value), mg_value(value), eg_value(value), Options["l" + name]);
