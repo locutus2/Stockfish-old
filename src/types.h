@@ -257,29 +257,38 @@ enum Rank : int {
 };
 
 
-/// Score enum stores a middlegame and an endgame value in a single integer
-/// (enum). The least significant 16 bits are used to store the endgame value
-/// and the upper 16 bits are used to store the middlegame value. Take some
-/// care to avoid left-shifting a signed int to avoid undefined behavior.
-enum Score : int { SCORE_ZERO };
+/// Score stores an opening, middlegame, endgame and late endgame value.
+struct Score
+{
+    int16_t op, mg, eg, lg;
+    Score(int op_value = 0, int mg_value = 0, int eg_value = 0, int lg_value = 0)
+         : op(op_value), mg(mg_value), eg(eg_value), lg(lg_value) {}
+};
 
-inline Score make_score(int mg, int eg) {
-  return Score((int)((unsigned int)eg << 16) + mg);
+const Score SCORE_ZERO;
+
+inline Score make_score(int op, int mg, int eg, int lg) {
+  return Score(op, mg, eg, lg);
 }
 
-/// Extracting the signed lower and upper 16 bits is not so trivial because
-/// according to the standard a simple cast to short is implementation defined
-/// and so is a right shift of a signed integer.
-inline Value eg_value(Score s) {
+inline Score make_score(int mg, int eg) {
+  return Score(0, mg, eg, 0);
+}
 
-  union { uint16_t u; int16_t s; } eg = { uint16_t(unsigned(s + 0x8000) >> 16) };
-  return Value(eg.s);
+inline Value op_value(Score s) {
+  return Value(s.op);
 }
 
 inline Value mg_value(Score s) {
+  return Value(s.mg);
+}
 
-  union { uint16_t u; int16_t s; } mg = { uint16_t(unsigned(s)) };
-  return Value(mg.s);
+inline Value eg_value(Score s) {
+  return Value(s.eg);
+}
+
+inline Value lg_value(Score s) {
+  return Value(s.lg);
 }
 
 #define ENABLE_BASE_OPERATORS_ON(T)                             \
@@ -309,8 +318,6 @@ ENABLE_FULL_OPERATORS_ON(Square)
 ENABLE_FULL_OPERATORS_ON(File)
 ENABLE_FULL_OPERATORS_ON(Rank)
 
-ENABLE_BASE_OPERATORS_ON(Score)
-
 #undef ENABLE_FULL_OPERATORS_ON
 #undef ENABLE_BASE_OPERATORS_ON
 
@@ -320,24 +327,46 @@ inline Value operator-(Value v, int i) { return Value(int(v) - i); }
 inline Value& operator+=(Value& v, int i) { return v = v + i; }
 inline Value& operator-=(Value& v, int i) { return v = v - i; }
 
+/// Operators for caluclation with scores
+inline Score operator+(Score s1, Score s2) { return Score(s1.op + s2.op, s1.mg + s2.mg,
+                                                          s1.eg + s2.eg, s1.lg + s2.lg); }
+inline Score operator-(Score s1, Score s2) { return Score(s1.op - s2.op, s1.mg - s2.mg,
+                                                          s1.eg - s2.eg, s1.lg - s2.lg); }
+inline Score operator-(Score s) { return Score(-s.op, -s.mg, -s.eg, -s.lg); }
+inline Score& operator+=(Score& s1, Score s2) { return s1.op += s2.op, s1.mg += s2.mg,
+                                                       s1.eg += s2.eg, s1.lg += s2.lg,
+                                                       s1; }
+inline Score& operator-=(Score& s1, Score s2) { return s1.op -= s2.op, s1.mg -= s2.mg,
+                                                       s1.eg -= s2.eg, s1.lg -= s2.lg,
+                                                       s1; }
+
 /// Only declared but not defined. We don't want to multiply two scores due to
 /// a very high risk of overflow. So user should explicitly convert to integer.
 inline Score operator*(Score s1, Score s2);
 
 /// Division of a Score must be handled separately for each term
 inline Score operator/(Score s, int i) {
-  return make_score(mg_value(s) / i, eg_value(s) / i);
+
+  assert(i != 0);
+
+  return Score(op_value(s) / i, mg_value(s) / i, eg_value(s) / i, lg_value(s) / i);
 }
 
 /// Multiplication of a Score by an integer. We check for overflow in debug mode.
 inline Score operator*(Score s, int i) {
-  Score result = Score(int(s) * i);
+  Score result = Score(op_value(s) * i, mg_value(s) * i, eg_value(s) * i, lg_value(s) * i);
 
-  assert(eg_value(result) == (i * eg_value(s)));
+  assert(op_value(result) == (i * op_value(s)));
   assert(mg_value(result) == (i * mg_value(s)));
+  assert(eg_value(result) == (i * eg_value(s)));
+  assert(lg_value(result) == (i * lg_value(s)));
   assert((i == 0) || (result / i) == s );
 
   return result;
+}
+
+inline Score operator*(int i, Score s) {
+  return s * i;
 }
 
 inline Color operator~(Color c) {
