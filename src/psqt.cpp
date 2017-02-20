@@ -37,7 +37,7 @@ namespace PSQT {
 // type on a given square a (middlegame, endgame) score pair is assigned. Table
 // is defined for files A..D and white side: it is symmetric for black side and
 // second half of the files.
-const Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
+Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
   { },
   { // Pawn
    { S(  0, 0), S(  0, 0), S(  0, 0), S( 0, 0) },
@@ -99,6 +99,13 @@ const Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
    { S( 63,  9), S( 89, 55), S( 47, 80), S(  0, 90) }
   }
 };
+
+TUNE(SetRange(-100, 100), Bonus[PAWN]);
+TUNE(SetRange(-300, 200), Bonus[KNIGHT]);
+TUNE(SetRange(-100, 100), Bonus[BISHOP]);
+TUNE(SetRange(-100, 100), Bonus[ROOK]);
+TUNE(SetRange(-200, 100), Bonus[QUEEN]);
+TUNE(SetRange(-100, 400), Bonus[KING]);
 
 #undef S
 
