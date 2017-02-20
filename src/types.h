@@ -152,9 +152,12 @@ template<Color C, CastlingSide S> struct MakeCastling {
 };
 
 enum Phase {
-  PHASE_ENDGAME,
-  PHASE_MIDGAME = 128,
-  MG = 0, EG = 1, PHASE_NB = 2
+  PHASE_LATE_ENDGAME,
+  PHASE_ENDGAME = 42,
+  PHASE_MIDGAME = 86,
+  PHASE_OPENING = 128,
+  MAX_PHASE = 128,
+  OP = 0, MG = 1, EG = 2, LG = 3, PHASE_NB = 4
 };
 
 enum ScaleFactor {
@@ -183,11 +186,11 @@ enum Value : int {
   VALUE_MATE_IN_MAX_PLY  =  VALUE_MATE - 2 * MAX_PLY,
   VALUE_MATED_IN_MAX_PLY = -VALUE_MATE + 2 * MAX_PLY,
 
-  PawnValueMg   = 188,   PawnValueEg   = 248,
-  KnightValueMg = 753,   KnightValueEg = 832,
-  BishopValueMg = 814,   BishopValueEg = 890,
-  RookValueMg   = 1285,  RookValueEg   = 1371,
-  QueenValueMg  = 2513,  QueenValueEg  = 2648,
+  PawnValueOp   = 188,   PawnValueMg   = 207,  PawnValueEg   = 228,   PawnValueLg   = 248,
+  KnightValueOp = 753,   KnightValueMg = 778,  KnightValueEg = 806,   KnightValueLg = 832,
+  BishopValueOp = 814,   BishopValueMg = 838,  BishopValueEg = 865,   BishopValueLg = 890,
+  RookValueOp   = 1285,  RookValueMg   = 1313, RookValueEg   = 1342,  RookValueLg   = 1371,
+  QueenValueOp  = 2513,  QueenValueMg  = 2557, QueenValueEg  = 2603,  QueenValueLg  = 2648,
 
   MidgameLimit  = 15258, EndgameLimit  = 3915
 };
@@ -271,8 +274,9 @@ inline Score make_score(int op, int mg, int eg, int lg) {
   return Score(op, mg, eg, lg);
 }
 
-inline Score make_score(int mg, int eg) {
-  return Score(0, mg, eg, 0);
+inline Score make_score(int op, int lg) {
+  return Score(op, (op * int(PHASE_MIDGAME) + lg * int(MAX_PHASE - PHASE_MIDGAME)) / int(MAX_PHASE),
+                   (op * int(PHASE_ENDGAME) + lg * int(MAX_PHASE - PHASE_ENDGAME)) / int(MAX_PHASE), lg);
 }
 
 inline Value op_value(Score s) {

@@ -23,8 +23,10 @@
 #include "types.h"
 
 Value PieceValue[PHASE_NB][PIECE_NB] = {
+  { VALUE_ZERO, PawnValueOp, KnightValueOp, BishopValueOp, RookValueOp, QueenValueOp },
   { VALUE_ZERO, PawnValueMg, KnightValueMg, BishopValueMg, RookValueMg, QueenValueMg },
-  { VALUE_ZERO, PawnValueEg, KnightValueEg, BishopValueEg, RookValueEg, QueenValueEg }
+  { VALUE_ZERO, PawnValueEg, KnightValueEg, BishopValueEg, RookValueEg, QueenValueEg },
+  { VALUE_ZERO, PawnValueLg, KnightValueLg, BishopValueLg, RookValueLg, QueenValueLg }
 };
 
 namespace PSQT {
@@ -109,10 +111,12 @@ void init() {
 
   for (Piece pc = W_PAWN; pc <= W_KING; ++pc)
   {
+      PieceValue[OP][~pc] = PieceValue[OP][pc];
       PieceValue[MG][~pc] = PieceValue[MG][pc];
       PieceValue[EG][~pc] = PieceValue[EG][pc];
+      PieceValue[LG][~pc] = PieceValue[LG][pc];
 
-      Score v = make_score(PieceValue[MG][pc], PieceValue[EG][pc]);
+      Score v = make_score(PieceValue[OP][pc], PieceValue[MG][pc], PieceValue[EG][pc], PieceValue[LG][pc]);
 
       for (Square s = SQ_A1; s <= SQ_H8; ++s)
       {
