@@ -816,8 +816,10 @@ Value Eval::evaluate(const Position& pos) {
   ei.pe = Pawns::probe(pos);
   score += ei.pe->pawns_score();
 
+
   // Early exit if score is high
-  v = interpolate(ei.me->game_phase(), score, SCALE_FACTOR_NORMAL);
+  ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
+  v = interpolate(ei.me->game_phase(), score, sf);
   if (abs(v) > LazyThreshold)
      return pos.side_to_move() == WHITE ? v : -v;
 
@@ -851,7 +853,7 @@ Value Eval::evaluate(const Position& pos) {
   score += evaluate_initiative(pos, ei.pe->pawn_asymmetry(), eg_value(score));
 
   // Evaluate scale factor for the winning side
-  ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
+  sf = evaluate_scale_factor(pos, ei, eg_value(score));
 
   // Interpolate between a middlegame and a (scaled by 'sf') endgame score
   v = interpolate(ei.me->game_phase(), score, sf);
