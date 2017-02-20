@@ -35,10 +35,12 @@ inline Range default_range(int v) {
 
 struct SetRange {
   explicit SetRange(RangeFun f) : fun(f) {}
-  SetRange(int min, int max) : fun(nullptr), range(min, max) {}
-  Range operator()(int v) const { return fun ? fun(v) : range; }
+  SetRange(int min, int max) : fun(nullptr), delta(0), range(min, max) {}
+  SetRange(int d) : fun(nullptr), delta(d) {}
+  Range operator()(int v) const { return fun ? fun(v) : delta > 0 ? Range(v - delta, v + delta) : range; }
 
   RangeFun* fun;
+  int delta;
   Range range;
 };
 
