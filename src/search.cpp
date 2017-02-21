@@ -565,7 +565,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval;
-    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
+    bool ttHit, inCheck, inDoubleCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning;
     Piece moved_piece;
     int moveCount, quietCount;
@@ -573,6 +573,7 @@ namespace {
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
+    inDoubleCheck = more_than_one(pos.checkers());
     moveCount = quietCount =  ss->moveCount = 0;
     ss->history = VALUE_ZERO;
     bestValue = -VALUE_INFINITE;
@@ -977,7 +978,8 @@ moves_loop: // When in check search starts from here
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1
-          && (!captureOrPromotion || moveCountPruning))
+          && (!captureOrPromotion || moveCountPruning)
+          && !inDoubleCheck)
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
