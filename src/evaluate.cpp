@@ -818,7 +818,8 @@ Value Eval::evaluate(const Position& pos) {
 
 
   // Early exit if score is high
-  ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
+  Color strongSide = eg_value(score) > VALUE_DRAW ? WHITE : BLACK;
+  ScaleFactor sf = ei.me->scale_factor(pos, strongSide);
   v = interpolate(ei.me->game_phase(), score, sf);
   if (abs(v) > LazyThreshold)
      return pos.side_to_move() == WHITE ? v : -v;
