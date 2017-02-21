@@ -100,8 +100,6 @@ Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
   }
 };
 
-TUNE(SetRange(100), Bonus[PAWN]);
-
 #undef S
 
 Score psq[PIECE_NB][SQUARE_NB];
@@ -128,5 +126,8 @@ void init() {
       }
   }
 }
+
+TUNE(SetRange(100), Bonus[PAWN], init);
+UPDATE_ON_LAST();
 
 } // namespace PSQT
