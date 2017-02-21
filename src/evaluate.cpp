@@ -860,7 +860,7 @@ Value Eval::evaluate(const Position& pos) {
   score += ei.pe->pawns_score();
 
   // Early exit if score is high
-  v = interpolate(ei.me->game_phase(), score, SCALE_FACTOR_NORMAL);
+  v = (op_value(score) + mg_value(score) + eg_value(score) + lg_value(score)) / 4;
   if (abs(v) > LazyThreshold)
      return pos.side_to_move() == WHITE ? v : -v;
 
