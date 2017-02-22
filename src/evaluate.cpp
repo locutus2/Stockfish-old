@@ -813,7 +813,7 @@ namespace {
       else if(phase >= PHASE_ENDGAME)
       {
           v =  mg_value(score) * int(phase - PHASE_ENDGAME)
-             + eg_value(score) * int(PHASE_MIDGAME - v) * sf / SCALE_FACTOR_NORMAL;
+             + eg_value(score) * int(PHASE_MIDGAME - phase) * sf / SCALE_FACTOR_NORMAL;
           v /= int(PHASE_MIDGAME) - int(PHASE_ENDGAME);
       }
       else
