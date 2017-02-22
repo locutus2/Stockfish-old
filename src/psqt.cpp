@@ -32,21 +32,22 @@ Value PieceValue[PHASE_NB][PIECE_NB] = {
 namespace PSQT {
 
 #define S(mg, eg) make_score(mg, eg)
+#define S4(op, mg, eg, lg) make_score(op, mg, eg, lg)
 
 // Bonus[PieceType][Square / 2] contains Piece-Square scores. For each piece
-// type on a given square a (middlegame, endgame) score pair is assigned. Table
-// is defined for files A..D and white side: it is symmetric for black side and
+// type on a given square a (opening, middlegame, endgame, late endgame) score tupel is assigned.
+// Table is defined for files A..D and white side: it is symmetric for black side and
 // second half of the files.
 const Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
   { },
   { // Pawn
-   { S(  0, 0), S(  0, 0), S(  0, 0), S( 0, 0) },
-   { S(-11, 7), S(  6,-4), S(  7, 8), S( 3,-2) },
-   { S(-18,-4), S( -2,-5), S( 19, 5), S(24, 4) },
-   { S(-17, 3), S( -9, 3), S( 20,-8), S(35,-3) },
-   { S( -6, 8), S(  5, 9), S(  3, 7), S(21,-6) },
-   { S( -6, 8), S( -8,-5), S( -6, 2), S(-2, 4) },
-   { S( -4, 3), S( 20,-9), S( -8, 1), S(-4,18) }
+   { S4(  0,  0,  0,  0), S4(  0,  0,  0,  0), S4(  0,  0,  0,  0), S4(  0,  0,  0,  0) },
+   { S4(-12, -4,-12,  3), S4(  4, -8,  5,  5), S4( -2,  7,  9, 12), S4(  1, -1, 10,  1) },
+   { S4(-14, -5,-17, -9), S4( 10, -2,-11, -9), S4( 28,  4, 11,  2), S4( 27, 12, 15,  5) },
+   { S4(-21,-16,  4,  3), S4(-14,-11,  5, -3), S4( 21, 15, -2, -8), S4( 35, 16,  6,  8) },
+   { S4(-14, -6, 14, 17), S4( 13, -3,  9, -1), S4( -4, 15,  0,  6), S4( 10,  5,  2,  4) },
+   { S4(-16,  2, 17, 17), S4(-11,-14,  0, -9), S4(-14, -1, -6, 12), S4(-10,  8, -2,  3) },
+   { S4( -6,  0,  2,  0), S4( 32,  4,  4, -3), S4( -8,  1,  5,  9), S4(-11,  0,-11, 13) }
   },
   { // Knight
    { S(-144, -98), S(-96,-82), S(-80,-46), S(-73,-14) },
