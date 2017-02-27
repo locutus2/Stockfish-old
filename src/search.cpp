@@ -1066,7 +1066,6 @@ moves_loop: // When in check search starts from here
       if (value > bestValue)
       {
           bestValue = value;
-          bestMoveFailLow = move;
 
           if (value > alpha)
           {
@@ -1083,6 +1082,8 @@ moves_loop: // When in check search starts from here
                   break;
               }
           }
+          else
+              bestMoveFailLow = move;
       }
 
       if (!captureOrPromotion && move != bestMove && quietCount < 64)
@@ -1124,7 +1125,7 @@ moves_loop: // When in check search starts from here
              && is_ok((ss-1)->currentMove))
         update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
 
-    if (!bestMove && !ttMove)
+    if (!bestMove && !ttMove && pos.see_ge(bestMoveFailLow, Value(1)))
         bestMove = bestMoveFailLow;
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
