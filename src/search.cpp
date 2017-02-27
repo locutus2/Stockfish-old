@@ -1125,7 +1125,8 @@ moves_loop: // When in check search starts from here
              && is_ok((ss-1)->currentMove))
         update_cm_stats(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
 
-    if (!bestMove && !ttMove && (bestMoveFailLow == ss->killers[0] || bestMoveFailLow == ss->killers[1]))
+    if (   !bestMove && !ttMove
+        &&  cmh && (*cmh )[pos.moved_piece(bestMoveFailLow)][to_sq(bestMoveFailLow)] > VALUE_ZERO)
         bestMove = bestMoveFailLow;
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
