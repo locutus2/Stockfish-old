@@ -192,11 +192,18 @@ Move MovePicker::next_move() {
       score<CAPTURES>();
       ++stage;
 
+      move = ss->captureKiller;  // capture killer move
+      if(   move != MOVE_NONE
+         && move != ttMove
+         && pos.pseudo_legal(move)
+         && pos.capture_or_promotion(move))
+          return move;
+
   case GOOD_CAPTURES:
       while (cur < endMoves)
       {
           move = pick_best(cur++, endMoves);
-          if (move != ttMove)
+          if (move != ttMove && move != ss->captureKiller)
           {
               if (pos.see_ge(move, VALUE_ZERO))
                   return move;
