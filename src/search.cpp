@@ -1113,8 +1113,8 @@ moves_loop: // When in check search starts from here
         if (!pos.capture_or_promotion(bestMove))
             update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
 
-        // Capture or promotion check move best: update capture killer
-        else if(pos.gives_check(bestMove))
+        // Promotion move best: update capture killer
+        else if(type_of(bestMove) == PROMOTION)
             ss->captureKiller = bestMove;
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
