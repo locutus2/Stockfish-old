@@ -602,7 +602,8 @@ namespace {
 
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->counterMoves = nullptr;
-    (ss+2)->killers[0] = (ss+2)->killers[1] = (ss+1)->captureKiller = MOVE_NONE;
+    (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
+    (ss+2)->captureKillers[0] = (ss+2)->captureKillers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
     // Step 4. Transposition table lookup. We don't want the score of a partial
@@ -1115,7 +1116,13 @@ moves_loop: // When in check search starts from here
 
         // Promotion or bad capture move best: update capture killer
         else if(type_of(bestMove) == PROMOTION || !pos.see_ge(bestMove, VALUE_ZERO))
-            ss->captureKiller = bestMove;
+        {
+            if (ss->captureKillers[0] != bestMove)
+            {
+                ss->captureKillers[1] = ss->captureKillers[0];
+                ss->captureKillers[0] = bestMove;
+            }
+        }
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
