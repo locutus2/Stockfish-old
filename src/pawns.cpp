@@ -32,22 +32,22 @@ namespace {
   #define S(mg, eg) make_score(mg, eg)
 
   // Isolated pawn penalty by opposed flag
-  const Score Isolated[2] = { S(45, 40), S(30, 27) };
+  Score Isolated[2] = { S(45, 40), S(30, 27) };
 
   // Backward pawn penalty by opposed flag
-  const Score Backward[2] = { S(56, 33), S(41, 19) };
+  Score Backward[2] = { S(56, 33), S(41, 19) };
 
   // Unsupported pawn penalty for pawns which are neither isolated or backward
-  const Score Unsupported = S(17, 8);
+  Score Unsupported = S(17, 8);
 
   // Connected pawn bonus by opposed, phalanx, twice supported and rank
   Score Connected[2][2][2][RANK_NB];
 
   // Doubled pawn penalty
-  const Score Doubled = S(18, 38);
+  Score Doubled = S(18, 38);
 
   // Lever bonus by rank
-  const Score Lever[RANK_NB] = {
+  Score Lever[RANK_NB] = {
     S( 0,  0), S( 0,  0), S(0, 0), S(0, 0),
     S(17, 16), S(33, 32), S(0, 0), S(0, 0)
   };
@@ -195,6 +195,11 @@ namespace Pawns {
 /// hard-coded tables, when makes sense, we prefer to calculate them with a formula
 /// to reduce independent parameters and to allow easier tuning and better insight.
 
+int weight_mg_1 = 86;
+int weight_mg_2 = 42;
+int weight_eg_1 = 42;
+int weight_eg_2 = 86;
+
 void init() {
 
   static const int Seed[RANK_NB] = { 0, 8, 19, 13, 71, 94, 169, 324 };
@@ -206,7 +211,9 @@ void init() {
   {
       int v = (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
       v += (apex ? v / 2 : 0);
-      Connected[opposed][phalanx][apex][r] = make_score(v, v * (r-2) / 4);
+      int v_mg = (weight_mg_1 * v + weight_mg_2 * v * (r-2) / 4) / 128;
+      int v_eg = (weight_eg_1 * v + weight_eg_2 * v * (r-2) / 4) / 128;
+      Connected[opposed][phalanx][apex][r] = make_score(v, v_mg, v_eg, v * (r-2) / 4);
   }
 }
 
@@ -298,5 +305,10 @@ Score Entry::do_king_safety(const Position& pos, Square ksq) {
 // Explicit template instantiation
 template Score Entry::do_king_safety<WHITE>(const Position& pos, Square ksq);
 template Score Entry::do_king_safety<BLACK>(const Position& pos, Square ksq);
+
+  TUNE(Lever);
+  TUNE(SetRange(50),Isolated,Backward,Unsupported,Doubled);
+  TUNE(SetRange(100),weight_mg_1,weight_mg_2,weight_eg_1,weight_eg_2,init);
+  UPDATE_ON_LAST();
 
 } // namespace Pawns
