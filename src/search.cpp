@@ -67,7 +67,7 @@ namespace {
   const int razor_margin[4] = { 483, 570, 603, 554 };
 
   Value futility_margin(Depth d, const Position& pos, Move move) {
-    if(!pos.captured_piece() && move && pos.capture_or_promotion(move)
+    if(!pos.captured_piece() && move && pos.capture_or_promotion(move))
         return Value(100 * d / ONE_PLY);
     else
         return Value(150 * d / ONE_PLY);
