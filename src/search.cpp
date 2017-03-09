@@ -65,7 +65,13 @@ namespace {
 
   // Razoring and futility margin based on depth
   const int razor_margin[4] = { 483, 570, 603, 554 };
-  Value futility_margin(Depth d) { return Value(150 * d / ONE_PLY); }
+
+  Value futility_margin(Depth d, const Position& pos, Move move) {
+    if(!pos.captured_piece() && move && pos.capture_or_promotion(move)
+        return Value(100 * d / ONE_PLY);
+    else
+        return Value(150 * d / ONE_PLY);
+  }
 
   // Futility and reductions lookup tables, initialized at startup
   int FutilityMoveCounts[2][16]; // [improving][depth]
@@ -719,9 +725,8 @@ namespace {
 
     // Step 7. Futility pruning: child node (skipped when in check)
     if (   !rootNode
-        && (    depth < 7 * ONE_PLY
-            || (depth < 8 * ONE_PLY && !pos.captured_piece() && ttMove && pos.capture_or_promotion(ttMove)))
-        &&  eval - futility_margin(depth) >= beta
+        &&  depth < 7 * ONE_PLY
+        &&  eval - futility_margin(depth, pos, ttMove) >= beta
         &&  eval < VALUE_KNOWN_WIN  // Do not return unproven wins
         &&  pos.non_pawn_material(pos.side_to_move()))
         return eval;
