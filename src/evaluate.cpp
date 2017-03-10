@@ -209,7 +209,7 @@ namespace {
   const Score ThreatByRank        = S(16,  3);
   const Score Hanging             = S(48, 27);
   const Score ThreatByPawnPush    = S(38, 22);
-  const Score Unstoppable         = S( 0, 45);
+  const Score Unstoppable         = S( 0, 20);
   const Score PawnlessFlank       = S(20, 80);
   const Score HinderPassedPawn    = S( 7,  0);
 
@@ -887,11 +887,12 @@ Value Eval::evaluate(const Position& pos) {
   // If both sides have only pawns, score for potential unstoppable pawns
   if (!pos.non_pawn_material(WHITE) && !pos.non_pawn_material(BLACK))
   {
-      if (ei.pe->passed_pawns(WHITE))
-          score += Unstoppable;
+      Bitboard b;
+      if ((b = ei.pe->passed_pawns(WHITE)) != 0)
+          score += Unstoppable * int(relative_rank(WHITE, frontmost_sq(WHITE, b)));
 
-      if (ei.pe->passed_pawns(BLACK))
-          score -= Unstoppable;
+      if ((b = ei.pe->passed_pawns(BLACK)) != 0)
+          score -= Unstoppable * int(relative_rank(BLACK, frontmost_sq(BLACK, b)));
   }
 
   // Evaluate space for both sides, only during opening
