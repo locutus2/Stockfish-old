@@ -204,12 +204,13 @@ namespace {
   const Score CloseEnemies        = S( 7,  0);
   const Score SafeCheck           = S(20, 20);
   const Score OtherCheck          = S(10, 10);
-  const Score PawnlessFlank       = S(20, 80);
   const Score LooseEnemies        = S( 0, 25);
   const Score ThreatByHangingPawn = S(71, 61);
   const Score ThreatByRank        = S(16,  3);
   const Score Hanging             = S(48, 27);
   const Score ThreatByPawnPush    = S(38, 22);
+  const Score Unstoppable         = S( 0, 45);
+  const Score PawnlessFlank       = S(20, 80);
   const Score HinderPassedPawn    = S( 7,  0);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
@@ -704,10 +705,6 @@ namespace {
                 mbonus += rr + r * 2, ebonus += rr + r * 2;
         } // rr != 0
 
-        // Assign a small bonus when no pieces left (unstoppable)
-        if (!pos.non_pawn_material(Us) && !pos.non_pawn_material(Them))
-            ebonus += 20;
-
         // Scale down bonus for candidate passers which need more than one pawn
         // push to become passed.
         if (!pos.pawn_passed(Us, s + pawn_push(Us)))
@@ -886,6 +883,16 @@ Value Eval::evaluate(const Position& pos) {
   // Evaluate passed pawns, we need full attack information including king
   score +=  evaluate_passer_pawns<WHITE, DoTrace>(pos, ei)
           - evaluate_passer_pawns<BLACK, DoTrace>(pos, ei);
+
+  // If both sides have only pawns, score for potential unstoppable pawns
+  if (!pos.non_pawn_material(WHITE) && !pos.non_pawn_material(BLACK))
+  {
+      if (ei.pe->passed_pawns(WHITE))
+          score += Unstoppable;
+
+      if (ei.pe->passed_pawns(BLACK))
+          score -= Unstoppable;
+  }
 
   // Evaluate space for both sides, only during opening
   if (pos.non_pawn_material() >= 12222)
