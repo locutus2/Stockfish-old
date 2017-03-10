@@ -703,8 +703,8 @@ namespace {
                 mbonus += rr + r * 2, ebonus += rr + r * 2;
         } // rr != 0
 
-        // Assign a small bonus when the opponent has no pieces left
-        if (!pos.non_pawn_material(Them))
+        // Assign a small bonus when no pieces left (unstoppable)
+        if (!pos.non_pawn_material(Us) && !pos.non_pawn_material(Them))
             ebonus += 20;
 
         // Scale down bonus for candidate passers which need more than one pawn
