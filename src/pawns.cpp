@@ -29,27 +29,27 @@
 namespace {
 
   #define V Value
-  #define S(mg, eg) make_score(mg, eg)
+  #define S(op, mg, eg, lg) make_score(op, mg, eg, lg)
 
   // Isolated pawn penalty by opposed flag
-  const Score Isolated[2] = { S(45, 40), S(30, 27) };
+  const Score Isolated[2] = { S(44, 42, 41, 40), S(29, 26, 29, 27) };
 
   // Backward pawn penalty by opposed flag
-  const Score Backward[2] = { S(56, 33), S(41, 19) };
+  const Score Backward[2] = { S(55, 49, 36, 36), S(39, 33, 29, 21) };
 
   // Unsupported pawn penalty for pawns which are neither isolated or backward
-  const Score Unsupported = S(17, 8);
+  const Score Unsupported = S(15, 17, 10, 1);
 
   // Connected pawn bonus by opposed, phalanx, twice supported and rank
   Score Connected[2][2][2][RANK_NB];
 
   // Doubled pawn penalty
-  const Score Doubled = S(18, 38);
+  const Score Doubled = S(20, 23, 30, 38);
 
   // Lever bonus by rank
   const Score Lever[RANK_NB] = {
-    S( 0,  0), S( 0,  0), S(0, 0), S(0, 0),
-    S(17, 16), S(33, 32), S(0, 0), S(0, 0)
+    S( 0,  0,  0,  0), S( 0,  0,  0,  0), S( 0,  0,  0,  0), S( 0,  0,  0,  0),
+    S(17, 20, 15, 14), S(32, 32, 32, 32), S( 0,  0,  0,  0), S( 0,  0,  0,  0)
   };
 
   // Weakness of our pawn shelter in front of the king by [distance from edge][rank].
@@ -206,7 +206,9 @@ void init() {
   {
       int v = (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
       v += (apex ? v / 2 : 0);
-      Connected[opposed][phalanx][apex][r] = make_score(v, v * (r-2) / 4);
+      int v_mg = (81 * v + 35 * v * (r-2) / 4) / 128;
+      int v_eg = (41 * v + 81 * v * (r-2) / 4) / 128;
+      Connected[opposed][phalanx][apex][r] = make_score(v, v_mg, v_eg, v * (r-2) / 4);
   }
 }
 
