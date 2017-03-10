@@ -224,7 +224,7 @@ namespace {
   const int KnightCheck       = 924;
 
   // Threshold for lazy evaluation
-  const Value LazyThreshold = Value(1500);
+  const Value LazyEval = Value(1500);
 
   // eval_init() initializes king and attack bitboards for a given color
   // adding pawn attacks. To be done at the beginning of the evaluation.
@@ -810,6 +810,18 @@ namespace {
     return sf;
   }
 
+
+  Value lazy_eval(Value mg, Value eg) {
+
+    if (mg > LazyEval && eg > LazyEval)
+        return  LazyEval + ((mg + eg) / 2 - LazyEval) / 4;
+
+    else if (mg < -LazyEval && eg < -LazyEval)
+        return -LazyEval + ((mg + eg) / 2 + LazyEval) / 4;
+
+    return VALUE_ZERO;
+  }
+
 } // namespace
 
 
@@ -822,7 +834,6 @@ Value Eval::evaluate(const Position& pos) {
   assert(!pos.checkers());
 
   Score mobility[COLOR_NB] = { SCORE_ZERO, SCORE_ZERO };
-  Value v;
   EvalInfo ei;
 
   // Probe the material hash table
@@ -842,10 +853,11 @@ Value Eval::evaluate(const Position& pos) {
   ei.pe = Pawns::probe(pos);
   score += ei.pe->pawns_score();
 
-  // Early exit if score is high
-  v = (mg_value(score) + eg_value(score)) / 2;
-  if (abs(v) > LazyThreshold)
-     return pos.side_to_move() == WHITE ? v : -v;
+  // We have taken into account all cheap evaluation terms.
+  // If score exceeds a threshold return a lazy evaluation.
+  Value lazy = lazy_eval(mg_value(score), eg_value(score));
+  if (lazy)
+      return pos.side_to_move() == WHITE ? lazy : -lazy;
 
   // Initialize attack and king safety bitboards
   eval_init<WHITE>(pos, ei);
@@ -880,8 +892,8 @@ Value Eval::evaluate(const Position& pos) {
   ScaleFactor sf = evaluate_scale_factor(pos, ei, eg_value(score));
 
   // Interpolate between a middlegame and a (scaled by 'sf') endgame score
-  v =  mg_value(score) * int(ei.me->game_phase())
-     + eg_value(score) * int(PHASE_MIDGAME - ei.me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
+  Value v =  mg_value(score) * int(ei.me->game_phase())
+           + eg_value(score) * int(PHASE_MIDGAME - ei.me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
 
   v /= int(PHASE_MIDGAME);
 
