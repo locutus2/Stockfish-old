@@ -157,6 +157,12 @@ enum Phase {
   MG = 0, EG = 1, PHASE_NB = 2
 };
 
+enum Closedness {
+  OPEN_GAME,
+  CLOSED_GAME = 32,
+  CLOSEDNESS_NB = 2
+};
+
 enum ScaleFactor {
   SCALE_FACTOR_DRAW    = 0,
   SCALE_FACTOR_ONEPAWN = 48,
@@ -257,30 +263,62 @@ enum Rank : int {
 };
 
 
-/// Score enum stores a middlegame and an endgame value in a single integer
+/// BaseScore enum stores a middlegame and an endgame value in a single integer
 /// (enum). The least significant 16 bits are used to store the endgame value
 /// and the upper 16 bits are used to store the middlegame value. Take some
 /// care to avoid left-shifting a signed int to avoid undefined behavior.
-enum Score : int { SCORE_ZERO };
+enum BaseScore : int { BASE_SCORE_ZERO };
 
-inline Score make_score(int mg, int eg) {
-  return Score((int)((unsigned int)eg << 16) + mg);
+inline BaseScore make_base_score(int v1, int v2) {
+  return BaseScore((int)((unsigned int)v2 << 16) + v1);
 }
 
 /// Extracting the signed lower and upper 16 bits is not so trivial because
 /// according to the standard a simple cast to short is implementation defined
 /// and so is a right shift of a signed integer.
-inline Value eg_value(Score s) {
+inline Value second_value(BaseScore s) {
 
-  union { uint16_t u; int16_t s; } eg = { uint16_t(unsigned(s + 0x8000) >> 16) };
-  return Value(eg.s);
+  union { uint16_t u; int16_t s; } v = { uint16_t(unsigned(s + 0x8000) >> 16) };
+  return Value(v.s);
+}
+
+inline Value first_value(BaseScore s) {
+
+  union { uint16_t u; int16_t s; } v = { uint16_t(unsigned(s)) };
+  return Value(v.s);
+}
+
+/// Score stores an middlegame, endgame, open game and closed game value.
+struct Score {
+    BaseScore phase, closedness;
+    Score(BaseScore p = BASE_SCORE_ZERO, BaseScore c = BASE_SCORE_ZERO) 
+         : phase(p), closedness(c) {}
+    Score(int mg, int eg, int open, int closed)
+         : phase(make_base_score(mg, eg)), closedness(make_base_score(open, closed)) {}
+};
+
+const Score SCORE_ZERO;
+
+inline Score make_score(int mg, int eg, int open = 0, int closed = 0) {
+  return Score(mg, eg, open, closed);
 }
 
 inline Value mg_value(Score s) {
-
-  union { uint16_t u; int16_t s; } mg = { uint16_t(unsigned(s)) };
-  return Value(mg.s);
+  return first_value(s.phase);
 }
+
+inline Value eg_value(Score s) {
+  return second_value(s.phase);
+}
+
+inline Value open_value(Score s) {
+  return first_value(s.closedness);
+}
+
+inline Value closed_value(Score s) {
+  return second_value(s.closedness);
+}
+
 
 #define ENABLE_BASE_OPERATORS_ON(T)                             \
 inline T operator+(T d1, T d2) { return T(int(d1) + int(d2)); } \
@@ -309,7 +347,7 @@ ENABLE_FULL_OPERATORS_ON(Square)
 ENABLE_FULL_OPERATORS_ON(File)
 ENABLE_FULL_OPERATORS_ON(Rank)
 
-ENABLE_BASE_OPERATORS_ON(Score)
+ENABLE_BASE_OPERATORS_ON(BaseScore)
 
 #undef ENABLE_FULL_OPERATORS_ON
 #undef ENABLE_BASE_OPERATORS_ON
@@ -322,22 +360,64 @@ inline Value& operator-=(Value& v, int i) { return v = v - i; }
 
 /// Only declared but not defined. We don't want to multiply two scores due to
 /// a very high risk of overflow. So user should explicitly convert to integer.
+inline BaseScore operator*(BaseScore s1, BaseScore s2);
+
+/// Division of a BaseScore must be handled separately for each term
+inline BaseScore operator/(BaseScore s, int i) {
+  return make_base_score(first_value(s) / i, second_value(s) / i);
+}
+
+/// Multiplication of a BaseScore by an integer. We check for overflow in debug mode.
+inline BaseScore operator*(BaseScore s, int i) {
+  BaseScore result = BaseScore(int(s) * i);
+
+  assert(first_value(result) == (i * first_value(s)));
+  assert(second_value(result) == (i * second_value(s)));
+  assert((i == 0) || (result / i) == s );
+
+  return result;
+}
+
+/// Operators for caluclation with scores
+inline Score operator+(Score s1, Score s2) { return Score(s1.phase + s2.phase, 
+                                                          s1.closedness + s2.closedness); }
+inline Score operator-(Score s1, Score s2) { return Score(s1.phase - s2.phase, 
+                                                          s1.closedness - s2.closedness); }
+inline Score operator-(Score s) { return Score(-s.phase, -s.closedness); }
+inline Score& operator+=(Score& s1, Score s2) { return s1.phase += s2.phase, 
+                                                       s1.closedness += s2.closedness,
+                                                       s1; }
+inline Score& operator-=(Score& s1, Score s2) { return s1.phase -= s2.phase, 
+                                                       s1.closedness -= s2.closedness,
+                                                       s1; }
+
+/// Only declared but not defined. We don't want to multiply two base scores due to
+/// a very high risk of overflow. So user should explicitly convert to integer.
 inline Score operator*(Score s1, Score s2);
 
 /// Division of a Score must be handled separately for each term
 inline Score operator/(Score s, int i) {
-  return make_score(mg_value(s) / i, eg_value(s) / i);
+
+  assert(i != 0);
+
+  return Score(mg_value(s) / i, eg_value(s) / i, open_value(s) / i, closed_value(s) / i);
 }
 
 /// Multiplication of a Score by an integer. We check for overflow in debug mode.
 inline Score operator*(Score s, int i) {
-  Score result = Score(int(s) * i);
+  Score result = Score(mg_value(s) * i, eg_value(s) * i, open_value(s) * i, closed_value(s) * i);
 
-  assert(eg_value(result) == (i * eg_value(s)));
   assert(mg_value(result) == (i * mg_value(s)));
+  assert(eg_value(result) == (i * eg_value(s)));
+  assert(open_value(result) == (i * open_value(s)));
+  assert(closed_value(result) == (i * closed_value(s)));
   assert((i == 0) || (result / i) == s );
 
   return result;
+}
+
+inline Score operator*(int i, Score s) {
+  return s * i;
 }
 
 inline Color operator~(Color c) {

@@ -862,6 +862,11 @@ Value Eval::evaluate(const Position& pos) {
      + eg_value(score) * int(PHASE_MIDGAME - ei.me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
 
   v /= int(PHASE_MIDGAME);
+  
+  // Add interpolation between open and closed score
+  Closedness closedness = pos.closedness();
+  v += (  closed_value(score) * int(closedness)
+        + open_value(score)   * int(CLOSED_GAME - closedness)) / CLOSED_GAME;
 
   // In case of tracing add all remaining individual evaluation terms
   if (DoTrace)
