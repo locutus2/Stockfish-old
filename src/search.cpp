@@ -145,7 +145,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_cm_stats(Stack* ss, Piece pc, Square s, Value bonus);
-  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, Value bonus);
+  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, Value bonus, Value bestValue);
   void check_time();
 
 } // namespace
@@ -187,6 +187,7 @@ void Search::clear() {
   {
       th->counterMoves.clear();
       th->history.clear();
+      th->mateMoveHistory.clear();
       th->counterMoveHistory.clear();
       th->resetCalls = true;
   }
@@ -623,7 +624,7 @@ namespace {
             if (ttValue >= beta)
             {
                 if (!pos.capture_or_promotion(ttMove))
-                    update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
+                    update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth), ttValue);
 
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -1109,7 +1110,7 @@ moves_loop: // When in check search starts from here
 
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
+            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth), bestValue);
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -1387,7 +1388,7 @@ moves_loop: // When in check search starts from here
   // update_stats() updates move sorting heuristics when a new quiet best move is found
 
   void update_stats(const Position& pos, Stack* ss, Move move,
-                    Move* quiets, int quietsCnt, Value bonus) {
+                    Move* quiets, int quietsCnt, Value bonus, Value bestValue) {
 
     if (ss->killers[0] != move)
     {
@@ -1397,8 +1398,12 @@ moves_loop: // When in check search starts from here
 
     Color c = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
+    MateMoveStats& mmh = thisThread->mateMoveHistory[pos.square<KING>(~c)];
     thisThread->history.update(c, move, bonus);
     update_cm_stats(ss, pos.moved_piece(move), to_sq(move), bonus);
+
+    if (bestValue >= VALUE_MATE_IN_MAX_PLY)
+        mmh.update_mate(pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
     {
@@ -1411,6 +1416,9 @@ moves_loop: // When in check search starts from here
     {
         thisThread->history.update(c, quiets[i], -bonus);
         update_cm_stats(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+
+        if (bestValue >= VALUE_MATE_IN_MAX_PLY)
+            mmh.update_mate(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }
 

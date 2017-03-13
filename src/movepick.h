@@ -28,6 +28,15 @@
 #include "position.h"
 #include "types.h"
 
+template<typename T>
+struct SquareStats {
+  const T& operator[](Square s) const { return table[s]; }
+  T& operator[](Square s) { return table[s]; }
+  void clear() { std::memset(table, 0, sizeof(table)); }
+
+private:
+  T table[SQUARE_NB];
+};
 
 /// HistoryStats records how often quiet moves have been successful or unsuccessful
 /// during the current search, and is used for reduction and move ordering decisions.
@@ -74,6 +83,14 @@ struct Stats {
     table[pc][to] -= table[pc][to] * abs(int(v)) / 936;
     table[pc][to] += int(v) * 32;
   }
+  void update_mate(Piece pc, Square to, Value v) {
+
+    if (abs(int(v)) >= 324)
+        return;
+
+    table[pc][to] -= table[pc][to] * abs(int(v)) / 936;
+    table[pc][to] += int(v) * 16;
+  }
 
 private:
   T table[PIECE_NB][SQUARE_NB];
@@ -81,7 +98,9 @@ private:
 
 typedef Stats<Move> MoveStats;
 typedef Stats<Value> CounterMoveStats;
+typedef Stats<Value> MateMoveStats;
 typedef Stats<CounterMoveStats> CounterMoveHistoryStats;
+typedef SquareStats<MateMoveStats> MateMoveHistoryStats;
 
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the

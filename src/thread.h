@@ -71,6 +71,7 @@ public:
   std::atomic_bool resetCalls;
   MoveStats counterMoves;
   HistoryStats history;
+  MateMoveHistoryStats mateMoveHistory;
   CounterMoveHistoryStats counterMoveHistory;
 };
 
