@@ -89,7 +89,7 @@ struct Stats {
         return;
 
     table[pc][to] -= table[pc][to] * abs(int(v)) / 936;
-    table[pc][to] += int(v) * 8;
+    table[pc][to] += int(v) * 32;
   }
 
 private:
