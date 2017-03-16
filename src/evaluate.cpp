@@ -600,7 +600,7 @@ namespace {
 
     score += ThreatByPawnPush * popcount(b);
 
-    // Give bonus for opponent undefended or bad defended piece (expect king)
+    // Give bonus for opponent undefended or bad defended piece (except king)
     b =   (pos.pieces(Them) ^ pos.pieces(Them, KING))
         & (   ~ei.attackedBy[Them][ALL_PIECES]
            || (ei.attackedBy[Us][ALL_PIECES] & ~ei.attackedBy2[Them])
