@@ -31,11 +31,12 @@
 
 /// HistoryStats records how often quiet moves have been successful or unsuccessful
 /// during the current search, and is used for reduction and move ordering decisions.
+/// Additionally a Alpha/Beta-Filter (a simplified Kalman-Filter) is applied to smooth the stats.
 struct HistoryStats {
 
   static const Value Max = Value(1 << 28);
 
-  Value get(Color c, Move m) const { return table[c][from_sq(m)][to_sq(m)]; }
+  Value get(Color c, Move m) const { return xTable[c][from_sq(m)][to_sq(m)]; }
   void clear() { std::memset(table, 0, sizeof(table)); }
   void update(Color c, Move m, Value v) {
 
@@ -46,12 +47,21 @@ struct HistoryStats {
 
     assert(abs(int(v)) <= denom); // Needed for stability.
 
+    // Update stats
     table[c][from][to] -= table[c][from][to] * abs(int(v)) / denom;
     table[c][from][to] += int(v) * 32;
+
+    // Filter stats
+    Value delta = table[c][from][to] - xTable[c][from][to];
+    xTable[c][from][to] += delta / 4;
+    vTable[c][from][to] += delta / 64;
+    xTable[c][from][to] += vTable[c][from][to];
   }
 
 private:
   Value table[COLOR_NB][SQUARE_NB][SQUARE_NB];
+  Value xTable[COLOR_NB][SQUARE_NB][SQUARE_NB];
+  Value vTable[COLOR_NB][SQUARE_NB][SQUARE_NB];
 };
 
 
