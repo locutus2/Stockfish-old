@@ -53,8 +53,8 @@ struct HistoryStats {
 
     // Filter stats
     Value delta = table[c][from][to] - xTable[c][from][to];
-    xTable[c][from][to] += delta / 8;
-    vTable[c][from][to] += delta / 64;
+    xTable[c][from][to] += delta / 16;
+    vTable[c][from][to] += delta / 128;
     xTable[c][from][to] += vTable[c][from][to];
   }
 
