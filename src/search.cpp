@@ -290,6 +290,9 @@ void MainThread::search() {
   {
       for (Thread* th : Threads)
       {
+          if(th->excludedMove)
+              continue;
+
           Depth depthDiff = th->completedDepth - bestThread->completedDepth;
           Value scoreDiff = th->rootMoves[0].score - bestThread->rootMoves[0].score;
 
@@ -331,6 +334,7 @@ void Thread::search() {
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
   completedDepth = DEPTH_ZERO;
+  excludedMove = MOVE_NONE;
 
   if (mainThread)
   {
@@ -376,6 +380,11 @@ void Thread::search() {
       // MultiPV loop. We perform a full root search for each PV line
       for (PVIdx = 0; PVIdx < multiPV && !Signals.stop; ++PVIdx)
       {
+          if(idx % 8 == 6 && rootMoves.size() > PVIdx + 1)
+              excludedMove = rootMoves[PVIdx].pv[0];
+          else
+              excludedMove = MOVE_NONE;
+
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
           {
@@ -601,6 +610,9 @@ namespace {
     ss->counterMoves = &thisThread->counterMoveHistory[NO_PIECE][0];
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
+
+    if(rootNode)
+        ss->excludedMove = thisThread->excludedMove;
 
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
