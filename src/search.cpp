@@ -380,7 +380,7 @@ void Thread::search() {
       // MultiPV loop. We perform a full root search for each PV line
       for (PVIdx = 0; PVIdx < multiPV && !Signals.stop; ++PVIdx)
       {
-          if(idx % 8 == 6 && rootMoves.size() > PVIdx + 1)
+          if(idx % 8 == 6 && rootMoves.size() > PVIdx + 1 && !rootPos.capture_or_promotion(rootMoves[PVIdx].pv[0]))
               excludedMove = rootMoves[PVIdx].pv[0];
           else
               excludedMove = MOVE_NONE;
