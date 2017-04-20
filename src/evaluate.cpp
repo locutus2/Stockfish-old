@@ -493,6 +493,9 @@ namespace {
        | (b & ei.attackedBy2[Them] & ~ei.attackedBy[Us][PAWN]);
 
     score -= CloseEnemies * popcount(b);
+    
+    int d = distance<File>(ksq, pos.square<KING>(Them));
+    score += make_score(mg_value(score) * (std::min(d, 5) - 2) / 16, 0);
 
     // Penalty when our king is on a pawnless flank
     if (!(pos.pieces(PAWN) & KingFlank[kf]))
