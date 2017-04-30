@@ -316,8 +316,9 @@ namespace {
             }
 
             // Bonus when behind a pawn
-            if (    relative_rank(Us, s) < RANK_5
-                && (pos.pieces(PAWN) & (s + pawn_push(Us))))
+            if (     relative_rank(Us, s) < RANK_5
+                &&  (pos.pieces(PAWN) & (s + pawn_push(Us)))
+                && !(ei.attackedBy[Them][PAWN] & s))
                 score += MinorBehindPawn;
 
             // Penalty for pawns on the same color square as the bishop
