@@ -672,6 +672,8 @@ namespace {
             }
             else if (pos.pieces(Us) & blockSq)
                 mbonus += rr + r * 2, ebonus += rr + r * 2;
+            else
+                mbonus -= 6;
         } // rr != 0
 
         // Scale down bonus for candidate passers which need more than one
