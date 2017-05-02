@@ -672,7 +672,7 @@ namespace {
             }
             else if (pos.pieces(Us) & blockSq)
                 mbonus += rr + r * 2, ebonus += rr + r * 2;
-            else
+            else // passed pawn is blocked by an opponent piece
                 mbonus -= 3;
         } // rr != 0
 
