@@ -267,8 +267,8 @@ namespace {
     const PieceType NextPt = (Us == WHITE ? Pt : PieceType(Pt + 1));
     const Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
                                                : Rank5BB | Rank4BB | Rank3BB);
-    const Bitboard MinorBehindPawnMask = (Us == WHITE ? Rank3BB | Rank4BB | Rank5BB
-                                                      : Rank6BB | Rank5BB | Rank4BB);
+    const Bitboard MinorBehindPawnMask = (Us == WHITE ? Rank2BB | Rank3BB | Rank4BB
+                                                      : Rank7BB | Rank6BB | Rank5BB);
     const Square* pl = pos.squares<Pt>(Us);
 
     Bitboard b, bb;
@@ -318,7 +318,8 @@ namespace {
             }
 
             // Bonus when behind a pawn
-            if (MinorBehindPawnMask & (pos.pieces(PAWN) ^ ei.pe->passed_pawns(Them)) & (s + pawn_push(Us)))
+            if (    (MinorBehindPawnMask & s)
+                && ((pos.pieces(PAWN) ^ ei.pe->passed_pawns(Them)) & (s + pawn_push(Us))))
                 score += MinorBehindPawn;
 
             // Penalty for pawns on the same color square as the bishop
