@@ -267,6 +267,8 @@ namespace {
     const PieceType NextPt = (Us == WHITE ? Pt : PieceType(Pt + 1));
     const Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
                                                : Rank5BB | Rank4BB | Rank3BB);
+    const Bitboard MinorBehindPawnMask = (Us == WHITE ? Rank3BB | Rank4BB | Rank5BB
+                                                      : Rank6BB | Rank5BB | Rank4BB);
     const Square* pl = pos.squares<Pt>(Us);
 
     Bitboard b, bb;
@@ -316,8 +318,7 @@ namespace {
             }
 
             // Bonus when behind a pawn
-            if (    relative_rank(Us, s) < RANK_5
-                && ((pos.pieces(PAWN) ^ ei.pe->passed_pawns(Them)) & (s + pawn_push(Us))))
+            if (MinorBehindPawnMask & (pos.pieces(PAWN) ^ ei.pe->passed_pawns(Them)) & (s + pawn_push(Us)))
                 score += MinorBehindPawn;
 
             // Penalty for pawns on the same color square as the bishop
@@ -672,8 +673,6 @@ namespace {
             }
             else if (pos.pieces(Us) & blockSq)
                 mbonus += rr + r * 2, ebonus += rr + r * 2;
-            else // passed pawn is blocked by an opponent piece
-                mbonus -= 3;
         } // rr != 0
 
         // Scale down bonus for candidate passers which need more than one
