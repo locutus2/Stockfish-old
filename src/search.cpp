@@ -633,7 +633,7 @@ namespace {
         {
             if (ttValue >= beta)
             {
-                if (!pos.capture_or_promotion(ttMove))
+                if (!pos.capture_or_promotion(ttMove) && pos.pseudo_legal(ttMove))
                     update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
 
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
@@ -1405,6 +1405,8 @@ moves_loop: // When in check search starts from here
         ss->killers[1] = ss->killers[0];
         ss->killers[0] = move;
     }
+
+    assert(pos.pseudo_legal(move));
 
     if (pos.gives_check(move))
         bonus /= 2;
