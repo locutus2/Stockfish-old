@@ -1092,7 +1092,7 @@ moves_loop: // When in check search starts from here
           }
       }
 
-      if (!captureOrPromotion && !givesCheck && move != bestMove && quietCount < 64)
+      if (!captureOrPromotion && move != bestMove && quietCount < 64)
           quietsSearched[quietCount++] = move;
     }
 
@@ -1406,6 +1406,9 @@ moves_loop: // When in check search starts from here
         ss->killers[1] = ss->killers[0];
         ss->killers[0] = move;
     }
+
+    if (pos.gives_check(move))
+        bonus /= 2;
 
     Color c = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
