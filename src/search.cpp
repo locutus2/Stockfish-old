@@ -1092,7 +1092,7 @@ moves_loop: // When in check search starts from here
           }
       }
 
-      if (!captureOrPromotion && move != bestMove && quietCount < 64)
+      if (!captureOrPromotion && !givesCheck && move != bestMove && quietCount < 64)
           quietsSearched[quietCount++] = move;
     }
 
