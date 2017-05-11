@@ -1213,20 +1213,34 @@ moves_loop: // When in check search starts from here
         if (ttHit)
         {
             // Never assume anything on values stored in TT
-            if ((ss->staticEval = bestValue = tte->eval()) == VALUE_NONE)
-                ss->staticEval = bestValue = evaluate(pos);
-
-            // Can ttValue be used as a better position evaluation?
-            if (ttValue != VALUE_NONE)
-                if (tte->bound() & (ttValue > bestValue ? BOUND_LOWER : BOUND_UPPER))
-                    bestValue = ttValue;
+            if ((ss->staticEval = tte->eval()) == VALUE_NONE)
+                ss->staticEval = evaluate(pos);
         }
         else
-            ss->staticEval = bestValue =
-            (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
-                                             : -(ss-1)->staticEval + 2 * Eval::Tempo;
+            ss->staticEval = (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
+                                                              : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
-        // Stand pat. Return immediately if static value is at least beta
+        // Try non-recursive null move search for safer stand pat value in PV nodes
+        if (PvNode && (ss-1)->currentMove != MOVE_NULL)
+        {
+            ss->currentMove = MOVE_NULL;
+
+            // Make null move and search
+            pos.do_null_move(st);
+            bestValue = -qsearch<NT, false>(pos, ss+1, -beta, -alpha, depth - ONE_PLY);
+            pos.undo_null_move();
+
+            assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
+        }
+        else
+            bestValue = ss->staticEval;
+
+        // Can ttValue be used as a better position evaluation?
+        if (ttValue != VALUE_NONE)
+            if (tte->bound() & (ttValue > bestValue ? BOUND_LOWER : BOUND_UPPER))
+                bestValue = ttValue;
+
+        // Stand pat. Return immediately if static or null move search value is at least beta
         if (bestValue >= beta)
         {
             if (!ttHit)
