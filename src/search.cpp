@@ -1229,6 +1229,7 @@ moves_loop: // When in check search starts from here
             pos.do_null_move(st);
             bestValue = -qsearch<NT, false>(pos, ss+1, -beta, -alpha, depth - ONE_PLY) + 2 * Eval::Tempo;
             pos.undo_null_move();
+            bestValue = std::min(bestValue, ss->staticEval);
 
             assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
         }
