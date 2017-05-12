@@ -1221,7 +1221,7 @@ moves_loop: // When in check search starts from here
                                                               : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
         // Try non-recursive null move search for safer stand pat value in PV nodes
-        if (PvNode && depth >= DEPTH_ZERO && (ss-1)->currentMove != MOVE_NULL)
+        if (PvNode && ss->staticEval > alpha && (ss-1)->currentMove != MOVE_NULL)
         {
             ss->currentMove = MOVE_NULL;
 
