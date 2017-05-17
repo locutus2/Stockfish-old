@@ -996,7 +996,7 @@ moves_loop: // When in check search starts from here
               else if (ss->history < 0 && (ss-1)->history > 0)
                   r += ONE_PLY;
 
-              Value evalDiff = eval == VALUE_NONE ? VALUE_ZERO : std::max(std::min(32 * (eval - alpha), Value(20000)), Value(-20000));
+              Value evalDiff = eval == VALUE_NONE ? VALUE_ZERO : std::max(std::min(64 * (eval - alpha), Value(20000)), Value(-20000));
 
               // Decrease/increase reduction for moves with a good/bad history
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->history + evalDiff) / 20000) * ONE_PLY);
