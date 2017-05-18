@@ -110,6 +110,10 @@ namespace {
     // a white knight on g5 and black's king is on g8, this white knight adds 2
     // to kingAdjacentZoneAttacksCount[WHITE].
     int kingAdjacentZoneAttacksCount[COLOR_NB];
+
+    // kingDefendersCount[color] is the number of pieces of the given color
+    // which attack a square in the kingRing of the own king.
+    int kingDefendersCount[COLOR_NB];
   };
 
   #define V(v) Value(v)
@@ -238,6 +242,7 @@ namespace {
 
     ei.attackedBy2[Us]            = b & ei.attackedBy[Us][PAWN];
     ei.attackedBy[Us][ALL_PIECES] = b | ei.attackedBy[Us][PAWN];
+    ei.kingDefendersCount[Us] = 0;
 
     // Init our king safety tables only if we are going to use them
     if (pos.non_pawn_material(Them) >= RookValueMg + KnightValueMg)
@@ -291,6 +296,9 @@ namespace {
             ei.kingAttackersWeight[Us] += KingAttackWeights[Pt];
             ei.kingAdjacentZoneAttacksCount[Us] += popcount(b & ei.attackedBy[Them][KING]);
         }
+
+        if (b & ei.kingRing[Us])
+            ei.kingDefendersCount[Us]++;
 
         int mob = popcount(b & ei.mobilityArea[Us]);
 
@@ -476,7 +484,11 @@ namespace {
 
         // Transform the kingDanger units into a Score, and substract it from the evaluation
         if (kingDanger > 0)
+        {
+            // Scale king danger according to the assault ratio
+            kingDanger = kingDanger * (4 + ei.kingAttackersCount[Them]) / (4 + ei.kingDefendersCount[Us]);
             score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
+        }
     }
 
     // King tropism: firstly, find squares that opponent attacks in our king flank
