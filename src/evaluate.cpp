@@ -486,7 +486,7 @@ namespace {
         if (kingDanger > 0)
         {
             // Scale king danger according to the assault ratio
-            kingDanger += kingDanger * (ei.kingAttackersCount[Them] - ei.kingDefendersCount[Us]) / 32;
+            kingDanger += kingDanger * (2 * std::max(ei.kingAttackersCount[Them] - ei.kingDefendersCount[Us], 0) - 1) / 64;
             score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
         }
     }
