@@ -46,7 +46,7 @@ struct HistoryStats {
     assert(abs(v) <= D); // Consistency check for below formula
 
     table[c][from][to] -= table[c][from][to] * abs(v) / D;
-    table[c][from][to] += v * 64;
+    table[c][from][to] += v * 32;
   }
 
 private:
