@@ -986,7 +986,7 @@ moves_loop: // When in check search starts from here
 
               ss->history =  cmh[moved_piece][to_sq(move)]
                            + fmh[moved_piece][to_sq(move)]
-                           + 2 * fm2[moved_piece][to_sq(move)]
+                           + fm2[moved_piece][to_sq(move)] / 2
                            + thisThread->history.get(~pos.side_to_move(), move)
                            - 4000; // Correction factor
 
