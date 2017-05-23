@@ -525,6 +525,9 @@ void Thread::search() {
                 rootMoves.end(), skill.best_move(multiPV)));
 }
 
+int CMH = 128, FMH = 128, FM2 = 128, HIST = 128, CORR = 128;
+
+TUNE(SetRange(0, 256), CMH, FMH, FM2, HIST, CORR);
 
 namespace {
 
@@ -984,11 +987,11 @@ moves_loop: // When in check search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
-              ss->history =  cmh[moved_piece][to_sq(move)]
-                           + fmh[moved_piece][to_sq(move)]
-                           + fm2[moved_piece][to_sq(move)]
-                           + thisThread->history.get(~pos.side_to_move(), move)
-                           - 4000; // Correction factor
+              ss->history =  (CMH * cmh[moved_piece][to_sq(move)]
+                           +  FMH * fmh[moved_piece][to_sq(move)]
+                           +  FM2 * fm2[moved_piece][to_sq(move)]
+                           + HIST * thisThread->history.get(~pos.side_to_move(), move)
+                           - CORR * 4000) / 128; // Correction factor
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->history > 0 && (ss-1)->history < 0)
