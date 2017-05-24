@@ -987,7 +987,7 @@ moves_loop: // When in check search starts from here
               ss->history =  cmh[moved_piece][to_sq(move)]
                            + fmh[moved_piece][to_sq(move)]
                            + fm2[moved_piece][to_sq(move)]
-                           + thisThread->history.get(~pos.side_to_move(), move) * 11 / 8
+                           + thisThread->history.get(~pos.side_to_move(), move) * 23 / 16
                            - 4000; // Correction factor
 
               // Decrease/increase reduction by comparing opponent's stat score
