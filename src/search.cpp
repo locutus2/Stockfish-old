@@ -968,41 +968,49 @@ moves_loop: // When in check search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          Depth r = reduction<PvNode>(improving, depth, moveCount);
-
-          if (captureOrPromotion)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+          Depth d;
+          if (newDepth == 2)
+                d =  (type_of(move) == NORMAL && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
+                   + (moveCount < 4) + (ss->statScore > -2216) + PvNode - cutNode >= 2
+                   ? 2 * ONE_PLY : ONE_PLY;
           else
           {
-              // Increase reduction for cut nodes
-              if (cutNode)
-                  r += 2 * ONE_PLY;
+              Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-              // Decrease reduction for moves that escape a capture. Filter out
-              // castling moves, because they are coded as "king captures rook" and
-              // hence break make_move().
-              else if (    type_of(move) == NORMAL
-                       && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
-                  r -= 2 * ONE_PLY;
+              if (captureOrPromotion)
+                  r -= r ? ONE_PLY : DEPTH_ZERO;
+              else
+              {
+                  // Increase reduction for cut nodes
+                  if (cutNode)
+                      r += 2 * ONE_PLY;
 
-              ss->statScore =  cmh[moved_piece][to_sq(move)]
-                             + fmh[moved_piece][to_sq(move)]
-                             + fm2[moved_piece][to_sq(move)]
-                             + thisThread->history[~pos.side_to_move()][from_to(move)]
-                             - 4000; // Correction factor
+                  // Decrease reduction for moves that escape a capture. Filter out
+                  // castling moves, because they are coded as "king captures rook" and
+                  // hence break make_move().
+                  else if (    type_of(move) == NORMAL
+                           && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
+                      r -= 2 * ONE_PLY;
 
-              // Decrease/increase reduction by comparing opponent's stat score
-              if (ss->statScore > 0 && (ss-1)->statScore < 0)
-                  r -= ONE_PLY;
+                  ss->statScore =  cmh[moved_piece][to_sq(move)]
+                                 + fmh[moved_piece][to_sq(move)]
+                                 + fm2[moved_piece][to_sq(move)]
+                                 + thisThread->history[~pos.side_to_move()][from_to(move)]
+                                 - 4000; // Correction factor
 
-              else if (ss->statScore < 0 && (ss-1)->statScore > 0)
-                  r += ONE_PLY;
+                  // Decrease/increase reduction by comparing opponent's stat score
+                  if (ss->statScore > 0 && (ss-1)->statScore < 0)
+                      r -= ONE_PLY;
 
-              // Decrease/increase reduction for moves with a good/bad history
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+                  else if (ss->statScore < 0 && (ss-1)->statScore > 0)
+                      r += ONE_PLY;
+
+                  // Decrease/increase reduction for moves with a good/bad history
+                  r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+              }
+
+              d = std::max(newDepth - r, ONE_PLY);
           }
-
-          Depth d = std::max(newDepth - r, ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
 
