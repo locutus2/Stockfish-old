@@ -970,7 +970,7 @@ moves_loop: // When in check search starts from here
       {
           Depth d;
           if (newDepth == 2)
-                d =  (type_of(move) == NORMAL && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
+                d =  2 * (type_of(move) == NORMAL && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                    + (moveCount < 4) + (ss->statScore > -2216) + PvNode - cutNode >= 2
                    ? 2 * ONE_PLY : ONE_PLY;
           else
