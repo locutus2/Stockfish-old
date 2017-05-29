@@ -970,9 +970,19 @@ moves_loop: // When in check search starts from here
       {
           Depth d;
           if (newDepth == 2)
-                d =  (type_of(move) == NORMAL && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
-                   + (moveCount < 4) + (ss->statScore > -2216) + PvNode - cutNode >= 2
-                   ? 2 * ONE_PLY : ONE_PLY;
+          {
+                if (captureOrPromotion)
+                    d = PvNode || moveCount <= 14 ? 2 * ONE_PLY : ONE_PLY;
+                else
+                    d =  167 * (type_of(move) == NORMAL && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
+                       - 229 * moveCount
+                       + 143 * ss->statScore
+                       +  37 * PvNode
+                       - 392 * cutNode
+                       +  29 * improving
+                       -  99 * (ss-1)->statScore >= 638
+                       ? 2 * ONE_PLY : ONE_PLY;
+          }
           else
           {
               Depth r = reduction<PvNode>(improving, depth, moveCount);
