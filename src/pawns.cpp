@@ -275,15 +275,13 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
                  [d][rkThem];
   }
 
-  // Penalty for dangerous pawn structure (like white pawn on e5 and black pawns on e6, f7 and g7 with black king on the kingside)
+  // Penalty for dangerous pawn structure (like white pawn on e5 and black pawns on e6, f7 with black king on the kingside)
   if(   (file_of(ksq) >= FILE_E && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_E4))
                                 && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_E3))
-                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_F2))
-                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_G2)))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_F2)))
      || (file_of(ksq) <= FILE_D && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_D4))
                                 && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_D3))
-                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_C2))
-                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_B2))))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_C2))))
       safety -= DangerousPawnStructure;
 
   return safety;
