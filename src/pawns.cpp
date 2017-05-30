@@ -83,6 +83,8 @@ namespace {
       { V(21),  V(  23), V( 116), V(41), V(15) } }
   };
 
+  const Value DangerousPawnStructure = Value(32);
+
   // Max bonus for king safety. Corresponds to start position with all the pawns
   // in front of the king and no enemy pawn on the horizon.
   const Value MaxSafetyBonus = V(258);
@@ -272,6 +274,17 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
                   rkThem == rkUs + 1                                        ? BlockedByPawn  : Unblocked]
                  [d][rkThem];
   }
+
+  // Penalty for dangerous pawn structure (like white pawn on e5 and black pawns on e6, f7 and g7 with black king on the kingside)
+  if(   (file_of(ksq) >= FILE_E && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_E4))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_E3))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_F2))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_G2)))
+     || (file_of(ksq) <= FILE_D && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_D4))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_D3))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_C2))
+                                && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_B2))))
+      safety -= DangerousPawnStructure;
 
   return safety;
 }
