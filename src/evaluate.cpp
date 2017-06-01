@@ -618,9 +618,7 @@ namespace {
 
         assert(!(pos.pieces(Them, PAWN) & forward_bb(Us, s + pawn_push(Us))));
 
-        bb = forward_bb(Us, s) & (  ei.attackedBy[Them][KNIGHT] | ei.attackedBy[Them][BISHOP]
-                                  | ei.attackedBy[Them][ROOK]   | ei.attackedBy[Them][QUEEN]
-                                  | ei.attackedBy[Them][KING]   | (pos.pieces(Them) ^ pos.pieces(Them, PAWN)));
+        bb = forward_bb(Us, s) & (ei.attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
         score -= HinderPassedPawn * popcount(bb);
 
         int r = relative_rank(Us, s) - RANK_2;
@@ -654,7 +652,8 @@ namespace {
                     defendedSquares &= ei.attackedBy[Us][ALL_PIECES];
 
                 if (!(pos.pieces(Them) & bb))
-                    unsafeSquares &= ei.attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
+                    unsafeSquares &= (ei.attackedBy[Them][ALL_PIECES] ^ ei.attackedBy[Them][PAWN])
+                                    | ei.attackedBy2[Them] | pos.pieces(Them);
 
                 // If there aren't any enemy attacks, assign a big bonus. Otherwise
                 // assign a smaller bonus if the block square isn't attacked.
