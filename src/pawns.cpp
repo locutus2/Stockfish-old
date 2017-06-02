@@ -70,10 +70,8 @@ namespace {
   // on the given file, or their pawn is behind our king.
   Value StormDanger[][2][4][RANK_NB] = {
     { //BlockedByKing
-      { { V( 0),  V(-290), V(-274), V(57), V(41) },
-        { V( 0),  V(  60), V( 144), V(39), V(13) },
-        { V( 0),  V(  65), V( 141), V(41), V(34) },
-        { V( 0),  V(  53), V( 127), V(56), V(14) } },
+      {}, // this values are not used because the king is in this case on this file
+
       { { V( 0),  V(-290), V(-274), V(57), V(41) },
         { V( 0),  V(  60), V( 144), V(39), V(13) },
         { V( 0),  V(  65), V( 141), V(41), V(34) },
