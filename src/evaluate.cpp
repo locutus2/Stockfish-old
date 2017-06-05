@@ -639,7 +639,7 @@ namespace {
                 ebonus -= distance(pos.square<KING>(Us), blockSq + pawn_push(Us)) * rr;
 
             // If the pawn is free to advance, then increase the bonus
-            if (pos.empty(blockSq) || (pos.pieces(Them) & ei.attackedBy[Us][PAWN] & blockSq))
+            if (pos.empty(blockSq) || (ei.attackedBy[Us][PAWN] & blockSq))
             {
                 // If there is a rook or queen attacking/defending the pawn from behind,
                 // consider all the squaresToQueen. Otherwise consider only the squares
