@@ -70,12 +70,7 @@ namespace {
   // on the given file, or their pawn is behind our king.
   Value StormDanger[][2][4][RANK_NB] = {
    { //BlockedByKing
-    { { V( 0),  V(-290), V(-274), V(57), V(41) },
-      { V( 0),  V(  60), V( 144), V(39), V(13) },
-      { V( 0),  V(  65), V( 141), V(41), V(34) },
-      { V( 0),  V(  53), V( 127), V(56), V(14) } },
-    {}, // this values are not used because the king is in this case on the file
-
+     {}, // this values are not used because the king is in this case on the file
      { { V( 0),  V(-290), V(-274), V(57), V(41) },
        { V( 0),  V(  60), V( 144), V(39), V(13) },
        { V( 0),  V(  65), V( 141), V(41), V(34) },
@@ -291,12 +286,12 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
       Rank rkThem = b ? relative_rank(Us, frontmost_sq(Them, b)) : RANK_1;
 
       int d = std::min(f, FILE_H - f);
-      safety -=  ShelterWeakness[d][rkUs]
+      safety -=  ShelterWeakness[f == file_of(ksq)][d][rkUs]
                + StormDanger
                  [f == file_of(ksq) && rkThem == relative_rank(Us, ksq) + 1 ? BlockedByKing  :
                   rkUs   == RANK_1                                          ? Unopposed :
                   rkThem == rkUs + 1                                        ? BlockedByPawn  : Unblocked]
-                 [d][rkThem];
+                 [f == file_of(ksq)][d][rkThem];
   }
 
   return safety;
