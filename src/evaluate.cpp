@@ -177,6 +177,13 @@ namespace {
   // KingProtector[PieceType-2] contains a bonus according to distance from king
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
+  const int A = 128;
+  const int PassedPawnState[3][3][2] = {
+    { {24*A, 24*A}, {14*A, 14*A}, { 6*A, 6*A} },
+    { {22*A, 22*A}, {12*A, 12*A}, { 4*A, 4*A} },
+    { {18*A, 18*A}, { 8*A,  8*A}, { 0, 0} }
+  };
+
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S( 16,  0);
   const Score BishopPawns         = S(  8, 12);
@@ -607,6 +614,9 @@ namespace {
 
     const Color Them = (Us == WHITE ? BLACK : WHITE);
 
+    enum {PP_ALL_SAFE, PP_BLOCK_SAFE, PP_UNSAFE};
+    enum {PP_ALL_DEFENDED, PP_BLOCK_DEFENDED, PP_UNDEFENDED};
+
     Bitboard b, bb, squaresToQueen, defendedSquares, unsafeSquares;
     Score score = SCORE_ZERO;
 
@@ -654,19 +664,13 @@ namespace {
                 if (!(pos.pieces(Them) & bb))
                     unsafeSquares &= ei.attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
 
-                // If there aren't any enemy attacks, assign a big bonus. Otherwise
-                // assign a smaller bonus if the block square isn't attacked.
-                int k = !unsafeSquares ? 18 : !(unsafeSquares & blockSq) ? 8 : 0;
+                int safeState = !unsafeSquares             ? PP_ALL_SAFE   :
+                                !(unsafeSquares & blockSq) ? PP_BLOCK_SAFE : PP_UNSAFE;
+                int defendState =  defendedSquares == squaresToQueen ? PP_ALL_DEFENDED   :
+                                   defendedSquares & blockSq         ? PP_BLOCK_DEFENDED : PP_UNDEFENDED;
 
-                // If the path to the queen is fully defended, assign a big bonus.
-                // Otherwise assign a smaller bonus if the block square is defended.
-                if (defendedSquares == squaresToQueen)
-                    k += 6;
-
-                else if (defendedSquares & blockSq)
-                    k += 4;
-
-                mbonus += k * rr, ebonus += k * rr;
+                mbonus += PassedPawnState[defendState][safeState][MG] * rr / A;
+                ebonus += PassedPawnState[defendState][safeState][EG] * rr / A;
             }
             else if (pos.pieces(Us) & blockSq)
                 mbonus += rr + r * 2, ebonus += rr + r * 2;
