@@ -178,7 +178,7 @@ namespace {
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
   const int A = 128;
-  const int PassedPawnState[3][3][2] = {
+  int PassedPawnState[3][3][2] = {
     { {24*A, 24*A}, {14*A, 14*A}, { 6*A, 6*A} },
     { {22*A, 22*A}, {12*A, 12*A}, { 4*A, 4*A} },
     { {18*A, 18*A}, { 8*A,  8*A}, { 0, 0} }
@@ -914,3 +914,10 @@ std::string Eval::trace(const Position& pos) {
 
   return ss.str();
 }
+
+Range centered_range(int v)
+{
+    return Range(v - 10 * A, v + 10 * A);
+}
+
+TUNE(SetRange(centered_range), PassedPawnState);
