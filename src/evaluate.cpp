@@ -177,11 +177,11 @@ namespace {
   // KingProtector[PieceType-2] contains a bonus according to distance from king
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
-  const int A = 128;
+  // Bonus for passed pawns depending on defend and safe state
   const int PassedPawnState[3][3][2] = {
-    { {24*A, 24*A}, {14*A, 14*A}, { 6*A, 6*A} },
-    { {22*A, 22*A}, {12*A, 12*A}, { 4*A, 4*A} },
-    { {18*A, 18*A}, { 8*A,  8*A}, { 0, 0} }
+    { { 3186, 3124 }, { 1818, 1800 }, { 833, 760 } },
+    { { 2750, 2823 }, { 1524, 1549 }, { 509, 534 } },
+    { { 2346, 2236 }, { 1035, 1054 }, {  -3, -35 } }
   };
 
   // Assorted bonuses and penalties used by evaluation
@@ -669,8 +669,8 @@ namespace {
                 int defendState =  defendedSquares == squaresToQueen ? PP_ALL_DEFENDED   :
                                    defendedSquares & blockSq         ? PP_BLOCK_DEFENDED : PP_UNDEFENDED;
 
-                mbonus += PassedPawnState[defendState][safeState][MG] * rr / A;
-                ebonus += PassedPawnState[defendState][safeState][EG] * rr / A;
+                mbonus += PassedPawnState[defendState][safeState][MG] * rr / 128;
+                ebonus += PassedPawnState[defendState][safeState][EG] * rr / 128;
             }
             else if (pos.pieces(Us) & blockSq)
                 mbonus += rr + r * 2, ebonus += rr + r * 2;
