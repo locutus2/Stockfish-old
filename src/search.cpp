@@ -1288,7 +1288,9 @@ moves_loop: // When in check search starts from here
 
       // Detect non-capture evasions that are candidates to be pruned
       evasionPrunable =    InCheck
-                       &&  (depth != DEPTH_ZERO || moveCount > 3)
+                       &&  (    depth != DEPTH_ZERO
+                            ||  moveCount > 3
+                            || (moveCount == 2 && pos.non_pawn_material(pos.side_to_move()) > BishopValueMg))
                        &&  bestValue > VALUE_MATED_IN_MAX_PLY
                        && !pos.capture(move);
 
