@@ -1261,7 +1261,8 @@ moves_loop: // When in check search starts from here
                   ? pos.check_squares(type_of(pos.piece_on(from_sq(move)))) & to_sq(move)
                   : pos.gives_check(move);
 
-      moveCount++;
+      if (!pos.capture(move))
+          moveCount++;
 
       // Futility pruning
       if (   !InCheck
@@ -1288,9 +1289,7 @@ moves_loop: // When in check search starts from here
 
       // Detect non-capture evasions that are candidates to be pruned
       evasionPrunable =    InCheck
-                       &&  (    depth != DEPTH_ZERO
-                            ||  moveCount > 3
-                            || (moveCount == 2 && pos.non_pawn_material(pos.side_to_move()) > BishopValueMg))
+                       &&  (depth != DEPTH_ZERO || moveCount > 2)
                        &&  bestValue > VALUE_MATED_IN_MAX_PLY
                        && !pos.capture(move);
 
