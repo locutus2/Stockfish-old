@@ -285,7 +285,7 @@ namespace {
         ei.attackedBy2[Us] |= ei.attackedBy[Us][ALL_PIECES] & b;
         ei.attackedBy[Us][ALL_PIECES] |= ei.attackedBy[Us][Pt] |= b;
 
-        if (b & ei.kingRing[Them])
+        if ((b & ei.kingRing[Them]) || (Pt != KNIGHT && pos.pinnersForKing(Them) & s))
         {
             ei.kingAttackersCount[Us]++;
             ei.kingAttackersWeight[Us] += KingAttackWeights[Pt];
