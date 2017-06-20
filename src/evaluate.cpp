@@ -294,7 +294,7 @@ namespace {
         else if(    Pt != KNIGHT
                 && (pos.pinnersForKing(Them) & s)
                 && (BetweenBB[pos.square<KING>(Them)][s] & pos.pieces(Them) & ~ei.attackedBy[Them][PAWN]))
-            ei.kingAttackersWeight[Us] += KingAttackWeights[Pt];
+            ei.kingAttackersWeight[Us] += KingAttackWeights[Pt] / 4;
 
         int mob = popcount(b & ei.mobilityArea[Us]);
 
