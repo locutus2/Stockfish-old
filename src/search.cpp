@@ -955,7 +955,7 @@ moves_loop: // When in check search starts from here
           continue;
       }
       
-      if (move == ttMove && !cutNode && captureOrPromotion)
+      if (move == ttMove && !PvNode && captureOrPromotion)
           ttCapture = true;
 
       // Update the current move (this must be done after singular extension search)
