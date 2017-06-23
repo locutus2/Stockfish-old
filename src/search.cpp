@@ -984,10 +984,6 @@ moves_loop: // When in check search starts from here
           else
           {
           
-              // Increase reduction if ttMove is a capture
-              if (ttCapture)
-                  r += ONE_PLY;
-          
               // Increase reduction for cut nodes
               if (cutNode)
                   r += 2 * ONE_PLY;
@@ -1004,6 +1000,10 @@ moves_loop: // When in check search starts from here
                              + fm2[moved_piece][to_sq(move)]
                              + thisThread->history[~pos.side_to_move()][from_to(move)]
                              - 4000; // Correction factor
+
+              // Increase reduction if ttMove is a capture
+              if (ttCapture && ss->statScore <= 0)
+                  r += ONE_PLY;
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->statScore > 0 && (ss-1)->statScore < 0)
