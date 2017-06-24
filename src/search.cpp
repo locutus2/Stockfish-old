@@ -551,7 +551,7 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
-    Depth extension, newDepth;
+    Depth extension, newDepth, ttDepth;
     Value bestValue, value, ttValue, eval;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture;
@@ -625,13 +625,14 @@ namespace {
     posKey = pos.key() ^ Key(excludedMove);
     tte = TT.probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
+    ttDepth = ttHit ? tte->depth() : DEPTH_NONE;
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->PVIdx].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
 
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
         && ttHit
-        && tte->depth() >= depth
+        && ttDepth >= depth
         && ttValue != VALUE_NONE // Possible in case of TT access race
         && (ttValue >= beta ? (tte->bound() & BOUND_LOWER)
                             : (tte->bound() & BOUND_UPPER)))
@@ -840,7 +841,7 @@ moves_loop: // When in check search starts from here
                            &&  ttValue != VALUE_NONE
                            && !excludedMove // Recursive singular search is not allowed
                            && (tte->bound() & BOUND_LOWER)
-                           &&  tte->depth() >= depth - 3 * ONE_PLY;
+                           &&  ttDepth >= depth - 3 * ONE_PLY;
     skipQuiets = false;
     ttCapture = false;
 
@@ -961,7 +962,7 @@ moves_loop: // When in check search starts from here
           continue;
       }
       
-      if (move == ttMove && captureOrPromotion)
+      if (move == ttMove && captureOrPromotion && ttDepth >= depth - 3 * ONE_PLY)
           ttCapture = true;
 
       // Update the current move (this must be done after singular extension search)
