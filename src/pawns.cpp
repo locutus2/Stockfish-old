@@ -163,13 +163,25 @@ namespace {
             && popcount(phalanx)   >= popcount(leverPush))
             e->passedPawns[Us] |= s;
 
-        else if (   stoppers == SquareBB[s + Up]
-                 && relative_rank(Us, s) >= RANK_5)
+        else if (    stoppers == SquareBB[s + Up]
+                 &&  relative_rank(Us, s) >= RANK_5
+                 &&  neighbours)
         {
-            b = shift<Up>(supported) & ~theirPawns;
+            b = adjacent_files_bb(f) & rank_bb(s) & ~theirPawns;
             while (b)
-                if (!more_than_one(theirPawns & PawnAttacks[Us][pop_lsb(&b)]))
-                    e->passedPawns[Us] |= s;
+            {
+                Bitboard bb = forward_bb(Them, pop_lsb(&b)) & pos.pieces(PAWN);
+                if(bb)
+                {
+                    Square s2 = frontmost_sq(Us, bb);
+                    if(    (pos.pieces(Us, PAWN) & s2)
+                       && !(pawn_attack_span(Us, s2) & (pos.pieces(Them, PAWN) ^ (s + Up))))
+                    {
+                        e->passedPawns[Us] |= s;
+                        break;
+                    }
+                }
+            }
         }
 
         // Score this pawn
