@@ -177,7 +177,7 @@ namespace {
                     if(    (pos.pieces(Us, PAWN) & s2)
                        && !(pawn_attack_span(Us, s2) & (pos.pieces(Them, PAWN) ^ (s + Up))))
                     {
-                        e->passedPawns[Us] |= s;
+                        e->passedPawns[Us] |= s2;
                         break;
                     }
                 }
