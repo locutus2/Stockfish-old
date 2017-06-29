@@ -692,16 +692,9 @@ namespace {
 
         // Scale down bonus for candidate passers which need more than one
         // pawn push to become passed or have a pawn in front of them.
-        if (pos.pieces(PAWN) & forward_bb(Us, s))
-        {
-            bb =  adjacent_files_bb(file_of(s)) & rank_bb(s) & ~pos.pieces(Them)
-                & (~attackedBy2[Them] | attackedBy[Us][ALL_PIECES]);
-            if (bb)
-                mbonus /= 2, ebonus /= 2;
-            else
-                mbonus /= 4, ebonus /= 4;
-        }
-        else if (!pos.pawn_passed(Us, s + pawn_push(Us)))
+        if (   !pos.pawn_passed(Us, s + pawn_push(Us))
+            || (    (pos.pieces(PAWN) & forward_bb(Us, s))
+                && !(adjacent_files_bb(file_of(s)) & rank_bb(s) & ~pos.pieces(Them) & (~attackedBy2[Them] | attackedBy[Us][ALL_PIECES]))))
             mbonus /= 2, ebonus /= 2;
 
         score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
