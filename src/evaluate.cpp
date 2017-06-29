@@ -694,7 +694,7 @@ namespace {
         // pawn push to become passed or have a pawn in front of them.
         if (   !pos.pawn_passed(Us, s + pawn_push(Us))
             || (    (pos.pieces(PAWN) & forward_bb(Us, s))
-                && !(adjacent_files_bb(file_of(s)) & rank_bb(s) & ~pos.pieces(Them) & (~attackedBy2[Them] | attackedBy[Us][ALL_PIECES]))))
+                && !((attackedBy2[Us] | ~attackedBy[Them][ALL_PIECES]) & s)))
             mbonus /= 2, ebonus /= 2;
 
         score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
