@@ -175,7 +175,7 @@ namespace {
                 {
                     Square s2 = frontmost_sq(Us, bb);
                     if(    (pos.pieces(Us, PAWN) & s2)
-                       && !(pawn_attack_span(Us, s2) & ~in_front_bb(Us, rank_of(s + Up)) & (pos.pieces(Them, PAWN) ^ (s + Up))))
+                       && !(pawn_attack_span(Us, s2) & (pos.pieces(Them, PAWN) ^ (s + Up))))
                     {
                         e->passedPawns[Us] |= s;
                         break;
