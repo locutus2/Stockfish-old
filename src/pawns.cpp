@@ -170,7 +170,7 @@ namespace {
             b = adjacent_files_bb(f) & rank_bb(s) & ~theirPawns;
             while (b)
             {
-                Bitboard bb = forward_bb(Them, pop_lsb(&b)) & pos.pieces(PAWN);
+                Bitboard bb = forward_file_bb(Them, pop_lsb(&b)) & pos.pieces(PAWN);
                 if(bb)
                 {
                     Square s2 = frontmost_sq(Us, bb);
