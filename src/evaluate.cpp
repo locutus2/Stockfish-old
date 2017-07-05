@@ -692,7 +692,7 @@ namespace {
 
         // Scale down bonus for candidate passers which have a pawn in front of them ...
         if (pos.pieces(PAWN) & forward_bb(Us, s))
-            mbonus = mbonus * 5 / 8, ebonus /= 2;
+            mbonus = mbonus * 17 / 32, ebonus /= 2;
 
         // ... or needs more than one pawn push to become passed.
         else if (!pos.pawn_passed(Us, s + pawn_push(Us)))
