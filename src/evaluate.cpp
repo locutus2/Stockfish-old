@@ -216,6 +216,7 @@ namespace {
   const Score Hanging             = S( 48, 27);
   const Score ThreatByPawnPush    = S( 38, 22);
   const Score HinderPassedPawn    = S(  7,  0);
+  const Score WeakPassedPawn      = S( 10, 10);
 
   // Penalty for a bishop on a1/h1 (a8/h8 for black) which is trapped by
   // a friendly pawn on b2/g2 (b7/g7 for black). This can obviously only
@@ -634,11 +635,16 @@ namespace {
     while (b)
     {
         Square s = pop_lsb(&b);
+        Square blockSq = s + Up;
 
         assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
 
         bb = forward_file_bb(Us, s) & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
         score -= HinderPassedPawn * popcount(bb);
+
+        if (   (attackedBy[Them][ALL_PIECES] & ~attackedBy[Us][ALL_PIECES] & s)
+            && ((pos.pieces() | (attackedBy[Them][ALL_PIECES] & ~attackedBy[Us][ALL_PIECES])) & blockSq))
+            score -= WeakPassedPawn;
 
         int r = relative_rank(Us, s) - RANK_2;
         int rr = r * (r - 1);
@@ -647,8 +653,6 @@ namespace {
 
         if (rr)
         {
-            Square blockSq = s + Up;
-
             // Adjust bonus based on the king's proximity
             ebonus +=  distance(pos.square<KING>(Them), blockSq) * 5 * rr
                      - distance(pos.square<KING>(  Us), blockSq) * 2 * rr;
