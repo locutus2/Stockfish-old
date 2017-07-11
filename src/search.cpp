@@ -328,6 +328,8 @@ void MainThread::search() {
 
 void Thread::search() {
 
+  const Value InitialDelta = Value(18);
+
   Stack stack[MAX_PLY+7], *ss = stack+4; // To allow referencing (ss-4) and (ss+2)
   Value bestValue, alpha, beta, delta;
   Move easyMove = MOVE_NONE;
@@ -337,7 +339,8 @@ void Thread::search() {
   for (int i = 4; i > 0; i--)
      (ss-i)->history = &this->counterMoveHistory[NO_PIECE][0]; // Use as sentinel
 
-  bestValue = delta = alpha = -VALUE_INFINITE;
+  bestValue = alpha = -VALUE_INFINITE;
+  delta = InitialDelta;
   beta = VALUE_INFINITE;
   completedDepth = DEPTH_ZERO;
 
@@ -387,7 +390,7 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
           {
-              delta = Value(18);
+              delta = (delta + InitialDelta) / 2;
               alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
           }
