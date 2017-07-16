@@ -86,6 +86,7 @@ namespace {
   private:
     // Evaluation helpers (used when calling value())
     template<Color Us> void initialize();
+    template<Color Us> bool king_can_retreat() const;
     template<Color Us> Score evaluate_king();
     template<Color Us> Score evaluate_threats();
     template<Color Us> Score evaluate_passed_pawns();
@@ -233,6 +234,8 @@ namespace {
   const int RookCheck   = 880;
   const int BishopCheck = 435;
   const int KnightCheck = 790;
+
+  const int KingCannotRetreat = 100;
 
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
@@ -396,6 +399,30 @@ namespace {
     return score;
   }
 
+  // king_can_retreat() check if the king can retreat
+
+  template<Tracing T> template<Color Us>
+  bool Evaluation<T>::king_can_retreat() const {
+
+    const Color Them = (Us == WHITE ? BLACK : WHITE);
+    const Square ksq = pos.square<KING>(Us);
+
+    Bitboard b, next, visited, retreatArea, safe;
+
+    safe = ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
+    retreatArea = ~(file_bb(ksq) | adjacent_files_bb(file_of(ksq)));
+    next = visited = SquareBB[ksq];
+
+    while(next && !(retreatArea & visited))
+    {
+        Square s = pop_lsb(&next);
+        b = pos.attacks_from<KING>(s) & safe;
+        next |= b & ~visited;
+        visited |= b;
+    }
+
+    return retreatArea & visited;
+  }
 
   // evaluate_king() assigns bonuses and penalties to a king of a given color
 
@@ -491,6 +518,9 @@ namespace {
 
         else if (b & other)
             score -= OtherCheck;
+
+        if (!king_can_retreat<Us>())
+            kingDanger += KingCannotRetreat;
 
         // Transform the kingDanger units into a Score, and substract it from the evaluation
         if (kingDanger > 0)
