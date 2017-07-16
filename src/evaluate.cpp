@@ -235,7 +235,7 @@ namespace {
   const int BishopCheck = 435;
   const int KnightCheck = 790;
 
-  const int KingCannotRetreat = 100;
+  const int KingCannotRetreat = 200;
 
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
