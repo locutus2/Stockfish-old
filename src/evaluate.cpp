@@ -223,6 +223,8 @@ namespace {
   // happen in Chess960 games.
   const Score TrappedBishopA1H1 = S(50, 50);
 
+  const Score KingCannotRetreat = S(20,  0);
+
   #undef S
   #undef V
 
@@ -234,8 +236,6 @@ namespace {
   const int RookCheck   = 880;
   const int BishopCheck = 435;
   const int KnightCheck = 790;
-
-  const int KingCannotRetreat = 100;
 
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
@@ -452,6 +452,9 @@ namespace {
     // Main king safety evaluation
     if (kingAttackersCount[Them] > (1 - pos.count<QUEEN>(Them)))
     {
+        if (!king_can_retreat<Us>())
+            score -= KingCannotRetreat;
+
         // Find the attacked squares which are defended only by our king...
         kingOnlyDefended =   attackedBy[Them][ALL_PIECES]
                           &  attackedBy[Us][KING]
@@ -518,9 +521,6 @@ namespace {
 
         else if (b & other)
             score -= OtherCheck;
-
-        if (!king_can_retreat<Us>())
-            kingDanger += KingCannotRetreat;
 
         // Transform the kingDanger units into a Score, and substract it from the evaluation
         if (kingDanger > 0)
