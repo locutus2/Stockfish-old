@@ -60,7 +60,14 @@ void TranspositionTable::resize(size_t mbSize) {
 
 void TranspositionTable::clear() {
 
-  std::memset(table, 0, clusterCount * sizeof(Cluster));
+  // Clear first cluster
+  std::memset(table, 0, sizeof(Cluster));
+  for (int j = 0; j < ClusterSize; j++)
+      table->entry[j].depth8 = TTEntry::Empty;
+
+  // Clear other cluster using first cluster as template
+  for (size_t i = 1; i < clusterCount; i++)
+      std::memcpy(table + i, table, sizeof(Cluster));
 }
 
 
@@ -92,8 +99,8 @@ TTEntry* TranspositionTable::probe(const Key key, bool& found) const {
       // nature we add 259 (256 is the modulus plus 3 to keep the lowest
       // two bound bits from affecting the result) to calculate the entry
       // age correctly even after generation8 overflows into the next cycle.
-      if (  replace->depth() - ((259 + generation8 - replace->genBound8) & 0xFC) * 2
-          >   tte[i].depth() - ((259 + generation8 -   tte[i].genBound8) & 0xFC) * 2)
+      if (  replace->depth8 - ((259 + generation8 - replace->genBound8) & 0xFC) * 2
+          >   tte[i].depth8 - ((259 + generation8 -   tte[i].genBound8) & 0xFC) * 2)
           replace = &tte[i];
 
   return found = false, replace;

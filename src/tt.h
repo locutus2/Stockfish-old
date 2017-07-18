@@ -41,9 +41,9 @@ struct TTEntry {
   Move  move()  const { return (Move )move16; }
   Value value() const { return (Value)value16; }
   Value eval()  const { return (Value)eval16; }
-  Depth depth() const { return (Depth)((depth8 ^ Empty) * int(ONE_PLY)); }
+  Depth depth() const { return (Depth)(depth8 * int(ONE_PLY)); }
   Bound bound() const { return (Bound)(genBound8 & 0x3); }
-  bool  empty() const { return !depth8; }
+  bool  empty() const { return depth8 == Empty; }
 
   void save(Key k, Value v, Bound b, Depth d, Move m, Value ev, uint8_t g) {
 
@@ -55,7 +55,7 @@ struct TTEntry {
 
     // Don't overwrite more valuable entries
     if (  (k >> 48) != key16
-        || d / ONE_PLY > depth() - 4
+        || d / ONE_PLY > depth8 - 4
      /* || g != (genBound8 & 0xFC) // Matching non-zero keys are already refreshed by probe() */
         || b == BOUND_EXACT)
     {
@@ -63,7 +63,7 @@ struct TTEntry {
         value16   = (int16_t)v;
         eval16    = (int16_t)ev;
         genBound8 = (uint8_t)(g | b);
-        depth8    = (int8_t)(d / ONE_PLY) ^ Empty;
+        depth8    = (int8_t)(d / ONE_PLY);
     }
   }
 
