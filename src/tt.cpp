@@ -65,7 +65,7 @@ void TranspositionTable::clear() {
   for (int j = 0; j < ClusterSize; j++)
       table->entry[j].depth8 = TTEntry::Empty;
 
-  // Clear other cluster using first cluster as template
+  // Clear other clusters using first cluster as template
   for (size_t i = 1; i < clusterCount; i++)
       std::memcpy(table + i, table, sizeof(Cluster));
 }
