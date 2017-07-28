@@ -654,7 +654,7 @@ namespace {
 
             // Adjust bonus based on the king's proximity
             ebonus +=  distance(pos.square<KING>(Them), promotionSq) * 5 * rr
-                     - distance(pos.square<KING>(  Us), blockSq)     * 2 * rr;
+                     - distance(pos.square<KING>(  Us), blockSq    ) * 2 * rr;
 
             // If blockSq is not the queening square then consider also a second push
             if (relative_rank(Us, blockSq) != RANK_8)
