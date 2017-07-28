@@ -695,7 +695,7 @@ namespace {
         // pawn push to become passed or have a pawn in front of them and
         // an adjacent pawn for pushing and sacrificing.
         if (relative_rank(Us, s) < RANK_5 && (pos.pieces(PAWN) & forward_file_bb(Us, s)))
-            mbonus /= 4, ebonus /= 4;
+            mbonus /= 5, ebonus /= 5;
 
         else if (!pos.pawn_passed(Us, s + Up) || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
             mbonus /= 2, ebonus /= 2;
