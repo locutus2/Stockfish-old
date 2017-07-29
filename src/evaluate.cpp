@@ -653,7 +653,8 @@ namespace {
             Square blockSq = s + Up;
 
             // Adjust bonus based on the king's proximity
-            ebonus +=  distance(pos.square<KING>(Them), promotionSq) * 5 * rr
+            ebonus +=  distance(pos.square<KING>(Them), promotionSq) * 2 * rr
+                     + distance(pos.square<KING>(Them), blockSq    ) * 3 * rr
                      - distance(pos.square<KING>(  Us), blockSq    ) * 2 * rr;
 
             // If blockSq is not the queening square then consider also a second push
