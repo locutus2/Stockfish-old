@@ -46,6 +46,7 @@ struct Stack {
   int statScore;
   int moveCount;
   int pathImportance;
+  int pvDistance;
 };
 
 
