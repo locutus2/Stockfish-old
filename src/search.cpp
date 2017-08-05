@@ -560,7 +560,7 @@ namespace {
     ss->statScore = 0;
     bestValue = -VALUE_INFINITE;
     ss->ply = (ss-1)->ply + 1;
-    ss->pathImportance = PvNode ? 0 : (ss-1)->pathImportance - (ss-1)->moveCount;
+    ss->pathImportance = PvNode ? 0 : (ss-1)->pathImportance - (ss-1)->moveCount * (ss-1)->moveCount;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -990,7 +990,7 @@ moves_loop: // When in check search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore + 300 * ss->pathImportance / ss->ply) / 20000) * ONE_PLY);
+              r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore + 15 * ss->pathImportance / ss->ply) / 20000) * ONE_PLY);
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
