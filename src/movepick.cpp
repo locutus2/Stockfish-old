@@ -140,11 +140,14 @@ void MovePicker::score<CAPTURES>() {
 template<>
 void MovePicker::score<QUIETS>() {
 
+  const Square ksq = pos.square<KING>(~pos.side_to_move());
+
   for (auto& m : *this)
       m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
                + (*contHistory[0])[pos.moved_piece(m)][to_sq(m)]
                + (*contHistory[1])[pos.moved_piece(m)][to_sq(m)]
-               + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)];
+               + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)]
+               + 100 * distance(ksq, to_sq(m));
 }
 
 template<>
