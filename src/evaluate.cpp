@@ -198,6 +198,8 @@ namespace {
     S(-20,-12), S( 1, -8), S( 2, 10), S(  9, 10)
   };
 
+  const Score DistantPassedPawns = S(0, 3);
+
   // KingProtector[PieceType-2] contains a bonus according to distance from king
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
@@ -627,6 +629,7 @@ namespace {
     const Square Up  = (Us == WHITE ? NORTH : SOUTH);
 
     Bitboard b, bb, squaresToQueen, defendedSquares, unsafeSquares;
+    Bitboard passedPawnFiles = 0;
     Score score = SCORE_ZERO;
 
     b = pe->passed_pawns(Us);
@@ -636,6 +639,8 @@ namespace {
         Square s = pop_lsb(&b);
 
         assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
+
+        passedPawnFiles |= 1 << file_of(s);
 
         bb = forward_file_bb(Us, s) & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
         score -= HinderPassedPawn * popcount(bb);
@@ -697,6 +702,12 @@ namespace {
             mbonus /= 2, ebonus /= 2;
 
         score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
+    }
+
+    if (more_than_one(passedPawnFiles))
+    {
+        int span = msb(passedPawnFiles) - lsb(passedPawnFiles) - 2;
+        score += DistantPassedPawns * span * span;
     }
 
     if (T)
