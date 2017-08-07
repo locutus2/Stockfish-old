@@ -707,7 +707,7 @@ namespace {
     if (more_than_one(passedPawnFiles))
     {
         int span = msb(passedPawnFiles) - lsb(passedPawnFiles) - 2;
-        score += DistantPassedPawns * span * span;
+        score += DistantPassedPawns * (span * span - 3);
     }
 
     if (T)
