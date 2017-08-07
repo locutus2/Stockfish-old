@@ -198,7 +198,7 @@ namespace {
     S(-20,-12), S( 1, -8), S( 2, 10), S(  9, 10)
   };
 
-  const Score DistantPassedPawns = S(3, 3);
+  const Score DistantPassedPawns = S(0, 1);
 
   // KingProtector[PieceType-2] contains a bonus according to distance from king
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
