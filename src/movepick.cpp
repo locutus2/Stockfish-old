@@ -147,7 +147,7 @@ void MovePicker::score<QUIETS>() {
                + (*contHistory[0])[pos.moved_piece(m)][to_sq(m)]
                + (*contHistory[1])[pos.moved_piece(m)][to_sq(m)]
                + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)]
-               + 100 * distance(ksq, to_sq(m));
+               + 100 * (distance(ksq, from_sq(m)) - distance(ksq, to_sq(m)));
 }
 
 template<>
