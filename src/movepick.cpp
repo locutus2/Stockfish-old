@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "material.h"
 
 namespace {
 
@@ -141,13 +142,15 @@ template<>
 void MovePicker::score<QUIETS>() {
 
   const Square ksq = pos.square<KING>(~pos.side_to_move());
+  const Material::Entry* me = Material::probe(pos);
+  const int DistanceWeight = 100 * me->game_phase() / PHASE_MIDGAME;
 
   for (auto& m : *this)
       m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
                + (*contHistory[0])[pos.moved_piece(m)][to_sq(m)]
                + (*contHistory[1])[pos.moved_piece(m)][to_sq(m)]
                + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)]
-               + 100 * (distance(ksq, from_sq(m)) - distance(ksq, to_sq(m)));
+               + DistanceWeight * (distance(ksq, from_sq(m)) - distance(ksq, to_sq(m)));
 }
 
 template<>
