@@ -633,7 +633,7 @@ namespace {
             {
                 int penalty = -stat_bonus(depth);
                 thisThread->mainHistory.update(pos.side_to_move(), ttMove, penalty);
-                thisThread->kingDistanceHistory.update(pos.moved_piece(ttMove), oppKsq, penalty);
+                thisThread->kingDistanceHistory.update(pos.moved_piece(ttMove), distance(oppKsq, to_sq(ttMove)), penalty);
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
