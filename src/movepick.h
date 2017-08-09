@@ -91,9 +91,9 @@ struct PieceDistanceHistory : public PieceDistanceBoards {
 
     assert(abs(bonus) <= D); // Consistency check for below formula
 
-    entry += bonus * 16  - entry * abs(bonus) / D;
+    entry += bonus * 8  - entry * abs(bonus) / D;
 
-    assert(abs(entry) <= 16 * D);
+    assert(abs(entry) <= 8 * D);
   }
 };
 
