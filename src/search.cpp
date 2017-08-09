@@ -193,6 +193,7 @@ void Search::clear() {
   {
       th->counterMoves.fill(MOVE_NONE);
       th->mainHistory.fill(0);
+      th->kingDistanceHistory.fill(0);
 
       for (auto& to : th->contHistory)
           for (auto& h : to)
@@ -552,10 +553,12 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture;
     Piece moved_piece;
     int moveCount, quietCount;
+    Square oppKsq;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
+    oppKsq = pos.square<KING>(~pos.side_to_move());
     moveCount = quietCount = ss->moveCount = 0;
     ss->statScore = 0;
     bestValue = -VALUE_INFINITE;
@@ -630,6 +633,7 @@ namespace {
             {
                 int penalty = -stat_bonus(depth);
                 thisThread->mainHistory.update(pos.side_to_move(), ttMove, penalty);
+                thisThread->kingDistanceHistory.update(pos.moved_piece(ttMove), oppKsq, penalty);
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
@@ -804,7 +808,7 @@ moves_loop: // When in check search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->kingDistanceHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -1241,7 +1245,7 @@ moves_loop: // When in check search starts from here
     // queen promotions and checks (only if depth >= DEPTH_QS_CHECKS) will
     // be generated.
     const PieceToHistory* contHist[4] = {};
-    MovePicker mp(pos, ttMove, depth, &pos.this_thread()->mainHistory, contHist, to_sq((ss-1)->currentMove));
+    MovePicker mp(pos, ttMove, depth, &pos.this_thread()->mainHistory, &pos.this_thread()->kingDistanceHistory, contHist, to_sq((ss-1)->currentMove));
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move()) != MOVE_NONE)
@@ -1408,8 +1412,10 @@ moves_loop: // When in check search starts from here
     }
 
     Color c = pos.side_to_move();
+    Square oppKsq = pos.square<KING>(~c);
     Thread* thisThread = pos.this_thread();
     thisThread->mainHistory.update(c, move, bonus);
+    thisThread->kingDistanceHistory.update(pos.moved_piece(move), distance(oppKsq, to_sq(move)), bonus);
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
@@ -1422,6 +1428,7 @@ moves_loop: // When in check search starts from here
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->mainHistory.update(c, quiets[i], -bonus);
+        thisThread->kingDistanceHistory.update(pos.moved_piece(move), distance(oppKsq, to_sq(quiets[i])), -bonus);
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }

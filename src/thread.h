@@ -69,6 +69,7 @@ public:
   Depth completedDepth;
   CounterMoveHistory counterMoves;
   ButterflyHistory mainHistory;
+  PieceDistanceHistory kingDistanceHistory;
   ContinuationHistory contHistory;
 };
 

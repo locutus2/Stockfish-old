@@ -44,6 +44,9 @@ typedef StatBoards<COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyBoards;
 /// PieceToBoards are addressed by a move's [piece][to] information
 typedef StatBoards<PIECE_NB, SQUARE_NB> PieceToBoards;
 
+/// PieceDistanceBoards are addressed by a move's [piece] information and a distance to a target
+typedef StatBoards<PIECE_NB, RANK_NB> PieceDistanceBoards;
+
 /// ButterflyHistory records how often quiet moves have been successful or
 /// unsuccessful during the current search, and is used for reduction and move
 /// ordering decisions. It uses ButterflyBoards as backing store.
@@ -78,6 +81,22 @@ struct PieceToHistory : public PieceToBoards {
   }
 };
 
+/// PieceDistanceHistory is like ButterflyHistory, but is based on PieceDistanceBoards
+struct PieceDistanceHistory : public PieceDistanceBoards {
+
+  void update(Piece pc, int dist, int bonus) {
+
+    const int D = 324;
+    auto& entry = (*this)[pc][dist];
+
+    assert(abs(bonus) <= D); // Consistency check for below formula
+
+    entry += bonus * 32  - entry * abs(bonus) / D;
+
+    assert(abs(entry) <= 32 * D);
+  }
+};
+
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
 /// move, see chessprogramming.wikispaces.com/Countermove+Heuristic
 typedef StatBoards<PIECE_NB, SQUARE_NB, Move> CounterMoveHistory;
@@ -100,8 +119,8 @@ public:
   MovePicker(const MovePicker&) = delete;
   MovePicker& operator=(const MovePicker&) = delete;
   MovePicker(const Position&, Move, Value);
-  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Square);
-  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Move, Move*);
+  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceDistanceHistory*, const PieceToHistory**, Square);
+  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceDistanceHistory*, const PieceToHistory**, Move, Move*);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -111,6 +130,7 @@ private:
 
   const Position& pos;
   const ButterflyHistory* mainHistory;
+  const PieceDistanceHistory* kingDistanceHistory;
   const PieceToHistory** contHistory;
   Move ttMove, countermove, killers[2];
   ExtMove *cur, *endMoves, *endBadCaptures;

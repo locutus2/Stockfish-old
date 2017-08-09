@@ -67,8 +67,8 @@ namespace {
 /// ordering is at the current node.
 
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const PieceToHistory** ch, Move cm, Move* killers_p)
-           : pos(p), mainHistory(mh), contHistory(ch), countermove(cm),
+                       const PieceDistanceHistory* kdh, const PieceToHistory** ch, Move cm, Move* killers_p)
+           : pos(p), mainHistory(mh), kingDistanceHistory(kdh), contHistory(ch), countermove(cm),
              killers{killers_p[0], killers_p[1]}, depth(d){
 
   assert(d > DEPTH_ZERO);
@@ -79,8 +79,8 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 }
 
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const PieceToHistory** ch, Square s)
-           : pos(p), mainHistory(mh), contHistory(ch) {
+                       const PieceDistanceHistory* kdh, const PieceToHistory** ch, Square s)
+           : pos(p), mainHistory(mh), kingDistanceHistory(kdh), contHistory(ch) {
 
   assert(d <= DEPTH_ZERO);
 
@@ -140,11 +140,16 @@ void MovePicker::score<CAPTURES>() {
 template<>
 void MovePicker::score<QUIETS>() {
 
+  const Square oppKsq = pos.square<KING>(~pos.side_to_move());
+
   for (auto& m : *this)
+  {
       m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
+               + (*kingDistanceHistory)[pos.moved_piece(m)][distance(oppKsq, to_sq(m))]
                + (*contHistory[0])[pos.moved_piece(m)][to_sq(m)]
                + (*contHistory[1])[pos.moved_piece(m)][to_sq(m)]
                + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)];
+    }
 }
 
 template<>
