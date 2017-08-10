@@ -548,7 +548,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval;
-    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
+    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving, oppImproving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture;
     Piece moved_piece;
     int moveCount, quietCount;
@@ -809,6 +809,9 @@ moves_loop: // When in check search starts from here
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
                ||(ss-2)->staticEval == VALUE_NONE;
+    oppImproving =  -ss->staticEval >= (ss-1)->staticEval
+                  || ss->staticEval == VALUE_NONE
+                  ||(ss-1)->staticEval == VALUE_NONE;
 
     singularExtensionNode =   !rootNode
                            &&  depth >= 8 * ONE_PLY
@@ -953,7 +956,7 @@ moves_loop: // When in check search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          Depth r = reduction<PvNode>(improving, depth, moveCount);
+          Depth r = reduction<PvNode>(improving, depth, moveCount) + Depth(!oppImproving);
 
           if (captureOrPromotion)
               r -= r ? ONE_PLY : DEPTH_ZERO;
