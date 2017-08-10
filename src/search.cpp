@@ -809,7 +809,7 @@ moves_loop: // When in check search starts from here
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
                ||(ss-2)->staticEval == VALUE_NONE;
-    oppImproving =  -ss->staticEval >= (ss-1)->staticEval
+    oppImproving =  2 * Eval::Tempo - ss->staticEval >= (ss-1)->staticEval
                   || ss->staticEval == VALUE_NONE
                   ||(ss-1)->staticEval == VALUE_NONE;
 
