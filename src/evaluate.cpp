@@ -834,10 +834,11 @@ namespace {
     Value v = (mg_value(score) + eg_value(score)) / 2;
     if (abs(v) > LazyThreshold)
     {
-       ScaleFactor sf = evaluate_scale_factor(eg_value(score));
-       v =  mg_value(score) * int(me->game_phase())
-          + eg_value(score) * int(PHASE_MIDGAME - me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
-       v /= int(PHASE_MIDGAME);
+       if (me->game_phase() == PHASE_ENDGAME)
+       {
+           ScaleFactor sf = evaluate_scale_factor(eg_value(score));
+           v = eg_value(score) * sf / SCALE_FACTOR_NORMAL;
+       }
 
        return pos.side_to_move() == WHITE ? v : -v;
     }
