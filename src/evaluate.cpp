@@ -236,7 +236,6 @@ namespace {
 
   // Thresholds for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
-  const Value LazyThreshold2 = Value(1350);
   const Value SpaceThreshold = Value(12222);
 
 
@@ -850,7 +849,7 @@ namespace {
 
     // Another early exit if score is high
     v = (mg_value(score) + eg_value(score)) / 2;
-    if (abs(v) > LazyThreshold2)
+    if (abs(v) > LazyThreshold)
        return pos.side_to_move() == WHITE ? v : -v;
 
     score +=  evaluate_king<WHITE>()
