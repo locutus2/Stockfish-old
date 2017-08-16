@@ -234,8 +234,9 @@ namespace {
   const int BishopCheck = 435;
   const int KnightCheck = 790;
 
-  // Threshold for lazy and space evaluation
+  // Thresholds for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
+  const Value LazyThreshold2 = Value(1200);
   const Value SpaceThreshold = Value(12222);
 
 
@@ -846,6 +847,11 @@ namespace {
     score += evaluate_pieces<WHITE, QUEEN >() - evaluate_pieces<BLACK, QUEEN >();
 
     score += mobility[WHITE] - mobility[BLACK];
+
+    // Another early exit if score is high
+    v = (mg_value(score) + eg_value(score)) / 2;
+    if (abs(v) > LazyThreshold2)
+       return pos.side_to_move() == WHITE ? v : -v;
 
     score +=  evaluate_king<WHITE>()
             - evaluate_king<BLACK>();
