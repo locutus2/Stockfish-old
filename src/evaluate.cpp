@@ -236,7 +236,7 @@ namespace {
 
   // Thresholds for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
-  const Value LazyThreshold2 = Value(1200);
+  const Value LazyThreshold2 = Value(1350);
   const Value SpaceThreshold = Value(12222);
 
 
