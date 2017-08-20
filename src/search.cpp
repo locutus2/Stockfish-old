@@ -812,7 +812,7 @@ moves_loop: // When in check search starts from here
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
     Move prevBestMove = thisThread->prevBestMoves[pos.moved_piece(ttMove)][to_sq(ttMove)];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, prevBestMove, ss->killers);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -970,6 +970,10 @@ moves_loop: // When in check search starts from here
               // Increase reduction if ttMove is a capture
               if (ttCapture)
                   r += ONE_PLY;
+
+              // Decrease reduction if previous best move
+              if (move == prevBestMove)
+                  r -= ONE_PLY;
 
               // Increase reduction for cut nodes
               if (cutNode)

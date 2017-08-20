@@ -98,7 +98,7 @@ public:
   MovePicker& operator=(const MovePicker&) = delete;
   MovePicker(const Position&, Move, Value);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Square);
-  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Move, Move, Move*);
+  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Move, Move*);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -109,7 +109,7 @@ private:
   const Position& pos;
   const ButterflyHistory* mainHistory;
   const PieceToHistory** contHistory;
-  Move ttMove, countermove, prevBestMove, killers[2];
+  Move ttMove, countermove, killers[2];
   ExtMove *cur, *endMoves, *endBadCaptures;
   int stage;
   Square recaptureSquare;

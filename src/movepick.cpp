@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE, PREV_BESTMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
+    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
     EVASION, EVASIONS_INIT, ALL_EVASIONS,
     PROBCUT, PROBCUT_INIT, PROBCUT_CAPTURES,
     QSEARCH_WITH_CHECKS, QCAPTURES_1_INIT, QCAPTURES_1, QCHECKS,
@@ -67,8 +67,8 @@ namespace {
 /// ordering is at the current node.
 
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const PieceToHistory** ch, Move cm, Move pbm, Move* killers_p)
-           : pos(p), mainHistory(mh), contHistory(ch), countermove(cm), prevBestMove(pbm),
+                       const PieceToHistory** ch, Move cm, Move* killers_p)
+           : pos(p), mainHistory(mh), contHistory(ch), countermove(cm),
              killers{killers_p[0], killers_p[1]}, depth(d){
 
   assert(d > DEPTH_ZERO);
@@ -209,19 +209,6 @@ Move MovePicker::next_move(bool skipQuiets) {
           return move;
       /* fallthrough */
 
-  case PREV_BESTMOVE:
-      ++stage;
-      move = prevBestMove;
-      if (    move != MOVE_NONE
-          &&  move != ttMove
-          &&  move != killers[0]
-          &&  move != killers[1]
-          &&  move != countermove
-          &&  pos.pseudo_legal(move)
-          && !pos.capture(move))
-          return move;
-      /* fallthrough */
-
   case QUIET_INIT:
       cur = endBadCaptures;
       endMoves = generate<QUIETS>(pos, cur);
@@ -239,8 +226,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           if (   move != ttMove
               && move != killers[0]
               && move != killers[1]
-              && move != countermove
-              && move != prevBestMove)
+              && move != countermove)
               return move;
       }
       ++stage;
