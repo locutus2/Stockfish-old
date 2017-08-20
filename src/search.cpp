@@ -900,7 +900,8 @@ moves_loop: // When in check search starts from here
       {
           if (   !captureOrPromotion
               && !givesCheck
-              && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
+              && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000))
+              &&  move != prevBestMove)
           {
               // Move count based pruning
               if (moveCountPruning)
@@ -970,10 +971,6 @@ moves_loop: // When in check search starts from here
               // Increase reduction if ttMove is a capture
               if (ttCapture)
                   r += ONE_PLY;
-
-              // Decrease reduction if previous best move
-              if (move == prevBestMove)
-                  r -= ONE_PLY;
 
               // Increase reduction for cut nodes
               if (cutNode)
