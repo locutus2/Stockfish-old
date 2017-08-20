@@ -221,6 +221,7 @@ void Search::clear() {
   for (Thread* th : Threads)
   {
       th->counterMoves.fill(MOVE_NONE);
+      th->prevBestMoves.fill(MOVE_NONE);
       th->mainHistory.fill(0);
 
       for (auto& to : th->contHistory)
@@ -809,8 +810,9 @@ moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move prevBestMove = thisThread->prevBestMoves[pos.moved_piece(ttMove)][to_sq(ttMove)];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, prevBestMove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -1116,7 +1118,11 @@ moves_loop: // When in check search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
+        {
             update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
+            if (ttMove && bestMove != ttMove && !pos.capture_or_promotion(ttMove))
+                thisThread->prevBestMoves[pos.moved_piece(bestMove)][to_sq(bestMove)] = ttMove;
+        }
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())

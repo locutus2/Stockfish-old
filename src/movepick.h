@@ -76,6 +76,9 @@ struct PieceToHistory : public PieceToBoards {
 /// move, see chessprogramming.wikispaces.com/Countermove+Heuristic
 typedef StatBoards<PIECE_NB, SQUARE_NB, Move> CounterMoveHistory;
 
+/// PrevBestMoveHistory stores previous best move indexed by [piece][to] of the best move
+typedef StatBoards<PIECE_NB, SQUARE_NB, Move> PrevBestMoveHistory;
+
 /// ContinuationHistory is the history of a given pair of moves, usually the
 /// current one given a previous one. History table is based on PieceToBoards
 /// instead of ButterflyBoards.
@@ -95,7 +98,7 @@ public:
   MovePicker& operator=(const MovePicker&) = delete;
   MovePicker(const Position&, Move, Value);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Square);
-  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Move, Move*);
+  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Move, Move, Move*);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -106,7 +109,7 @@ private:
   const Position& pos;
   const ButterflyHistory* mainHistory;
   const PieceToHistory** contHistory;
-  Move ttMove, countermove, killers[2];
+  Move ttMove, countermove, prevBestMove, killers[2];
   ExtMove *cur, *endMoves, *endBadCaptures;
   int stage;
   Square recaptureSquare;
