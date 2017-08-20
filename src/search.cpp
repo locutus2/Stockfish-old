@@ -863,7 +863,8 @@ moves_loop: // When in check search starts from here
                   : pos.gives_check(move);
 
       moveCountPruning =   depth < 16 * ONE_PLY
-                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY];
+                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY]
+                        && move != prevBestMove;
 
       // Step 12. Singular and Gives Check Extensions
 
@@ -900,8 +901,7 @@ moves_loop: // When in check search starts from here
       {
           if (   !captureOrPromotion
               && !givesCheck
-              && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000))
-              &&  move != prevBestMove)
+              && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning
               if (moveCountPruning)
