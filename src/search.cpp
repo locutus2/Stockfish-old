@@ -971,12 +971,8 @@ moves_loop: // When in check search starts from here
               if (ttCapture)
                   r += ONE_PLY;
 
-              // Decrease reduction if previous best move
-              if (PvNode && move == prevBestMove)
-                  r -= 2 * ONE_PLY;
-
-              // Increase reduction for cut nodes
-              if (cutNode)
+              // Increase reduction for cut nodes if not previous best move
+              if (cutNode && move != prevBestMove)
                   r += 2 * ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
