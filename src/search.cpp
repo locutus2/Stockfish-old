@@ -959,8 +959,7 @@ moves_loop: // When in check search starts from here
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1
-          && (!captureOrPromotion || moveCountPruning)
-          &&  move != prevBestMove)
+          && (!captureOrPromotion || moveCountPruning))
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
@@ -971,6 +970,10 @@ moves_loop: // When in check search starts from here
               // Increase reduction if ttMove is a capture
               if (ttCapture)
                   r += ONE_PLY;
+
+              // Decrease reduction for previous best move
+              if (move == prevBestMove)
+                  r -= 2 * ONE_PLY;
 
               // Increase reduction for cut nodes
               if (cutNode)
@@ -1080,6 +1083,10 @@ moves_loop: // When in check search starts from here
           {
               bestMove = move;
 
+              if (ttMove && bestMove != ttMove && !pos.capture_or_promotion(ttMove)
+                                               && !pos.capture_or_promotion(bestMove))
+                  thisThread->prevBestMoves[pos.moved_piece(bestMove)][to_sq(bestMove)] = ttMove;
+
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
 
@@ -1119,11 +1126,7 @@ moves_loop: // When in check search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-        {
             update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
-            if (ttMove && bestMove != ttMove && !pos.capture_or_promotion(ttMove))
-                thisThread->prevBestMoves[pos.moved_piece(bestMove)][to_sq(bestMove)] = ttMove;
-        }
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
