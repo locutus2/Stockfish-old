@@ -973,7 +973,7 @@ moves_loop: // When in check search starts from here
 
               // Decrease reduction if previous best move
               if (move == prevBestMove)
-                  r -= 2 * ONE_PLY;
+                  r -= 3 * ONE_PLY;
 
               // Increase reduction for cut nodes
               if (cutNode)
