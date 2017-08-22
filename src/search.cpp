@@ -24,6 +24,7 @@
 #include <cstring>   // For std::memset
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 #include "evaluate.h"
 #include "misc.h"
@@ -152,7 +153,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
+  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus, Move ttMove = MOVE_NONE);
 
   // perft() is our utility to verify move generation. All the leaf nodes up
   // to the given depth are generated and counted, and the sum is returned.
@@ -221,7 +222,7 @@ void Search::clear() {
   for (Thread* th : Threads)
   {
       th->counterMoves.fill(MOVE_NONE);
-      th->prevBestMoves.fill(MOVE_NONE);
+      th->prevBestMoves.fill({MOVE_NONE, MOVE_NONE});
       th->mainHistory.fill(0);
 
       for (auto& to : th->contHistory)
@@ -810,7 +811,7 @@ moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    Move prevBestMove = thisThread->prevBestMoves[pos.moved_piece(ttMove)][to_sq(ttMove)];
+    const MovePair &prevBestMove = thisThread->prevBestMoves[pos.moved_piece(ttMove)][to_sq(ttMove)];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
@@ -972,7 +973,7 @@ moves_loop: // When in check search starts from here
                   r += ONE_PLY;
 
               // Decrease reduction for previous best move
-              if (move == prevBestMove)
+              if (move == prevBestMove[0] || move == prevBestMove[1])
                   r -= 2 * ONE_PLY;
 
               // Increase reduction for cut nodes
@@ -1122,11 +1123,7 @@ moves_loop: // When in check search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-        {
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
-            if (depth >= 3 * ONE_PLY && ttMove && bestMove != ttMove && !pos.capture_or_promotion(ttMove))
-                thisThread->prevBestMoves[pos.moved_piece(bestMove)][to_sq(bestMove)] = ttMove;
-        }
+            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth), ttMove);
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -1415,7 +1412,7 @@ moves_loop: // When in check search starts from here
   // update_stats() updates move sorting heuristics when a new quiet best move is found
 
   void update_stats(const Position& pos, Stack* ss, Move move,
-                    Move* quiets, int quietsCnt, int bonus) {
+                    Move* quiets, int quietsCnt, int bonus, Move ttMove) {
 
     if (ss->killers[0] != move)
     {
@@ -1432,6 +1429,16 @@ moves_loop: // When in check search starts from here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
+    }
+
+    if (ttMove && move != ttMove && !pos.capture_or_promotion(ttMove))
+    {
+        MovePair &prevBestMoves =  thisThread->prevBestMoves[pos.moved_piece(move)][to_sq(move)];
+        if (ttMove != prevBestMoves[0])
+        {
+            prevBestMoves[1] = prevBestMoves[0];
+            prevBestMoves[0] = ttMove;
+        }
     }
 
     // Decrease all the other played quiet moves

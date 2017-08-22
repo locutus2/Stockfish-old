@@ -77,7 +77,8 @@ struct PieceToHistory : public PieceToBoards {
 typedef StatBoards<PIECE_NB, SQUARE_NB, Move> CounterMoveHistory;
 
 /// PrevBestMoveHistory stores previous best move indexed by [piece][to] of the best move
-typedef StatBoards<PIECE_NB, SQUARE_NB, Move> PrevBestMoveHistory;
+typedef std::vector<Move> MovePair;
+typedef StatBoards<PIECE_NB, SQUARE_NB, MovePair> PrevBestMoveHistory;
 
 /// ContinuationHistory is the history of a given pair of moves, usually the
 /// current one given a previous one. History table is based on PieceToBoards
