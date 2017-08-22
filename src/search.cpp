@@ -971,8 +971,12 @@ moves_loop: // When in check search starts from here
               if (ttCapture)
                   r += ONE_PLY;
 
-              // Increase reduction for cut nodes if not previous best move
-              if (cutNode && move != prevBestMove)
+              // Decrease reduction for previous best move
+              if (move == prevBestMove)
+                  r -= 2 * ONE_PLY;
+
+              // Increase reduction for cut nodes
+              if (cutNode)
                   r += 2 * ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
@@ -1120,7 +1124,7 @@ moves_loop: // When in check search starts from here
         if (!pos.capture_or_promotion(bestMove))
         {
             update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
-            if (ttMove && bestMove != ttMove && !pos.capture_or_promotion(ttMove))
+            if (depth >= 3 * ONE_PLY && ttMove && bestMove != ttMove && !pos.capture_or_promotion(ttMove))
                 thisThread->prevBestMoves[pos.moved_piece(bestMove)][to_sq(bestMove)] = ttMove;
         }
 
