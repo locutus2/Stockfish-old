@@ -191,7 +191,7 @@ void Search::init() {
       for (int d = 1; d < 64; ++d)
           for (int mc = 1; mc < 64; ++mc)
           {
-              double r = log(d) * log(mc) / 1.95;
+              double r = log(d) * (log(mc) - 0.05) / 1.95;
 
               Reductions[NonPV][imp][d][mc] = int(std::round(r));
               Reductions[PV][imp][d][mc] = std::max(Reductions[NonPV][imp][d][mc] - 1, 0);
@@ -908,8 +908,7 @@ moves_loop: // When in check search starts from here
               }
 
               // Reduced depth of the next LMR search
-              int mch = std::max(1, moveCount - (ss-1)->moveCount / 16);
-              int lmrDepth = std::max(newDepth - reduction<PvNode>(improving, depth, mch), DEPTH_ZERO) / ONE_PLY;
+              int lmrDepth = std::max(newDepth - reduction<PvNode>(improving, depth, moveCount), DEPTH_ZERO) / ONE_PLY;
 
               // Countermoves based pruning
               if (   lmrDepth < 3
@@ -960,8 +959,7 @@ moves_loop: // When in check search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          int mch = std::max(1, moveCount - (ss-1)->moveCount / 16);
-          Depth r = reduction<PvNode>(improving, depth, mch);
+          Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           if (captureOrPromotion)
               r -= r ? ONE_PLY : DEPTH_ZERO;
