@@ -908,7 +908,7 @@ moves_loop: // When in check search starts from here
               }
 
               // Reduced depth of the next LMR search
-              int mch = std::max(1, moveCount - (ss-1)->moveCount / 14);
+              int mch = std::max(1, moveCount - (ss-1)->moveCount / 12);
               int lmrDepth = std::max(newDepth - reduction<PvNode>(improving, depth, mch), DEPTH_ZERO) / ONE_PLY;
 
               // Countermoves based pruning
@@ -960,7 +960,7 @@ moves_loop: // When in check search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          int mch = std::max(1, moveCount - (ss-1)->moveCount / 14);
+          int mch = std::max(1, moveCount - (ss-1)->moveCount / 12);
           Depth r = reduction<PvNode>(improving, depth, mch);
 
           if (captureOrPromotion)
