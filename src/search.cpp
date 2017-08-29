@@ -566,7 +566,7 @@ namespace {
     ss->statScore = 0;
     bestValue = -VALUE_INFINITE;
     ss->ply = (ss-1)->ply + 1;
-    ss->cumulativeMoveCount = (ss-1)->cumulativeMoveCount;
+    ss->cumulativeMoveCount = (ss-2)->cumulativeMoveCount;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -909,7 +909,7 @@ moves_loop: // When in check search starts from here
               }
 
               // Reduced depth of the next LMR search
-              int mch = std::max(1, moveCount - (ss-1)->cumulativeMoveCount / (8 * ss->ply));
+              int mch = std::max(1, moveCount - (ss-2)->cumulativeMoveCount / (8 * ss->ply));
               int lmrDepth = std::max(newDepth - reduction<PvNode>(improving, depth, mch), DEPTH_ZERO) / ONE_PLY;
 
               // Countermoves based pruning
@@ -951,7 +951,7 @@ moves_loop: // When in check search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->contHistory = &thisThread->contHistory[movedPiece][to_sq(move)];
-      ss->cumulativeMoveCount = (ss-1)->cumulativeMoveCount + moveCount;
+      ss->cumulativeMoveCount = (ss-2)->cumulativeMoveCount + moveCount;
 
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
@@ -962,7 +962,7 @@ moves_loop: // When in check search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          int mch = std::max(1, moveCount - (ss-1)->cumulativeMoveCount / (8 * ss->ply));
+          int mch = std::max(1, moveCount - (ss-2)->cumulativeMoveCount / (8 * ss->ply));
           Depth r = reduction<PvNode>(improving, depth, mch);
 
           if (captureOrPromotion)
