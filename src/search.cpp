@@ -959,8 +959,7 @@ moves_loop: // When in check search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          int mch = std::max(1, moveCount - (ss-1)->moveCount / 16);
-          Depth r = reduction<PvNode>(improving, depth, mch);
+          Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           if (captureOrPromotion)
               r -= r ? ONE_PLY : DEPTH_ZERO;
@@ -969,6 +968,9 @@ moves_loop: // When in check search starts from here
               // Increase reduction if ttMove is a capture
               if (ttCapture)
                   r += ONE_PLY;
+
+			  if ((ss - 1)->moveCount > 15)
+				   r -= ONE_PLY;
 
               // Increase reduction for cut nodes
               if (cutNode)
