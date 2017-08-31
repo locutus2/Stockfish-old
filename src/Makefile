@@ -50,7 +50,9 @@ OBJS = benchmark.o bitbase.o bitboard.o endgame.o evaluate.o main.o \
 # ----------------------------------------------------------------------------
 #
 # debug = yes/no      --- -DNDEBUG         --- Enable/Disable debug mode
-# sanitize = yes/no   --- (-fsanitize )    --- enable undefined behavior checks
+# sanitize = undefined/thread/no (-fsanitize )
+#                     --- ( undefined )    --- enable undefined behavior checks
+#                     --- ( thread    )    --- enable threading error  checks
 # optimize = yes/no   --- (-O3/-fast etc.) --- Enable/Disable optimizations
 # arch = (name)       --- (-arch)          --- Target architecture
 # bits = 64/32        --- -DIS_64BIT       --- 64-/32-bit operating system
@@ -155,9 +157,11 @@ ifeq ($(COMP),gcc)
 	ifeq ($(ARCH),armv7)
 		ifeq ($(OS),Android)
 			CXXFLAGS += -m$(bits)
+			LDFLAGS += -m$(bits)
 		endif
 	else
 		CXXFLAGS += -m$(bits)
+		LDFLAGS += -m$(bits)
 	endif
 
 	ifneq ($(KERNEL),Darwin)
@@ -200,6 +204,9 @@ ifeq ($(COMP),clang)
 	comp=clang
 	CXX=clang++
 	CXXFLAGS += -pedantic -Wextra -Wshadow
+ifneq ($(KERNEL),Darwin)
+	LDFLAGS += -latomic
+endif
 
 	ifeq ($(ARCH),armv7)
 		ifeq ($(OS),Android)
@@ -210,19 +217,19 @@ ifeq ($(COMP),clang)
 		CXXFLAGS += -m$(bits)
 		LDFLAGS += -m$(bits)
 	endif
-
-	ifeq ($(KERNEL),Darwin)
-		CXXFLAGS += -stdlib=libc++
-		DEPENDFLAGS += -stdlib=libc++
-	endif
 endif
 
 ifeq ($(comp),icc)
 	profile_make = icc-profile-make
 	profile_use = icc-profile-use
 else
+ifeq ($(comp),clang)
+	profile_make = clang-profile-make
+	profile_use = clang-profile-use
+else
 	profile_make = gcc-profile-make
 	profile_use = gcc-profile-use
+endif
 endif
 
 ifeq ($(KERNEL),Darwin)
@@ -259,9 +266,9 @@ else
 endif
 
 ### 3.2.2 Debugging with undefined behavior sanitizers
-ifeq ($(sanitize),yes)
-        CXXFLAGS += -g3 -fsanitize=undefined
-        LDFLAGS += -fsanitize=undefined
+ifneq ($(sanitize),no)
+        CXXFLAGS += -g3 -fsanitize=$(sanitize) -fuse-ld=gold
+        LDFLAGS += -fsanitize=$(sanitize) -fuse-ld=gold
 endif
 
 ### 3.3 Optimization
@@ -293,10 +300,8 @@ ifeq ($(optimize),yes)
 
 	ifeq ($(comp),clang)
 		ifeq ($(KERNEL),Darwin)
-			ifeq ($(pext),no)
 				CXXFLAGS += -flto
 				LDFLAGS += $(CXXFLAGS)
-			endif
 			ifeq ($(arch),i386)
 				CXXFLAGS += -mdynamic-no-pic
 			endif
@@ -421,7 +426,8 @@ help:
 
 
 .PHONY: help build profile-build strip install clean objclean profileclean help \
-        config-sanity icc-profile-use icc-profile-make gcc-profile-use gcc-profile-make
+        config-sanity icc-profile-use icc-profile-make gcc-profile-use gcc-profile-make \
+        clang-profile-use clang-profile-make
 
 build: config-sanity
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) all
@@ -451,7 +457,7 @@ install:
 
 #clean all
 clean: objclean profileclean
-	@rm -f .depend *~ core 
+	@rm -f .depend *~ core
 
 # clean binaries and objects
 objclean:
@@ -461,6 +467,7 @@ objclean:
 profileclean:
 	@rm -rf profdir
 	@rm -f bench.txt *.gcda ./syzygy/*.gcda *.gcno ./syzygy/*.gcno
+	@rm -f stockfish.profdata *.profraw
 
 default:
 	help
@@ -494,7 +501,7 @@ config-sanity:
 	@echo "Testing config sanity. If this fails, try 'make help' ..."
 	@echo ""
 	@test "$(debug)" = "yes" || test "$(debug)" = "no"
-	@test "$(sanitize)" = "yes" || test "$(sanitize)" = "no"
+	@test "$(sanitize)" = "undefined" || test "$(sanitize)" = "thread" || test "$(sanitize)" = "no"
 	@test "$(optimize)" = "yes" || test "$(optimize)" = "no"
 	@test "$(arch)" = "any" || test "$(arch)" = "x86_64" || test "$(arch)" = "i386" || \
 	 test "$(arch)" = "ppc64" || test "$(arch)" = "ppc" || test "$(arch)" = "armv7"
@@ -507,6 +514,19 @@ config-sanity:
 
 $(EXE): $(OBJS)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+
+clang-profile-make:
+	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
+	EXTRACXXFLAGS='-fprofile-instr-generate ' \
+	EXTRALDFLAGS=' -fprofile-instr-generate' \
+	all
+
+clang-profile-use:
+	llvm-profdata merge -output=stockfish.profdata *.profraw
+	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
+	EXTRACXXFLAGS='-fprofile-instr-use=stockfish.profdata' \
+	EXTRALDFLAGS='-fprofile-use ' \
+	all
 
 gcc-profile-make:
 	$(MAKE) ARCH=$(ARCH) COMP=$(COMP) \
