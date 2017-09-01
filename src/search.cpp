@@ -566,6 +566,7 @@ namespace {
     ss->statScore = 0;
     bestValue = -VALUE_INFINITE;
     ss->ply = (ss-1)->ply + 1;
+    ss->pvDistance = PvNode ? 0 : (ss-1)->pvDistance + 1;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -959,7 +960,7 @@ moves_loop: // When in check search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          int mch = std::max(1, moveCount - (ss-1)->moveCount / 16);
+          int mch = std::max(1, moveCount - (ss-1)->moveCount / 16 - ss->pvDistance / 8);
           Depth r = reduction<PvNode>(improving, depth, mch);
 
           if (captureOrPromotion)
