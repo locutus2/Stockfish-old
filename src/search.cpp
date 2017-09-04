@@ -1421,7 +1421,7 @@ moves_loop: // When in check search starts from here
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
 
-    if (ttMove && ttMove != move)
+    if (ttMove)
     {
         PieceToHistory& pbmHistory = thisThread->prevBestMoveHistory[pos.moved_piece(move)][to_sq(move)];
         pbmHistory.update2(pos.moved_piece(ttMove), to_sq(ttMove), bonus);
