@@ -796,8 +796,8 @@ namespace {
 moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
-    const PieceToHistory* pbmHistory = ttMove ? &thisThread->prevBestMoveHistory[pos.moved_piece(ttMove)][to_sq(ttMove)]
-                                              : &thisThread->prevBestMoveHistory[NO_PIECE][0];
+    const PieceToHistory* pbmHistory = ttMove && !pos.capture_or_promotion(ttMove) ? &thisThread->prevBestMoveHistory[pos.moved_piece(ttMove)][to_sq(ttMove)]
+                                                                                   : &thisThread->prevBestMoveHistory[NO_PIECE][0];
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, pbmHistory, countermove, ss->killers);
@@ -1421,7 +1421,7 @@ moves_loop: // When in check search starts from here
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
 
-    if (ttMove)
+    if (ttMove && move != ttMove)
     {
         PieceToHistory& pbmHistory = thisThread->prevBestMoveHistory[pos.moved_piece(move)][to_sq(move)];
         pbmHistory.update2(pos.moved_piece(ttMove), to_sq(ttMove), bonus);
