@@ -1424,10 +1424,10 @@ moves_loop: // When in check search starts from here
     if (ttMove && ttMove != move)
     {
         PieceToHistory& pbmHistory = thisThread->prevBestMoveHistory[pos.moved_piece(move)][to_sq(move)];
-        pbmHistory.update(pos.moved_piece(ttMove), to_sq(ttMove), bonus);
+        pbmHistory.update2(pos.moved_piece(ttMove), to_sq(ttMove), bonus);
         for (int i = 0; i < quietsCnt; ++i)
             if (ttMove != quiets[i])
-                pbmHistory.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+                pbmHistory.update2(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }
 

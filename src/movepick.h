@@ -70,6 +70,10 @@ struct PieceToHistory : public PieceToBoards {
   void update(Piece pc, Square to, int bonus) {
     StatBoards::update((*this)[pc][to], bonus, 936);
   }
+
+  void update2(Piece pc, Square to, int bonus) {
+    StatBoards::update((*this)[pc][to], bonus, 324);
+  }
 };
 
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
