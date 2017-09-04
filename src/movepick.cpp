@@ -68,8 +68,8 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const PieceToHistory** ch, Move cm, Move* killers_p)
-           : pos(p), mainHistory(mh), contHistory(ch), countermove(cm),
+                       const PieceToHistory** ch, const PieceToHistory* ph, Move cm, Move* killers_p)
+           : pos(p), mainHistory(mh), contHistory(ch), prevBestMoveHistory(ph), countermove(cm),
              killers{killers_p[0], killers_p[1]}, depth(d){
 
   assert(d > DEPTH_ZERO);
@@ -138,7 +138,8 @@ void MovePicker::score() {
           m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
                    + (*contHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    + (*contHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)];
+                   + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                   + (*prevBestMoveHistory)[pos.moved_piece(m)][to_sq(m)];
 
       else // Type == EVASIONS
       {

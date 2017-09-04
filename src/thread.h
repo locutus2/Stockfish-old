@@ -70,6 +70,7 @@ public:
   CounterMoveHistory counterMoves;
   ButterflyHistory mainHistory;
   ContinuationHistory contHistory;
+  PrevBestMoveHistory prevBestMoveHistory;
 };
 
 

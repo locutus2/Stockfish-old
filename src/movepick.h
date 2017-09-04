@@ -81,6 +81,9 @@ typedef StatBoards<PIECE_NB, SQUARE_NB, Move> CounterMoveHistory;
 /// instead of ButterflyBoards.
 typedef StatBoards<PIECE_NB, SQUARE_NB, PieceToHistory> ContinuationHistory;
 
+/// PrevBestMoveHistory is the history of the previous best move
+typedef StatBoards<PIECE_NB, SQUARE_NB, PieceToHistory> PrevBestMoveHistory;
+
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a
@@ -95,7 +98,7 @@ public:
   MovePicker& operator=(const MovePicker&) = delete;
   MovePicker(const Position&, Move, Value);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*, Square);
-  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, Move, Move*);
+  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const PieceToHistory**, const PieceToHistory*, Move, Move*);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -106,6 +109,7 @@ private:
   const Position& pos;
   const ButterflyHistory* mainHistory;
   const PieceToHistory** contHistory;
+  const PieceToHistory* prevBestMoveHistory;
   Move ttMove, countermove, killers[2];
   ExtMove *cur, *endMoves, *endBadCaptures;
   int stage;

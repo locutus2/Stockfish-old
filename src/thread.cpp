@@ -63,6 +63,10 @@ void Thread::clear() {
       for (auto& h : to)
           h.fill(0);
 
+  for (auto& to : prevBestMoveHistory)
+      for (auto& h : to)
+          h.fill(0);
+
   contHistory[NO_PIECE][0].fill(Search::CounterMovePruneThreshold - 1);
 }
 

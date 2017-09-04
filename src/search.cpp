@@ -149,7 +149,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
+  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus, Move ttMove);
 
   // perft() is our utility to verify move generation. All the leaf nodes up
   // to the given depth are generated and counted, and the sum is returned.
@@ -613,7 +613,7 @@ namespace {
             if (ttValue >= beta)
             {
                 if (!pos.capture_or_promotion(ttMove))
-                    update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
+                    update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth), ttMove);
 
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -796,9 +796,11 @@ namespace {
 moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
+    const PieceToHistory* pbmHistory = ttMove ? &thisThread->prevBestMoveHistory[pos.moved_piece(ttMove)][to_sq(ttMove)]
+                                              : &thisThread->prevBestMoveHistory[NO_PIECE][0];
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, pbmHistory, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -1105,7 +1107,7 @@ moves_loop: // When in check search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
+            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth), ttMove);
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -1393,7 +1395,7 @@ moves_loop: // When in check search starts from here
   // update_stats() updates move sorting heuristics when a new quiet best move is found
 
   void update_stats(const Position& pos, Stack* ss, Move move,
-                    Move* quiets, int quietsCnt, int bonus) {
+                    Move* quiets, int quietsCnt, int bonus, Move ttMove) {
 
     if (ss->killers[0] != move)
     {
@@ -1418,8 +1420,16 @@ moves_loop: // When in check search starts from here
         thisThread->mainHistory.update(c, quiets[i], -bonus);
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
-  }
 
+    if (ttMove && ttMove != move)
+    {
+        PieceToHistory& pbmHistory = thisThread->prevBestMoveHistory[pos.moved_piece(move)][to_sq(move)];
+        pbmHistory.update(pos.moved_piece(ttMove), to_sq(ttMove), bonus);
+        for (int i = 0; i < quietsCnt; ++i)
+            if (ttMove != quiets[i])
+                pbmHistory.update(pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+    }
+  }
 
   // When playing with strength handicap, choose best move among a set of RootMoves
   // using a statistical rule dependent on 'level'. Idea by Heinz van Saanen.
