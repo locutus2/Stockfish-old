@@ -213,7 +213,7 @@ namespace {
   const Score WeakQueen           = S( 50, 10);
   const Score OtherCheck          = S( 10, 10);
   const Score CloseEnemies        = S(  7,  0);
-  const Score XRayKingDanger      = S( 10,  0);
+  const Score XRayAttackNearKing  = S(  5,  0);
   const Score PawnlessFlank       = S( 20, 80);
   const Score ThreatByHangingPawn = S( 71, 61);
   const Score ThreatBySafePawn    = S(182,175);
@@ -526,7 +526,7 @@ namespace {
     b = xrayAttacks[Them] & attackedBy[Us][KING];
 
     if (b)
-        score -= XRayKingDanger * popcount(b);
+        score -= XRayAttackNearKing * popcount(b);
 
     // Penalty when our king is on a pawnless flank
     if (!(pos.pieces(PAWN) & KingFlank[kf]))
