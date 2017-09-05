@@ -312,7 +312,7 @@ namespace {
 
         if (Pt != KNIGHT)
         {
-           bb = (pos.pieces() & ~b) | pos.pieces(Us, PAWN);
+           bb = (pos.pieces() & ~b) | pos.pieces(Us, PAWN) | pos.pinned_pieces(Them);
            xrayAttacks[Us] |= ~b & (  (Pt != ROOK   ? attacks_bb<BISHOP>(s, bb) : 0)
                                     | (Pt != BISHOP ? attacks_bb<  ROOK>(s, bb) : 0));
         }
