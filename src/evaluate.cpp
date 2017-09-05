@@ -105,6 +105,10 @@ namespace {
     // attacked by a given color and piece type (can be also ALL_PIECES).
     Bitboard attackedBy[COLOR_NB][PIECE_TYPE_NB];
 
+    // xrayAttacks[color] is a bitboard representing all squares
+    // xray-attacked by a given color. Xrays are considered through all pieces.
+    Bitboard xrayAttacks[COLOR_NB];
+
     // attackedBy2[color] are the squares attacked by 2 pieces of a given color,
     // possibly via x-ray or by one pawn and one piece. Diagonal x-ray through
     // pawn or squares attacked by 2 pawns are not explicitly added.
@@ -259,6 +263,7 @@ namespace {
 
     attackedBy2[Us]            = b & attackedBy[Us][PAWN];
     attackedBy[Us][ALL_PIECES] = b | attackedBy[Us][PAWN];
+    xrayAttacks[Us]            = 0;
 
     // Init our king safety tables only if we are going to use them
     if (pos.non_pawn_material(Them) >= RookValueMg + KnightValueMg)
@@ -304,6 +309,10 @@ namespace {
 
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][ALL_PIECES] |= attackedBy[Us][Pt] |= b;
+
+        if (Pt != KNIGHT)
+           xrayAttacks[Us] |= ~b & (  (Pt != ROOK   ? attacks_bb<BISHOP>(s, pos.pieces() & ~b) : 0)
+                                    | (Pt != BISHOP ? attacks_bb<  ROOK>(s, pos.pieces() & ~b) : 0));
 
         if (b & kingRing[Them])
         {
@@ -439,6 +448,7 @@ namespace {
         // the quality of the pawn shelter (current 'score' value).
         kingDanger =        kingAttackersCount[Them] * kingAttackersWeight[Them]
                     + 102 * kingAdjacentZoneAttacksCount[Them]
+                    +  50 * popcount(xrayAttacks[Them] & kingRing[Us])
                     + 191 * popcount(kingOnlyDefended | undefended)
                     + 143 * !!pos.pinned_pieces(Us)
                     - 848 * !pos.count<QUEEN>(Them)
