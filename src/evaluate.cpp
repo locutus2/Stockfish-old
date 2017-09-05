@@ -311,8 +311,11 @@ namespace {
         attackedBy[Us][ALL_PIECES] |= attackedBy[Us][Pt] |= b;
 
         if (Pt != KNIGHT)
-           xrayAttacks[Us] |= ~b & (  (Pt != ROOK   ? attacks_bb<BISHOP>(s, pos.pieces() & ~b) : 0)
-                                    | (Pt != BISHOP ? attacks_bb<  ROOK>(s, pos.pieces() & ~b) : 0));
+        {
+           bb = (pos.pieces() & ~b) | pos.pieces(Us, PAWN);
+           xrayAttacks[Us] |= ~b & (  (Pt != ROOK   ? attacks_bb<BISHOP>(s, bb) : 0)
+                                    | (Pt != BISHOP ? attacks_bb<  ROOK>(s, bb) : 0));
+        }
 
         if (b & kingRing[Them])
         {
