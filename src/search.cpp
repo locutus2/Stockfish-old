@@ -544,7 +544,7 @@ namespace {
     Value bestValue, value, ttValue, eval;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture;
-    Piece movedPiece;
+    Piece movedPiece, prevCapturedPiece;
     int moveCount, quietCount;
 
     // Step 1. Initialize node
@@ -800,6 +800,7 @@ moves_loop: // When in check search starts from here
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
+    prevCapturedPiece = pos.captured_piece();
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
                ||(ss-2)->staticEval == VALUE_NONE;
@@ -954,7 +955,7 @@ moves_loop: // When in check search starts from here
           else
           {
               // Decrease reduction if opponent's move count is high
-              if ((ss-1)->moveCount > 15)
+              if ((ss-1)->moveCount > 15 && !prevCapturedPiece)
                   r -= ONE_PLY;
 
               // Increase reduction if ttMove is a capture
