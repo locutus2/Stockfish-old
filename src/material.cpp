@@ -64,6 +64,8 @@ namespace {
     31, -8, -15, -25, -5
   };
 
+  const int QueenKnightVsQueenBishop = 600;
+
   // Endgame evaluation and scaling functions are accessed directly and not through
   // the function maps because they correspond to more than one material hash key.
   Endgame<KXK>    EvaluateKXK[] = { Endgame<KXK>(WHITE),    Endgame<KXK>(BLACK) };
@@ -120,6 +122,11 @@ namespace {
     // Special handling of Queen vs. Minors
     if  (pieceCount[Us][QUEEN] == 1 && pieceCount[Them][QUEEN] == 0)
          bonus += QueenMinorsImbalance[pieceCount[Them][KNIGHT] + pieceCount[Them][BISHOP]];
+
+    // Special handling of Queen + Knight vs. Queen + Bishop
+    if  (   pieceCount[Us  ][QUEEN] == 1 && pieceCount[Us  ][KNIGHT] == 1 && pieceCount[Us  ][BISHOP] == 0 && pieceCount[Us  ][ROOK] == 0
+         && pieceCount[Them][QUEEN] == 1 && pieceCount[Them][KNIGHT] == 0 && pieceCount[Them][BISHOP] == 1 && pieceCount[Them][ROOK] == 0)
+         bonus += QueenKnightVsQueenBishop;
 
     return bonus;
   }
