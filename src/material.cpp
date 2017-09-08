@@ -64,7 +64,7 @@ namespace {
     31, -8, -15, -25, -5
   };
 
-  const int QueenKnightVsQueenBishop = 600;
+  const int QueenKnightVsQueenBishop = 300;
 
   // Endgame evaluation and scaling functions are accessed directly and not through
   // the function maps because they correspond to more than one material hash key.
