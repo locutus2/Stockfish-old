@@ -762,7 +762,7 @@ namespace {
     // that the endgame score will never change sign after the bonus.
     int v = ((eg > 0) - (eg < 0)) * std::max(initiative, -abs(eg));
 
-    return make_score(v / 4, v);
+    return make_score(v / 2, v);
   }
 
 
