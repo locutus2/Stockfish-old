@@ -194,7 +194,7 @@ namespace {
         else if (backward)
             score -= Backward, e->weakUnopposed[Us] += !opposed;
 
-        else if(!supportable && relative_rank(Us, s) >= RANK_3)
+        else if(!supportable && relative_rank(Us, s) >= RANK_4)
             score -= Unsupportable;
 
         if (doubled && !supported)
