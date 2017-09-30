@@ -43,9 +43,6 @@ namespace {
   // Doubled pawn penalty
   const Score Doubled = S(18, 38);
 
-  // Unsupportable pawn penalty
-  const Score Unsupportable = S(5, 5);
-
   // Lever bonus by rank
   const Score Lever[RANK_NB] = {
     S( 0,  0), S( 0,  0), S(0, 0), S(0, 0),
@@ -101,8 +98,8 @@ namespace {
     const Square Up    = (Us == WHITE ? NORTH      : SOUTH);
     const Square Right = (Us == WHITE ? NORTH_EAST : SOUTH_WEST);
     const Square Left  = (Us == WHITE ? NORTH_WEST : SOUTH_EAST);
-    const Square RightThem = (Us == WHITE ? SOUTH_EAST : NORTH_WEST);
-    const Square LeftThem  = (Us == WHITE ? SOUTH_WEST : NORTH_EAST);
+    const Square RightThem  = (Us == WHITE ? SOUTH_EAST : NORTH_WEST);
+    const Square LeftThem   = (Us == WHITE ? SOUTH_WEST : NORTH_EAST);
     const Bitboard TRank3BB = (Us == WHITE ? Rank3BB : Rank6BB);
 
     Bitboard b, neighbours, stoppers, doubled, supported, phalanx;
@@ -138,14 +135,14 @@ namespace {
         e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
 
         // Flag the pawn
-        opposed    = theirPawns & forward_file_bb(Us, s);
-        stoppers   = theirPawns & passed_pawn_mask(Us, s);
-        lever      = theirPawns & PawnAttacks[Us][s];
-        leverPush  = theirPawns & PawnAttacks[Us][s + Up];
-        doubled    = ourPawns   & (s - Up);
-        neighbours = ourPawns   & adjacent_files_bb(f);
-        phalanx    = neighbours & rank_bb(s);
-        supported  = neighbours & rank_bb(s - Up);
+        opposed     = theirPawns & forward_file_bb(Us, s);
+        stoppers    = theirPawns & passed_pawn_mask(Us, s);
+        lever       = theirPawns & PawnAttacks[Us][s];
+        leverPush   = theirPawns & PawnAttacks[Us][s + Up];
+        doubled     = ourPawns   & (s - Up);
+        neighbours  = ourPawns   & adjacent_files_bb(f);
+        phalanx     = neighbours & rank_bb(s);
+        supported   = neighbours & rank_bb(s - Up);
         supportable = safePawnPushes & PawnAttacks[Them][s];
 
         // A pawn is backward when it is behind all pawns of the same color on the
@@ -194,8 +191,8 @@ namespace {
         else if (backward)
             score -= Backward, e->weakUnopposed[Us] += !opposed;
 
-        else if(!supportable && relative_rank(Us, s) >= RANK_3)
-            score -= Unsupportable;
+        if (supportable)
+            score += Connected[opposed][0][0][relative_rank(Us, s)] / 4;
 
         if (doubled && !supported)
             score -= Doubled;
