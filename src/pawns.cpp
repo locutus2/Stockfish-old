@@ -192,7 +192,7 @@ namespace {
             score -= Backward, e->weakUnopposed[Us] += !opposed;
 
         if (supportable)
-            score += Connected[opposed][0][0][relative_rank(Us, s)] / 4;
+            score += Connected[opposed][0][0][relative_rank(Us, s)] / 2;
 
         if (doubled && !supported)
             score -= Doubled;
