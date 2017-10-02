@@ -975,7 +975,7 @@ moves_loop: // When in check search starts from here
               // hence break make_move().
               else if (    type_of(move) == NORMAL
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
-                  r -= 2 * ONE_PLY;
+                  r -= ONE_PLY * 3 / 2;
 
               ss->statScore =  thisThread->mainHistory[~pos.side_to_move()][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
