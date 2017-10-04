@@ -335,6 +335,9 @@ namespace {
         {
             // Bonus for outpost squares
             bb = OutpostRanks & ~pe->pawn_attacks_span(Them);
+            if (Pt == BISHOP)
+               bb &= ~((FileABB | FileHBB) & (Us == WHITE ? Rank6BB : Rank3BB) & attackedBy[Us][PAWN]);
+
             if (bb & s)
                 score += Outpost[Pt == BISHOP][!!(attackedBy[Us][PAWN] & s)] * 2;
             else
