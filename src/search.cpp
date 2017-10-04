@@ -543,7 +543,7 @@ namespace {
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval;
     bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
-    bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
+    bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExactOrLower;
     Piece movedPiece;
     int moveCount, quietCount;
 
@@ -813,7 +813,8 @@ moves_loop: // When in check search starts from here
                            &&  tte->depth() >= depth - 3 * ONE_PLY;
     skipQuiets = false;
     ttCapture = false;
-    pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT && ttValue > alpha && ttValue < beta;
+    pvExactOrLower =    PvNode && ttHit && ttValue < beta
+                    && (tte->bound() == BOUND_LOWER || (tte->bound() == BOUND_EXACT && ttValue > alpha));
 
     // Step 11. Loop through moves
     // Loop through all pseudo-legal moves until no moves remain or a beta cutoff occurs
@@ -959,7 +960,7 @@ moves_loop: // When in check search starts from here
                   r -= ONE_PLY;
 
               // Decrease reduction for exact PV nodes
-              if (pvExact)
+              if (pvExactOrLower)
                   r -= ONE_PLY;
 
               // Increase reduction if ttMove is a capture
