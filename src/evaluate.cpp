@@ -149,6 +149,8 @@ namespace {
   #define V(v) Value(v)
   #define S(mg, eg) make_score(mg, eg)
 
+  const Score Tempo = S(40, 0);
+
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
   const Score MobilityBonus[][32] = {
@@ -876,6 +878,8 @@ namespace {
 
     score += evaluate_initiative(eg_value(score));
 
+    score += pos.side_to_move() == WHITE ? Tempo : -Tempo;
+
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = evaluate_scale_factor(eg_value(score));
     v =  mg_value(score) * int(me->game_phase())
@@ -896,7 +900,7 @@ namespace {
         Trace::add(TOTAL, score);
     }
 
-    return (pos.side_to_move() == WHITE ? v : -v) + Eval::Tempo; // Side to move point of view
+    return (pos.side_to_move() == WHITE ? v : -v); // Side to move point of view
   }
 
 } // namespace
