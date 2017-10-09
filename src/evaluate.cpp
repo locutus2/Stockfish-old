@@ -149,7 +149,7 @@ namespace {
   #define V(v) Value(v)
   #define S(mg, eg) make_score(mg, eg)
 
-  const Score Tempo = S(40, 0);
+  const Score Tempo = S(20, 0);
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
