@@ -970,7 +970,7 @@ moves_loop: // When in check search starts from here
                   r += 2 * ONE_PLY;
 
               // Less reduction if current best value is a draw
-              if (bestValue == DrawValue[~pos.side_to_move()])
+              if (bestValue >= alpha && bestValue == DrawValue[~pos.side_to_move()])
                   r -= ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
