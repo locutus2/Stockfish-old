@@ -294,7 +294,8 @@ namespace {
   template<Tracing T>  template<Color Us, PieceType Pt>
   Score Evaluation<T>::evaluate_pieces() {
 
-    const Color Them = (Us == WHITE ? BLACK : WHITE);
+    const Color  Them = (Us == WHITE ? BLACK : WHITE);
+    const Square Down = (Us == WHITE ? SOUTH : NORTH);
     const Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
                                                : Rank5BB | Rank4BB | Rank3BB);
     const Square* pl = pos.squares<Pt>(Us);
@@ -361,8 +362,8 @@ namespace {
                     score += LongRangedBishop[1];
 
                 // ... or at least can "see" one of the center squares
-                // which contains an opponent pawn which is not defended by a pawn
-                else if(bb & pos.pieces(Them, PAWN) & ~attackedBy[Them][PAWN])
+                // which contains an own pawn which is not blocked
+                else if(bb & pos.pieces(Us, PAWN) & shift<Down>(~pos.pieces()))
                     score += LongRangedBishop[0];
             }
 
