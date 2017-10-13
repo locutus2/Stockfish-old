@@ -211,7 +211,7 @@ namespace {
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
   // LongRangedBishop[squares-1] contains a bonus according to the "seen" center squares
-  const Score LongRangedBishop[] = { S(11, 0), S(22, 0) };
+  const Score LongRangedBishop[] = { S(6, 0), S(22, 0) };
 
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S( 16,  0);
