@@ -210,12 +210,10 @@ namespace {
   // KingProtector[PieceType-2] contains a bonus according to distance from king
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
-  // LongRangedBishop[squares-1] contains a bonus according to the "seen" center squares
-  const Score LongRangedBishop[] = { S(6, 0), S(22, 0) };
-
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S( 16,  0);
   const Score BishopPawns         = S(  8, 12);
+  const Score LongRangedBishop    = S( 22,  0);
   const Score RookOnPawn          = S(  8, 24);
   const Score TrappedRook         = S( 92,  0);
   const Score WeakQueen           = S( 50, 10);
@@ -355,15 +353,12 @@ namespace {
                 // Penalty for pawns on the same color square as the bishop
                 score -= BishopPawns * pe->pawns_on_same_color_squares(Us, s);
 
-                bb = Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s);
                 // Bonus for bishop on a long diagonal which can "see" both center squares
-                if (more_than_one(bb))
-                    score += LongRangedBishop[1];
-
-                // ... or at least can "see" one of the center squares
-                // which contains an opponent pawn which is not defended by a pawn
-                else if(bb & pos.pieces(Them, PAWN) & ~attackedBy[Them][PAWN])
-                    score += LongRangedBishop[0];
+                // or at least can "see" one of the center squares which contains
+                // an opponent pawn which is not defended by a pawn
+                bb = Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s);
+                if (more_than_one(bb) || (bb & pos.pieces(Them, PAWN) & ~attackedBy[Them][PAWN]))
+                    score += LongRangedBishop;
             }
 
             // An important Chess960 pattern: A cornered bishop blocked by a friendly
