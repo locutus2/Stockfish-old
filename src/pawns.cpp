@@ -191,7 +191,8 @@ namespace {
         if (lever)
             score += Lever[relative_rank(Us, s)];
 
-        else if (leverPush && (phalanx || !more_than_one(leverPush)))
+        else if (leverPush && !((ourPawns | theirPawns) & (s + Up))
+                           &&   (phalanx || !more_than_one(leverPush)))
             score += PawnBreak;
     }
 
