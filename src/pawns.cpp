@@ -43,6 +43,9 @@ namespace {
   // Doubled pawn penalty
   const Score Doubled = S(18, 38);
 
+  // Bonus for possible pawn break
+  const Score PawnBreak = S(10, 10);
+
   // Lever bonus by rank
   const Score Lever[RANK_NB] = {
     S( 0,  0), S( 0,  0), S(0, 0), S(0, 0),
@@ -187,6 +190,9 @@ namespace {
 
         if (lever)
             score += Lever[relative_rank(Us, s)];
+
+        else if (leverPush && (phalanx || !more_than_one(leverPush)))
+            score += PawnBreak;
     }
 
     return score;
