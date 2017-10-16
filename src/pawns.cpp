@@ -44,7 +44,7 @@ namespace {
   const Score Doubled = S(18, 38);
 
   // Bonus for possible pawn break
-  const Score PawnBreak = S(10, 10);
+  const Score PawnBreak = S(10, 0);
 
   // Lever bonus by rank
   const Score Lever[RANK_NB] = {
