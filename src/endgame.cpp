@@ -105,7 +105,7 @@ Endgames::Endgames() {
   add<KRPKB>("KRPKB");
   add<KBPKB>("KBPKB");
   add<KBPKN>("KBPKN");
-  add<KBPPKB>("KBPPKB");
+  add<KBPPKBPs>("KBPPKBPs");
   add<KRPPKRP>("KRPPKRP");
 }
 
@@ -658,12 +658,12 @@ ScaleFactor Endgame<KBPKB>::operator()(const Position& pos) const {
 }
 
 
-/// KBPP vs KB. It detects a few basic draws with opposite-colored bishops
+/// KBPP vs KB + any number of pawns. It detects a few basic draws with opposite-colored bishops
 template<>
-ScaleFactor Endgame<KBPPKB>::operator()(const Position& pos) const {
+ScaleFactor Endgame<KBPPKBPs>::operator()(const Position& pos) const {
 
   assert(verify_material(pos, strongSide, BishopValueMg, 2));
-  assert(verify_material(pos, weakSide,   BishopValueMg, 0));
+  assert(pos.non_pawn_material(weakSide) == BishopValueMg);
 
   Square wbsq = pos.square<BISHOP>(strongSide);
   Square bbsq = pos.square<BISHOP>(weakSide);
@@ -677,6 +677,7 @@ ScaleFactor Endgame<KBPPKB>::operator()(const Position& pos) const {
   Rank r1 = rank_of(psq1);
   Rank r2 = rank_of(psq2);
   Square blockSq1, blockSq2;
+  Square promotionSq1, promotionSq2;
 
   if (relative_rank(strongSide, psq1) > relative_rank(strongSide, psq2))
   {
@@ -721,7 +722,24 @@ ScaleFactor Endgame<KBPPKB>::operator()(const Position& pos) const {
         return SCALE_FACTOR_NONE;
 
   default:
-    // The pawns are not on the same file or adjacent files. No scaling.
+    // The pawns are not on the same file or adjacent files.
+    // Its draw if one pawn is on the a or h file and the promotion square is covered by the king
+    // and the others pawn promotion path is covered by the bishop
+    promotionSq1 = make_square(file_of(psq1), strongSide == WHITE ?  RANK_8 : RANK_1);
+    promotionSq2 = make_square(file_of(psq2), strongSide == WHITE ?  RANK_8 : RANK_1);
+
+    if (   ((FileABB | FileHBB) & promotionSq1)
+        && distance(ksq, promotionSq1) <= 1
+        && opposite_colors(promotionSq1, wbsq)
+        && (pos.attacks_from<BISHOP>(bbsq) & forward_file_bb(strongSide, psq2)))
+        return SCALE_FACTOR_DRAW;
+
+    else if (   ((FileABB | FileHBB) & promotionSq2)
+             && distance(ksq, promotionSq2) <= 1
+             && opposite_colors(promotionSq2, wbsq)
+             && (pos.attacks_from<BISHOP>(bbsq) & forward_file_bb(strongSide, psq1)))
+        return SCALE_FACTOR_DRAW;
+
     return SCALE_FACTOR_NONE;
   }
 }
