@@ -210,13 +210,15 @@ namespace {
   // KingProtector[PieceType-2] contains a bonus according to distance from king
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
+  // WeakQueen[double defended] contains the penalty according if the pinned piece is double defended
+  const Score WeakQueen[] = { S(80, 20), S(40, 10) };
+
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S( 16,  0);
   const Score BishopPawns         = S(  8, 12);
   const Score LongRangedBishop    = S( 22,  0);
   const Score RookOnPawn          = S(  8, 24);
   const Score TrappedRook         = S( 92,  0);
-  const Score WeakQueen           = S( 50, 10);
   const Score OtherCheck          = S( 10, 10);
   const Score CloseEnemies        = S(  7,  0);
   const Score PawnlessFlank       = S( 20, 80);
@@ -399,9 +401,8 @@ namespace {
             // Penalty if any relative pin or discovered attack against the queen
             Bitboard pinners, pinned;
             pinned = pos.slider_blockers(pos.pieces(Them, ROOK, BISHOP), s, pinners);
-            if (pinned && !((pinners & pos.pieces(Them, ROOK  )) && (pinned & pos.pieces(Us, ROOK  )))
-                       && !((pinners & pos.pieces(Them, BISHOP)) && (pinned & pos.pieces(Us, BISHOP))))
-                score -= WeakQueen;
+            if (pinned)
+                score -= WeakQueen[!(pinned & ~attackedBy2[Us])];
         }
     }
 
