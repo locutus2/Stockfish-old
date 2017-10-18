@@ -83,6 +83,7 @@ struct Entry {
 struct MoveEntry {
   Key key;
   Move move;
+  MoveEntry() : key(0), move(MOVE_NONE) {}
 };
 
 typedef HashTable<Entry, 16384> Table;
