@@ -1186,3 +1186,9 @@ bool Position::pos_is_ok() const {
 
   return true;
 }
+
+Key Position::pawn_king_key() const {
+  return st->pawnKey ^ Zobrist::psq[W_KING][square<KING>(WHITE)]
+                     ^ Zobrist::psq[B_KING][square<KING>(BLACK)];
+}
+

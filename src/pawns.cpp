@@ -310,7 +310,7 @@ template Score Entry::do_king_safety<BLACK>(const Position& pos, Square ksq);
 
 Move probe_move(const Position& pos) {
 
-  Key key = pos.pawn_key();
+  Key key = pos.pawn_king_key();
   MoveEntry* e = pos.this_thread()->pawnsMoveTable[pos.side_to_move()][key];
 
   if (e->key == key)
@@ -323,7 +323,7 @@ Move probe_move(const Position& pos) {
 /// the pawns move hash table.
 void update_move(const Position& pos, Move move) {
 
-  Key key = pos.pawn_key();
+  Key key = pos.pawn_king_key();
   MoveEntry* e = pos.this_thread()->pawnsMoveTable[pos.side_to_move()][key];
 
   e->key = key;
