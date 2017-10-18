@@ -1418,7 +1418,7 @@ moves_loop: // When in check search starts from here
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
 
-        if (   type_of(pos.piece_on(to_sq((ss-1)->currentMove))) == PAWN
+        if (   type_of(pos.piece_on(prevSq)) == PAWN
             || type_of((ss-1)->currentMove) == PROMOTION)
             Pawns::update_move(pos, move);
     }
