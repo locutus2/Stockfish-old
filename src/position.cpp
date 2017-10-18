@@ -340,6 +340,8 @@ void Position::set_state(StateInfo* si) const {
 
   si->key = si->materialKey = 0;
   si->pawnKey = Zobrist::noPawns;
+  si->pawnKeys[WHITE] = Zobrist::noPawns;
+  si->pawnKeys[BLACK] = Zobrist::noPawns;
   si->nonPawnMaterial[WHITE] = si->nonPawnMaterial[BLACK] = VALUE_ZERO;
   si->psq = SCORE_ZERO;
   si->checkersBB = attackers_to(square<KING>(sideToMove)) & pieces(~sideToMove);
@@ -366,6 +368,7 @@ void Position::set_state(StateInfo* si) const {
   {
       Square s = pop_lsb(&b);
       si->pawnKey ^= Zobrist::psq[piece_on(s)][s];
+      si->pawnKeys[sideToMove] ^= Zobrist::psq[piece_on(s)][s];
   }
 
   for (Piece pc : Pieces)
@@ -376,6 +379,8 @@ void Position::set_state(StateInfo* si) const {
       for (int cnt = 0; cnt < pieceCount[pc]; ++cnt)
           si->materialKey ^= Zobrist::psq[pc][cnt];
   }
+
+  assert(pawn_key() == (pawn_key(WHITE) ^ pawn_key(BLACK) ^ Zobrist::noPawns));
 }
 
 
@@ -739,6 +744,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
           }
 
           st->pawnKey ^= Zobrist::psq[captured][capsq];
+          st->pawnKeys[them] ^= Zobrist::psq[captured][capsq];
       }
       else
           st->nonPawnMaterial[them] -= PieceValue[MG][captured];
@@ -804,6 +810,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
           // Update hash keys
           k ^= Zobrist::psq[pc][to] ^ Zobrist::psq[promotion][to];
           st->pawnKey ^= Zobrist::psq[pc][to];
+          st->pawnKeys[us] ^= Zobrist::psq[pc][to];
           st->materialKey ^=  Zobrist::psq[promotion][pieceCount[promotion]-1]
                             ^ Zobrist::psq[pc][pieceCount[pc]];
 
@@ -816,6 +823,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
 
       // Update pawn hash key and prefetch access to pawnsTable
       st->pawnKey ^= Zobrist::psq[pc][from] ^ Zobrist::psq[pc][to];
+      st->pawnKeys[us] ^= Zobrist::psq[pc][from] ^ Zobrist::psq[pc][to];
       prefetch2(thisThread->pawnsTable[st->pawnKey]);
 
       // Reset rule 50 draw counter
@@ -840,6 +848,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
   set_check_info(st);
 
   assert(pos_is_ok());
+  assert(pawn_key() == (pawn_key(WHITE) ^ pawn_key(BLACK) ^ Zobrist::noPawns));
 }
 
 
