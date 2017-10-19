@@ -87,7 +87,7 @@ struct MoveEntry {
 };
 
 typedef HashTable<Entry, 16384> Table;
-typedef HashTable<MoveEntry, 16384> MoveTable;
+typedef HashTable<MoveEntry, 65536> MoveTable;
 
 void init();
 Entry* probe(const Position& pos);
