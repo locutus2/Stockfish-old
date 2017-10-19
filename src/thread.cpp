@@ -58,8 +58,8 @@ void Thread::clear() {
 
   counterMoves.fill(MOVE_NONE);
   mainHistory.fill(0);
-  pawnsMoveTable[WHITE].clear();
-  pawnsMoveTable[BLACK].clear();
+  materialMoveTable[WHITE].clear();
+  materialMoveTable[BLACK].clear();
 
   for (auto& to : contHistory)
       for (auto& h : to)

@@ -64,9 +64,18 @@ struct Entry {
   Phase gamePhase;
 };
 
+struct MoveEntry {
+  Key key;
+  Move move;
+  MoveEntry() : key(0), move(MOVE_NONE) {}
+};
+
 typedef HashTable<Entry, 8192> Table;
+typedef HashTable<MoveEntry, 8192> MoveTable;
 
 Entry* probe(const Position& pos);
+Move probe_move(const Position& pos);
+void update_move(const Position& pos, Move move);
 
 } // namespace Material
 

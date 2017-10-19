@@ -240,4 +240,29 @@ Entry* probe(const Position& pos) {
   return e;
 }
 
+/// Material::probe_move() looks up the current position's material configuration in
+/// the material move hash table. It returns a move or MOVE_NONE if key not found
+
+Move probe_move(const Position& pos) {
+
+  Key key = pos.material_key();
+  MoveEntry* e = pos.this_thread()->materialMoveTable[pos.side_to_move()][key];
+
+  if (e->key == key)
+      return e->move;
+
+  return MOVE_NONE;
+}
+
+/// Material::update_move() update best move dependend on the current position's material configuration in
+/// the material move hash table.
+void update_move(const Position& pos, Move move) {
+
+  Key key = pos.material_key();
+  MoveEntry* e = pos.this_thread()->materialMoveTable[pos.side_to_move()][key];
+
+  e->key = key;
+  e->move = move;
+}
+
 } // namespace Material

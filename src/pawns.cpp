@@ -305,29 +305,4 @@ Score Entry::do_king_safety(const Position& pos, Square ksq) {
 template Score Entry::do_king_safety<WHITE>(const Position& pos, Square ksq);
 template Score Entry::do_king_safety<BLACK>(const Position& pos, Square ksq);
 
-/// Pawns::probe_move() looks up the current position's pawns configuration in
-/// the pawns move hash table. It returns a move or MOVE_NONE if key not found
-
-Move probe_move(const Position& pos) {
-
-  Key key = pos.pawn_key();
-  MoveEntry* e = pos.this_thread()->pawnsMoveTable[pos.side_to_move()][key];
-
-  if (e->key == key)
-      return e->move;
-
-  return MOVE_NONE;
-}
-
-/// Pawns::update_move() update best move dependend on the current position's pawns configuration in
-/// the pawns move hash table.
-void update_move(const Position& pos, Move move) {
-
-  Key key = pos.pawn_key();
-  MoveEntry* e = pos.this_thread()->pawnsMoveTable[pos.side_to_move()][key];
-
-  e->key = key;
-  e->move = move;
-}
-
 } // namespace Pawns

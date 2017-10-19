@@ -796,9 +796,9 @@ moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    Move goodMoveForPawnStructure = Pawns::probe_move(pos);
+    Move goodMove = Material::probe_move(pos);
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers, goodMoveForPawnStructure);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers, goodMove);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -1417,10 +1417,7 @@ moves_loop: // When in check search starts from here
     if (is_ok((ss-1)->currentMove))
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
 
-    if (   type_of(pos.piece_on(prevSq)) == PAWN
-        || type_of((ss-1)->currentMove) == PROMOTION
-        || Pawns::probe_move(pos) == MOVE_NONE)
-        Pawns::update_move(pos, move);
+    Material::update_move(pos, move);
 
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)

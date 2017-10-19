@@ -58,7 +58,7 @@ public:
   void wait_for_search_finished();
 
   Pawns::Table pawnsTable;
-  Pawns::MoveTable pawnsMoveTable[COLOR_NB];
+  Material::MoveTable materialMoveTable[COLOR_NB];
   Material::Table materialTable;
   Endgames endgames;
   size_t PVIdx;
