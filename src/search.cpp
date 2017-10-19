@@ -1410,18 +1410,17 @@ moves_loop: // When in check search starts from here
 
     Color c = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
+    Square prevSq = to_sq((ss-1)->currentMove);
     thisThread->mainHistory.update(c, move, bonus);
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
-    {
-        Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
 
-        if (   type_of(pos.piece_on(prevSq)) == PAWN
-            || type_of((ss-1)->currentMove) == PROMOTION)
-            Pawns::update_move(pos, move);
-    }
+    if (   type_of(pos.piece_on(prevSq)) == PAWN
+        || type_of((ss-1)->currentMove) == PROMOTION
+        || Pawns::probe_move(pos) == MOVE_NONE)
+        Pawns::update_move(pos, move);
 
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
