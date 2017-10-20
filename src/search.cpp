@@ -796,7 +796,7 @@ moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    bool splitCaptures = posKey % 32 != 0;
+    bool splitCaptures = thisThread->nodes % 32 != 0;
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, contHist, countermove, ss->killers, splitCaptures);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
