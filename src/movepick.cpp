@@ -68,9 +68,9 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const PieceToHistory** ch, Move cm, Move* killers_p)
+                       const PieceToHistory** ch, Move cm, Move* killers_p, bool split_captures)
            : pos(p), mainHistory(mh), contHistory(ch), countermove(cm),
-             killers{killers_p[0], killers_p[1]}, depth(d){
+             killers{killers_p[0], killers_p[1]}, depth(d), splitCaptures(split_captures) {
 
   assert(d > DEPTH_ZERO);
 
@@ -179,7 +179,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           move = pick_best(cur++, endMoves);
           if (move != ttMove)
           {
-              if (pos.see_ge(move))
+              if (!splitCaptures || pos.see_ge(move))
                   return move;
 
               // Losing capture, move it to the beginning of the array
