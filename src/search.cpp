@@ -1058,7 +1058,8 @@ moves_loop: // When in check search starts from here
               if (moveCount > 1 && thisThread == Threads.main())
               {
                   ++static_cast<MainThread*>(thisThread)->bestMoveChanges;
-                  TT.new_search();
+                  if (depth >= 7 * ONE_PLY)
+                      TT.new_search();
               }
           }
           else
