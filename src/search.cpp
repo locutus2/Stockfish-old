@@ -541,7 +541,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval;
-    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
+    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving, allowTTaging;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, quietCount;
@@ -812,6 +812,7 @@ moves_loop: // When in check search starts from here
                            &&  tte->depth() >= depth - 3 * ONE_PLY;
     skipQuiets = false;
     ttCapture = false;
+    allowTTaging = true;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
 
     // Step 11. Loop through moves
@@ -1058,8 +1059,11 @@ moves_loop: // When in check search starts from here
               if (moveCount > 1 && thisThread == Threads.main())
               {
                   ++static_cast<MainThread*>(thisThread)->bestMoveChanges;
-                  if (depth >= 7 * ONE_PLY)
+                  if (allowTTaging)
+                  {
                       TT.new_search();
+                      allowTTaging = false;
+                  }
               }
           }
           else
