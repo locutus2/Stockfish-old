@@ -946,7 +946,7 @@ moves_loop: // When in check search starts from here
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning)
-          && (!PvNode || bestValue != DrawValue[~pos.side_to_move()]))
+          &&  bestValue != DrawValue[~pos.side_to_move()])
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
