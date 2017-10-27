@@ -236,6 +236,7 @@ void MainThread::search() {
 
   Color us = rootPos.side_to_move();
   Time.init(Limits, us, rootPos.game_ply());
+  TT.new_search();
 
   int contempt = Options["Contempt"] * PawnValueEg / 100; // From centipawns
   DrawValue[ us] = VALUE_DRAW - Value(contempt);
@@ -367,11 +368,7 @@ void Thread::search() {
 
       // Age out PV variability metric
       if (mainThread)
-      {
           mainThread->bestMoveChanges *= 0.505, mainThread->failedLow = false;
-          if (rootDepth / ONE_PLY % 2 == 1)
-              TT.new_search();
-      }
 
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
@@ -1059,7 +1056,10 @@ moves_loop: // When in check search starts from here
               // iteration. This information is used for time management: When
               // the best move changes frequently, we allocate some more time.
               if (moveCount > 1 && thisThread == Threads.main())
+              {
                   ++static_cast<MainThread*>(thisThread)->bestMoveChanges;
+                  TT.new_search();
+              }
           }
           else
               // All other moves but the PV are set to the lowest value: this
