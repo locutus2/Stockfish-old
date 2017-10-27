@@ -368,8 +368,9 @@ void Thread::search() {
       // Age out PV variability metric
       if (mainThread)
       {
-          TT.new_search();
           mainThread->bestMoveChanges *= 0.505, mainThread->failedLow = false;
+          if (rootDepth / ONE_PLY % 2 == 1)
+              TT.new_search();
       }
 
       // Save the last iteration's scores before first PV line is searched and
