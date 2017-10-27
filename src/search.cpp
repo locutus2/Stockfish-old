@@ -236,7 +236,6 @@ void MainThread::search() {
 
   Color us = rootPos.side_to_move();
   Time.init(Limits, us, rootPos.game_ply());
-  TT.new_search();
 
   int contempt = Options["Contempt"] * PawnValueEg / 100; // From centipawns
   DrawValue[ us] = VALUE_DRAW - Value(contempt);
@@ -368,7 +367,10 @@ void Thread::search() {
 
       // Age out PV variability metric
       if (mainThread)
+      {
+          TT.new_search();
           mainThread->bestMoveChanges *= 0.505, mainThread->failedLow = false;
+      }
 
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
