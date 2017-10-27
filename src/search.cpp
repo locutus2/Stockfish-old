@@ -945,13 +945,16 @@ moves_loop: // When in check search starts from here
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1
-          && (!captureOrPromotion || moveCountPruning)
-          && (!PvNode || bestValue != DrawValue[~pos.side_to_move()]))
+          && (!captureOrPromotion || moveCountPruning))
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
+          // Decrease reduction if at a PV node the best value is draw
+          if (PvNode && bestValue == DrawValue[~pos.side_to_move()])
+              r -= ONE_PLY;
+
           if (captureOrPromotion)
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+              r -= ONE_PLY;
           else
           {
               // Decrease reduction if opponent's move count is high
@@ -991,8 +994,10 @@ moves_loop: // When in check search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+              r -= ss->statScore / 20000 * ONE_PLY;
           }
+
+          r = std::max(DEPTH_ZERO, r);
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
