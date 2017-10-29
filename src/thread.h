@@ -44,7 +44,6 @@ class Thread {
 
   Mutex mutex;
   ConditionVariable cv;
-  size_t idx;
   bool exit = false, searching = true; // Set before starting std::thread
   std::thread stdThread;
 
@@ -60,6 +59,7 @@ public:
   Pawns::Table pawnsTable;
   Material::Table materialTable;
   Endgames endgames;
+  size_t idx;
   size_t PVIdx;
   int selDepth;
   std::atomic<uint64_t> nodes, tbHits;

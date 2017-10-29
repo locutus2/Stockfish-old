@@ -32,7 +32,7 @@ ThreadPool Threads; // Global object
 /// Thread constructor launches the thread and waits until it goes to sleep
 /// in idle_loop(). Note that 'searching' and 'exit' should be alredy set.
 
-Thread::Thread(size_t n) : idx(n), stdThread(&Thread::idle_loop, this) {
+Thread::Thread(size_t n) : stdThread(&Thread::idle_loop, this), idx(n) {
 
   wait_for_search_finished();
   clear(); // Zero-init histories (based on std::array)
