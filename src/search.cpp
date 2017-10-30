@@ -890,7 +890,6 @@ moves_loop: // When in check search starts from here
 
       // Step 13. Pruning at shallow depth
       if (   !rootNode
-          && !isPvDraw
           &&  pos.non_pawn_material(pos.side_to_move())
           &&  bestValue > VALUE_MATED_IN_MAX_PLY)
       {
@@ -1011,7 +1010,7 @@ moves_loop: // When in check search starts from here
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, isPvDraw);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
@@ -1023,7 +1022,7 @@ moves_loop: // When in check search starts from here
           value = newDepth <   ONE_PLY ?
                             givesCheck ? -qsearch<NonPV,  true>(pos, ss+1, -(alpha+1), -alpha)
                                        : -qsearch<NonPV, false>(pos, ss+1, -(alpha+1), -alpha)
-                                       : - search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, false);
+                                       : - search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, isPvDraw);
 
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
@@ -1036,7 +1035,7 @@ moves_loop: // When in check search starts from here
           value = newDepth <   ONE_PLY ?
                             givesCheck ? -qsearch<PV,  true>(pos, ss+1, -beta, -alpha)
                                        : -qsearch<PV, false>(pos, ss+1, -beta, -alpha)
-                                       : - search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, false);
+                                       : - search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, isPvDraw);
       }
 
       // Step 17. Undo move
