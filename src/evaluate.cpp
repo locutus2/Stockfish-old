@@ -79,7 +79,7 @@ namespace {
   }
 
   using namespace Trace;
-
+  
   // Evaluation class contains various information computed and collected
   // by the evaluation functions.
   template<Tracing T = NO_TRACE>
@@ -212,7 +212,9 @@ namespace {
 
   // LongRangedBishop[not hindered/hindered by center pawns]
   // contains bonuses for bishop which "sees" two center squares
-  const Score LongRangedBishop[] = { S( 27,  0), S(9, 0) };
+  Score LongRangedBishop[] = { S( 27,  0), S(9, 0) };
+  
+  TUNE(SetRange(0, 100), LongRangedBishop);
 
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S( 16,  0);
@@ -904,7 +906,6 @@ namespace {
   }
 
 } // namespace
-
 
 /// evaluate() is the evaluator for the outer world. It returns a static evaluation
 /// of the position from the point of view of the side to move.
