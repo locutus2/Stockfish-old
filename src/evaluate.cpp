@@ -212,7 +212,7 @@ namespace {
 
   // LongRangedBishop[not hindered/hindered by center pawns]
   // contains bonuses for bishop which "sees" two center squares
-  const Score LongRangedBishop[] = { S( 27,  0), S(9, 0) };
+  const Score LongRangedBishop[] = { S( 32,  1), S(8, 1) };
 
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S( 16,  0);
