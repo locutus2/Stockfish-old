@@ -101,9 +101,10 @@ namespace {
     template<Color Us> Score evaluate_space();
     template<Color Us, PieceType Pt> Score evaluate_pieces();
     ScaleFactor evaluate_scale_factor(Value eg);
-    Score evaluate_initiative(Value eg);
+    Score evaluate_initiative(Score score);
 
     // Data members
+    Score kingSafety[COLOR_NB] = { SCORE_ZERO, SCORE_ZERO };
     const Position& pos;
     Material::Entry* me;
     Pawns::Entry* pe;
@@ -522,6 +523,8 @@ namespace {
     if (!(pos.pieces(PAWN) & KingFlank[kf]))
         score -= PawnlessFlank;
 
+    kingSafety[Us] = score;
+
     if (T)
         Trace::add(KING, Us, score);
 
@@ -761,24 +764,29 @@ namespace {
   // status of the players.
 
   template<Tracing T>
-  Score Evaluation<T>::evaluate_initiative(Value eg) {
+  Score Evaluation<T>::evaluate_initiative(Score score) {
 
+    Value mg = mg_value(score);
+    Value eg = eg_value(score);
+    Color weakSideMg = mg < VALUE_DRAW ? WHITE : BLACK;
     int kingDistance =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                       - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
     bool bothFlanks = (pos.pieces(PAWN) & QueenSide) && (pos.pieces(PAWN) & KingSide);
 
     // Compute the initiative bonus for the attacking side
-    int initiative = 8 * (pe->pawn_asymmetry() + kingDistance - 17) + 12 * pos.count<PAWN>() + 16 * bothFlanks;
+    int initiative_eg = 8 * (pe->pawn_asymmetry() + kingDistance - 17) + 12 * pos.count<PAWN>() + 16 * bothFlanks;
+    int initiative_mg = -(172 + mg_value(kingSafety[weakSideMg])) / 8;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
     // that the endgame score will never change sign after the bonus.
-    int v = ((eg > 0) - (eg < 0)) * std::max(initiative, -abs(eg));
+    int u = ((mg > 0) - (mg < 0)) * std::max(initiative_mg, -abs(mg));
+    int v = ((eg > 0) - (eg < 0)) * std::max(initiative_eg, -abs(eg));
 
     if (T)
-        Trace::add(INITIATIVE, make_score(0, v));
+        Trace::add(INITIATIVE, make_score(u, v));
 
-    return make_score(0, v);
+    return make_score(u, v);
   }
 
 
@@ -874,7 +882,7 @@ namespace {
         score +=  evaluate_space<WHITE>()
                 - evaluate_space<BLACK>();
 
-    score += evaluate_initiative(eg_value(score));
+    score += evaluate_initiative(score);
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = evaluate_scale_factor(eg_value(score));
