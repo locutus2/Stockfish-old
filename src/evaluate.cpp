@@ -210,9 +210,9 @@ namespace {
   // KingProtector[PieceType-2] contains a bonus according to distance from king
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
-  // LongRangedBishop[not hindered/hindered by center pawns]
+  // LongRangedBishop[hindered/not hindered by center pawns]
   // contains bonuses for bishop which "sees" two center squares
-  const Score LongRangedBishop[] = { S( 32,  1), S(8, 1) };
+  const Score LongRangedBishop[] = { S(8, 1), S(32, 1) };
 
   // Assorted bonuses and penalties used by evaluation
   const Score MinorBehindPawn     = S( 16,  0);
@@ -359,7 +359,7 @@ namespace {
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 bb = Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s);
                 if (more_than_one(bb))
-                    score += LongRangedBishop[!!(bb & pos.pieces(PAWN))];
+                    score += LongRangedBishop[!(bb & pos.pieces(PAWN))];
             }
 
             // An important Chess960 pattern: A cornered bishop blocked by a friendly
