@@ -99,7 +99,7 @@ struct PieceToHistory : public PieceToBoards {
 struct CapturePieceToHistory : public CapturePieceToBoards {
 
   void update(Piece pc, Square to, PieceType captured, int bonus) {
-    StatCubes::update((*this)[pc][to][captured], bonus, 324, 2);
+    StatCubes::update((*this)[pc][to][captured], bonus, 324, 4);
   }
 };
 
