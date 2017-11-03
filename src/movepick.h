@@ -111,7 +111,7 @@ typedef StatBoards<PIECE_NB, SQUARE_NB, Move> CounterMoveHistory;
 /// ContinuationHistory is the history of a given pair of moves, usually the
 /// current one given a previous one. History table is based on PieceToBoards
 /// instead of ButterflyBoards.
-typedef StatBoards<PIECE_NB, SQUARE_NB, PieceToHistory> ContinuationHistory;
+typedef StatCubes<PIECE_NB, SQUARE_NB, PIECE_TYPE_NB, PieceToHistory> ContinuationHistory;
 
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the

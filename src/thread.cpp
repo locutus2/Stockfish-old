@@ -61,10 +61,11 @@ void Thread::clear() {
   captureHistory.fill(0);
 
   for (auto& to : contHistory)
-      for (auto& h : to)
-          h.fill(0);
+      for (auto& cap : to)
+          for (auto& h : cap)
+              h.fill(0);
 
-  contHistory[NO_PIECE][0].fill(Search::CounterMovePruneThreshold - 1);
+  contHistory[NO_PIECE][0][0].fill(Search::CounterMovePruneThreshold - 1);
 }
 
 /// Thread::start_searching() wakes up the thread that will start the search

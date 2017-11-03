@@ -332,7 +332,7 @@ void Thread::search() {
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
   for (int i = 4; i > 0; i--)
-     (ss-i)->contHistory = &this->contHistory[NO_PIECE][0]; // Use as sentinel
+     (ss-i)->contHistory = &this->contHistory[NO_PIECE][0][0]; // Use as sentinel
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -592,7 +592,7 @@ namespace {
 
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
-    ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
+    ss->contHistory = &thisThread->contHistory[NO_PIECE][0][0];
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -737,7 +737,7 @@ namespace {
         Depth R = ((823 + 67 * depth / ONE_PLY) / 256 + std::min((eval - beta) / PawnValueMg, 3)) * ONE_PLY;
 
         ss->currentMove = MOVE_NULL;
-        ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
+        ss->contHistory = &thisThread->contHistory[NO_PIECE][0][0];
 
         pos.do_null_move(st);
         Value nullValue = depth-R < ONE_PLY ? -qsearch<NonPV, false>(pos, ss+1, -beta, -beta+1)
@@ -779,7 +779,7 @@ namespace {
             if (pos.legal(move))
             {
                 ss->currentMove = move;
-                ss->contHistory = &thisThread->contHistory[pos.moved_piece(move)][to_sq(move)];
+                ss->contHistory = &thisThread->contHistory[pos.moved_piece(move)][to_sq(move)][type_of(pos.piece_on(to_sq(move)))];
 
                 assert(depth >= 5 * ONE_PLY);
                 pos.do_move(move, st);
@@ -946,7 +946,7 @@ moves_loop: // When in check search starts from here
 
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
-      ss->contHistory = &thisThread->contHistory[movedPiece][to_sq(move)];
+      ss->contHistory = &thisThread->contHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))];
 
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
