@@ -37,6 +37,12 @@
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
+const int NN_SIZE = 1;
+const bool NN_LEARN = true;
+const bool NN_RANDOM = true;
+
+NeuralNet NN;
+
 namespace Search {
 
   LimitsType Limits;
@@ -163,6 +169,16 @@ void Search::init() {
   {
       FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
       FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00));
+  }
+
+  // [0] Total 6672469 CramersV(x,y) = 0.158311 error% =71.3293
+
+  if(NN_RANDOM)
+     NN.random_init(NN_SIZE);
+  else
+  {
+     std::vector<double> weights = { 0.271521, 0.728454};
+     NN.init(weights);
   }
 }
 
@@ -512,6 +528,8 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
+    bool checkNull = false, foundNull = false;
+    std::vector<int> C(NN_SIZE);
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -687,6 +705,10 @@ namespace {
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         &&  pos.non_pawn_material(pos.side_to_move()))
     {
+        checkNull = true;
+        foundNull = false;
+
+        C[0] = cutNode;
 
         assert(eval - beta >= 0);
 
@@ -708,14 +730,18 @@ namespace {
                 nullValue = beta;
 
             if (depth < 12 * ONE_PLY && abs(beta) < VALUE_KNOWN_WIN)
-                return nullValue;
+                foundNull = true;
+                //return nullValue;
+            else
+            {
+                // Do verification search at high depths
+                Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta)
+                                            :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, true);
 
-            // Do verification search at high depths
-            Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta)
-                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, true);
-
-            if (v >= beta)
-                return nullValue;
+                if (v >= beta)
+                    foundNull = true;
+                    //return nullValue;
+            }
         }
     }
 
@@ -1073,6 +1099,16 @@ moves_loop: // When in check search starts from here
     // return a fail low score.
 
     assert(moveCount || !inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
+
+    if(moveCount && checkNull)
+    {
+        if(NN_LEARN)
+           NN.learn(C, bestValue >= beta);
+        int label = NN.classify(C);
+       
+        dbg_cramer_of(foundNull, bestValue >= beta, 0);
+         dbg_cramer_of(label, bestValue >= beta, 1);
+    }
 
     if (!moveCount)
         bestValue = excludedMove ? alpha

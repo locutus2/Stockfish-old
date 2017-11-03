@@ -34,9 +34,13 @@ void prefetch(void* addr);
 void prefetch2(void* addr);
 void start_logger(const std::string& fname);
 
-void dbg_hit_on(bool b);
-void dbg_hit_on(bool c, bool b);
-void dbg_mean_of(int v);
+void dbg_hit_on(bool b, int n = 0);
+void dbg_hit_on(bool c, bool b, int n = 0);
+void dbg_mean_of(int v, int n = 0);
+void dbg_std_of(int v, int n = 0);
+void dbg_cov_of(int v, int w, int n = 0);
+void dbg_corr_of(int v, int w, int n = 0);
+void dbg_cramer_of(bool v, bool w, int n = 0);
 void dbg_print();
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
@@ -49,6 +53,7 @@ inline TimePoint now() {
 template<class Entry, int Size>
 struct HashTable {
   Entry* operator[](Key key) { return &table[(uint32_t)key & (Size - 1)]; }
+  void clear() { table.clear(); table.resize(Size); }
 
 private:
   std::vector<Entry> table = std::vector<Entry>(Size);
@@ -103,7 +108,7 @@ public:
 /// logical processor group. This usually means to be limited to use max 64
 /// cores. To overcome this, some special platform specific API should be
 /// called to set group affinity for each thread. Original code from Texel by
-/// Peter Ã–sterlund.
+/// Peter Österlund.
 
 namespace WinProcGroup {
   void bindThisThread(size_t idx);

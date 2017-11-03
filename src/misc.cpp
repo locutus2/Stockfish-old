@@ -41,6 +41,7 @@ typedef bool(*fun3_t)(HANDLE, CONST GROUP_AFFINITY*, PGROUP_AFFINITY);
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <cmath>
 
 #include "misc.h"
 #include "thread.h"
@@ -48,6 +49,8 @@ typedef bool(*fun3_t)(HANDLE, CONST GROUP_AFFINITY*, PGROUP_AFFINITY);
 using namespace std;
 
 namespace {
+
+const int DBG_N = 256;
 
 /// Version number. If Version is left empty, then compile date in the format
 /// DD-MM-YY and show in engine_info.
@@ -63,10 +66,10 @@ struct Tie: public streambuf { // MSVC requires split streambuf for cin and cout
 
   Tie(streambuf* b, streambuf* l) : buf(b), logBuf(l) {}
 
-  int sync() override { return logBuf->pubsync(), buf->pubsync(); }
-  int overflow(int c) override { return log(buf->sputc((char)c), "<< "); }
-  int underflow() override { return buf->sgetc(); }
-  int uflow() override { return log(buf->sbumpc(), ">> "); }
+  int sync() { return logBuf->pubsync(), buf->pubsync(); }
+  int overflow(int c) { return log(buf->sputc((char)c), "<< "); }
+  int underflow() { return buf->sgetc(); }
+  int uflow() { return log(buf->sbumpc(), ">> "); }
 
   streambuf *buf, *logBuf;
 
@@ -140,21 +143,78 @@ const string engine_info(bool to_uci) {
 
 
 /// Debug functions used mainly to collect run-time statistics
-static int64_t hits[2], means[2];
+static int64_t hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], cramer[DBG_N][5];
 
-void dbg_hit_on(bool b) { ++hits[0]; if (b) ++hits[1]; }
-void dbg_hit_on(bool c, bool b) { if (c) dbg_hit_on(b); }
-void dbg_mean_of(int v) { ++means[0]; means[1] += v; }
+void dbg_hit_on(bool b, int n) { ++hits[n][0]; if (b) ++hits[n][1]; }
+void dbg_hit_on(bool c, bool b, int n) { if (c) dbg_hit_on(b, n); }
+void dbg_mean_of(int v, int n) { ++means[n][0]; means[n][1] += v; }
+void dbg_std_of(int v, int n) { ++stds[n][0]; stds[n][1] += v; stds[n][2] += v * v; }
+void dbg_cov_of(int v, int w, int n) { ++covs[n][0]; covs[n][1] += v; covs[n][2] += w; covs[n][3] += v*v; covs[n][4] += w*w; covs[n][5] += v*w;}
+void dbg_corr_of(int v, int w, int n) { ++corrs[n][0]; corrs[n][1] += v; corrs[n][2] += w; corrs[n][3] += v*v; corrs[n][4] += w*w; corrs[n][5] += v*w;}
+void dbg_cramer_of(bool v, bool w, int n) { ++cramer[n][0]; ++cramer[n][2*v+w+1];};
 
 void dbg_print() {
 
-  if (hits[0])
-      cerr << "Total " << hits[0] << " Hits " << hits[1]
-           << " hit rate (%) " << 100 * hits[1] / hits[0] << endl;
+  for(int n = 0; n < DBG_N; ++n)
+    if (hits[n][0])
+        cerr << "[" << n << "] Total " << hits[n][0] << " Hits " << hits[n][1]
+             << " hit rate (%) " << 100. * hits[n][1] / hits[n][0] << endl;
 
-  if (means[0])
-      cerr << "Total " << means[0] << " Mean "
-           << (double)means[1] / means[0] << endl;
+  for(int n = 0; n < DBG_N; ++n)
+    if (means[n][0])
+        cerr << "[" << n << "] Total " << means[n][0] << " Mean "
+             << (double)means[n][1] / means[n][0] << endl;
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (stds[n][0])
+        cerr << "[" << n << "] Total " << stds[n][0] << " Std "
+             << std::sqrt((double)stds[n][2] / stds[n][0] - std::pow((double)stds[n][1] / stds[n][0], 2)) << endl;
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (corrs[n][0])
+    {
+        double x = corrs[n][1] / (double)corrs[n][0];
+        double y = corrs[n][2] / (double)corrs[n][0];
+        double x2 = corrs[n][3] - corrs[n][0] * x * x;
+        double y2 = corrs[n][4] - corrs[n][0] * y * y;
+        double xy = corrs[n][5] - corrs[n][0] * x * y;
+        double w = (y2 - xy) / (x2 + y2 - 2 * xy);
+        cerr << "[" << n << "] Total " << corrs[n][0] << " Correlation(x,y) = "
+             << xy / std::sqrt(x2 * y2)
+             << " y = " << xy / x2
+             << " * x + " << y - x * xy / x2
+             << " x = " << xy / y2
+             << " * y + " << x - y * xy / y2
+             << " var_min with w(x) = " << w << endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (covs[n][0])
+    {
+        double x = covs[n][1] / (double)covs[n][0];
+        double y = covs[n][2] / (double)covs[n][0];
+        double xy = covs[n][5] / (double)covs[n][0] - x * y;
+        cerr << "[" << n << "] Total " << covs[n][0] << " Cov(x,y) = "
+             << xy << endl;
+    }
+    
+  for(int n = 0; n < DBG_N; ++n)
+    if (cramer[n][0])
+    {
+        double a = cramer[n][1];
+        double b = cramer[n][2];
+        double c = cramer[n][3];
+        double d = cramer[n][4];
+        double cr = (a*d-b*c)/std::sqrt((a+b)*(c+d)*(a+c)*(b+d));
+        double ce = 100.*(cramer[n][2]+cramer[n][3])/(double)cramer[n][0];
+        cerr << "[" << n << "] Total " << cramer[n][0] << " CramersV(x,y) = "
+             //<< cramer[n][1] << " "
+             //<< cramer[n][2] << " "
+             //<< cramer[n][3] << " "
+             //<< cramer[n][4] << " "
+             << cr
+             << " error% =" << ce << endl;
+    }
 }
 
 
@@ -207,8 +267,8 @@ void prefetch(void* addr) {
 
 void prefetch2(void* addr) {
 
-  prefetch(addr);
-  prefetch((uint8_t*)addr + 64);
+    prefetch(addr);
+    prefetch((uint8_t*)addr + 64);
 }
 
 namespace WinProcGroup {
@@ -221,7 +281,7 @@ void bindThisThread(size_t) {}
 
 /// get_group() retrieves logical processor information using Windows specific
 /// API and returns the best group id for the thread with index idx. Original
-/// code from Texel by Peter Ã–sterlund.
+/// code from Texel by Peter Österlund.
 
 int get_group(size_t idx) {
 

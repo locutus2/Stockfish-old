@@ -32,6 +32,7 @@
 #include "timeman.h"
 #include "uci.h"
 #include "syzygy/tbprobe.h"
+#include "nn.h"
 
 using namespace std;
 
@@ -175,6 +176,8 @@ namespace {
          << "\nTotal time (ms) : " << elapsed
          << "\nNodes searched  : " << nodes
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+
+    NN.print();
   }
 
 } // namespace

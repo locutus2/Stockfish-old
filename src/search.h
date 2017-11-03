@@ -26,8 +26,11 @@
 #include "misc.h"
 #include "movepick.h"
 #include "types.h"
+#include "nn.h"
 
 class Position;
+
+extern NeuralNet NN;
 
 namespace Search {
 
