@@ -920,9 +920,7 @@ moves_loop: // When in check search starts from here
 
           if (captureOrPromotion)
           {
-              r -= ONE_PLY;
-
-              if (thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 600)
+              if (thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] >= 0)
                   r -= ONE_PLY;
           }
           else
