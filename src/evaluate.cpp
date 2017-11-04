@@ -219,7 +219,7 @@ namespace {
   const Score WeakQueen           = S( 50, 10);
   const Score OtherCheck          = S( 10, 10);
   const Score CloseEnemies        = S(  7,  0);
-  const Score CloseEnemyQueens    = S(  3,  0);
+  const Score CloseEnemyQueens    = S(  1,  0);
   const Score PawnlessFlank       = S( 20, 80);
   const Score ThreatByHangingPawn = S( 71, 61);
   const Score ThreatBySafePawn    = S(192,175);
