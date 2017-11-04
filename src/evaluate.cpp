@@ -219,6 +219,7 @@ namespace {
   const Score WeakQueen           = S( 50, 10);
   const Score OtherCheck          = S( 10, 10);
   const Score CloseEnemies        = S(  7,  0);
+  const Score CloseEnemyQueens    = S(  3,  0);
   const Score PawnlessFlank       = S( 20, 80);
   const Score ThreatByHangingPawn = S( 71, 61);
   const Score ThreatBySafePawn    = S(192,175);
@@ -510,6 +511,9 @@ namespace {
 
     assert(((Us == WHITE ? b << 4 : b >> 4) & b) == 0);
     assert(popcount(Us == WHITE ? b << 4 : b >> 4) == popcount(b));
+
+    // Give extra bonus for attacking queens
+    score -= CloseEnemyQueens * popcount(b & attackedBy[Them][QUEEN]);
 
     // Secondly, add the squares which are attacked twice in that flank and
     // which are not defended by our pawns.
