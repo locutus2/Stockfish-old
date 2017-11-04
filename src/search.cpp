@@ -205,7 +205,8 @@ void MainThread::search() {
   if (Limits.use_time_management())
       timeContempt = 45 * (Limits.time[us] - Limits.time[~us]) / (Limits.time[us] + Limits.time[~us]);
 
-  int contempt = (Options["Contempt"] + timeContempt) * PawnValueEg / 100 ; // From centipawns
+  int contempt =  (Options["Contempt"] + timeContempt)
+                * PawnValueEg * Material::probe(rootPos)->game_phase() / (100 * PHASE_MIDGAME); // From centipawns
   DrawValue[ us] = VALUE_DRAW - Value(contempt);
   DrawValue[~us] = VALUE_DRAW + Value(contempt);
 
