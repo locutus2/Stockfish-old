@@ -920,8 +920,10 @@ moves_loop: // When in check search starts from here
 
           if (captureOrPromotion)
           {
-              if (thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] >= 0)
-                  r -= ONE_PLY;
+              ss->statScore = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] - 300;
+
+              // Decrease/increase reduction for moves with a good/bad history
+              r -= (ss->statScore / 128 + 1) * ONE_PLY;
           }
           else
           {
