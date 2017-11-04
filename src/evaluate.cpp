@@ -512,7 +512,7 @@ namespace {
     assert(((Us == WHITE ? b << 4 : b >> 4) & b) == 0);
     assert(popcount(Us == WHITE ? b << 4 : b >> 4) == popcount(b));
 
-    // Give extra bonus for attacking queens
+    // Give extra penalty for attacking queens
     score -= CloseEnemyQueens * popcount(b & attackedBy[Them][QUEEN]);
 
     // Secondly, add the squares which are attacked twice in that flank and
