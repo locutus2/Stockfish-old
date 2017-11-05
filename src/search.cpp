@@ -203,8 +203,11 @@ void MainThread::search() {
 
   int timeContempt = 0;
   if (Limits.use_time_management())
-      timeContempt = std::max(-8, std::min(8, 40 * (Limits.time[us] - Limits.time[~us]) 
-                                                 / (Limits.time[us] + Limits.time[~us])));
+  {
+      double timeAdvantage = (double)(Limits.time[us] - Limits.time[~us])
+                                   / (Limits.time[us] + Limits.time[~us]);
+      timeContempt = std::max(-8, std::min(8, (int)(1728 * std::pow(timeAdvantage, 3))));
+  }
 
   int contempt = (Options["Contempt"] + timeContempt) * PawnValueEg / 100 ; // From centipawns
   DrawValue[ us] = VALUE_DRAW - Value(contempt);
