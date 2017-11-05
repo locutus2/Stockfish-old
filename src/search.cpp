@@ -203,7 +203,8 @@ void MainThread::search() {
 
   int timeContempt = 0;
   if (Limits.use_time_management())
-      timeContempt = 45 * (Limits.time[us] - Limits.time[~us]) / (Limits.time[us] + Limits.time[~us]);
+      timeContempt = std::max(-8, std::min(8, 48 * (Limits.time[us] - Limits.time[~us]) 
+                                                 / (Limits.time[us] + Limits.time[~us])));
 
   int contempt =  (Options["Contempt"] + timeContempt)
                 * PawnValueEg * Material::probe(rootPos)->game_phase() / (100 * PHASE_MIDGAME); // From centipawns
