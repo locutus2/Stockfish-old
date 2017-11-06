@@ -58,7 +58,8 @@ void Thread::clear() {
 
   counterMoves.fill(MOVE_NONE);
   mainHistory.fill(0);
-  captureHistory.fill(0);
+  captureHistory[0].fill(0);
+  captureHistory[1].fill(0);
 
   for (auto& to : contHistory)
       for (auto& h : to)

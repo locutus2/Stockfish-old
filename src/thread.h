@@ -69,7 +69,7 @@ public:
   Depth rootDepth, completedDepth;
   CounterMoveHistory counterMoves;
   ButterflyHistory mainHistory;
-  CapturePieceToHistory captureHistory;
+  CapturePieceToHistory captureHistory[2];
   ContinuationHistory contHistory;
 };
 
