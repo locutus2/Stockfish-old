@@ -1405,6 +1405,9 @@ moves_loop: // When in check search starts from here
     thisThread->mainHistory[NT].update(c, move, bonus);
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
+    if (bonus > 60)
+        thisThread->mainHistory[NT == NonPV ? PV : NonPV].update(c, move, bonus);
+
     if (is_ok((ss-1)->currentMove))
     {
         Square prevSq = to_sq((ss-1)->currentMove);
@@ -1416,6 +1419,9 @@ moves_loop: // When in check search starts from here
     {
         thisThread->mainHistory[NT].update(c, quiets[i], -bonus);
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+
+        if (bonus > 60)
+            thisThread->mainHistory[NT == NonPV ? PV : NonPV].update(c, quiets[i], -bonus);
     }
   }
 
