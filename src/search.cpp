@@ -886,7 +886,7 @@ moves_loop: // When in check search starts from here
           }
           else if (    depth < 7 * ONE_PLY
                    && !extension
-                   && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY)))
+                   && !pos.see_ge(move, PieceValue[MG][type_of(pos.captured_piece())] - PawnValueEg * (depth / ONE_PLY)))
                   continue;
       }
 
