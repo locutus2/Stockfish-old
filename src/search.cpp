@@ -108,7 +108,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
+  void update_stats(NodeType NT, const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
   bool pv_is_draw(Position& pos);
 
@@ -579,7 +579,7 @@ namespace {
             if (ttValue >= beta)
             {
                 if (!pos.capture_or_promotion(ttMove))
-                    update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
+                    update_stats(NT, pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
                 else
                     update_capture_stats(pos, ttMove, nullptr, 0, stat_bonus(depth));
 
@@ -591,7 +591,7 @@ namespace {
             else if (!pos.capture_or_promotion(ttMove))
             {
                 int penalty = -stat_bonus(depth);
-                thisThread->mainHistory.update(pos.side_to_move(), ttMove, penalty);
+                thisThread->mainHistory[NT].update(pos.side_to_move(), ttMove, penalty);
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
@@ -766,7 +766,7 @@ moves_loop: // When in check search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, ss->killers);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory[NT], &thisThread->captureHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -945,7 +945,7 @@ moves_loop: // When in check search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
-              ss->statScore =  thisThread->mainHistory[~pos.side_to_move()][from_to(move)]
+              ss->statScore =  thisThread->mainHistory[NT][~pos.side_to_move()][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
@@ -1083,7 +1083,7 @@ moves_loop: // When in check search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
+            update_stats(NT, pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
         else
             update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth));
 
@@ -1214,7 +1214,7 @@ moves_loop: // When in check search starts from here
     // to search the moves. Because the depth is <= 0 here, only captures,
     // queen promotions and checks (only if depth >= DEPTH_QS_CHECKS) will
     // be generated.
-    MovePicker mp(pos, ttMove, depth, &pos.this_thread()->mainHistory, &pos.this_thread()->captureHistory, to_sq((ss-1)->currentMove));
+    MovePicker mp(pos, ttMove, depth, &pos.this_thread()->mainHistory[NT], &pos.this_thread()->captureHistory, to_sq((ss-1)->currentMove));
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move()) != MOVE_NONE)
@@ -1391,7 +1391,7 @@ moves_loop: // When in check search starts from here
 
   // update_stats() updates move sorting heuristics when a new quiet best move is found
 
-  void update_stats(const Position& pos, Stack* ss, Move move,
+  void update_stats(NodeType NT, const Position& pos, Stack* ss, Move move,
                     Move* quiets, int quietsCnt, int bonus) {
 
     if (ss->killers[0] != move)
@@ -1402,7 +1402,7 @@ moves_loop: // When in check search starts from here
 
     Color c = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
-    thisThread->mainHistory.update(c, move, bonus);
+    thisThread->mainHistory[NT].update(c, move, bonus);
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
@@ -1414,7 +1414,7 @@ moves_loop: // When in check search starts from here
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
     {
-        thisThread->mainHistory.update(c, quiets[i], -bonus);
+        thisThread->mainHistory[NT].update(c, quiets[i], -bonus);
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }
