@@ -56,7 +56,7 @@ Thread::~Thread() {
 
 void Thread::clear() {
 
-  counterMoves.fill(MOVE_NONE);
+  counterMoves.fill(MoveInfo());
   mainHistory.fill(0);
   captureHistory.fill(0);
 

@@ -68,9 +68,9 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers_p)
-           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch), countermove(cm),
-             killers{killers_p[0], killers_p[1]}, depth(d){
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, MoveInfo cm, Move* killers_p)
+           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch),
+             killers{killers_p[0], killers_p[1]}, countermove(cm), depth(d){
 
   assert(d > DEPTH_ZERO);
 
@@ -213,11 +213,11 @@ Move MovePicker::next_move(bool skipQuiets) {
 
   case COUNTERMOVE:
       ++stage;
-      move = countermove;
+      move = countermove.move;
       if (    move != MOVE_NONE
-          &&  move != ttMove
-          &&  move != killers[0]
-          &&  move != killers[1]
+          && (move != ttMove     || pos.moved_piece(ttMove) != countermove.movedPiece)
+          && (move != killers[0] || pos.moved_piece(killers[0]) != countermove.movedPiece)
+          && (move != killers[1] || pos.moved_piece(killers[1]) != countermove.movedPiece)
           &&  pos.pseudo_legal(move)
           && !pos.capture(move))
           return move;
@@ -240,7 +240,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           if (   move != ttMove
               && move != killers[0]
               && move != killers[1]
-              && move != countermove)
+              && (move != countermove.move || pos.moved_piece(move) != countermove.movedPiece))
               return move;
       }
       ++stage;
