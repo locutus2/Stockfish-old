@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
+    MAIN_SEARCH, CAPTURES_INIT, CAPTURE_COUNTERMOVE, GOOD_CAPTURES, KILLERS, COUNTERMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
     EVASION, EVASIONS_INIT, ALL_EVASIONS,
     PROBCUT, PROBCUT_INIT, PROBCUT_CAPTURES,
     QSEARCH_WITH_CHECKS, QCAPTURES_1_INIT, QCAPTURES_1, QCHECKS,
@@ -68,9 +68,9 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers_p)
-           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch), countermove(cm),
-             killers{killers_p[0], killers_p[1]}, depth(d){
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move ccm, Move* killers_p)
+           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch), countermove(cm), captureCountermove(ccm),
+             killers{killers_p[0], killers_p[1]}, depth(d) {
 
   assert(d > DEPTH_ZERO);
 
@@ -173,11 +173,21 @@ Move MovePicker::next_move(bool skipQuiets) {
       ++stage;
       /* fallthrough */
 
+  case CAPTURE_COUNTERMOVE:
+      ++stage;
+      move = captureCountermove;
+      if(     move != MOVE_NONE
+          &&  move != ttMove
+          &&  pos.pseudo_legal(move)
+          &&  pos.capture_or_promotion(move))
+          return move;
+      /* fallthrough */
+
   case GOOD_CAPTURES:
       while (cur < endMoves)
       {
           move = pick_best(cur++, endMoves);
-          if (move != ttMove)
+          if (move != ttMove && move != captureCountermove)
           {
               if (pos.see_ge(move))
                   return move;
