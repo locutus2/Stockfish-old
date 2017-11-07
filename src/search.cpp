@@ -1376,12 +1376,11 @@ moves_loop: // When in check search starts from here
 
       CapturePieceToHistory& captureHistory =  pos.this_thread()->captureHistory[NT];
       CapturePieceToHistory& otherCaptureHistory =  pos.this_thread()->captureHistory[NT == NonPV ? PV : NonPV];
+      int otherBonus = bonus / 2;
       Piece moved_piece = pos.moved_piece(move);
       PieceType captured = type_of(pos.piece_on(to_sq(move)));
       captureHistory.update(moved_piece,to_sq(move), captured, bonus);
-
-      if (bonus > 60)
-          otherCaptureHistory.update(moved_piece,to_sq(move), captured, bonus);
+      otherCaptureHistory.update(moved_piece,to_sq(move), captured, otherBonus);
 
       // Decrease all the other played capture moves
       for (int i = 0; i < captureCnt; ++i)
@@ -1389,9 +1388,7 @@ moves_loop: // When in check search starts from here
           moved_piece = pos.moved_piece(captures[i]);
           captured = type_of(pos.piece_on(to_sq(captures[i])));
           captureHistory.update(moved_piece, to_sq(captures[i]), captured, -bonus);
-
-          if (bonus > 60)
-              otherCaptureHistory.update(moved_piece, to_sq(captures[i]), captured, -bonus);
+          otherCaptureHistory.update(moved_piece, to_sq(captures[i]), captured, -otherBonus);
       }
   }
 
