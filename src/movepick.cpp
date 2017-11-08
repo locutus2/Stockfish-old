@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVES, QUIET_INIT, QUIET, BAD_CAPTURES,
+    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, FIRST_COUNTERMOVE, OTHER_COUNTERMOVES, QUIET_INIT, QUIET, BAD_CAPTURES,
     EVASION, EVASIONS_INIT, ALL_EVASIONS,
     PROBCUT, PROBCUT_INIT, PROBCUT_CAPTURES,
     QSEARCH_WITH_CHECKS, QCAPTURES_1_INIT, QCAPTURES_1, QCHECKS,
@@ -211,15 +211,31 @@ Move MovePicker::next_move(bool skipQuiets) {
           return move;
       /* fallthrough */
 
-  case COUNTERMOVES:
+  case FIRST_COUNTERMOVE:
+      ++stage;
+      move = countermoves[NO_PIECE_TYPE]; // generic counter move
+      if (    move != MOVE_NONE
+          &&  move != ttMove
+          &&  move != killers[0]
+          &&  move != killers[1]
+          &&  pos.pseudo_legal(move)
+          && !pos.capture(move))
+      {
+          ++stage; // skip other counter moves
+          return move;
+      }
+      /* fallthrough */
+
+  case OTHER_COUNTERMOVES:
       while(++currentPiece <= KING)
       {
           move = countermoves[currentPiece];
           if (    move != MOVE_NONE
+              &&  type_of(pos.moved_piece(move)) == currentPiece
               &&  move != ttMove
               &&  move != killers[0]
               &&  move != killers[1]
-              &&  type_of(pos.moved_piece(move)) == currentPiece
+              &&  move != countermoves[NO_PIECE_TYPE]
               &&  pos.pseudo_legal(move)
               && !pos.capture(move))
               return move;

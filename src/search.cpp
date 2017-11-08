@@ -1408,6 +1408,7 @@ moves_loop: // When in check search starts from here
     if (is_ok((ss-1)->currentMove))
     {
         Square prevSq = to_sq((ss-1)->currentMove);
+        thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][NO_PIECE_TYPE] = move;
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][type_of(pos.moved_piece(move))] = move;
     }
 
