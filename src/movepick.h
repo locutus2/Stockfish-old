@@ -104,9 +104,9 @@ struct CapturePieceToHistory : public CapturePieceToBoards {
   }
 };
 
-/// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
+/// CounterMoveHistory stores two counter moves indexed by [piece][to] of the previous
 /// move, see chessprogramming.wikispaces.com/Countermove+Heuristic
-typedef StatBoards<PIECE_NB, SQUARE_NB, Move> CounterMoveHistory;
+typedef StatBoards<PIECE_NB, SQUARE_NB, std::array<Move, 2>> CounterMoveHistory;
 
 /// ContinuationHistory is the history of a given pair of moves, usually the
 /// current one given a previous one. History table is based on PieceToBoards
@@ -127,7 +127,7 @@ public:
   MovePicker& operator=(const MovePicker&) = delete;
   MovePicker(const Position&, Move, Value, const CapturePieceToHistory*);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*,  const CapturePieceToHistory*, Square);
-  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const CapturePieceToHistory*, const PieceToHistory**, Move, Move*);
+  MovePicker(const Position&, Move, Depth, const ButterflyHistory*, const CapturePieceToHistory*, const PieceToHistory**, const std::array<Move, 2>&, Move*);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -139,7 +139,7 @@ private:
   const ButterflyHistory* mainHistory;
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** contHistory;
-  Move ttMove, countermove, killers[2];
+  Move ttMove, countermoves[2], killers[2];
   ExtMove *cur, *endMoves, *endBadCaptures;
   int stage;
   Square recaptureSquare;

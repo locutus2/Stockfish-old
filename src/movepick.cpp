@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
+    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE1, COUNTERMOVE2, QUIET_INIT, QUIET, BAD_CAPTURES,
     EVASION, EVASIONS_INIT, ALL_EVASIONS,
     PROBCUT, PROBCUT_INIT, PROBCUT_CAPTURES,
     QSEARCH_WITH_CHECKS, QCAPTURES_1_INIT, QCAPTURES_1, QCHECKS,
@@ -68,8 +68,8 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers_p)
-           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch), countermove(cm),
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const std::array<Move,2>& cm, Move* killers_p)
+           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch), countermoves{cm[0], cm[1]},
              killers{killers_p[0], killers_p[1]}, depth(d){
 
   assert(d > DEPTH_ZERO);
@@ -211,9 +211,24 @@ Move MovePicker::next_move(bool skipQuiets) {
           return move;
       /* fallthrough */
 
-  case COUNTERMOVE:
+  case COUNTERMOVE1:
       ++stage;
-      move = countermove;
+      move = countermoves[0];
+      if (    move != MOVE_NONE
+          &&  move != ttMove
+          &&  move != killers[0]
+          &&  move != killers[1]
+          &&  pos.pseudo_legal(move)
+          && !pos.capture(move))
+      {
+          ++stage; // skip second counter move
+          return move;
+      }
+      /* fallthrough */
+
+    case COUNTERMOVE2:
+      ++stage;
+      move = countermoves[0] = countermoves[1];
       if (    move != MOVE_NONE
           &&  move != ttMove
           &&  move != killers[0]
@@ -240,7 +255,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           if (   move != ttMove
               && move != killers[0]
               && move != killers[1]
-              && move != countermove)
+              && move != countermoves[0])
               return move;
       }
       ++stage;
