@@ -263,6 +263,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           if (   move != ttMove
               && move != killers[0]
               && move != killers[1]
+              && move != countermoves[NO_PIECE_TYPE]
               && move != countermoves[type_of(pos.moved_piece(move))])
               return move;
       }
