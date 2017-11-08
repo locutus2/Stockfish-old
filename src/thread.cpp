@@ -20,6 +20,7 @@
 
 #include <algorithm> // For std::count
 #include <cassert>
+#include <iostream>
 
 #include "movegen.h"
 #include "search.h"
@@ -56,7 +57,7 @@ Thread::~Thread() {
 
 void Thread::clear() {
 
-  counterMoves.fill(MOVE_NONE);
+  counterMoves.fill(std::array<Move, PIECE_TYPE_NB>{ {MOVE_NONE, MOVE_NONE, MOVE_NONE, MOVE_NONE, MOVE_NONE, MOVE_NONE, MOVE_NONE} } );
   mainHistory.fill(0);
   captureHistory.fill(0);
 

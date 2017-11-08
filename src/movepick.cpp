@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
+    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVES, QUIET_INIT, QUIET, BAD_CAPTURES,
     EVASION, EVASIONS_INIT, ALL_EVASIONS,
     PROBCUT, PROBCUT_INIT, PROBCUT_CAPTURES,
     QSEARCH_WITH_CHECKS, QCAPTURES_1_INIT, QCAPTURES_1, QCHECKS,
@@ -68,9 +68,9 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers_p)
-           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch), countermove(cm),
-             killers{killers_p[0], killers_p[1]}, depth(d){
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const std::array<Move, PIECE_TYPE_NB>& cm, Move* killers_p)
+           : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch),
+             killers{killers_p[0], killers_p[1]}, countermoves{cm}, depth(d), currentPiece(NO_PIECE_TYPE) {
 
   assert(d > DEPTH_ZERO);
 
@@ -211,16 +211,20 @@ Move MovePicker::next_move(bool skipQuiets) {
           return move;
       /* fallthrough */
 
-  case COUNTERMOVE:
+  case COUNTERMOVES:
+      while(++currentPiece <= KING)
+      {
+          move = countermoves[currentPiece];
+          if (    move != MOVE_NONE
+              &&  move != ttMove
+              &&  move != killers[0]
+              &&  move != killers[1]
+              &&  type_of(pos.moved_piece(move)) == currentPiece
+              &&  pos.pseudo_legal(move)
+              && !pos.capture(move))
+              return move;
+      }
       ++stage;
-      move = countermove;
-      if (    move != MOVE_NONE
-          &&  move != ttMove
-          &&  move != killers[0]
-          &&  move != killers[1]
-          &&  pos.pseudo_legal(move)
-          && !pos.capture(move))
-          return move;
       /* fallthrough */
 
   case QUIET_INIT:
@@ -240,7 +244,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           if (   move != ttMove
               && move != killers[0]
               && move != killers[1]
-              && move != countermove)
+              && move != countermoves[type_of(pos.moved_piece(move))])
               return move;
       }
       ++stage;
