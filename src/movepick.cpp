@@ -70,7 +70,7 @@ namespace {
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
                        const CapturePieceToHistory* cph, const PieceToHistory** ch, const std::array<Move, PIECE_TYPE_NB>& cm, Move* killers_p)
            : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch),
-             killers{killers_p[0], killers_p[1]}, countermoves{cm}, depth(d), currentPiece(NO_PIECE_TYPE) {
+             killers{killers_p[0], killers_p[1]}, countermoves{cm}, depth(d) {
 
   assert(d > DEPTH_ZERO);
 
@@ -213,6 +213,7 @@ Move MovePicker::next_move(bool skipQuiets) {
 
   case FIRST_COUNTERMOVE:
       ++stage;
+      ptCounter = -1;
       move = countermoves[NO_PIECE_TYPE]; // generic counter move
       if (    move != MOVE_NONE
           &&  move != ttMove
@@ -227,11 +228,11 @@ Move MovePicker::next_move(bool skipQuiets) {
       /* fallthrough */
 
   case OTHER_COUNTERMOVES:
-      while(++currentPiece <= KING)
+      while(++ptCounter < pieceTypesCount)
       {
-          move = countermoves[currentPiece];
+          move = countermoves[pieceTypes[ptCounter]];
           if (    move != MOVE_NONE
-              &&  type_of(pos.moved_piece(move)) == currentPiece
+              &&  type_of(pos.moved_piece(move)) == pieceTypes[ptCounter]
               &&  move != ttMove
               &&  move != killers[0]
               &&  move != killers[1]
