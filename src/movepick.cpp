@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE1, COUNTERMOVE2, QUIET_INIT, QUIET, BAD_CAPTURES,
+    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLERS, COUNTERMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
     EVASION, EVASIONS_INIT, ALL_EVASIONS,
     PROBCUT, PROBCUT_INIT, PROBCUT_CAPTURES,
     QSEARCH_WITH_CHECKS, QCAPTURES_1_INIT, QCAPTURES_1, QCHECKS,
@@ -211,7 +211,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           return move;
       /* fallthrough */
 
-  case COUNTERMOVE1:
+  case COUNTERMOVE:
       ++stage;
       move = countermoves[0];
       if (    move != MOVE_NONE
@@ -220,14 +220,8 @@ Move MovePicker::next_move(bool skipQuiets) {
           &&  move != killers[1]
           &&  pos.pseudo_legal(move)
           && !pos.capture(move))
-      {
-          ++stage; // skip second counter move
           return move;
-      }
-      /* fallthrough */
 
-    case COUNTERMOVE2:
-      ++stage;
       move = countermoves[0] = countermoves[1];
       if (    move != MOVE_NONE
           &&  move != ttMove
