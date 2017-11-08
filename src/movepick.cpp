@@ -221,7 +221,7 @@ Move MovePicker::next_move(bool skipQuiets) {
           &&  pos.pseudo_legal(move)
           && !pos.capture(move))
       {
-          ++stage; // skip other counter moves
+          ++stage; // if counter move found skip other counter moves
           return move;
       }
       /* fallthrough */
@@ -238,7 +238,10 @@ Move MovePicker::next_move(bool skipQuiets) {
               &&  move != countermoves[NO_PIECE_TYPE]
               &&  pos.pseudo_legal(move)
               && !pos.capture(move))
+          {
+              ++stage; // if counter move found skip other counter moves
               return move;
+          }
       }
       ++stage;
       /* fallthrough */
