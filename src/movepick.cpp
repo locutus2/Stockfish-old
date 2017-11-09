@@ -193,17 +193,18 @@ Move MovePicker::next_move(bool skipQuiets) {
       }
 
       ++stage;
+      /* fallthrough */
+
+  case KILLERS:
+      ++stage;
       move = killers[0];  // First killer move
       if (    move != MOVE_NONE
           &&  move != ttMove
           &&  pos.pseudo_legal(move)
           && !pos.capture(move))
           return move;
-      /* fallthrough */
-
-  case KILLERS:
-      ++stage;
-      move = killers[1]; // Second killer move
+      
+      move = killers[0] = killers[1]; // Second killer move
       if (    move != MOVE_NONE
           &&  move != ttMove
           &&  pos.pseudo_legal(move)
@@ -217,7 +218,6 @@ Move MovePicker::next_move(bool skipQuiets) {
       if (    move != MOVE_NONE
           &&  move != ttMove
           &&  move != killers[0]
-          &&  move != killers[1]
           &&  pos.pseudo_legal(move)
           && !pos.capture(move))
           return move;
@@ -229,7 +229,6 @@ Move MovePicker::next_move(bool skipQuiets) {
       if (    move != MOVE_NONE
           &&  move != ttMove
           &&  move != killers[0]
-          &&  move != killers[1]
           &&  pos.pseudo_legal(move)
           && !pos.capture(move))
           return move;
@@ -251,7 +250,6 @@ Move MovePicker::next_move(bool skipQuiets) {
 
           if (   move != ttMove
               && move != killers[0]
-              && move != killers[1]
               && move != countermoves[0]
               && move != countermoves[1])
               return move;
