@@ -98,6 +98,7 @@ namespace {
     const Square Up    = (Us == WHITE ? NORTH      : SOUTH);
     const Square Right = (Us == WHITE ? NORTH_EAST : SOUTH_WEST);
     const Square Left  = (Us == WHITE ? NORTH_WEST : SOUTH_EAST);
+    const Bitboard CenterFiles = FileCBB | FileDBB | FileEBB | FileFBB;
 
     Bitboard b, neighbours, stoppers, doubled, supported, phalanx;
     Bitboard lever, leverPush;
@@ -189,7 +190,7 @@ namespace {
         if (lever)
             score += Lever[relative_rank(Us, s)];
 
-        else if(blocked)
+        else if(blocked && (CenterFiles & s))
             e->pawnsOnSquares[Us][!!(DarkSquares & s)]++;
     }
 
