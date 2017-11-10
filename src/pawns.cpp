@@ -190,7 +190,7 @@ namespace {
             score += Lever[relative_rank(Us, s)];
 
         else if(blocked)
-            e->pawnsOnSquares[Us][!!(s & DarkSquares)]++;
+            e->pawnsOnSquares[Us][!!(DarkSquares & s)]++;
     }
 
     return score;
