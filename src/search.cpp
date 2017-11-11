@@ -108,7 +108,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
+  void update_stats(const Position& pos, Depth depth, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
   bool pv_is_draw(Position& pos);
 
@@ -579,7 +579,7 @@ namespace {
             if (ttValue >= beta)
             {
                 if (!pos.capture_or_promotion(ttMove))
-                    update_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
+                    update_stats(pos, depth, ss, ttMove, nullptr, 0, stat_bonus(depth));
 
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -1081,7 +1081,7 @@ moves_loop: // When in check search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
+            update_stats(pos, depth, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
         else
             update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth));
 
@@ -1389,7 +1389,7 @@ moves_loop: // When in check search starts from here
 
   // update_stats() updates move sorting heuristics when a new quiet best move is found
 
-  void update_stats(const Position& pos, Stack* ss, Move move,
+  void update_stats(const Position& pos, Depth depth, Stack* ss, Move move,
                     Move* quiets, int quietsCnt, int bonus) {
 
     if (ss->killers[0] != move)
@@ -1414,7 +1414,8 @@ moves_loop: // When in check search starts from here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         Move prevCM = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-        if(    prevCM == MOVE_NONE
+        if(    depth >= ss->ply * ONE_PLY
+           ||  prevCM == MOVE_NONE
            || !pos.pseudo_legal(prevCM)
            ||    (*(ss-1)->contHistory)[pos.moved_piece(move)][to_sq(move)]
               >= (*(ss-1)->contHistory)[pos.moved_piece(prevCM)][to_sq(prevCM)])
