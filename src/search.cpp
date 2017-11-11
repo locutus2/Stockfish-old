@@ -1403,17 +1403,22 @@ moves_loop: // When in check search starts from here
     thisThread->mainHistory.update(c, move, bonus);
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
-    if (is_ok((ss-1)->currentMove))
-    {
-        Square prevSq = to_sq((ss-1)->currentMove);
-        thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
-    }
-
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->mainHistory.update(c, quiets[i], -bonus);
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+    }
+
+    if (is_ok((ss-1)->currentMove))
+    {
+        Square prevSq = to_sq((ss-1)->currentMove);
+        Move prevCM = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+        if(    prevCM == MOVE_NONE
+           || !pos.pseudo_legal(prevCM)
+           ||    (ss-1)->contHistory[pos.moved_piece(move)][to_sq(move)]
+              >= (ss-1)->contHistory[pos.moved_piece(prevCM)][to_sq(prevCM)])
+            thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
   }
 
