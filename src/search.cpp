@@ -1416,8 +1416,8 @@ moves_loop: // When in check search starts from here
         Move prevCM = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
         if(    prevCM == MOVE_NONE
            || !pos.pseudo_legal(prevCM)
-           ||    (ss-1)->contHistory[pos.moved_piece(move)][to_sq(move)]
-              >= (ss-1)->contHistory[pos.moved_piece(prevCM)][to_sq(prevCM)])
+           ||    (*(ss-1)->contHistory)[pos.moved_piece(move)][to_sq(move)]
+              >= (*(ss-1)->contHistory)[pos.moved_piece(prevCM)][to_sq(prevCM)])
             thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
   }
