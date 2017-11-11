@@ -191,7 +191,7 @@ namespace {
             score += Lever[relative_rank(Us, s)];
 
         else if(blocked && (CenterFiles & s))
-            e->pawnsOnSquares[Us][!!(DarkSquares & s)]++;
+            e->pawnsOnSquares[Us][!!(DarkSquares & s)] += 2;
     }
 
     return score;
