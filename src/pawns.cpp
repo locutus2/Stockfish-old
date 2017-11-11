@@ -98,9 +98,8 @@ namespace {
     const Square Up    = (Us == WHITE ? NORTH      : SOUTH);
     const Square Right = (Us == WHITE ? NORTH_EAST : SOUTH_WEST);
     const Square Left  = (Us == WHITE ? NORTH_WEST : SOUTH_EAST);
-    const Bitboard CenterFiles = FileCBB | FileDBB | FileEBB | FileFBB;
 
-    Bitboard b, neighbours, stoppers, doubled, supported, phalanx, blocked;
+    Bitboard b, neighbours, stoppers, doubled, supported, phalanx;
     Bitboard lever, leverPush;
     Square s;
     bool opposed, backward;
@@ -114,8 +113,8 @@ namespace {
     e->semiopenFiles[Us] = 0xFF;
     e->kingSquares[Us]   = SQ_NONE;
     e->pawnAttacks[Us]   = shift<Right>(ourPawns) | shift<Left>(ourPawns);
-    e->pawnsOnSquares[Us][BLACK] = 2 * popcount(ourPawns & DarkSquares);
-    e->pawnsOnSquares[Us][WHITE] = 2 * pos.count<PAWN>(Us) - e->pawnsOnSquares[Us][BLACK];
+    e->pawnsOnSquares[Us][BLACK] = popcount(ourPawns & DarkSquares);
+    e->pawnsOnSquares[Us][WHITE] = pos.count<PAWN>(Us) - e->pawnsOnSquares[Us][BLACK];
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
@@ -132,7 +131,6 @@ namespace {
         stoppers   = theirPawns & passed_pawn_mask(Us, s);
         lever      = theirPawns & PawnAttacks[Us][s];
         leverPush  = theirPawns & PawnAttacks[Us][s + Up];
-        blocked    = theirPawns & (s + Up);
         doubled    = ourPawns   & (s - Up);
         neighbours = ourPawns   & adjacent_files_bb(f);
         phalanx    = neighbours & rank_bb(s);
@@ -182,20 +180,19 @@ namespace {
             score -= Isolated, e->weakUnopposed[Us] += !opposed;
 
         else if (backward)
+        {
             score -= Backward, e->weakUnopposed[Us] += !opposed;
+
+            if(leverPush)
+                e->pawnsOnSquares[Us][!!(DarkSquares & s)]++;
+        }
 
         if (doubled && !supported)
             score -= Doubled;
 
         if (lever)
             score += Lever[relative_rank(Us, s)];
-
-        else if(blocked && (CenterFiles & s))
-            e->pawnsOnSquares[Us][!(DarkSquares & blocked)]++;
     }
-
-    e->pawnsOnSquares[Us][WHITE] /= 2;
-    e->pawnsOnSquares[Us][BLACK] /= 2;
 
     return score;
   }
