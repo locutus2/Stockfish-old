@@ -183,7 +183,7 @@ namespace {
         {
             score -= Backward, e->weakUnopposed[Us] += !opposed;
 
-            if(leverPush)
+            if(more_than_one(leverPush))
                 e->pawnsOnSquares[Us][!!(DarkSquares & s)]++;
         }
 
