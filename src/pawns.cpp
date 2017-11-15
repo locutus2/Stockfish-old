@@ -51,10 +51,10 @@ namespace {
 
   // Penalties for pawns on a color per file [a/h,b/g,c/f,d/e] (symmetric between a and h file) and rank
   const Score PawnOnSquare[int(FILE_NB) / 2][RANK_NB] = {
-     { S(0, 0), S( 0, 13), S( 5,  9), S( 3, 16), S( 4,  2), S( 7, -7), S( 3,  2) },
-     { S(0, 0), S( 4, 24), S( 9, 20), S( 7, 27), S( 8, 13), S(11,  4), S( 7, 13) },
-     { S(0, 0), S(12, 14), S(17, 10), S(15, 17), S(16,  3), S(19, -6), S(15,  3) },
-     { S(0, 0), S(15, 22), S(20, 18), S(18, 25), S(19, 11), S(22,  2), S(18, 11) }
+     { S(0, 0), S( 1, 12), S( 6,  9), S(-1, 15), S( 2,  0), S( 5, -8), S( 2,  2) },
+     { S(0, 0), S( 4, 24), S(11, 19), S( 8, 23), S( 7, 11), S(11,  4), S( 8, 11) },
+     { S(0, 0), S(13, 14), S(14,  9), S(14, 18), S(15,  3), S(19, -9), S(13,  1) },
+     { S(0, 0), S(16, 20), S(18, 20), S(17, 24), S(19,  9), S(24,  2), S(16, 11) }
    };
 
   // Weakness of our pawn shelter in front of the king by [isKingFile][distance from edge][rank].
