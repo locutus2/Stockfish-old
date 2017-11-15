@@ -49,6 +49,14 @@ namespace {
     S(17, 16), S(33, 32), S(0, 0), S(0, 0)
   };
 
+  // Penalties for pawns on a color per file [a/h,b/g,c/f,d/e] (symmetric between a and h file) and rank
+  const Score PawnOnSquare[int(FILE_NB) / 2][RANK_NB] = {
+     { S(0, 0), S( 0, 13), S( 5,  9), S( 3, 16), S( 4,  2), S( 7, -7), S( 3,  2) },
+     { S(0, 0), S( 4, 24), S( 9, 20), S( 7, 27), S( 8, 13), S(11,  4), S( 7, 13) },
+     { S(0, 0), S(12, 14), S(17, 10), S(15, 17), S(16,  3), S(19, -6), S(15,  3) },
+     { S(0, 0), S(15, 22), S(20, 18), S(18, 25), S(19, 11), S(22,  2), S(18, 11) }
+   };
+
   // Weakness of our pawn shelter in front of the king by [isKingFile][distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawns or our pawn is behind our king.
   const Value ShelterWeakness[][int(FILE_NB) / 2][RANK_NB] = {
@@ -113,8 +121,7 @@ namespace {
     e->semiopenFiles[Us] = 0xFF;
     e->kingSquares[Us]   = SQ_NONE;
     e->pawnAttacks[Us]   = shift<Right>(ourPawns) | shift<Left>(ourPawns);
-    e->pawnsOnSquares[Us][BLACK] = popcount(ourPawns & DarkSquares);
-    e->pawnsOnSquares[Us][WHITE] = pos.count<PAWN>(Us) - e->pawnsOnSquares[Us][BLACK];
+    e->pawnsOnSquaresScore[Us][WHITE] = e->pawnsOnSquaresScore[Us][BLACK] = SCORE_ZERO;
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
@@ -122,9 +129,13 @@ namespace {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
         File f = file_of(s);
+        int edgeDist = std::min(f, FILE_H - f);
+        Rank r = relative_rank(Us, s);
+        Color c = DarkSquares & s ? BLACK : WHITE;
 
         e->semiopenFiles[Us]   &= ~(1 << f);
         e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
+        e->pawnsOnSquaresScore[Us][c] += PawnOnSquare[edgeDist][r];
 
         // Flag the pawn
         opposed    = theirPawns & forward_file_bb(Us, s);
@@ -138,7 +149,7 @@ namespace {
 
         // A pawn is backward when it is behind all pawns of the same color on the
         // adjacent files and cannot be safely advanced.
-        if (!neighbours || lever || relative_rank(Us, s) >= RANK_5)
+        if (!neighbours || lever || r >= RANK_5)
             backward = false;
         else
         {
@@ -164,7 +175,7 @@ namespace {
             e->passedPawns[Us] |= s;
 
         else if (   stoppers == SquareBB[s + Up]
-                 && relative_rank(Us, s) >= RANK_5)
+                 && r >= RANK_5)
         {
             b = shift<Up>(supported) & ~theirPawns;
             while (b)
@@ -174,7 +185,7 @@ namespace {
 
         // Score this pawn
         if (supported | phalanx)
-            score += Connected[opposed][!!phalanx][popcount(supported)][relative_rank(Us, s)];
+            score += Connected[opposed][!!phalanx][popcount(supported)][r];
 
         else if (!neighbours)
             score -= Isolated, e->weakUnopposed[Us] += !opposed;
@@ -186,7 +197,7 @@ namespace {
             score -= Doubled;
 
         if (lever)
-            score += Lever[relative_rank(Us, s)];
+            score += Lever[r];
     }
 
     return score;
