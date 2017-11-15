@@ -754,7 +754,7 @@ namespace {
     int kingDistance =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                       - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
     bool bothFlanks = (pos.pieces(PAWN) & QueenSide) && (pos.pieces(PAWN) & KingSide);
-    bool imbalance =  !pos.pieces(WHITE, QUEEN) != !pos.pieces(BLACK, QUEEN);
+    bool imbalance =  !pos.pieces(WHITE, ROOK) != !pos.pieces(BLACK, ROOK);
 
     // Compute the initiative bonus for the attacking side
     int initiative =   8 * (pe->pawn_asymmetry() + kingDistance + imbalance - 18)
