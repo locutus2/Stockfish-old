@@ -215,7 +215,7 @@ namespace {
   const Score BishopPawns         = S(  8, 12);
   const Score LongRangedBishop    = S( 22,  0);
   const Score RookOnPawn          = S(  8, 24);
-  const Score RookOpenFiles       = S(  5,  5);
+  const Score RookOpenFiles       = S(  8,  8);
   const Score TrappedRook         = S( 92,  0);
   const Score WeakQueen           = S( 50, 10);
   const Score OtherCheck          = S( 10, 10);
