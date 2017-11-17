@@ -125,7 +125,7 @@ namespace {
     return bonus;
   }
 
-  TUNE(SetRange(-200, 200), PawnSet);
+  TUNE(SetRange(-400, 400), PawnSet);
 } // namespace
 
 namespace Material {
