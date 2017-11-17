@@ -757,8 +757,8 @@ namespace {
     bool imbalance =  !pos.pieces(WHITE, QUEEN) != !pos.pieces(BLACK, QUEEN);
 
     // Compute the initiative bonus for the attacking side
-    int initiative =   8 * (pe->pawn_asymmetry() + kingDistance + imbalance - 18)
-                    + 12 *  pos.count<PAWN>()
+    int initiative =   8 * (pe->pawn_asymmetry() + kingDistance - 18)
+                    + 12 * (pos.count<PAWN>() + imbalance)
                     + 16 *  bothFlanks;
 
     // Now apply the bonus: note that we find the attacking side by extracting
