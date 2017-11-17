@@ -24,6 +24,7 @@
 
 #include "material.h"
 #include "thread.h"
+#include "tune.h"
 
 using namespace std;
 
@@ -54,8 +55,8 @@ namespace {
   };
 
   // PawnSet[pawn count] contains a bonus/malus indexed by number of pawns
-  const int PawnSet[] = {
-    24, -32, 107, -51, 117, -9, -126, -21, 31
+  int PawnSet[] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0
   };
 
   // QueenMinorsImbalance[opp_minor_count] is applied when only one side has a queen.
@@ -124,6 +125,7 @@ namespace {
     return bonus;
   }
 
+  TUNE(SetRange(-200, 200), PawnSet);
 } // namespace
 
 namespace Material {
