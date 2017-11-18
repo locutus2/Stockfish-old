@@ -802,7 +802,7 @@ namespace {
             return ScaleFactor(37 + 7 * pos.count<PAWN>(strongSide));
     }
 
-    return ScaleFactor(sf * (me->game_phase() + 7 * PHASE_MIDGAME) / (8 * PHASE_MIDGAME));
+    return ScaleFactor(sf * (me->game_phase() + 15 * PHASE_MIDGAME) / (16 * PHASE_MIDGAME));
   }
 
 
