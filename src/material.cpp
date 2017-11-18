@@ -55,7 +55,7 @@ namespace {
 
   // PawnSet[pawn count] contains a bonus/malus indexed by number of pawns
   const int PawnSet[] = {
-    24, -32, 107, -51, 117, -9, -126, -21, 31
+    123, 66, 47, 54, 89, 61, 90, 119, -87
   };
 
   // QueenMinorsImbalance[opp_minor_count] is applied when only one side has a queen.
