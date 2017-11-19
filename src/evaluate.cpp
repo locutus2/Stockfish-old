@@ -884,11 +884,21 @@ namespace {
         Trace::add(TOTAL, score);
     }
 
-    return (pos.side_to_move() == WHITE ? v : -v) + Eval::Tempo; // Side to move point of view
+    return (pos.side_to_move() == WHITE ? v : -v) + Eval::tempo(pos); // Side to move point of view
   }
 
 } // namespace
 
+/// tempo() computes a position based tempo
+
+Value Eval::tempo(const Position& pos)
+{
+   const Material::Entry* me = Material::probe(pos);
+   const int phase = me->game_phase();
+   const int pawns = pos.count<PAWN>();
+   return Value(  (10 * pawns + 14 * (16 - pawns)) / 16
+                + (14 * phase +  8 * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME);
+}
 
 /// evaluate() is the evaluator for the outer world. It returns a static evaluation
 /// of the position from the point of view of the side to move.
