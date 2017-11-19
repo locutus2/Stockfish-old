@@ -21,6 +21,7 @@
 #include <algorithm> // For std::count
 #include <cassert>
 
+#include "material.h"
 #include "movegen.h"
 #include "search.h"
 #include "thread.h"
@@ -187,6 +188,7 @@ void ThreadPool::start_thinking(Position& pos, StateListPtr& states,
       th->rootDepth = th->completedDepth = DEPTH_ZERO;
       th->rootMoves = rootMoves;
       th->rootPos.set(pos.fen(), pos.is_chess960(), &setupStates->back(), th);
+      th->rootGamePhase = Material::probe(th->rootPos)->game_phase();
   }
 
   setupStates->back() = tmp;

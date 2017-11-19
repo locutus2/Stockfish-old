@@ -28,6 +28,7 @@
 #include "evaluate.h"
 #include "material.h"
 #include "pawns.h"
+#include "thread.h"
 
 namespace {
 
@@ -866,7 +867,7 @@ namespace {
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = evaluate_scale_factor(eg_value(score));
-    v =  mg_value(score) * int(me->game_phase())
+    v =  mg_value(score) * int(pos.this_thread()->rootGamePhase)
        + eg_value(score) * int(PHASE_MIDGAME - me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
 
     v /= int(PHASE_MIDGAME);
