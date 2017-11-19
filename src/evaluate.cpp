@@ -894,8 +894,7 @@ namespace {
 Value Eval::tempo(const Position& pos)
 {
    const Material::Entry* me = Material::probe(pos);
-   return Value(  (56 - pos.count<PAWN>()) / 4
-                + (6 * me->game_phase() +  8 * PHASE_MIDGAME) / PHASE_MIDGAME);
+   return Value(22 - pos.count<PAWN>() / 4 + 6 * me->game_phase() / PHASE_MIDGAME);
 }
 
 /// evaluate() is the evaluator for the outer world. It returns a static evaluation
