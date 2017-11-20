@@ -893,7 +893,7 @@ namespace {
 
 Value Eval::tempo(const Position& pos)
 {
-   return Value(28 - pos.count<PAWN>() / 2);
+   return Value(20 + pos.count<PAWN>() / 2);
 }
 
 /// evaluate() is the evaluator for the outer world. It returns a static evaluation
