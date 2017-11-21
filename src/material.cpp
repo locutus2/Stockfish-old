@@ -56,7 +56,7 @@ namespace {
   // QueenMinorsImbalance[opp_minor_count] is applied when only one side has a queen.
   // It contains a bonus/malus for the side with the queen.
   const int QueenMinorsImbalance[13] = {
-    31, -8, -15, -3072, -3072, -3072, -3072, -3072, -3072, -3072, -3072, -3072, -3072
+    31, -8, -1024, -3072, -3072, -3072, -3072, -3072, -3072, -3072, -3072, -3072, -3072
   };
 
   // Endgame evaluation and scaling functions are accessed directly and not through
