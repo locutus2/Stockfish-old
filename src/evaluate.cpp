@@ -211,23 +211,24 @@ namespace {
   const Score KingProtector[] = { S(-3, -5), S(-4, -3), S(-3, 0), S(-1, 1) };
 
   // Assorted bonuses and penalties used by evaluation
-  const Score MinorBehindPawn     = S( 16,  0);
-  const Score BishopPawns         = S(  8, 12);
-  const Score LongRangedBishop    = S( 22,  0);
-  const Score RookOnPawn          = S(  8, 24);
-  const Score TrappedRook         = S( 92,  0);
-  const Score WeakQueen           = S( 50, 10);
-  const Score OtherCheck          = S( 10, 10);
-  const Score CloseEnemies        = S(  7,  0);
-  const Score PawnlessFlank       = S( 20, 80);
-  const Score ThreatByHangingPawn = S( 71, 61);
-  const Score ThreatBySafePawn    = S(192,175);
-  const Score ThreatByRank        = S( 16,  3);
-  const Score Hanging             = S( 48, 27);
-  const Score WeakUnopposedPawn   = S(  5, 25);
-  const Score ThreatByPawnPush    = S( 38, 22);
-  const Score HinderPassedPawn    = S(  7,  0);
-  const Score TrappedBishopA1H1   = S( 50, 50);
+  const Score MinorBehindPawn      = S( 16,  0);
+  const Score BishopPawns          = S(  8, 12);
+  const Score LongRangedBishop     = S( 22,  0);
+  const Score RookOnPawn           = S(  8, 24);
+  const Score TrappedRook          = S( 92,  0);
+  const Score WeakQueen            = S( 50, 10);
+  const Score OtherCheck           = S( 10, 10);
+  const Score CloseEnemies         = S(  7,  0);
+  const Score PawnlessFlank        = S( 20, 80);
+  const Score ThreatByHangingPawn  = S( 71, 61);
+  const Score ThreatBySafePawn     = S(192,175);
+  const Score ThreatByRank         = S( 16,  3);
+  const Score Hanging              = S( 48, 27);
+  const Score WeakUnopposedPawn    = S(  5, 25);
+  const Score ThreatByPawnPush     = S( 38, 22);
+  const Score HinderPassedPawn     = S(  7,  0);
+  const Score TrappedBishopA1H1    = S( 50, 50);
+  const Score QueenMinorsImbalance = S( 20, 20);
 
   #undef S
   #undef V
@@ -400,6 +401,10 @@ namespace {
             Bitboard pinners;
             if (pos.slider_blockers(pos.pieces(Them, ROOK, BISHOP), s, pinners))
                 score -= WeakQueen;
+
+            // Bonus for open files in a queen vs 3 minors imbalance
+            if (!pos.pieces(Them, QUEEN) && pos.count<KNIGHT>(Them) + pos.count<BISHOP>(Them) >= 3)
+                score += QueenMinorsImbalance * pe->open_files();
         }
     }
 
