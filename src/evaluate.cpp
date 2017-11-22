@@ -328,7 +328,7 @@ namespace {
         mobility[Us] += MobilityBonus[Pt - 2][mob];
         if (Pt == QUEEN && !pos.pieces(Them, QUEEN))
             mobility[Us] += make_score(   mg_value(MobilityBonus[Pt - 2][mob])
-                                       * (pos.count<KNIGHT>(Them) + pos.count<BISHOP>(Them)) / 3, 0);
+                                       * (pos.count<KNIGHT>(Them) + pos.count<BISHOP>(Them)) / 6, 0);
 
         // Bonus for this piece as a king protector
         score += KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
