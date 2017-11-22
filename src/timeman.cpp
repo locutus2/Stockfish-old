@@ -65,7 +65,7 @@ namespace {
     }
 
     if (myTime > oppTime)
-        ratio *= 1 + 0.5 * (myTime - oppTime) / (myTime + oppTime);
+        ratio *= 1 + 0.2 * (myTime - oppTime) / (myTime + oppTime);
 
     int time = int(std::min(1.0, ratio) * std::max(0, myTime - moveOverhead));
 
