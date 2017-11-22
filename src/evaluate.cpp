@@ -228,6 +228,7 @@ namespace {
   const Score ThreatByPawnPush    = S( 38, 22);
   const Score HinderPassedPawn    = S(  7,  0);
   const Score TrappedBishopA1H1   = S( 50, 50);
+  const Score QueenMinorMobility  = S( 70,125);
 
   #undef S
   #undef V
@@ -326,8 +327,11 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
+
+        // If opponent have no queens correct mobility based on number of opponents minors
         if (Pt == QUEEN && !pos.pieces(Them, QUEEN))
-            mobility[Us] += MobilityBonus[Pt - 2][mob] * (pos.count<KNIGHT>(Them) + pos.count<BISHOP>(Them)) / 6;
+            mobility[Us] +=  (MobilityBonus[Pt - 2][mob] - QueenMinorMobility)
+                           * (pos.count<KNIGHT>(Them) + pos.count<BISHOP>(Them)) / 3;
 
         // Bonus for this piece as a king protector
         score += KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
