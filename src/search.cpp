@@ -96,7 +96,6 @@ namespace {
     Move best = MOVE_NONE;
   };
 
-  Value DrawValue[COLOR_NB];
   Value Contempt[COLOR_NB];
 
   template <NodeType NT>
@@ -186,10 +185,17 @@ void Search::clear() {
 }
 
 
-/// Search::contempt calculates the dynamic contempt for given side
+/// Search::contempt() calculates the dynamic contempt for given side
 
 Value Search::contempt(const Position& pos, Color c) {
    return Contempt[c] * Material::probe(pos)->game_phase() / PHASE_MIDGAME;
+}
+
+
+/// draw_value() calculates the dynamic draw value
+
+Value draw_value(const Position& pos) {
+   return VALUE_DRAW - contempt(pos, pos.side_to_move());
 }
 
 
@@ -212,8 +218,6 @@ void MainThread::search() {
   int base_contempt = Options["Contempt"] * PawnValueEg / 100; // From centipawns
   Contempt[ us] =  Value(base_contempt);
   Contempt[~us] = -Value(base_contempt);
-  DrawValue[ us] = VALUE_DRAW - contempt(rootPos, us);
-  DrawValue[~us] = VALUE_DRAW + contempt(rootPos, us);
 
   if (rootMoves.empty())
   {
@@ -454,7 +458,7 @@ void Thread::search() {
               int improvingFactor = std::max(229, std::min(715, 357 + 119 * F[0] - 6 * F[1]));
 
               Color us = rootPos.side_to_move();
-              bool thinkHard =    DrawValue[us] == bestValue
+              bool thinkHard =    draw_value(rootPos) == bestValue
                                && Limits.time[us] - Time.elapsed() > Limits.time[~us]
                                && ::pv_is_draw(rootPos);
 
@@ -543,7 +547,7 @@ namespace {
         // Step 2. Check for aborted search and immediate draw
         if (Threads.stop.load(std::memory_order_relaxed) || pos.is_draw(ss->ply) || ss->ply >= MAX_PLY)
             return ss->ply >= MAX_PLY && !inCheck ? evaluate(pos)
-                                                  : DrawValue[pos.side_to_move()];
+                                                  : draw_value(pos);
 
         // Step 3. Mate distance pruning. Even if we mate at the next move our score
         // would be at best mate_in(ss->ply+1), but if alpha is already bigger because
@@ -1086,7 +1090,7 @@ moves_loop: // When in check search starts from here
 
     if (!moveCount)
         bestValue = excludedMove ? alpha
-                   :     inCheck ? mated_in(ss->ply) : DrawValue[pos.side_to_move()];
+                   :     inCheck ? mated_in(ss->ply) : draw_value(pos);
     else if (bestMove)
     {
         // Quiet best move: update move sorting heuristics
@@ -1155,7 +1159,7 @@ moves_loop: // When in check search starts from here
     // Check for an instant draw or if the maximum ply has been reached
     if (pos.is_draw(ss->ply) || ss->ply >= MAX_PLY)
         return ss->ply >= MAX_PLY && !InCheck ? evaluate(pos)
-                                              : DrawValue[pos.side_to_move()];
+                                              : draw_value(pos);
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
