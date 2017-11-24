@@ -30,6 +30,8 @@
 #include "pawns.h"
 #include "search.h"
 
+Value Eval::Contempt[COLOR_NB];
+
 namespace {
 
   const Bitboard Center      = (FileDBB | FileEBB) & (Rank4BB | Rank5BB);
@@ -834,7 +836,8 @@ namespace {
     score += pe->pawns_score();
 
     // Early exit if score is high
-    Value v = (mg_value(score) + eg_value(score)) / 2 + Search::contempt(pos, WHITE);
+    Value theContempt = Eval::contempt(me->game_phase(), WHITE);
+    Value v = (mg_value(score) + eg_value(score)) / 2 + theContempt;
     if (abs(v) > LazyThreshold)
        return pos.side_to_move() == WHITE ? v : -v;
 
@@ -872,7 +875,7 @@ namespace {
 
     v /= int(PHASE_MIDGAME);
 
-    v += Search::contempt(pos, WHITE);
+    v += theContempt;
 
     // In case of tracing add all remaining individual evaluation terms
     if (T)
@@ -900,6 +903,14 @@ Value Eval::evaluate(const Position& pos)
 {
    return Evaluation<>(pos).value();
 }
+
+
+/// Eval::contempt calculates the dynamic contempt of a position for the given side
+
+Value Eval::contempt(Phase phase, Color c) {
+   return Contempt[c] * phase / PHASE_MIDGAME;
+}
+
 
 /// trace() is like evaluate(), but instead of returning a value, it returns
 /// a string (suitable for outputting to stdout) that contains the detailed

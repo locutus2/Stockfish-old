@@ -30,10 +30,14 @@ class Position;
 namespace Eval {
 
 const Value Tempo = Value(20); // Must be visible to search
+extern Value Contempt[COLOR_NB];
 
 std::string trace(const Position& pos);
 
 Value evaluate(const Position& pos);
+
+Value contempt(Phase phase, Color c);
+
 }
 
 #endif // #ifndef EVALUATE_H_INCLUDED
