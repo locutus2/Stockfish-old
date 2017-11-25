@@ -37,9 +37,9 @@
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
-const int NN_SIZE = 1;
+const int NN_SIZE = 14;
 const bool NN_LEARN = true;
-const bool NN_RANDOM = true;
+const bool NN_RANDOM = false;
 
 NeuralNet NN;
 
@@ -177,7 +177,12 @@ void Search::init() {
      NN.random_init(NN_SIZE);
   else
   {
-     std::vector<double> weights = { 0.271521, 0.728454};
+     //std::vector<double> weights = { 0.089887, -0.209518, 0.0701682, 0.0912097, 0.0817212, 0.0682275, 0.0492132, 0.0929467,
+     //                                0.0989638, 0.104426, 0.0832702, 0.0808481, 0.0644329, 0.0329386, 0.836806};
+     //std::vector<double> weights = {  0.0750133, -0.0666055, 0.0688112, 0.0878637, 0.0846648, 0.0593024, 0.0523801, 0.0684525,
+     //                                 0.0764165, 0.0773802, 0.0758497, 0.0643826, 0.0325501, 0.0329386, 0.842345};
+      std::vector<double> weights = {   0.0750133, -0.0665947, 0.0688216, 0.0878741, 0.0846752, 0.0593129, 0.0523906, 0.0684629,
+                                        0.076427, 0.0773907, 0.0758603, 0.0643949, 0.0324221, 0.0329386, 0.842334};
      NN.init(weights);
   }
 }
@@ -709,6 +714,19 @@ namespace {
         foundNull = false;
 
         C[0] = cutNode;
+        C[1] = depth == 1 * ONE_PLY;
+        C[2] = depth == 2 * ONE_PLY;
+        C[3] = depth == 3 * ONE_PLY;
+        C[4] = depth == 4 * ONE_PLY;
+        C[5] = depth == 5 * ONE_PLY;
+        C[6] = depth == 6 * ONE_PLY;
+        C[7] = depth == 7 * ONE_PLY;
+        C[8] = depth == 8 * ONE_PLY;
+        C[9] = depth == 9 * ONE_PLY;
+        C[10] = depth == 10 * ONE_PLY;
+        C[11] = depth == 11 * ONE_PLY;
+        C[12] = depth == 12 * ONE_PLY;
+        C[13] = depth == 13 * ONE_PLY;
 
         assert(eval - beta >= 0);
 
@@ -730,8 +748,12 @@ namespace {
                 nullValue = beta;
 
             if (depth < 12 * ONE_PLY && abs(beta) < VALUE_KNOWN_WIN)
-                foundNull = true;
-                //return nullValue;
+            {
+                if(checkNull)
+                    foundNull = true;
+                else
+                    return nullValue;
+            }
             else
             {
                 // Do verification search at high depths
@@ -739,8 +761,12 @@ namespace {
                                             :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, true);
 
                 if (v >= beta)
-                    foundNull = true;
-                    //return nullValue;
+                {
+                    if(checkNull)
+                        foundNull = true;
+                    else
+                        return nullValue;
+                }
             }
         }
     }
@@ -1100,14 +1126,17 @@ moves_loop: // When in check search starts from here
 
     assert(moveCount || !inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
 
-    if(moveCount && checkNull)
+    if(moveCount && checkNull && foundNull)
     {
         if(NN_LEARN)
            NN.learn(C, bestValue >= beta);
         int label = NN.classify(C);
        
-        dbg_cramer_of(foundNull, bestValue >= beta, 0);
-         dbg_cramer_of(label, bestValue >= beta, 1);
+        //dbg_cramer_of(foundNull, bestValue >= beta, 0);
+        dbg_hit_on(foundNull, bestValue >= beta, 0);
+        dbg_cramer_of(label, bestValue >= beta, 0);
+        dbg_hit_on(foundNull, bestValue >= beta, depth);
+        dbg_cramer_of(label, bestValue >= beta, depth);
     }
 
     if (!moveCount)
