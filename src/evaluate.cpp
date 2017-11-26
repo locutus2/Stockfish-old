@@ -231,6 +231,7 @@ namespace {
   const Score WeakUnopposedPawn     = S(  5, 25);
   const Score ThreatByPawnPush      = S( 38, 22);
   const Score ThreatByAttackOnQueen = S( 38, 22);
+  const Score ThreatByKnightAttackOnQueen = S(19, 11);
   const Score HinderPassedPawn      = S(  7,  0);
   const Score TrappedBishopA1H1     = S( 50, 50);
 
@@ -623,14 +624,18 @@ namespace {
 
     score += ThreatByPawnPush * popcount(b);
 
-    // Add a bonus for safe attack threats from knights, bishops and rooks on opponent queen
+    // Add a bonus for safe attack threats from bishops and rooks on opponent queen
     b =  ~pos.pieces(Us) & ~attackedBy2[Them] & attackedBy2[Us]
        & (  (attackedBy[Us][BISHOP] & attackedBy[Them][QUEEN_DIAGONAL])
           | (attackedBy[Us][ROOK  ] & attackedBy[Them][QUEEN] & ~attackedBy[Them][QUEEN_DIAGONAL]));
-    b |=  ~pos.pieces(Us) & ~attackedBy[Them][ALL_PIECES]
-         & attackedBy[Us][KNIGHT] & knightAttacksQueen[Us];
 
     score += ThreatByAttackOnQueen * popcount(b);
+
+    // ... and add a different bonus for safe attack threats from knights on opponent queen
+    b = ~pos.pieces(Us) & ~attackedBy[Them][ALL_PIECES]
+       & attackedBy[Us][KNIGHT] & knightAttacksQueen[Us];
+
+    score += ThreatByKnightAttackOnQueen * popcount(b);
 
     if (T)
         Trace::add(THREAT, Us, score);
