@@ -119,6 +119,10 @@ namespace {
     // pawn or squares attacked by 2 pawns are not explicitly added.
     Bitboard attackedBy2[COLOR_NB];
 
+    // knightAttacksQueen[color] are the squares from where a knight could
+    // attack an opponent queen.
+    Bitboard knightAttacksQueen[COLOR_NB];
+
     // kingRing[color] is the zone around the king which is considered
     // by the king safety evaluation. This consists of the squares directly
     // adjacent to the king, and (only for a king on its first rank) the
@@ -305,7 +309,7 @@ namespace {
     attackedBy[Us][Pt] = 0;
 
     if (Pt == QUEEN)
-        attackedBy[Us][QUEEN_DIAGONAL] = 0;
+        attackedBy[Us][QUEEN_DIAGONAL] = knightAttacksQueen[Them] = 0;
 
     while ((s = *pl++) != SQ_NONE)
     {
@@ -321,7 +325,10 @@ namespace {
         attackedBy[Us][ALL_PIECES] |= attackedBy[Us][Pt] |= b;
 
         if (Pt == QUEEN)
+        {
             attackedBy[Us][QUEEN_DIAGONAL] |= b & PseudoAttacks[BISHOP][s];
+            knightAttacksQueen[Them] |= pos.attacks_from<KNIGHT>(s);
+        }
 
         if (b & kingRing[Them])
         {
@@ -616,12 +623,14 @@ namespace {
 
     score += ThreatByPawnPush * popcount(b);
 
-    // Add a bonus for safe slider attack threats on opponent queen
-    safeThreats = ~pos.pieces(Us) & ~attackedBy2[Them] & attackedBy2[Us];
-    b =  (attackedBy[Us][BISHOP] & attackedBy[Them][QUEEN_DIAGONAL])
-       | (attackedBy[Us][ROOK  ] & attackedBy[Them][QUEEN] & ~attackedBy[Them][QUEEN_DIAGONAL]);
+    // Add a bonus for safe attack threats from knights, bishops and rooks on opponent queen
+    b =  ~pos.pieces(Us) & ~attackedBy2[Them] & attackedBy2[Us]
+       & (  (attackedBy[Us][BISHOP] & attackedBy[Them][QUEEN_DIAGONAL])
+          | (attackedBy[Us][ROOK  ] & attackedBy[Them][QUEEN] & ~attackedBy[Them][QUEEN_DIAGONAL]));
+    b |=  ~pos.pieces(Us) & ~attackedBy[Them][ALL_PIECES]
+         & attackedBy[Us][KNIGHT] & knightAttacksQueen[Us];
 
-    score += ThreatByAttackOnQueen * popcount(b & safeThreats);
+    score += ThreatByAttackOnQueen * popcount(b);
 
     if (T)
         Trace::add(THREAT, Us, score);
