@@ -229,7 +229,7 @@ namespace {
   const Score WeakUnopposedPawn     = S(  5, 25);
   const Score ThreatByPawnPush      = S( 38, 22);
   const Score ThreatByAttackOnQueen = S( 38, 22);
-  const Score ThreatByAttackOnRook  = S( 28, 16);
+  const Score ThreatByAttackOnRook  = S( 13,  7);
   const Score HinderPassedPawn      = S(  7,  0);
   const Score TrappedBishopA1H1     = S( 50, 50);
 
@@ -309,6 +309,7 @@ namespace {
 
     if (Pt == QUEEN)
         attackedBy[Us][QUEEN_DIAGONAL] = 0;
+
     else if (Pt == ROOK)
         diagonalAttackOnRook[Us] = 0;
 
