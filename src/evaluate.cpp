@@ -227,7 +227,7 @@ namespace {
   const Score WeakUnopposedPawn   = S(  5, 25);
   const Score ThreatByPawnPush    = S( 38, 22);
   const Score HinderPassedPawn    = S(  7,  0);
-  const Score DistantPassedPawns  = S(  0, 10);
+  const Score DistantPassedPawns  = S(  0, 20);
   const Score TrappedBishopA1H1   = S( 50, 50);
 
   #undef S
@@ -704,7 +704,7 @@ namespace {
 
     int passedPawnsSpan = rightMostFile - leftMostFile;
     if(passedPawnsSpan > 1)
-       score += DistantPassedPawns * passedPawnsSpan;
+       score += DistantPassedPawns;
 
     if (T)
         Trace::add(PASSED, Us, score);
