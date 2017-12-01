@@ -227,6 +227,7 @@ namespace {
   const Score WeakUnopposedPawn   = S(  5, 25);
   const Score ThreatByPawnPush    = S( 38, 22);
   const Score HinderPassedPawn    = S(  7,  0);
+  const Score DistantPassedPawns  = S(  0, 10);
   const Score TrappedBishopA1H1   = S( 50, 50);
 
   #undef S
@@ -627,12 +628,15 @@ namespace {
 
     Bitboard b, bb, squaresToQueen, defendedSquares, unsafeSquares;
     Score score = SCORE_ZERO;
+    File leftMostFile = FILE_H, rightMostFile = FILE_A;
 
     b = pe->passed_pawns(Us);
 
     while (b)
     {
         Square s = pop_lsb(&b);
+        leftMostFile = std::min(leftMostFile, file_of(s));
+        rightMostFile = std::max(rightMostFile, file_of(s));
 
         assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
 
@@ -697,6 +701,10 @@ namespace {
 
         score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
     }
+
+    int passedPawnsSpan = rightMostFile - leftMostFile;
+    if(passedPawnsSpan > 1)
+       score += DistantPassedPawns * passedPawnsSpan;
 
     if (T)
         Trace::add(PASSED, Us, score);
