@@ -702,9 +702,10 @@ namespace {
         score += make_score(mbonus, ebonus) + PassedFile[file_of(s)];
     }
 
-    int passedPawnsSpan = rightMostFile - leftMostFile;
-    if(passedPawnsSpan > 1)
-       score += DistantPassedPawns;
+    // Give bonus if the opponent has only pawns and we have a passed pawn pair
+    // which lies not on adjacent files
+    if (!pos.non_pawn_material(Them) && rightMostFile - leftMostFile > 1)
+        score += DistantPassedPawns;
 
     if (T)
         Trace::add(PASSED, Us, score);
