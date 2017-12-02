@@ -29,35 +29,39 @@ using namespace std;
 
 namespace {
 
+  #define S(v) make_score(v, v)
+  
   // Polynomial material imbalance parameters
 
-  const int QuadraticOurs[][PIECE_TYPE_NB] = {
+  const Score QuadraticOurs[][PIECE_TYPE_NB] = {
     //            OUR PIECES
     // pair pawn knight bishop rook queen
-    {1667                               }, // Bishop pair
-    {  40,    0                         }, // Pawn
-    {  32,  255,  -3                    }, // Knight      OUR PIECES
-    {   0,  104,   4,    0              }, // Bishop
-    { -26,   -2,  47,   105,  -149      }, // Rook
-    {-185,   24, 122,   137,  -134,   0 }  // Queen
+    {S(1667)                               }, // Bishop pair
+    {  S(40),    S(0)                         }, // Pawn
+    {  S(32),  S(255),  S(-3)                    }, // Knight      OUR PIECES
+    {   S(0),  S(104),   S(4),    S(0)              }, // Bishop
+    { S(-26),   S(-2),  S(47),   S(105),  S(-149)      }, // Rook
+    {S(-185),   S(24), S(122),   S(137),  S(-134),   S(0) }  // Queen
   };
 
-  const int QuadraticTheirs[][PIECE_TYPE_NB] = {
+  const Score QuadraticTheirs[][PIECE_TYPE_NB] = {
     //           THEIR PIECES
     // pair pawn knight bishop rook queen
-    {   0                               }, // Bishop pair
-    {  36,    0                         }, // Pawn
-    {   9,   63,   0                    }, // Knight      OUR PIECES
-    {  59,   65,  42,     0             }, // Bishop
-    {  46,   39,  24,   -24,    0       }, // Rook
-    { 101,  100, -37,   141,  268,    0 }  // Queen
+    {   S(0)                               }, // Bishop pair
+    {  S(36),    S(0)                         }, // Pawn
+    {   S(9),   S(63),   S(0)                    }, // Knight      OUR PIECES
+    {  S(59),   S(65),  S(42),     S(0)             }, // Bishop
+    {  S(46),   S(39),  S(24),   S(-24),    S(0)       }, // Rook
+    { S(101),  S(100), S(-37),   S(141),  S(268),    S(0) }  // Queen
   };
 
   // QueenMinorsImbalance[opp_minor_count] is applied when only one side has a queen.
   // It contains a bonus/malus for the side with the queen.
-  const int QueenMinorsImbalance[13] = {
-    31, -8, -15, -25, -5
+  const Score QueenMinorsImbalance[13] = {
+    S(31), S(-8), S(-15), S(-25), S(-5)
   };
+
+  #undef S
 
   // Endgame evaluation and scaling functions are accessed directly and not through
   // the function maps because they correspond to more than one material hash key.
@@ -91,11 +95,11 @@ namespace {
   /// imbalance() calculates the imbalance by comparing the piece count of each
   /// piece type for both colors.
   template<Color Us>
-  int imbalance(const int pieceCount[][PIECE_TYPE_NB]) {
+  Score imbalance(const int pieceCount[][PIECE_TYPE_NB]) {
 
     const Color Them = (Us == WHITE ? BLACK : WHITE);
 
-    int bonus = 0;
+    Score bonus = SCORE_ZERO;
 
     // Second-degree polynomial material imbalance, by Tord Romstad
     for (int pt1 = NO_PIECE_TYPE; pt1 <= QUEEN; ++pt1)
@@ -103,13 +107,13 @@ namespace {
         if (!pieceCount[Us][pt1])
             continue;
 
-        int v = 0;
+        Score v = SCORE_ZERO;
 
         for (int pt2 = NO_PIECE_TYPE; pt2 <= pt1; ++pt2)
             v +=  QuadraticOurs[pt1][pt2] * pieceCount[Us][pt2]
                 + QuadraticTheirs[pt1][pt2] * pieceCount[Them][pt2];
 
-        bonus += pieceCount[Us][pt1] * v;
+        bonus += v * pieceCount[Us][pt1];
     }
 
     // Special handling of Queen vs. Minors
@@ -231,7 +235,7 @@ Entry* probe(const Position& pos) {
   { pos.count<BISHOP>(BLACK) > 1, pos.count<PAWN>(BLACK), pos.count<KNIGHT>(BLACK),
     pos.count<BISHOP>(BLACK)    , pos.count<ROOK>(BLACK), pos.count<QUEEN >(BLACK) } };
 
-  e->value = int16_t((imbalance<WHITE>(PieceCount) - imbalance<BLACK>(PieceCount)) / 16);
+  e->value = (imbalance<WHITE>(PieceCount) - imbalance<BLACK>(PieceCount)) / 16;
   return e;
 }
 
