@@ -24,6 +24,7 @@
 
 #include "material.h"
 #include "thread.h"
+#include "tune.h"
 
 using namespace std;
 
@@ -33,18 +34,18 @@ namespace {
   
   // Polynomial material imbalance parameters
 
-  const Score QuadraticOurs[][PIECE_TYPE_NB] = {
+  Score QuadraticOurs[][PIECE_TYPE_NB] = {
     //            OUR PIECES
     // pair pawn knight bishop rook queen
     {S(1667)                               }, // Bishop pair
-    {  S(40),    S(0)                         }, // Pawn
+    {  S(40),    S(1)                         }, // Pawn
     {  S(32),  S(255),  S(-3)                    }, // Knight      OUR PIECES
-    {   S(0),  S(104),   S(4),    S(0)              }, // Bishop
+    {   S(1),  S(104),   S(4),    S(1)              }, // Bishop
     { S(-26),   S(-2),  S(47),   S(105),  S(-149)      }, // Rook
-    {S(-185),   S(24), S(122),   S(137),  S(-134),   S(0) }  // Queen
+    {S(-185),   S(24), S(122),   S(137),  S(-134),   S(01) }  // Queen
   };
 
-  const Score QuadraticTheirs[][PIECE_TYPE_NB] = {
+  Score QuadraticTheirs[][PIECE_TYPE_NB] = {
     //           THEIR PIECES
     // pair pawn knight bishop rook queen
     {   S(0)                               }, // Bishop pair
@@ -57,9 +58,11 @@ namespace {
 
   // QueenMinorsImbalance[opp_minor_count] is applied when only one side has a queen.
   // It contains a bonus/malus for the side with the queen.
-  const Score QueenMinorsImbalance[13] = {
+  Score QueenMinorsImbalance[13] = {
     S(31), S(-8), S(-15), S(-25), S(-5)
   };
+  
+  TUNE(QuadraticOurs, QuadraticTheirs, QueenMinorsImbalance);
 
   #undef S
 
