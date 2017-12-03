@@ -29,36 +29,36 @@ using namespace std;
 
 namespace {
 
-  #define S(v) make_score(v, v)
-  
+  #define S(mg, eg) make_score(mg, eg)
+
   // Polynomial material imbalance parameters
 
   const Score QuadraticOurs[][PIECE_TYPE_NB] = {
     //            OUR PIECES
-    // pair pawn knight bishop rook queen
-    {S(1667)                               }, // Bishop pair
-    {  S(40),    S(0)                         }, // Pawn
-    {  S(32),  S(255),  S(-3)                    }, // Knight      OUR PIECES
-    {   S(0),  S(104),   S(4),    S(0)              }, // Bishop
-    { S(-26),   S(-2),  S(47),   S(105),  S(-149)      }, // Rook
-    {S(-185),   S(24), S(122),   S(137),  S(-134),   S(0) }  // Queen
+    // pair           pawn         knight        bishop       rook         queen
+    {  S(1676, 1518)                                                                 }, // Bishop pair
+    {  S(-101,   52), S(  4, -11)                                                    }, // Pawn
+    {  S( 149,   64), S(373, 294), S(187, -139)                                      }, // Knight      OUR PIECES
+    {  S( 283,  -60), S(105, 149), S( 96,  -57), S(178,   6)                         }, // Bishop
+    {  S( -46,  -57), S(119,  -2), S(-58,   47), S(230, 298), S(-63, -31)            }, // Rook
+    {  S(-155, -219), S(116, -71), S( 93,  -21), S( 28,  69), S(-124, 99), S(2, -37) }  // Queen
   };
 
   const Score QuadraticTheirs[][PIECE_TYPE_NB] = {
     //           THEIR PIECES
-    // pair pawn knight bishop rook queen
-    {   S(0)                               }, // Bishop pair
-    {  S(36),    S(0)                         }, // Pawn
-    {   S(9),   S(63),   S(0)                    }, // Knight      OUR PIECES
-    {  S(59),   S(65),  S(42),     S(0)             }, // Bishop
-    {  S(46),   S(39),  S(24),   S(-24),    S(0)       }, // Rook
-    { S(101),  S(100), S(-37),   S(141),  S(268),    S(0) }  // Queen
+    // pair           pawn          knight        bishop       rook         queen
+    {  S(   0,    0)                                                                }, // Bishop pair
+    {  S( -18,   39), S(  0,    0)                                                  }, // Pawn
+    {  S(-101, -109), S( 81,  126), S(   0,   0)                                    }, // Knight      OUR PIECES
+    {  S( -23,  190), S(184,   48), S(   6, 199), S(  0,   0)                       }, // Bishop
+    {  S( -47,  186), S( 97, -130), S(-130, 140), S( 73,  65), S(  0,   0)          }, // Rook
+    {  S( 211,  282), S( 29,  329), S(  14, 139), S(260, 328), S(314, 185), S(0, 0) }  // Queen
   };
 
   // QueenMinorsImbalance[opp_minor_count] is applied when only one side has a queen.
   // It contains a bonus/malus for the side with the queen.
   const Score QueenMinorsImbalance[13] = {
-    S(31), S(-8), S(-15), S(-25), S(-5)
+    S(66, 45), S(-159, -196), S(-69, 140), S(232, 75), S(-106, -329)
   };
 
   #undef S
