@@ -459,9 +459,9 @@ namespace {
         safe  = ~pos.pieces(Them);
         safe &= ~attackedBy[Us][ALL_PIECES] | (weak & attackedBy2[Them]);
 
-        allowAttacksThrough = pos.pieces(Us, QUEEN) | ((pos.pieces(Us) ^ pos.pieces(Us, PAWN)) & ~attackedBy[Us][ALL_PIECES]);
-        b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ (allowAttacksThrough & ~pos.pieces(Us, ROOK)));
-        b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ (allowAttacksThrough & ~pos.pieces(Us, BISHOP)));
+        allowAttacksThrough = pos.pieces(Us, QUEEN) | pos.pinned_pieces(Us);
+        b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ allowAttacksThrough);
+        b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ allowAttacksThrough);
 
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
