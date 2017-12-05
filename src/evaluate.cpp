@@ -428,7 +428,7 @@ namespace {
                                         : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
     const Square ksq = pos.square<KING>(Us);
-    Bitboard weak, b, b1, b2, safe, other;
+    Bitboard weak, b, b1, b2, safe, other, allowAttacksThrough;
     int kingDanger;
 
     // King shelter and enemy pawns storm
@@ -459,8 +459,9 @@ namespace {
         safe  = ~pos.pieces(Them);
         safe &= ~attackedBy[Us][ALL_PIECES] | (weak & attackedBy2[Them]);
 
-        b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
-        b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN, ROOK));
+        allowAttacksThrough = pos.pieces(Us, QUEEN) | (pos.pieces(Us) & ~attackedBy[Us][ALL_PIECES]);
+        b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ allowAttacksThrough);
+        b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ allowAttacksThrough);
 
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
