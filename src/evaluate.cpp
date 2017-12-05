@@ -459,7 +459,7 @@ namespace {
         safe  = ~pos.pieces(Them);
         safe &= ~attackedBy[Us][ALL_PIECES] | (weak & attackedBy2[Them]);
 
-        allowAttacksThrough = pos.pieces(Us, QUEEN) | (pos.pieces(Us) & ~attackedBy[Us][ALL_PIECES]);
+        allowAttacksThrough = pos.pieces(Us, QUEEN) | ((pos.pieces(Us) ^ pos.pieces(Us, PAWN)) & ~attackedBy[Us][ALL_PIECES]);
         b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ allowAttacksThrough);
         b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ allowAttacksThrough);
 
