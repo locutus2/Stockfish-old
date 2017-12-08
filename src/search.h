@@ -47,6 +47,7 @@ struct Stack {
   Move excludedMove;
   Move killers[2];
   Value staticEval;
+  int mobility[COLOR_NB];
   int statScore;
   int moveCount;
 };

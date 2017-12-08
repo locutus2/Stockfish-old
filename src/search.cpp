@@ -550,6 +550,7 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
+    ss->mobility[WHITE] = ss->mobility[BLACK] = VALUE_INFINITE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -637,7 +638,7 @@ namespace {
     {
         // Never assume anything on values stored in TT
         if ((ss->staticEval = eval = tte->eval()) == VALUE_NONE)
-            eval = ss->staticEval = evaluate(pos);
+            eval = ss->staticEval = evaluate(pos, ss->mobility);
 
         // Can ttValue be used as a better position evaluation?
         if (   ttValue != VALUE_NONE
@@ -646,9 +647,14 @@ namespace {
     }
     else
     {
-        eval = ss->staticEval =
-        (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
-                                         : -(ss-1)->staticEval + 2 * Eval::Tempo;
+        if ((ss-1)->currentMove != MOVE_NULL)
+            eval = ss->staticEval = evaluate(pos, ss->mobility);
+        else
+        {
+            eval = ss->staticEval = -(ss-1)->staticEval + 2 * Eval::Tempo;
+            ss->mobility[WHITE] = (ss-1)->mobility[WHITE];
+            ss->mobility[BLACK] = (ss-1)->mobility[BLACK];
+        }
 
         tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE,
                   ss->staticEval, TT.generation());
@@ -681,6 +687,7 @@ namespace {
     // Step 8. Null move search with verification search (is omitted in PV nodes)
     if (   !PvNode
         &&  eval >= beta
+        &&  ss->mobility[pos.side_to_move()] > 0
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225)
     {
 

@@ -86,6 +86,8 @@ namespace {
   class Evaluation {
 
   public:
+    int mobilityCount[COLOR_NB] = { 0, 0 };
+
     Evaluation() = delete;
     Evaluation(const Position& p) : pos(p) {}
     Evaluation& operator=(const Evaluation&) = delete;
@@ -333,6 +335,7 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
+        mobilityCount[Us] += popcount(b & mobilityArea[Us] & ~pos.pieces(Us));
 
         // Bonus for this piece as a king protector
         score += KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
@@ -911,6 +914,15 @@ Score Eval::Contempt = SCORE_ZERO;
 Value Eval::evaluate(const Position& pos)
 {
    return Evaluation<>(pos).value();
+}
+
+Value Eval::evaluate(const Position& pos, int mobility[COLOR_NB])
+{
+   Evaluation<> eval(pos);
+   Value value = eval.value();
+   mobility[WHITE] = eval.mobilityCount[WHITE];
+   mobility[BLACK] = eval.mobilityCount[BLACK];
+   return value;
 }
 
 /// trace() is like evaluate(), but instead of returning a value, it returns
