@@ -472,7 +472,10 @@ namespace {
         else if (pos.pieces(Them, QUEEN) && (b &= ~attackedBy[Them][QUEEN]))
             while (b)
                 if (pos.attacks_from<QUEEN>(pop_lsb(&b)) & safe & ~attackedBy[Us][QUEEN] & attackedBy[Them][QUEEN])
+                {
                     score -= PrepareCheck;
+                    break;
+                }
 
         // Some other potential checks are also analysed, even from squares
         // currently occupied by the opponent own pieces, as long as the square
