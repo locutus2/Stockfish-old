@@ -218,6 +218,7 @@ namespace {
   const Score TrappedRook           = S( 92,  0);
   const Score WeakQueen             = S( 50, 10);
   const Score OtherCheck            = S( 10, 10);
+  const Score PrepareCheck          = S(  5,  5);
   const Score CloseEnemies          = S(  7,  0);
   const Score PawnlessFlank         = S( 20, 80);
   const Score ThreatByHangingPawn   = S( 71, 61);
@@ -463,8 +464,15 @@ namespace {
         b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
         // Enemy queen safe checks
-        if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
+        b = (b1 | b2) & safe & ~attackedBy[Us][QUEEN];
+        if (b & attackedBy[Them][QUEEN])
             kingDanger += QueenCheck;
+
+        // Prepare enemy queen safe checks
+        else if (pos.pieces(Them, QUEEN) && (b &= ~attackedBy[Them][QUEEN]))
+            while (b)
+                if (pos.attacks_from<QUEEN>(pop_lsb(&b)) & safe & ~attackedBy[Us][QUEEN] & attackedBy[Them][QUEEN])
+                    score -= PrepareCheck;
 
         // Some other potential checks are also analysed, even from squares
         // currently occupied by the opponent own pieces, as long as the square
