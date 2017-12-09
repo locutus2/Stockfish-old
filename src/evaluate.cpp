@@ -218,7 +218,6 @@ namespace {
   const Score TrappedRook           = S( 92,  0);
   const Score WeakQueen             = S( 50, 10);
   const Score OtherCheck            = S( 10, 10);
-  const Score SupportedCheckThreat  = S(  5,  5);
   const Score CloseEnemies          = S(  7,  0);
   const Score PawnlessFlank         = S( 20, 80);
   const Score ThreatByHangingPawn   = S( 71, 61);
@@ -242,6 +241,8 @@ namespace {
   const int RookCheck   = 880;
   const int BishopCheck = 435;
   const int KnightCheck = 790;
+
+  const int SupportedCheckThreat = 200;
 
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
@@ -475,7 +476,7 @@ namespace {
             while (b)
                 if (pos.attacks_from<QUEEN>(pop_lsb(&b)) & safe & ~attackedBy[Us][QUEEN] & attackedBy[Them][QUEEN])
                 {
-                    score -= SupportedCheckThreat;
+                    kingDanger += SupportedCheckThreat;
                     break;
                 }
 
