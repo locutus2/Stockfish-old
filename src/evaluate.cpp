@@ -218,6 +218,7 @@ namespace {
   const Score TrappedRook           = S( 92,  0);
   const Score WeakQueen             = S( 50, 10);
   const Score OtherCheck            = S( 10, 10);
+  const Score SupportedCheckThreat  = S(  5,  5);
   const Score CloseEnemies          = S(  7,  0);
   const Score PawnlessFlank         = S( 20, 80);
   const Score ThreatByHangingPawn   = S( 71, 61);
@@ -241,8 +242,6 @@ namespace {
   const int RookCheck   = 880;
   const int BishopCheck = 435;
   const int KnightCheck = 790;
-
-  const int SupportedCheckThreat = 200;
 
   // Threshold for lazy and space evaluation
   const Value LazyThreshold  = Value(1500);
@@ -469,17 +468,6 @@ namespace {
         if (b & attackedBy[Them][QUEEN])
             kingDanger += QueenCheck;
 
-        // Enemy queen safe check threats which are supported by another piece
-        else if (    pos.pieces(Them, QUEEN)
-                 && (attackedBy[Us][KING] & attackedBy[Them][ALL_PIECES] & ~attackedBy[Them][QUEEN])
-                 && (b &= ~attackedBy[Them][QUEEN]))
-            while (b)
-                if (pos.attacks_from<QUEEN>(pop_lsb(&b)) & safe & ~attackedBy[Us][QUEEN] & attackedBy[Them][QUEEN])
-                {
-                    kingDanger += SupportedCheckThreat;
-                    break;
-                }
-
         // Some other potential checks are also analysed, even from squares
         // currently occupied by the opponent own pieces, as long as the square
         // is not attacked by our pawns, and is not occupied by a blocked pawn.
@@ -507,6 +495,16 @@ namespace {
 
         else if (b & other)
             score -= OtherCheck;
+
+        else if (    pos.pieces(Them, KNIGHT)
+                 && (attackedBy[Us][KING] & attackedBy[Them][ALL_PIECES] & ~attackedBy[Them][KNIGHT])
+                 && (b = pos.attacks_from<KNIGHT>(ksq) & safe & ~attackedBy[Them][KNIGHT]))
+            while (b)
+                if (pos.attacks_from<KNIGHT>(pop_lsb(&b)) & safe & attackedBy[Them][KNIGHT])
+                {
+                    score -= SupportedCheckThreat;
+                    break;
+                }
 
         // Transform the kingDanger units into a Score, and substract it from the evaluation
         if (kingDanger > 0)
