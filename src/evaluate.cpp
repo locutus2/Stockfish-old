@@ -333,8 +333,8 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         // Less queen mobility if only diagonal or non-diagonal mobility exists
-        if (Pt == QUEEN && mob > 0 && (   !(b & mobilityArea[Us] & PseudoAttacks[BISHOP][s])
-                                       || !(b & mobilityArea[Us] & PseudoAttacks[ROOK][s])))
+        if (Pt == QUEEN && mob > 0 && (   !(b & mobilityArea[Us] & ~pos.pieces(Us) & PseudoAttacks[BISHOP][s])
+                                       || !(b & mobilityArea[Us] & ~pos.pieces(Us) & PseudoAttacks[ROOK][s])))
             --mob;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
