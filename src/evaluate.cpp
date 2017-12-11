@@ -332,6 +332,14 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
+        // Less queen mobility if only moves along one line exists
+        if (Pt == QUEEN && mob > 0)
+        {
+            bb = b & mobilityArea[Us] & ~pos.pieces(Us);
+            if (!bb || !(bb & ~LineBB[s][lsb(bb)]))
+                --mob;
+        }
+
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         // Bonus for this piece as a king protector
