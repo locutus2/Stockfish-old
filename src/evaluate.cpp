@@ -330,12 +330,11 @@ namespace {
             kingAdjacentZoneAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
-        int mob = popcount(b & mobilityArea[Us]);
+        bb = b & mobilityArea[Us];
+        if (Pt == QUEEN)
+            bb &= ~pos.pieces(Us);
 
-        // Less queen mobility if only diagonal or non-diagonal mobility exists
-        if (Pt == QUEEN && mob > 0 && (   !(b & mobilityArea[Us] & ~pos.pieces(Us) & PseudoAttacks[BISHOP][s])
-                                       || !(b & mobilityArea[Us] & ~pos.pieces(Us) & PseudoAttacks[ROOK][s])))
-            --mob;
+        int mob = popcount(bb);
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
