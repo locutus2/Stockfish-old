@@ -336,6 +336,11 @@ namespace {
 
         int mob = popcount(bb);
 
+        // Less queen mobility if only diagonal or non-diagonal mobility exists
+        if (Pt == QUEEN && mob > 0 && (   !(bb & PseudoAttacks[BISHOP][s])
+                                       || !(bb & PseudoAttacks[ROOK][s])))
+            --mob;
+
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         // Bonus for this piece as a king protector
