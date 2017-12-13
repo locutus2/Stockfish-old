@@ -1089,7 +1089,7 @@ moves_loop: // When in check search starts from here
     else if (    depth >= 3 * ONE_PLY
              && !pos.captured_piece()
              && is_ok((ss-1)->currentMove))
-        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
+        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth + (PvNode || cutNode) * ONE_PLY));
 
     if (!excludedMove)
         tte->save(posKey, value_to_tt(bestValue, ss->ply),
