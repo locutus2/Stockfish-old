@@ -106,6 +106,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
+  void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus, int bonus2);
   void update_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
   bool pv_is_draw(Position& pos);
@@ -1075,11 +1076,15 @@ moves_loop: // When in check search starts from here
                    :     inCheck ? mated_in(ss->ply) : VALUE_DRAW;
     else if (bestMove)
     {
-        // Quiet best move: update move sorting heuristics
+        int bonus = stat_bonus(depth + (!PvNode && !cutNode) * ONE_PLY);
+        int bonus2 = stat_bonus(depth);
+
+        // Update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth + (!PvNode && !cutNode) * ONE_PLY));
+            update_stats(pos, ss, bestMove, quietsSearched, quietCount, bonus, bonus2);
+
         else
-            update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth + (!PvNode && !cutNode) * ONE_PLY));
+            update_capture_stats(pos, bestMove, capturesSearched, captureCount, bonus);
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -1385,7 +1390,7 @@ moves_loop: // When in check search starts from here
   // update_stats() updates move sorting heuristics when a new quiet best move is found
 
   void update_stats(const Position& pos, Stack* ss, Move move,
-                    Move* quiets, int quietsCnt, int bonus) {
+                    Move* quiets, int quietsCnt, int bonus, int bonus2) {
 
     if (ss->killers[0] != move)
     {
@@ -1396,7 +1401,7 @@ moves_loop: // When in check search starts from here
     Color c = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
     thisThread->mainHistory.update(c, move, bonus);
-    update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
+    update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus2);
 
     if (is_ok((ss-1)->currentMove))
     {
@@ -1408,8 +1413,13 @@ moves_loop: // When in check search starts from here
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->mainHistory.update(c, quiets[i], -bonus);
-        update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus2);
     }
+  }
+
+  inline void update_stats(const Position& pos, Stack* ss, Move move,
+                           Move* quiets, int quietsCnt, int bonus) {
+      return update_stats(pos, ss, move, quiets, quietsCnt, bonus, bonus);
   }
 
 
