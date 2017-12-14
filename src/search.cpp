@@ -1076,11 +1076,11 @@ moves_loop: // When in check search starts from here
                    :     inCheck ? mated_in(ss->ply) : VALUE_DRAW;
     else if (bestMove)
     {
-        int bonus = stat_bonus(depth + (!PvNode && !cutNode) * ONE_PLY);
+        int bonus = stat_bonus(depth);
 
         // Update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, bonus, stat_bonus(depth));
+            update_stats(pos, ss, bestMove, quietsSearched, quietCount, bonus, stat_bonus(depth + (!PvNode && !cutNode) * ONE_PLY));
 
         else
             update_capture_stats(pos, bestMove, capturesSearched, captureCount, bonus);
