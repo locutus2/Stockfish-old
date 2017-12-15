@@ -80,9 +80,9 @@ namespace {
   }
 
   // History and stats update bonus, based on depth
-  int stat_bonus(Depth depth) {
+  int stat_bonus(Depth depth, bool important = false) {
     int d = depth / ONE_PLY;
-    return d > 17 ? 0 : d * d + 2 * d - 2;
+    return d > 17 ? 0 : important ? std::min(324, (d * d + 2 * d - 2) * 5 / 4) : (d * d + 2 * d - 2);
   }
 
   // Skill structure is used to implement strength limit
@@ -1075,11 +1075,11 @@ moves_loop: // When in check search starts from here
                    :     inCheck ? mated_in(ss->ply) : VALUE_DRAW;
     else if (bestMove)
     {
-        // Quiet best move: update move sorting heuristics
-        if (!pos.capture_or_promotion(bestMove))
-            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
-        else
+        // Update move sorting heuristics
+        if (pos.capture_or_promotion(bestMove))
             update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth));
+        else
+            update_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth, !ttHit));
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
