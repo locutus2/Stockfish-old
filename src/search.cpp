@@ -1049,10 +1049,13 @@ moves_loop: // When in check search starts from here
           }
       }
 
-      if (!captureOrPromotion && move != bestMove && quietCount < 64)
-          quietsSearched[quietCount++] = move;
-      else if (captureOrPromotion && move != bestMove && captureCount < 32)
-          capturesSearched[captureCount++] = move;
+      if (move != ttMove && move != bestMove)
+      {
+          if (!captureOrPromotion && quietCount < 64)
+              quietsSearched[quietCount++] = move;
+          else if (captureOrPromotion && captureCount < 32)
+              capturesSearched[captureCount++] = move;
+      }
     }
 
     // The following condition would detect a stop only after move loop has been
