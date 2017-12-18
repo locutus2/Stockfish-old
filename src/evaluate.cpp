@@ -331,7 +331,7 @@ namespace {
         }
 
         int mob = (  popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s))
-                   + popcount(b & mobilityArea[Us])) * 3 / 4;
+                   + popcount(b & mobilityArea[Us])) * 11 / 16;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
