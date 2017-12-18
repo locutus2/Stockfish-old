@@ -149,6 +149,9 @@ namespace {
   #define V(v) Value(v)
   #define S(mg, eg) make_score(mg, eg)
 
+  // MobilityFactor[PieceType-2] contains the scaling factor for mobility.
+  const int MobilityFactor[] = { 10, 10, 13, 11 };
+
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
   const Score MobilityBonus[][32] = {
@@ -331,7 +334,7 @@ namespace {
         }
 
         int mob = (  popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s))
-                   + popcount(b & mobilityArea[Us])) * 11 / 16;
+                   + popcount(b & mobilityArea[Us])) * MobilityFactor[Pt - 2] / 16;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
