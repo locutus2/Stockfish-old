@@ -329,6 +329,16 @@ namespace {
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAdjacentZoneAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
+        else if (Pt != KNIGHT)
+        {
+            // Find attacked squares by considering only the pawn structure
+            bb = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces(PAWN))
+               : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces(PAWN))
+                              : attacks_bb<  ROOK>(s, pos.pieces(PAWN)) | attacks_bb<BISHOP>(s, pos.pieces(PAWN));
+
+            if (bb & kingRing[Them])
+                kingAttackersCount[Us]++;
+        }
 
         int mob = popcount(b & mobilityArea[Us]);
 
