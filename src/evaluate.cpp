@@ -229,6 +229,7 @@ namespace {
   const Score ThreatByAttackOnQueen = S( 38, 22);
   const Score HinderPassedPawn      = S(  7,  0);
   const Score TrappedBishopA1H1     = S( 50, 50);
+  const Score XRayKingAttack        = S(  7,  0);
 
   #undef S
   #undef V
@@ -331,16 +332,13 @@ namespace {
         }
         else if (Pt != KNIGHT)
         {
-            bb = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces(PAWN) | (~b & (pos.pieces() ^ pos.pieces(QUEEN))))
-               : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces(PAWN) | (~b & (pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))))
-                              : attacks_bb<  ROOK>(s, pos.pieces(PAWN) | (~b &  pos.pieces())) 
-                              | attacks_bb<BISHOP>(s, pos.pieces(PAWN) | (~b &  pos.pieces()));
-
-            if (pos.pinned_pieces(Us) & s)
-                bb &= LineBB[pos.square<KING>(Us)][s];
+            bb = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces(PAWN))
+               : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces(PAWN))
+                              : attacks_bb<  ROOK>(s, pos.pieces(PAWN))
+                              | attacks_bb<BISHOP>(s, pos.pieces(PAWN));
 
             if (bb & kingRing[Them])
-                kingAttackersCount[Us]++;
+                score += XRayKingAttack;
         }
 
         int mob = popcount(b & mobilityArea[Us]);
