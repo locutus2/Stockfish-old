@@ -336,6 +336,9 @@ namespace {
                               : attacks_bb<  ROOK>(s, pos.pieces(PAWN) | (~b &  pos.pieces())) 
                               | attacks_bb<BISHOP>(s, pos.pieces(PAWN) | (~b &  pos.pieces()));
 
+            if (pos.pinned_pieces(Us) & s)
+                bb &= LineBB[pos.square<KING>(Us)][s];
+
             if (bb & kingRing[Them])
                 kingAttackersCount[Us]++;
         }
