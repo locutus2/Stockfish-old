@@ -331,13 +331,13 @@ namespace {
         }
         else if (Pt != KNIGHT)
         {
-            // Find attacked squares by considering only the pawn structure
-            bb = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces(PAWN))
-               : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces(PAWN))
-                              : attacks_bb<  ROOK>(s, pos.pieces(PAWN)) | attacks_bb<BISHOP>(s, pos.pieces(PAWN));
+            bb = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces(PAWN) | (~b & (pos.pieces() ^ pos.pieces(QUEEN))))
+               : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces(PAWN) | (~b & (pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))))
+                              : attacks_bb<  ROOK>(s, pos.pieces(PAWN) | (~b &  pos.pieces())) 
+                              | attacks_bb<BISHOP>(s, pos.pieces(PAWN) | (~b &  pos.pieces()));
 
             if (bb & kingRing[Them])
-                kingAttackersWeight[Us] += KingAttackWeights[Pt];
+                kingAttackersCount[Us]++;
         }
 
         int mob = popcount(b & mobilityArea[Us]);
