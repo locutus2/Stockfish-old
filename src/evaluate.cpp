@@ -259,7 +259,7 @@ namespace {
     const Bitboard LowRanks = (Us == WHITE ? Rank2BB | Rank3BB: Rank7BB | Rank6BB);
 
     // Find our pawns on the first two ranks, and those which are blocked
-    Bitboard b = pos.pieces(Us, PAWN) & (shift<Down>(pos.pieces(PAWN)) | LowRanks);
+    Bitboard b = pos.pieces(Us, PAWN) & (shift<Down>(pos.pieces(Us, PAWN) | pos.pieces(Them)) | LowRanks);
 
     // Squares occupied by those pawns, by our king, or controlled by enemy pawns
     // are excluded from the mobility area.
