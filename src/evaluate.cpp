@@ -403,7 +403,7 @@ namespace {
 
             // Penalty if any relative pin or discovered attack against the rook
             Bitboard pinners;
-            if (pos.slider_blockers(pos.pieces(Them, BISHOP), s, pinners))
+            if (pos.slider_blockers(pos.pieces(Them, BISHOP), s, pinners) & ~pos.pieces(PAWN))
                 score -= WeakRook;
         }
 
