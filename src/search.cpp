@@ -644,8 +644,9 @@ namespace {
         (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
                                          : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
-        tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE,
-                  ss->staticEval, TT.generation());
+        if (tte->depth() <= DEPTH_ZERO)
+            tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE,
+                      ss->staticEval, TT.generation());
     }
 
     if (skipEarlyPruning || !pos.non_pawn_material(pos.side_to_move()))
