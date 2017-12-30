@@ -644,8 +644,8 @@ namespace {
         (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
                                          : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
-         tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE,
-                   ss->staticEval, TT.generation());
+        tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE,
+                  ss->staticEval, TT.generation());
     }
 
     if (skipEarlyPruning || !pos.non_pawn_material(pos.side_to_move()))
@@ -1194,7 +1194,7 @@ moves_loop: // When in check search starts from here
         // Stand pat. Return immediately if static value is at least beta
         if (bestValue >= beta)
         {
-            if (!ttHit && tte->depth() <= DEPTH_ZERO)
+            if (!ttHit && tte->depth() <= ONE_PLY)
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval, TT.generation());
 
