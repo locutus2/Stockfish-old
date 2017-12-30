@@ -644,7 +644,7 @@ namespace {
         (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
                                          : -(ss-1)->staticEval + 2 * Eval::Tempo;
 
-        if (tte->depth() <= DEPTH_ZERO)
+        if (tte->depth() <= ONE_PLY)
             tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE,
                       ss->staticEval, TT.generation());
     }
