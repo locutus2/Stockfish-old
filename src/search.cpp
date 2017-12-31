@@ -926,14 +926,14 @@ moves_loop: // When in check search starts from here
                              + (*contHist[3])[movedPiece][to_sq(move)]
                              - 4000;
 
-              int goodness =  ss->statScore - 615
-                            + 22122 * ((ss-1)->moveCount > 15)
-                            + 21692 * pvExact
-                            - 22852 * ttCapture
-                            - 42999 * cutNode
-                            + 42266 * (type_of(move) == NORMAL && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
-                            + 23647 * (ss->statScore >= 0 && (ss-1)->statScore < 0)
-                            - 21084 * ((ss-1)->statScore >= 0 && ss->statScore < 0);
+              int goodness =  ss->statScore - 87
+                            + 20475 * ((ss-1)->moveCount > 15)
+                            + 19720 * pvExact
+                            - 20414 * ttCapture
+                            - 39359 * cutNode
+                            + 39111 * (type_of(move) == NORMAL && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
+                            + 20220 * (ss->statScore >= 0 && (ss-1)->statScore < 0)
+                            - 20875 * ((ss-1)->statScore >= 0 && ss->statScore < 0);
 
               // Decrease/increase reduction for moves with a good/bad history
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - goodness / 20000) * ONE_PLY);
