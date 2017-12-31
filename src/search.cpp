@@ -511,6 +511,7 @@ namespace {
     inCheck = pos.checkers();
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     ss->statScore = 0;
+    ss->pathStatScore = (ss-1)->pathStatScore;
     bestValue = -VALUE_INFINITE;
 
     // Check for the available remaining time
@@ -948,6 +949,7 @@ moves_loop: // When in check search starts from here
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
                              - 4000;
+              ss->pathStatScore = (ss-1)->pathStatScore + ss->statScore;
 
               // Decrease/increase reduction by comparing opponent's stat score
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
@@ -955,6 +957,10 @@ moves_loop: // When in check search starts from here
 
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
+
+              // Decrease reduction if stat score along the path to this position is goods
+              if (ss->pathStatScore > 2000 * ss->ply)
+                  r -= ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
