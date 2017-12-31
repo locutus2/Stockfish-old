@@ -1194,7 +1194,7 @@ moves_loop: // When in check search starts from here
         // Stand pat. Return immediately if static value is at least beta
         if (bestValue >= beta)
         {
-            if (!ttHit && tte->depth() <= ONE_PLY)
+            if (!ttHit && tte->depth() <= 2 * ONE_PLY)
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval, TT.generation());
 
