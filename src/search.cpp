@@ -544,7 +544,8 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
-    (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
+    (ss+2)->killers[0][0] = (ss+2)->killers[0][1] = MOVE_NONE;
+    (ss+2)->killers[1][0] = (ss+2)->killers[1][1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
     // Step 4. Transposition table lookup. We don't want the score of a partial
@@ -763,8 +764,9 @@ moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move* killers = ss->killers[(bool)pos.captured_piece()];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, ss->killers);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -1391,10 +1393,11 @@ moves_loop: // When in check search starts from here
   void update_stats(const Position& pos, Stack* ss, Move move,
                     Move* quiets, int quietsCnt, int bonus) {
 
-    if (ss->killers[0] != move)
+    Move*  killers = ss->killers[(bool)pos.captured_piece()];
+    if (killers[0] != move)
     {
-        ss->killers[1] = ss->killers[0];
-        ss->killers[0] = move;
+        killers[1] = killers[0];
+        killers[0] = move;
     }
 
     Color c = pos.side_to_move();
