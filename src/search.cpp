@@ -544,6 +544,7 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
+    (ss+2)->killerCount[0] = (ss+2)->killerCount[1] = 0;
     (ss+2)->killers[0][0] = (ss+2)->killers[0][1] = MOVE_NONE;
     (ss+2)->killers[1][0] = (ss+2)->killers[1][1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
@@ -764,12 +765,9 @@ moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    int killerContext = (bool)pos.captured_piece();
+    int context = (bool)pos.captured_piece();
 
-    if (!ss->killers[killerContext][0])
-        killerContext = !killerContext;
-
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, ss->killers[killerContext]);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, ss->killers[context]);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
@@ -1396,11 +1394,27 @@ moves_loop: // When in check search starts from here
   void update_stats(const Position& pos, Stack* ss, Move move,
                     Move* quiets, int quietsCnt, int bonus) {
 
-    Move*  killers = ss->killers[(bool)pos.captured_piece()];
-    if (killers[0] != move)
+    int context = (bool)pos.captured_piece();
+
+    // update killers for current context
+    if (ss->killers[context][0] != move)
     {
-        killers[1] = killers[0];
-        killers[0] = move;
+        ss->killers[context][1] = ss->killers[context][0];
+        ss->killers[context][0] = move;
+        if (ss->killerCount[context] < 2)
+            ++ss->killerCount[context];
+    }
+
+    // update killers for opposite context if killers missing
+    if (ss->killerCount[!context] < 2 && move != ss->killers[!context][0])
+    {
+        if (ss->killerCount[!context] == 0)
+        {
+            ss->killers[!context][1] = ss->killers[!context][0];
+            ss->killers[!context][0] = move;
+        }
+        else
+            ss->killers[!context][1] = move;
     }
 
     Color c = pos.side_to_move();
