@@ -544,7 +544,7 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
-    (ss+2)->killerCount[0] = (ss+2)->killerCount[1] = 0;
+    (ss+2)->killerFound[0] = (ss+2)->killerFound[1] = false;
     (ss+2)->killers[0][0] = (ss+2)->killers[0][1] = MOVE_NONE;
     (ss+2)->killers[1][0] = (ss+2)->killers[1][1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
@@ -1399,22 +1399,16 @@ moves_loop: // When in check search starts from here
     // update killers for current context
     if (ss->killers[context][0] != move)
     {
-        ss->killers[context][1] = ss->killers[context][0];
-        ss->killers[context][0] = move;
-        if (ss->killerCount[context] < 2)
-            ++ss->killerCount[context];
+        ss->killers[context][1]  = ss->killers[context][0];
+        ss->killers[context][0]  = move;
     }
+    ss->killerFound[context] = true;
 
-    // update killers for opposite context if killers missing
-    if (ss->killerCount[!context] < 2 && move != ss->killers[!context][0])
+    // update killers for opposite context if all killers missing
+    if (!ss->killerFound[!context] && move != ss->killers[!context][0])
     {
-        if (ss->killerCount[!context] == 0)
-        {
-            ss->killers[!context][1] = ss->killers[!context][0];
-            ss->killers[!context][0] = move;
-        }
-        else
-            ss->killers[!context][1] = move;
+        ss->killers[!context][1] = ss->killers[!context][0];
+        ss->killers[!context][0] = move;
     }
 
     Color c = pos.side_to_move();
