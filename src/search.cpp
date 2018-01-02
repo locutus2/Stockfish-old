@@ -1393,11 +1393,22 @@ moves_loop: // When in check search starts from here
   void update_stats(const Position& pos, Stack* ss, Move move,
                     Move* quiets, int quietsCnt, int bonus) {
 
-    Move*  killers = ss->killers[(bool)pos.captured_piece()];
-    if (killers[0] != move)
+    int context = (bool)pos.captured_piece();
+    for(int i = 0; i < 2; ++i)
     {
-        killers[1] = killers[0];
-        killers[0] = move;
+        Move* killers = ss->killers[i];
+        if (i == context)
+        {
+            if (killers[0] != move)
+            {
+                killers[1] = killers[0];
+                killers[0] = move;
+            }
+        }
+        else if (!killers[0])
+            killers[0] = move;
+        else if (!killers[1] && killers[0] != move)
+            killers[1] = move;
     }
 
     Color c = pos.side_to_move();
