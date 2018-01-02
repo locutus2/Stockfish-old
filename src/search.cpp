@@ -765,11 +765,27 @@ moves_loop: // When in check search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
     int killerContext = (bool)pos.captured_piece();
+    Move killers[2];
 
-    if (!ss->killers[killerContext][0])
-        killerContext = !killerContext;
+    if (ss->killers[killerContext][0])
+    {
+        killers[0] = ss->killers[killerContext][0];
+        if (ss->killers[killerContext][1])
+            killers[1] = ss->killers[killerContext][1];
+        else if (killers[0] != ss->killers[!killerContext][0])
+            killers[1] = ss->killers[!killerContext][0];
+        else if (killers[0] != ss->killers[!killerContext][1])
+            killers[1] = ss->killers[!killerContext][1];
+        else
+            killers[1] = MOVE_NONE;
+    }
+    else
+    {
+        killers[0] = ss->killers[!killerContext][0];
+        killers[1] = ss->killers[!killerContext][1];
+    }
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, ss->killers[killerContext]);
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     improving =   ss->staticEval >= (ss-2)->staticEval
             /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
