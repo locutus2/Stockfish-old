@@ -764,7 +764,7 @@ moves_loop: // When in check search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    int killerContext = (bool)inCheck;
+    int killerContext = (bool)excludedMove;
 
     if (!ss->killers[killerContext][0])
         killerContext = !killerContext;
@@ -1396,7 +1396,7 @@ moves_loop: // When in check search starts from here
   void update_stats(const Position& pos, Stack* ss, Move move,
                     Move* quiets, int quietsCnt, int bonus) {
 
-    Move* killers = ss->killers[(bool)pos.checkers()];
+    Move* killers = ss->killers[(bool)ss->excludedMove];
     if (killers[0] != move)
     {
         killers[1] = killers[0];
