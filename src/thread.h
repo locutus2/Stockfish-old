@@ -71,6 +71,7 @@ public:
   ButterflyHistory mainHistory;
   CapturePieceToHistory captureHistory;
   ContinuationHistory contHistory;
+  Move pvKillers[COLOR_NB][2];
 };
 
 
