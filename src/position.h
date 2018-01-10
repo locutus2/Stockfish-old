@@ -54,6 +54,7 @@ struct StateInfo {
   Bitboard   blockersForKing[COLOR_NB];
   Bitboard   pinnersForKing[COLOR_NB];
   Bitboard   checkSquares[PIECE_TYPE_NB];
+  Move       lastMove;
 };
 
 /// A list to keep track of the position states along the setup moves (from the
@@ -150,6 +151,7 @@ public:
   // Other properties of the position
   Color side_to_move() const;
   int game_ply() const;
+  Move last_move() const;
   bool is_chess960() const;
   Thread* this_thread() const;
   bool is_draw(int ply) const;
@@ -343,6 +345,10 @@ inline Value Position::non_pawn_material() const {
 
 inline int Position::game_ply() const {
   return gamePly;
+}
+
+inline Move Position::last_move() const {
+  return st->lastMove;
 }
 
 inline int Position::rule50_count() const {
