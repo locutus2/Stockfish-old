@@ -32,6 +32,8 @@
 template<int Size1, int Size2, typename T = int16_t>
 struct StatBoards : public std::array<std::array<T, Size2>, Size1> {
 
+  int average;
+
   void fill(const T& v) {
     T* p = &(*this)[0][0];
     std::fill(p, p + sizeof(*this) / sizeof(*p), v);
@@ -42,7 +44,8 @@ struct StatBoards : public std::array<std::array<T, Size2>, Size1> {
     assert(abs(bonus) <= D); // Ensure range is [-32 * D, 32 * D]
     assert(abs(32 * D) < (std::numeric_limits<T>::max)()); // Ensure we don't overflow
 
-    entry += bonus * 32 - entry * abs(bonus) / D;
+    entry   += bonus * 32 - entry   * abs(bonus) / D;
+    average += bonus * 32 - average * abs(bonus) / D;
 
     assert(abs(entry) <= 32 * D);
   }

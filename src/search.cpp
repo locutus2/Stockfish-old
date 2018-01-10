@@ -943,6 +943,12 @@ moves_loop: // When in check search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
+              int averageStatScore =   thisThread->mainHistory.average
+                                     + contHist[0]->average
+                                     + contHist[1]->average
+                                     + contHist[3]->average
+                                     - 4000;
+
               ss->statScore =  thisThread->mainHistory[~pos.side_to_move()][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
@@ -950,10 +956,10 @@ moves_loop: // When in check search starts from here
                              - 4000;
 
               // Decrease/increase reduction by comparing opponent's stat score
-              if (ss->statScore >= 0 && (ss-1)->statScore < 0)
+              if (ss->statScore >= averageStatScore && (ss-1)->statScore < averageStatScore)
                   r -= ONE_PLY;
 
-              else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
+              else if ((ss-1)->statScore >= averageStatScore && ss->statScore < averageStatScore)
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history
