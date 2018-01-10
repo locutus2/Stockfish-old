@@ -32,9 +32,10 @@
 template<int Size1, int Size2, typename T = int16_t>
 struct StatBoards : public std::array<std::array<T, Size2>, Size1> {
 
-  int average;
+  T average;
 
   void fill(const T& v) {
+    average = T(0);
     T* p = &(*this)[0][0];
     std::fill(p, p + sizeof(*this) / sizeof(*p), v);
   }
