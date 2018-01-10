@@ -284,13 +284,13 @@ void Thread::search() {
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1.0;
-  Move lastMove = rootPos.last_move();
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
-  for (int i = 4; i > 1; i--)
-     (ss-i)->contHistory = &this->contHistory[NO_PIECE][0]; // Use as sentinel
-
-  (ss-1)->contHistory = &this->contHistory[rootPos.piece_on(to_sq(lastMove))][to_sq(lastMove)];
+  for (int i = 4; i > 0; i--)
+  {
+      Move lastMove = rootPos.nth_last_move(i);
+      (ss-i)->contHistory = &this->contHistory[rootPos.piece_on(to_sq(lastMove))][to_sq(lastMove)];
+  }
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;

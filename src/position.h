@@ -151,7 +151,7 @@ public:
   // Other properties of the position
   Color side_to_move() const;
   int game_ply() const;
-  Move last_move() const;
+  Move nth_last_move(int n) const;
   bool is_chess960() const;
   Thread* this_thread() const;
   bool is_draw(int ply) const;
@@ -347,8 +347,14 @@ inline int Position::game_ply() const {
   return gamePly;
 }
 
-inline Move Position::last_move() const {
-  return st->lastMove;
+inline Move Position::nth_last_move(int n) const {
+  StateInfo* tmp = st;
+  while(n > 1 && tmp->previous != nullptr)
+  {
+    --n;
+    tmp = tmp->previous;
+  }
+  return n == 1 ? tmp->lastMove : MOVE_NONE;
 }
 
 inline int Position::rule50_count() const {
