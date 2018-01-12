@@ -515,7 +515,7 @@ namespace {
         score -= PawnlessFlank;
 
     // Penalty when king has no mobility
-    if (!(attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES])))
+    if (!(attackedBy[Us][KING] & ~(pos.pieces(Us, PAWN) | attackedBy[Them][ALL_PIECES])))
         score -= NoKingMobility;
 
     if (T)
