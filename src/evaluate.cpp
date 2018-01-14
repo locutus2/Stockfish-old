@@ -144,6 +144,9 @@ namespace {
     // a white knight on g5 and black's king is on g8, this white knight adds 2
     // to kingAdjacentZoneAttacksCount[WHITE].
     int kingAdjacentZoneAttacksCount[COLOR_NB];
+
+    // immobilePieces[color] contains pieces which could't move.
+    Bitboard immobilePieces[COLOR_NB];
   };
 
   #define V(v) Value(v)
@@ -228,6 +231,7 @@ namespace {
   const Score ThreatByAttackOnQueen = S( 38, 22);
   const Score HinderPassedPawn      = S(  7,  0);
   const Score TrappedBishopA1H1     = S( 50, 50);
+  const Score NoKingMobility        = S( 20, 70);
 
   #undef S
   #undef V
@@ -270,6 +274,7 @@ namespace {
 
     attackedBy2[Us]            = b & attackedBy[Us][PAWN];
     attackedBy[Us][ALL_PIECES] = b | attackedBy[Us][PAWN];
+    immobilePieces[Us]         = 0;
 
     // Init our king safety tables only if we are going to use them
     if (pos.non_pawn_material(Them) >= RookValueMg + KnightValueMg)
@@ -330,6 +335,9 @@ namespace {
         }
 
         int mob = popcount(b & mobilityArea[Us]);
+
+        if (mob == 0)
+            immobilePieces[Us] |= s;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
@@ -512,6 +520,10 @@ namespace {
     // Penalty when our king is on a pawnless flank
     if (!(pos.pieces(PAWN) & KingFlank[kf]))
         score -= PawnlessFlank;
+
+    // Penalty when king has no mobility
+    if (!(attackedBy[Us][KING] & ~(pos.pieces(Us, PAWN) | immobilePieces[Us] | attackedBy[Them][ALL_PIECES])))
+        score -= NoKingMobility;
 
     if (T)
         Trace::add(KING, Us, score);
