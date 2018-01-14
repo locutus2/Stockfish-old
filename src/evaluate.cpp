@@ -228,6 +228,7 @@ namespace {
   const Score ThreatByAttackOnQueen = S( 38, 22);
   const Score HinderPassedPawn      = S(  7,  0);
   const Score TrappedBishopA1H1     = S( 50, 50);
+  const Score NoKingMobility        = S( 20, 70);
 
   #undef S
   #undef V
@@ -422,6 +423,7 @@ namespace {
   Score Evaluation<T>::evaluate_king() {
 
     const Color     Them = (Us == WHITE ? BLACK : WHITE);
+    const Direction Down = (Us == WHITE ? SOUTH : NORTH);
     const Bitboard  Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                         : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
@@ -512,6 +514,12 @@ namespace {
     // Penalty when our king is on a pawnless flank
     if (!(pos.pieces(PAWN) & KingFlank[kf]))
         score -= PawnlessFlank;
+
+    // Penalty when king has no mobility
+    b = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces(Them));
+
+    if (!(attackedBy[Us][KING] & ~(b | attackedBy[Them][ALL_PIECES])))
+        score -= NoKingMobility;
 
     if (T)
         Trace::add(KING, Us, score);
