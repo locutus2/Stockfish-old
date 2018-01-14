@@ -144,6 +144,9 @@ namespace {
     // a white knight on g5 and black's king is on g8, this white knight adds 2
     // to kingAdjacentZoneAttacksCount[WHITE].
     int kingAdjacentZoneAttacksCount[COLOR_NB];
+
+    // immobilePieces[color] contains pieces which could't move.
+    Bitboard immobilePieces[COLOR_NB];
   };
 
   #define V(v) Value(v)
@@ -329,7 +332,10 @@ namespace {
             kingAdjacentZoneAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
-        int mob = popcount(b & mobilityArea[Us]);
+        int mob = popcount(b & mobilityArea[Us] & ~immobilePieces[Us]);
+
+        if (mob == 0)
+            immobilePieces[Us] |= s;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
