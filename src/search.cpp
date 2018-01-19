@@ -676,7 +676,6 @@ namespace {
     if (   !PvNode
         &&  eval >= beta
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
-        && (!cutNode || relative_rank(pos.side_to_move(), pos.square<KING>(~pos.side_to_move())) > RANK_4)
         && (ss->ply >= thisThread->nmp_ply || ss->ply % 2 != thisThread->nmp_odd))
     {
 
@@ -708,7 +707,7 @@ namespace {
             thisThread->nmp_odd = ss->ply % 2;
 
             Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta)
-                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, true);
+                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, true, true);
 
             thisThread->nmp_odd = thisThread->nmp_ply = 0;
 
