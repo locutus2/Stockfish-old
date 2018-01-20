@@ -707,7 +707,7 @@ namespace {
             thisThread->nmp_odd = ss->ply % 2;
 
             Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta)
-                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, true, true);
+                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, true);
 
             thisThread->nmp_odd = thisThread->nmp_ply = 0;
 
