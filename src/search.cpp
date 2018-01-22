@@ -698,7 +698,7 @@ namespace {
             if (nullValue >= VALUE_MATE_IN_MAX_PLY)
                 nullValue = beta;
 
-            if (abs(beta) < VALUE_KNOWN_WIN  && eval >= beta + 25 && (depth < 12 * ONE_PLY || thisThread->nmp_ply))
+            if (abs(beta) < VALUE_KNOWN_WIN  && eval >= beta + 50 && (depth < 12 * ONE_PLY || thisThread->nmp_ply))
                 return nullValue;
 
             // Do verification search at high depths
