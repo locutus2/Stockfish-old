@@ -220,6 +220,7 @@ namespace {
   const Score WeakQueen             = S( 50, 10);
   const Score CloseEnemies          = S(  7,  0);
   const Score PawnlessFlank         = S( 20, 80);
+  const Score KingBindedToDefense   = S( 20, 80);
   const Score ThreatBySafePawn      = S(192,175);
   const Score ThreatByRank          = S( 16,  3);
   const Score Hanging               = S( 48, 27);
@@ -615,6 +616,19 @@ namespace {
        | (attackedBy[Us][ROOK  ] & attackedBy[Them][QUEEN] & ~attackedBy[Them][QUEEN_DIAGONAL]);
 
     score += ThreatByAttackOnQueen * popcount(b & safeThreats);
+
+    // Add a bonus for attacks on pawns which only defended by king
+    // and king cannot move without giving up the defense
+    b =   pos.pieces(Them, PAWN)
+       &  attackedBy[Us][ALL_PIECES]
+       & ~attackedBy[Us][PAWN]
+       &  attackedBy[Them][KING]
+       & ~attackedBy2[Them];
+
+    while (b)
+       if (!(    pos.attacks_from<KING>(pop_lsb(&b)) & attackedBy[Them][KING]
+             & ~(pos.pieces(Them) | attackedBy[Us][ALL_PIECES])))
+           score += KingBindedToDefense;
 
     if (T)
         Trace::add(THREAT, Us, score);
