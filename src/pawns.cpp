@@ -31,8 +31,8 @@ namespace {
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
-  // Isolated pawn penalty
-  const Score Isolated = S(13, 18);
+  // Isolated pawn penalty by fixed state
+  const Score Isolated[2] = { S(13, 18), S(18, 25) };
 
   // Backward pawn penalty
   const Score Backward = S(24, 12);
@@ -177,7 +177,13 @@ namespace {
             score += Connected[opposed][bool(phalanx)][popcount(supported)][relative_rank(Us, s)];
 
         else if (!neighbours)
-            score -= Isolated, e->weakUnopposed[Us] += !opposed;
+        {
+            bool fixed =    relative_rank(Us, s) < RANK_5
+                        && !lever
+                        && (theirPawns & (s + Up))
+                        && (theirPawns & adjacent_files_bb(f));
+            score -= Isolated[fixed], e->weakUnopposed[Us] += !opposed;
+        }
 
         else if (backward)
             score -= Backward, e->weakUnopposed[Us] += !opposed;
