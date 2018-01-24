@@ -220,7 +220,7 @@ namespace {
   const Score WeakQueen             = S( 50, 10);
   const Score CloseEnemies          = S(  7,  0);
   const Score PawnlessFlank         = S( 20, 80);
-  const Score KingBindedToDefense   = S( 20, 80);
+  const Score KingBindedToDefense   = S( 10, 40);
   const Score ThreatBySafePawn      = S(192,175);
   const Score ThreatByRank          = S( 16,  3);
   const Score Hanging               = S( 48, 27);
