@@ -34,6 +34,8 @@ namespace {
   // Isolated pawn penalty
   const Score Isolated = S(13, 18);
 
+  const Score FixedIsolatedDoubled = S(19, 19);
+
   // Backward pawn penalty
   const Score Backward = S(24, 12);
 
@@ -177,7 +179,12 @@ namespace {
             score += Connected[opposed][bool(phalanx)][popcount(supported)][relative_rank(Us, s)];
 
         else if (!neighbours)
+        {
             score -= Isolated, e->weakUnopposed[Us] += !opposed;
+
+            if (leverPush && (ourPawns & forward_file_bb(Them, s)))
+                score -= FixedIsolatedDoubled;
+        }
 
         else if (backward)
             score -= Backward, e->weakUnopposed[Us] += !opposed;
