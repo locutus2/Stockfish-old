@@ -34,6 +34,12 @@ namespace {
   // Isolated pawn penalty
   const Score Isolated = S(13, 18);
 
+  // Vertically isolated pawn penalty by rank
+  const Score VerticalIsolated[RANK_NB] = {
+    S( 0,  0), S(54, 56), S(44, 46), S(35, 37),
+    S(25, 27), S(16, 18), S( 6,  8), S( 0, 0)
+  };
+
   // Backward pawn penalty
   const Score Backward = S(24, 12);
 
@@ -181,6 +187,9 @@ namespace {
 
         else if (backward)
             score -= Backward, e->weakUnopposed[Us] += !opposed;
+
+        if (neighbours && !(ourPawns & DistanceRingBB[s][0]))
+            score -= VerticalIsolated[relative_rank(Us, s)];
 
         if (doubled && !supported)
             score -= Doubled;
