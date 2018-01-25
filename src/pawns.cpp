@@ -36,8 +36,8 @@ namespace {
 
   // Vertically isolated pawn penalty by rank
   const Score VerticalIsolated[RANK_NB] = {
-    S( 0,  0), S(54, 56), S(44, 46), S(35, 37),
-    S(25, 27), S(16, 18), S( 6,  8), S( 0, 0)
+    S( 0,  0), S(13, 14), S(11, 12), S(9, 10),
+    S( 6,  7), S( 4,  5), S( 1,  2), S( 0, 0)
   };
 
   // Backward pawn penalty
