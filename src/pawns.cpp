@@ -188,7 +188,7 @@ namespace {
         else if (backward)
             score -= Backward, e->weakUnopposed[Us] += !opposed;
 
-        if (neighbours && !(ourPawns & DistanceRingBB[s][0]))
+        if (neighbours && !(neighbours & DistanceRingBB[s][0]))
             score -= VerticalIsolated[relative_rank(Us, s)];
 
         if (doubled && !supported)
