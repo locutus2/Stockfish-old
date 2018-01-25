@@ -32,7 +32,7 @@ namespace {
   #define S(mg, eg) make_score(mg, eg)
 
   // Isolated pawn penalty by double attack on square in front
-  const Score Isolated[2] = { S(13, 18), S(25, 30) };
+  const Score Isolated[2] = { S(13, 18), S(19, 24) };
 
   // Backward pawn penalty
   const Score Backward = S(24, 12);
