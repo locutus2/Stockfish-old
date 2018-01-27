@@ -500,7 +500,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval;
-    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving;
+    bool ttHit, inCheck, givesCheck, singularExtensionNode, improving, lmrResearch;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -900,6 +900,7 @@ moves_loop: // When in check search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->contHistory = &thisThread->contHistory[movedPiece][to_sq(move)];
+      lmrResearch = false;
 
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
@@ -960,7 +961,7 @@ moves_loop: // When in check search starts from here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
 
-          doFullDepthSearch = (value > alpha && d != newDepth);
+          lmrResearch = doFullDepthSearch = (value > alpha && d != newDepth);
       }
       else
           doFullDepthSearch = !PvNode || moveCount > 1;
@@ -1049,9 +1050,9 @@ moves_loop: // When in check search starts from here
           }
       }
 
-      if (!captureOrPromotion && move != bestMove && quietCount < 64)
+      if (!captureOrPromotion && move != bestMove && !lmrResearch && quietCount < 64)
           quietsSearched[quietCount++] = move;
-      else if (captureOrPromotion && move != bestMove && captureCount < 32)
+      else if (captureOrPromotion && move != bestMove && !lmrResearch && captureCount < 32)
           capturesSearched[captureCount++] = move;
     }
 
