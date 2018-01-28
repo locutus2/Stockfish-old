@@ -495,7 +495,7 @@ namespace {
         {
             int mobilityDanger = mg_value(mobility[Them] - mobility[Us]);
             kingDanger = std::max(0, kingDanger + mobilityDanger);
-            kingDanger = kingDanger * (kingAttackersCount[Them] + 63) / 64;
+            kingDanger = kingDanger * (kingAttackersCount[Them] + 60) / 64;
             score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
         }
     }
