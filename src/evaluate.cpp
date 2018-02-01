@@ -488,13 +488,12 @@ namespace {
                      + 143 * popcount(pos.pinned_pieces(Us) | unsafeChecks)
                      - 848 * !pos.count<QUEEN>(Them)
                      -   9 * mg_value(score) / 8
-                     +  40;
+                     + 165;
 
         // Transform the kingDanger units into a Score, and subtract it from the evaluation
         if (kingDanger > 0)
         {
-            int mobilityDanger = mg_value(mobility[Them] - mobility[Us]);
-            kingDanger = std::max(0, kingDanger + mobilityDanger);
+            kingDanger = std::max(0, kingDanger - mg_value(mobility[Us]));
             score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
         }
     }
