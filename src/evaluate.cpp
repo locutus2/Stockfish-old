@@ -174,7 +174,7 @@ namespace {
   // then score is doubled.
   const Score Outpost[][2] = {
     { S(22, 6), S(36,12) }, // Knight
-    { S( 9, 2), S(15, 5) }  // Bishop
+    { S( 4, 1), S( 7, 2) }  // Bishop
   };
 
   // RookOnFile[semiopen/open] contains bonuses for each rook when there is no
@@ -346,7 +346,7 @@ namespace {
             bb = OutpostRanks & ~pe->pawn_attacks_span(Them);
             if (bb & s)
                 score += Outpost[Pt == BISHOP][bool(attackedBy[Us][PAWN] & s)] * 2;
-            else
+            else if (Pt == KNIGHT)
             {
                 bb &= b & ~pos.pieces(Us);
                 if (bb)
