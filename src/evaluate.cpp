@@ -348,7 +348,10 @@ namespace {
                 score += Outpost[Pt == BISHOP][bool(attackedBy[Us][PAWN] & s)] * 2;
             else
             {
-                bb &= b & ~pos.pieces(Us) & forward_ranks_bb(Us, s);
+                bb &= b & ~pos.pieces(Us);
+                if (Pt == BISHOP)
+                    bb &= forward_ranks_bb(Us, s);
+
                 if (bb)
                    score += Outpost[Pt == BISHOP][bool(attackedBy[Us][PAWN] & bb)];
             }
