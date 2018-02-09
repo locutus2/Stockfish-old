@@ -181,20 +181,27 @@ namespace {
   // friendly pawn on the rook file.
   const Score RookOnFile[] = { S(20, 7), S(45, 20) };
 
-  // ThreatByMinor/ByRook[attacked PieceType] contains bonuses according to
+  // ThreatByMinor/ByRook[on move][attacked PieceType] contains bonuses according to
   // which piece type attacks which one. Attacks on lesser pieces which are
   // pawn-defended are not considered.
-  const Score ThreatByMinor[PIECE_TYPE_NB] = {
-    S(0, 0), S(0, 31), S(39, 42), S(57, 44), S(68, 112), S(47, 120)
+   Score ThreatByMinor[2][PIECE_TYPE_NB] = {
+     { S(0, 0), S(1, 31), S(39, 42), S(57, 44), S(68, 112), S(47, 120) },
+     { S(0, 0), S(1, 31), S(39, 42), S(57, 44), S(68, 112), S(47, 120) }
   };
 
-  const Score ThreatByRook[PIECE_TYPE_NB] = {
-    S(0, 0), S(0, 24), S(38, 71), S(38, 61), S(0, 38), S(36, 38)
+   Score ThreatByRook[2][PIECE_TYPE_NB] = {
+    { S(0, 0), S(1, 24), S(38, 71), S(38, 61), S(1, 38), S(36, 38) },
+    { S(0, 0), S(1, 24), S(38, 71), S(38, 61), S(1, 38), S(36, 38) }
   };
 
-  // ThreatByKing[on one/on many] contains bonuses for king attacks on
+  // ThreatByKing[on move][on one/on many] contains bonuses for king attacks on
   // pawns or pieces which are not pawn-defended.
-  const Score ThreatByKing[] = { S(3, 65), S(9, 145) };
+   Score ThreatByKing[2][2] = {
+    { S(3, 65), S(9, 145) },
+    { S(3, 65), S(9, 145) }
+  };
+
+  TUNE(ThreatByMinor, ThreatByRook, ThreatByKing);
 
   // Passed[mg/eg][Rank] contains midgame and endgame bonuses for passed pawns.
   // We don't use a Score because we process the two components independently.
@@ -224,14 +231,18 @@ namespace {
   const Score WeakQueen             = S( 50, 10);
   const Score CloseEnemies          = S(  7,  0);
   const Score PawnlessFlank         = S( 20, 80);
-  const Score ThreatBySafePawn      = S(175,168);
-  const Score ThreatByRank          = S( 16,  3);
-  const Score Hanging               = S( 52, 30);
-  const Score WeakUnopposedPawn     = S(  5, 25);
-  const Score ThreatByPawnPush      = S( 47, 26);
-  const Score ThreatByAttackOnQueen = S( 42, 21);
   const Score HinderPassedPawn      = S(  8,  1);
   const Score TrappedBishopA1H1     = S( 50, 50);
+
+  // Assorted bonuses and penalties indexed by right to move used by evaluation
+   Score ThreatBySafePawn[2]      = { S(175,168), S(175,168) };
+   Score ThreatByRank[2]          = { S( 16,  3), S( 16,  3) };
+   Score Hanging[2]               = { S( 52, 30), S( 52, 30) };
+   Score WeakUnopposedPawn[2]     = { S(  5, 25), S(  5, 25) };
+   Score ThreatByPawnPush[2]      = { S( 47, 26), S( 47, 26) };
+   Score ThreatByAttackOnQueen[2] = { S( 42, 21), S( 42, 21) };
+
+  TUNE(ThreatBySafePawn, ThreatByRank, Hanging, WeakUnopposedPawn, ThreatByPawnPush, ThreatByAttackOnQueen);
 
   #undef S
   #undef V
@@ -538,6 +549,7 @@ namespace {
 
     Bitboard b, weak, defended, stronglyProtected, safeThreats;
     Score score = SCORE_ZERO;
+    bool onMove = pos.side_to_move() == Us;
 
     // Non-pawn enemies attacked by a pawn
     weak = (pos.pieces(Them) ^ pos.pieces(Them, PAWN)) & attackedBy[Us][PAWN];
@@ -549,7 +561,7 @@ namespace {
 
         safeThreats = (shift<Right>(b) | shift<Left>(b)) & weak;
 
-        score += ThreatBySafePawn * popcount(safeThreats);
+        score += ThreatBySafePawn[onMove] * popcount(safeThreats);
     }
 
     // Squares strongly protected by the opponent, either because they attack the
@@ -573,30 +585,30 @@ namespace {
         while (b)
         {
             Square s = pop_lsb(&b);
-            score += ThreatByMinor[type_of(pos.piece_on(s))];
+            score += ThreatByMinor[onMove][type_of(pos.piece_on(s))];
             if (type_of(pos.piece_on(s)) != PAWN)
-                score += ThreatByRank * (int)relative_rank(Them, s);
+                score += ThreatByRank[onMove] * (int)relative_rank(Them, s);
         }
 
         b = (pos.pieces(Them, QUEEN) | weak) & attackedBy[Us][ROOK];
         while (b)
         {
             Square s = pop_lsb(&b);
-            score += ThreatByRook[type_of(pos.piece_on(s))];
+            score += ThreatByRook[onMove][type_of(pos.piece_on(s))];
             if (type_of(pos.piece_on(s)) != PAWN)
-                score += ThreatByRank * (int)relative_rank(Them, s);
+                score += ThreatByRank[onMove] * (int)relative_rank(Them, s);
         }
 
-        score += Hanging * popcount(weak & ~attackedBy[Them][ALL_PIECES]);
+        score += Hanging[onMove] * popcount(weak & ~attackedBy[Them][ALL_PIECES]);
 
         b = weak & attackedBy[Us][KING];
         if (b)
-            score += ThreatByKing[more_than_one(b)];
+            score += ThreatByKing[onMove][more_than_one(b)];
     }
 
     // Bonus for opponent unopposed weak pawns
     if (pos.pieces(Us, ROOK, QUEEN))
-        score += WeakUnopposedPawn * pe->weak_unopposed(Them);
+        score += WeakUnopposedPawn[onMove] * pe->weak_unopposed(Them);
 
     // Find squares where our pawns can push on the next move
     b  = shift<Up>(pos.pieces(Us, PAWN)) & ~pos.pieces();
@@ -611,14 +623,14 @@ namespace {
        &  pos.pieces(Them)
        & ~attackedBy[Us][PAWN];
 
-    score += ThreatByPawnPush * popcount(b);
+    score += ThreatByPawnPush[onMove] * popcount(b);
 
     // Add a bonus for safe slider attack threats on opponent queen
     safeThreats = ~pos.pieces(Us) & ~attackedBy2[Them] & attackedBy2[Us];
     b =  (attackedBy[Us][BISHOP] & attackedBy[Them][QUEEN_DIAGONAL])
        | (attackedBy[Us][ROOK  ] & attackedBy[Them][QUEEN] & ~attackedBy[Them][QUEEN_DIAGONAL]);
 
-    score += ThreatByAttackOnQueen * popcount(b & safeThreats);
+    score += ThreatByAttackOnQueen[onMove] * popcount(b & safeThreats);
 
     if (T)
         Trace::add(THREAT, Us, score);
