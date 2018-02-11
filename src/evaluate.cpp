@@ -185,20 +185,20 @@ namespace {
   // which piece type attacks which one. Attacks on lesser pieces which are
   // pawn-defended are not considered.
   const Score ThreatByMinor[2][PIECE_TYPE_NB] = {
-     { S(0, 0), S(3, 34), S(39, 45), S(57, 39), S(67, 115), S(41, 120) },
-     { S(0, 0), S(2, 31), S(37, 42), S(57, 46), S(64, 112), S(48, 124) }
+     { S(0, 0), S(3, 33), S(36, 46), S(58, 41), S(66, 119), S(39, 122) },
+     { S(0, 0), S(2, 29), S(38, 44), S(54, 46), S(64, 109), S(47, 125) }
   };
 
   const Score ThreatByRook[2][PIECE_TYPE_NB] = {
-    { S(0, 0), S( 0, 22), S(36, 75), S(39, 58), S(1, 38), S(38, 38) },
-    { S(0, 0), S(-4, 24), S(37, 64), S(40, 59), S(6, 40), S(40, 36) }
+    { S(0, 0), S(-2, 23), S(32, 72), S(36, 60), S(-2, 36), S(39, 34) },
+    { S(0, 0), S(-4, 26), S(41, 65), S(37, 60), S( 6, 41), S(38, 34) }
   };
 
   // ThreatByKing[on move][on one/on many] contains bonuses for king attacks on
   // pawns or pieces which are not pawn-defended.
   const Score ThreatByKing[2][2] = {
-    { S(8, 70), S(12, 140) },
-    { S(2, 67), S( 7, 145) }
+    { S(7, 67), S(13, 142) },
+    { S(0, 69), S( 5, 144) }
   };
 
   // Passed[mg/eg][Rank] contains midgame and endgame bonuses for passed pawns.
@@ -233,12 +233,12 @@ namespace {
   const Score TrappedBishopA1H1     = S( 50, 50);
 
   // Assorted bonuses and penalties indexed by right to move used by evaluation
-  const Score ThreatBySafePawn[2]      = { S(175,163), S(177,168) };
-  const Score ThreatByRank[2]          = { S( 14,  4), S( 17,  2) };
-  const Score Hanging[2]               = { S( 53, 36), S( 53, 31) };
-  const Score WeakUnopposedPawn[2]     = { S(  5, 25), S(  6, 27) };
-  const Score ThreatByPawnPush[2]      = { S( 47, 27), S( 48, 26) };
-  const Score ThreatByAttackOnQueen[2] = { S( 44, 18), S( 46, 25) };
+  const Score ThreatBySafePawn[2]      = { S(173,162), S(179,168) };
+  const Score ThreatByRank[2]          = { S( 12,  1), S( 15,  1) };
+  const Score Hanging[2]               = { S( 55, 36), S( 53, 34) };
+  const Score WeakUnopposedPawn[2]     = { S(  3, 24), S(  9, 26) };
+  const Score ThreatByPawnPush[2]      = { S( 44, 28), S( 47, 26) };
+  const Score ThreatByAttackOnQueen[2] = { S( 48, 18), S( 49, 26) };
 
   #undef S
   #undef V
