@@ -118,7 +118,7 @@ namespace {
         File f = file_of(s);
         Rank rr = relative_rank(Us, s);
 
-        if (rr < RANK_6)
+        if (rr < RANK_7)
             e->semiopenFiles[Us]   &= ~(1 << f);
 
         e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
