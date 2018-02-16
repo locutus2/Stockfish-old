@@ -116,8 +116,11 @@ namespace {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
         File f = file_of(s);
+        Rank rr = relative_rank(Us, s);
 
-        e->semiopenFiles[Us]   &= ~(1 << f);
+        if (rr < RANK_6)
+            e->semiopenFiles[Us]   &= ~(1 << f);
+
         e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
 
         // Flag the pawn
@@ -132,7 +135,7 @@ namespace {
 
         // A pawn is backward when it is behind all pawns of the same color on the
         // adjacent files and cannot be safely advanced.
-        if (!neighbours || lever || relative_rank(Us, s) >= RANK_5)
+        if (!neighbours || lever || rr >= RANK_5)
             backward = false;
         else
         {
@@ -158,7 +161,7 @@ namespace {
             e->passedPawns[Us] |= s;
 
         else if (   stoppers == SquareBB[s + Up]
-                 && relative_rank(Us, s) >= RANK_5)
+                 && rr >= RANK_5)
         {
             b = shift<Up>(supported) & ~theirPawns;
             while (b)
@@ -168,7 +171,7 @@ namespace {
 
         // Score this pawn
         if (supported | phalanx)
-            score += Connected[opposed][bool(phalanx)][popcount(supported)][relative_rank(Us, s)];
+            score += Connected[opposed][bool(phalanx)][popcount(supported)][rr];
 
         else if (!neighbours)
             score -= Isolated, e->weakUnopposed[Us] += !opposed;
