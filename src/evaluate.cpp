@@ -489,6 +489,9 @@ namespace {
                      -   9 * mg_value(score) / 8
                      +  40;
 
+        if (!(attackedBy[Them][ROOK] & kingRing[Us]))
+            kingDanger += 20 * pos.count<ROOK>(Them) - 20;
+
         // Transform the kingDanger units into a Score, and subtract it from the evaluation
         if (kingDanger > 0)
         {
