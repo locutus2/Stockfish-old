@@ -283,8 +283,9 @@ void Thread::search() {
   for (int i = 4; i > 0; i--)
      (ss-i)->contHistory = &this->contHistory[NO_PIECE][0]; // Use as sentinel
 
-  bestValue = delta = alpha = -VALUE_INFINITE;
-  beta = VALUE_INFINITE;
+  bestValue = alpha = -VALUE_INFINITE;
+  delta = VALUE_ZERO;
+  beta  = VALUE_INFINITE;
 
   if (mainThread)
       mainThread->bestMoveChanges = 0, mainThread->failedLow = false;
@@ -328,8 +329,9 @@ void Thread::search() {
       // MultiPV loop. We perform a full root search for each PV line
       for (PVIdx = 0; PVIdx < multiPV && !Threads.stop; ++PVIdx)
       {
-          // Reset UCI info selDepth for each depth and each PV line
+          // Reset UCI info selDepth and bestValue for each depth and each PV line
           selDepth = 0;
+          bestValue = -VALUE_INFINITE;
 
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
@@ -337,15 +339,6 @@ void Thread::search() {
               delta = Value(18);
               alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
-
-              // Adjust contempt based on current bestValue
-              ct =  Options["Contempt"] * PawnValueEg / 100 // From centipawns
-                  + (bestValue >  500 ?  50:                // Dynamic contempt
-                     bestValue < -500 ? -50:
-                     bestValue / 10);
-
-              Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
-                                            : -make_score(ct, ct / 2));
           }
 
           // Start with a small aspiration window and, in the case of a fail
@@ -397,6 +390,7 @@ void Thread::search() {
 
               delta += delta / 4 + 5;
 
+              assert(delta >= VALUE_ZERO);
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
 
