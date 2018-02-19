@@ -113,7 +113,7 @@ namespace {
 
     // attackedBy[color][piece type] is a bitboard representing all squares
     // attacked by a given color and piece type. Special "piece types" which are
-    // also calculated are QUEEN_DIAGONAL, BISHOP_WITHOUT_XRAY, ROOK_WITHOUT_XRAY
+    // also calculated are QUEEN_DIAGONAL, BISHOP_NON_XRAY, ROOK_NON_XRAY
     // and ALL_PIECES.
     Bitboard attackedBy[COLOR_NB][ATTACK_TYPE_NB];
 
@@ -309,10 +309,10 @@ namespace {
     attackedBy[Us][Pt] = 0;
 
     if (Pt == BISHOP)
-        attackedBy[Us][BISHOP_WITHOUT_XRAY] = 0;
+        attackedBy[Us][BISHOP_NON_XRAY] = 0;
 
     if (Pt == ROOK)
-        attackedBy[Us][ROOK_WITHOUT_XRAY] = 0;
+        attackedBy[Us][ROOK_NON_XRAY] = 0;
 
     if (Pt == QUEEN)
         attackedBy[Us][QUEEN_DIAGONAL] = 0;
@@ -331,10 +331,10 @@ namespace {
         attackedBy[Us][ALL_PIECES] |= attackedBy[Us][Pt] |= b;
 
         if (Pt == BISHOP)
-            attackedBy[Us][BISHOP_WITHOUT_XRAY] |= b & pos.attacks_from<Pt>(s);
+            attackedBy[Us][BISHOP_NON_XRAY] |= b & pos.attacks_from<Pt>(s);
 
         if (Pt == ROOK)
-            attackedBy[Us][ROOK_WITHOUT_XRAY] |= b & pos.attacks_from<Pt>(s);
+            attackedBy[Us][ROOK_NON_XRAY] |= b & pos.attacks_from<Pt>(s);
 
         if (Pt == QUEEN)
             attackedBy[Us][QUEEN_DIAGONAL] |= b & PseudoAttacks[BISHOP][s];
@@ -472,24 +472,14 @@ namespace {
         b2 &= attackedBy[Them][BISHOP];
 
         // Enemy rooks checks
-        if (b1 & safe)
-        {
-            if (b1 & safe & attackedBy[Them][ROOK_WITHOUT_XRAY])
-                kingDanger += RookSafeCheck;
-            else
-                kingDanger += RookSafeCheck / 2;
-        }
+        if (b1 & safe & attackedBy[Them][ROOK_NON_XRAY])
+            kingDanger += RookSafeCheck;
         else
             unsafeChecks |= b1;
 
         // Enemy bishops checks
-        if (b2 & safe)
-        {
-            if (b2 & safe & attackedBy[Them][BISHOP_WITHOUT_XRAY])
-                kingDanger += BishopSafeCheck;
-            else
-                kingDanger += BishopSafeCheck / 2;
-        }
+        if (b2 & safe & attackedBy[Them][BISHOP_NON_XRAY])
+            kingDanger += BishopSafeCheck;
         else
             unsafeChecks |= b2;
 
