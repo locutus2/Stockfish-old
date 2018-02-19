@@ -468,18 +468,28 @@ namespace {
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
             kingDanger += QueenSafeCheck;
 
-        b1 &= attackedBy[Them][ROOK_WITHOUT_XRAY];
-        b2 &= attackedBy[Them][BISHOP_WITHOUT_XRAY];
+        b1 &= attackedBy[Them][ROOK];
+        b2 &= attackedBy[Them][BISHOP];
 
         // Enemy rooks checks
         if (b1 & safe)
-            kingDanger += RookSafeCheck;
+        {
+            if (b1 & safe & attackedBy[Them][ROOK_WITHOUT_XRAY])
+                kingDanger += RookSafeCheck;
+            else
+                kingDanger += RookSafeCheck / 2;
+        }
         else
             unsafeChecks |= b1;
 
         // Enemy bishops checks
         if (b2 & safe)
-            kingDanger += BishopSafeCheck;
+        {
+            if (b2 & safe & attackedBy[Them][BISHOP_WITHOUT_XRAY])
+                kingDanger += BishopSafeCheck;
+            else
+                kingDanger += BishopSafeCheck / 2;
+        }
         else
             unsafeChecks |= b2;
 
