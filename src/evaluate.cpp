@@ -113,8 +113,9 @@ namespace {
 
     // attackedBy[color][piece type] is a bitboard representing all squares
     // attacked by a given color and piece type. Special "piece types" which are
-    // also calculated are QUEEN_DIAGONAL and ALL_PIECES.
-    Bitboard attackedBy[COLOR_NB][PIECE_TYPE_NB];
+    // also calculated are QUEEN_DIAGONAL, BISHOP_WITHOUT_XRAY, ROOK_WITHOUT_XRAY
+    // and ALL_PIECES.
+    Bitboard attackedBy[COLOR_NB][ATTACK_TYPE_NB];
 
     // attackedBy2[color] are the squares attacked by 2 pieces of a given color,
     // possibly via x-ray or by one pawn and one piece. Diagonal x-ray through
@@ -307,6 +308,12 @@ namespace {
 
     attackedBy[Us][Pt] = 0;
 
+    if (Pt == BISHOP)
+        attackedBy[Us][BISHOP_WITHOUT_XRAY] = 0;
+
+    if (Pt == ROOK)
+        attackedBy[Us][ROOK_WITHOUT_XRAY] = 0;
+
     if (Pt == QUEEN)
         attackedBy[Us][QUEEN_DIAGONAL] = 0;
 
@@ -322,6 +329,12 @@ namespace {
 
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][ALL_PIECES] |= attackedBy[Us][Pt] |= b;
+
+        if (Pt == BISHOP)
+            attackedBy[Us][BISHOP_WITHOUT_XRAY] |= b & pos.attacks_from<Pt>(s);
+
+        if (Pt == ROOK)
+            attackedBy[Us][ROOK_WITHOUT_XRAY] |= b & pos.attacks_from<Pt>(s);
 
         if (Pt == QUEEN)
             attackedBy[Us][QUEEN_DIAGONAL] |= b & PseudoAttacks[BISHOP][s];
@@ -455,8 +468,8 @@ namespace {
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
             kingDanger += QueenSafeCheck;
 
-        b1 &= attackedBy[Them][ROOK];
-        b2 &= attackedBy[Them][BISHOP];
+        b1 &= attackedBy[Them][ROOK_WITHOUT_XRAY];
+        b2 &= attackedBy[Them][BISHOP_WITHOUT_XRAY];
 
         // Enemy rooks checks
         if (b1 & safe)
