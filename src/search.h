@@ -97,6 +97,7 @@ struct LimitsType {
 };
 
 extern LimitsType Limits;
+extern std::vector<Move> TraceMoves;
 
 void init();
 void clear();

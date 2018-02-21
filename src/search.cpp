@@ -40,6 +40,7 @@
 namespace Search {
 
   LimitsType Limits;
+  std::vector<Move> TraceMoves;
 }
 
 namespace Tablebases {
@@ -95,10 +96,10 @@ namespace {
     Move best = MOVE_NONE;
   };
 
-  template <NodeType NT>
+  template <NodeType NT, bool TRACE = false>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning);
 
-  template <NodeType NT, bool InCheck>
+  template <NodeType NT, bool InCheck, bool TRACE = false>
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth = DEPTH_ZERO);
 
   Value value_to_tt(Value v, int ply);
@@ -107,6 +108,10 @@ namespace {
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
+
+  void trace_output(const Position& pos, Move move, string point);
+  void trace_enter(const Position& pos, Move move, string point);
+  void trace_exit(const Position& pos, Move move, string point, Value value, Move bestMove = MOVE_NONE);
 
   // perft() is our utility to verify move generation. All the leaf nodes up
   // to the given depth are generated and counted, and the sum is returned.
@@ -264,7 +269,6 @@ void MainThread::search() {
   std::cout << sync_endl;
 }
 
-
 /// Thread::search() is the main iterative deepening loop. It calls search()
 /// repeatedly with increasing depth until the allocated thinking time has been
 /// consumed, the user stops the search, or the maximum search depth is reached.
@@ -353,7 +357,11 @@ void Thread::search() {
           // high/low anymore.
           while (true)
           {
-              bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, false);
+              if (mainThread && !TraceMoves.empty()) {
+            	  trace_enter(rootPos, MOVE_NONE, "");
+            	  bestValue = ::search<PV, true>(rootPos, ss, alpha, beta, rootDepth, false, false);
+              }
+              else bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, false);
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
@@ -479,7 +487,23 @@ namespace {
 
   // search<>() is the main search function for both PV and non-PV nodes
 
-  template <NodeType NT>
+
+#define TRACING_MOVE(move) (TRACE && TraceMoves.size() >= unsigned(ss->ply) + 1\
+        && move == TraceMoves[ss->ply])
+
+#define SEARCH(point, nt, args) (TRACING_MOVE(ss->currentMove) ? (trace_enter(pos, ss->currentMove, point),\
+		    search<nt, true>args) : search<nt>args)
+#define QSEARCH(point, nt, inCheck, args) (TRACING_MOVE(ss->currentMove) ?\
+		(trace_enter(pos, ss->currentMove, point), qsearch<nt, inCheck, true>args)\
+	    : qsearch<nt, inCheck>args)
+#define ENTER(point) { if (TRACE) trace_enter(pos, (ss-1)->currentMove, point); }
+#define EXIT(point, value) { if (TRACE) trace_exit(pos, (ss-1)->currentMove, point, value);\
+	    return value; }
+#define EXIT2(point, value, bestMove) { if (TRACE) trace_exit(pos, (ss-1)->currentMove, point, value, bestMove);\
+	    return value; }
+#define SKIP_MOVE(point, move) { if (TRACING_MOVE(move)) trace_output(pos, move, point); continue; }
+
+  template <NodeType NT, bool TRACE = false>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning) {
 
     const bool PvNode = NT == PV;
@@ -490,6 +514,7 @@ namespace {
     assert(DEPTH_ZERO < depth && depth < DEPTH_MAX);
     assert(!(PvNode && cutNode));
     assert(depth / ONE_PLY * ONE_PLY == depth);
+    assert(!TRACE || pos.this_thread() == Threads.main());
 
     Move pv[MAX_PLY+1], capturesSearched[32], quietsSearched[64];
     StateInfo st;
@@ -502,6 +527,9 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
+
+    if (TRACE)
+        	std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -524,8 +552,10 @@ namespace {
         // Step 2. Check for aborted search and immediate draw
         if (   Threads.stop.load(std::memory_order_relaxed)
             || pos.is_draw(ss->ply)
-            || ss->ply >= MAX_PLY)
-            return (ss->ply >= MAX_PLY && !inCheck) ? evaluate(pos) : VALUE_DRAW;
+            || ss->ply >= MAX_PLY) {
+        	Value v = (ss->ply >= MAX_PLY && !inCheck) ? evaluate(pos) : VALUE_DRAW;
+        	EXIT("draw", v);
+        }
 
         // Step 3. Mate distance pruning. Even if we mate at the next move our score
         // would be at best mate_in(ss->ply+1), but if alpha is already bigger because
@@ -536,7 +566,7 @@ namespace {
         alpha = std::max(mated_in(ss->ply), alpha);
         beta = std::min(mate_in(ss->ply+1), beta);
         if (alpha >= beta)
-            return alpha;
+        	EXIT("mate_distance", alpha);
     }
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
@@ -585,7 +615,7 @@ namespace {
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
-        return ttValue;
+        EXIT("tt_cutoff", ttValue);
     }
 
     // Step 5. Tablebases probe
@@ -620,8 +650,7 @@ namespace {
                     tte->save(posKey, value_to_tt(value, ss->ply), b,
                               std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY),
                               MOVE_NONE, VALUE_NONE, TT.generation());
-
-                    return value;
+                    EXIT("tb_hit", value);
                 }
 
                 if (PvNode)
@@ -670,21 +699,26 @@ namespace {
         &&  depth < 4 * ONE_PLY
         &&  eval + RazorMargin <= alpha)
     {
-        if (depth <= ONE_PLY)
-            return qsearch<NonPV, false>(pos, ss, alpha, alpha+1);
+        if (depth <= ONE_PLY) {
+        	ENTER("razoring");
+        	Value v = qsearch<NonPV, false, TRACE>(pos, ss, alpha, alpha+1);
+        	EXIT("razoring", v);
+        }
 
         Value ralpha = alpha - RazorMargin;
-        Value v = qsearch<NonPV, false>(pos, ss, ralpha, ralpha+1);
+        ENTER("razoring");
+        Value v = qsearch<NonPV, false, TRACE>(pos, ss, ralpha, ralpha+1);
         if (v <= ralpha)
-            return v;
+        	EXIT("razoring", v);
     }
 
     // Step 8. Futility pruning: child node (skipped when in check)
     if (   !rootNode
         &&  depth < 7 * ONE_PLY
         &&  eval - futility_margin(depth) >= beta
-        &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
-        return eval;
+        &&  eval < VALUE_KNOWN_WIN) {// Do not return unproven wins
+    	EXIT("futility", eval);
+    }
 
     // Step 9. Null move search with verification search
     if (   !PvNode
@@ -701,8 +735,8 @@ namespace {
         ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
 
         pos.do_null_move(st);
-        Value nullValue = depth-R < ONE_PLY ? -qsearch<NonPV, false>(pos, ss+1, -beta, -beta+1)
-                                            : - search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode, true);
+        Value nullValue = depth-R < ONE_PLY ? -QSEARCH("nmp", NonPV, false, (pos, ss+1, -beta, -beta+1))
+                                            : - SEARCH("nmp", NonPV, (pos, ss+1, -beta, -beta+1, depth-R, !cutNode, true));
         pos.undo_null_move();
 
         if (nullValue >= beta)
@@ -712,20 +746,23 @@ namespace {
                 nullValue = beta;
 
             if (abs(beta) < VALUE_KNOWN_WIN && (depth < 12 * ONE_PLY || thisThread->nmp_ply))
-                return nullValue;
+            	EXIT("nmp", nullValue);
 
             // Do verification search at high depths. Disable null move pruning
             // for side to move for the first part of the remaining search tree.
             thisThread->nmp_ply = ss->ply + 3 * (depth-R) / 4;
             thisThread->nmp_odd = ss->ply % 2;
 
-            Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta)
-                                        :  search<NonPV>(pos, ss, beta-1, beta, depth-R, false, true);
+            Value v;
+
+            ENTER("nmp_ver");
+            v = depth-R < ONE_PLY ? qsearch<NonPV, false, TRACE>(pos, ss, beta-1, beta)
+                                  :  search<NonPV, TRACE>(pos, ss, beta-1, beta, depth-R, false, true);
 
             thisThread->nmp_odd = thisThread->nmp_ply = 0;
 
             if (v >= beta)
-                return nullValue;
+            	EXIT("nmp_ver", nullValue);
         }
     }
 
@@ -750,10 +787,10 @@ namespace {
                 assert(depth >= 5 * ONE_PLY);
 
                 pos.do_move(move, st);
-                value = -search<NonPV>(pos, ss+1, -rbeta, -rbeta+1, depth - 4 * ONE_PLY, !cutNode, false);
+                value = -SEARCH("probcut", NonPV, (pos, ss+1, -rbeta, -rbeta+1, depth - 4 * ONE_PLY, !cutNode, false));
                 pos.undo_move(move);
                 if (value >= rbeta)
-                    return value;
+                	EXIT("probcut", value);
             }
     }
 
@@ -867,7 +904,7 @@ moves_loop: // When in check, search starts from here
               if (moveCountPruning)
               {
                   skipQuiets = true;
-                  continue;
+                  SKIP_MOVE("mcp", move);
               }
 
               // Reduced depth of the next LMR search
@@ -877,23 +914,23 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 3
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-                  continue;
+                  SKIP_MOVE("countermoves", move);
 
               // Futility pruning: parent node
               if (   lmrDepth < 7
                   && !inCheck
                   && ss->staticEval + 256 + 200 * lmrDepth <= alpha)
-                  continue;
+                  SKIP_MOVE("futility", move);
 
               // Prune moves with negative SEE
               if (   lmrDepth < 8
                   && !pos.see_ge(move, Value(-35 * lmrDepth * lmrDepth)))
-                  continue;
+            	  SKIP_MOVE("see", move);
           }
           else if (    depth < 7 * ONE_PLY
                    && !extension
                    && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY)))
-                  continue;
+                  SKIP_MOVE("see", move);
       }
 
       // Speculative prefetch as early as possible
@@ -970,7 +1007,7 @@ moves_loop: // When in check, search starts from here
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
+          value = -SEARCH("lmr", NonPV, (pos, ss+1, -(alpha+1), -alpha, d, true, false));
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
@@ -978,11 +1015,12 @@ moves_loop: // When in check, search starts from here
           doFullDepthSearch = !PvNode || moveCount > 1;
 
       // Step 17. Full depth search when LMR is skipped or fails high
-      if (doFullDepthSearch)
-          value = newDepth <   ONE_PLY ?
-                            givesCheck ? -qsearch<NonPV,  true>(pos, ss+1, -(alpha+1), -alpha)
-                                       : -qsearch<NonPV, false>(pos, ss+1, -(alpha+1), -alpha)
-                                       : - search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, false);
+      if (doFullDepthSearch) {
+    		  value = newDepth <   ONE_PLY ?
+    		         givesCheck ? -QSEARCH("", NonPV, true, (pos, ss+1, -(alpha+1), -alpha))
+    		                    : -QSEARCH("", NonPV, false, (pos, ss+1, -(alpha+1), -alpha))
+    		                    : -SEARCH("", NonPV, (pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, false));
+      }
 
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
@@ -991,11 +1029,10 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
-
           value = newDepth <   ONE_PLY ?
-                            givesCheck ? -qsearch<PV,  true>(pos, ss+1, -beta, -alpha)
-                                       : -qsearch<PV, false>(pos, ss+1, -beta, -alpha)
-                                       : - search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, false);
+                  givesCheck ? -QSEARCH("", PV, true, (pos, ss+1, -beta, -alpha))
+                             : -QSEARCH("", PV, false, (pos, ss+1, -beta, -alpha))
+                             : -SEARCH("", PV, (pos, ss+1, -beta, -alpha, newDepth, false, false));
       }
 
       // Step 18. Undo move
@@ -1008,8 +1045,7 @@ moves_loop: // When in check, search starts from here
       // the search cannot be trusted, and we return immediately without
       // updating best move, PV and TT.
       if (Threads.stop.load(std::memory_order_relaxed))
-          return VALUE_ZERO;
-
+    	  EXIT("stop_sig", VALUE_ZERO);
       if (rootNode)
       {
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
@@ -1118,14 +1154,14 @@ moves_loop: // When in check, search starts from here
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
-    return bestValue;
+    EXIT2("", bestValue, bestMove);
   }
 
 
   // qsearch() is the quiescence search function, which is called by the main
   // search function with depth zero, or recursively with depth less than ONE_PLY.
 
-  template <NodeType NT, bool InCheck>
+  template <NodeType NT, bool InCheck, bool TRACE>
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
 
     const bool PvNode = NT == PV;
@@ -1146,6 +1182,9 @@ moves_loop: // When in check, search starts from here
     bool ttHit, givesCheck, evasionPrunable;
     int moveCount;
 
+    if (TRACE)
+        std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
+
     if (PvNode)
     {
         oldAlpha = alpha; // To flag BOUND_EXACT when eval above alpha and no available moves
@@ -1159,8 +1198,10 @@ moves_loop: // When in check, search starts from here
 
     // Check for an immediate draw or maximum ply reached
     if (   pos.is_draw(ss->ply)
-        || ss->ply >= MAX_PLY)
-        return (ss->ply >= MAX_PLY && !InCheck) ? evaluate(pos) : VALUE_DRAW;
+        || ss->ply >= MAX_PLY) {
+    	Value v = (ss->ply >= MAX_PLY && !InCheck) ? evaluate(pos) : VALUE_DRAW;
+    	EXIT("draw", v);
+    }
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
@@ -1180,8 +1221,9 @@ moves_loop: // When in check, search starts from here
         && tte->depth() >= ttDepth
         && ttValue != VALUE_NONE // Only in case of TT access race
         && (ttValue >= beta ? (tte->bound() &  BOUND_LOWER)
-                            : (tte->bound() &  BOUND_UPPER)))
-        return ttValue;
+                            : (tte->bound() &  BOUND_UPPER))) {
+    	EXIT("tt_cutoff", ttValue);
+    }
 
     // Evaluate the position statically
     if (InCheck)
@@ -1213,8 +1255,7 @@ moves_loop: // When in check, search starts from here
             if (!ttHit)
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval, TT.generation());
-
-            return bestValue;
+            EXIT("qs_stand_pat", bestValue);
         }
 
         if (PvNode && bestValue > alpha)
@@ -1253,13 +1294,13 @@ moves_loop: // When in check, search starts from here
           if (futilityValue <= alpha)
           {
               bestValue = std::max(bestValue, futilityValue);
-              continue;
+              SKIP_MOVE("futility", move);
           }
 
           if (futilityBase <= alpha && !pos.see_ge(move, VALUE_ZERO + 1))
           {
               bestValue = std::max(bestValue, futilityBase);
-              continue;
+              SKIP_MOVE("futility", move);
           }
       }
 
@@ -1272,7 +1313,7 @@ moves_loop: // When in check, search starts from here
       // Don't search moves with negative SEE values
       if (  (!InCheck || evasionPrunable)
           && !pos.see_ge(move))
-          continue;
+          SKIP_MOVE("see", move);
 
       // Speculative prefetch as early as possible
       prefetch(TT.first_entry(pos.key_after(move)));
@@ -1288,8 +1329,8 @@ moves_loop: // When in check, search starts from here
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
-      value = givesCheck ? -qsearch<NT,  true>(pos, ss+1, -beta, -alpha, depth - ONE_PLY)
-                         : -qsearch<NT, false>(pos, ss+1, -beta, -alpha, depth - ONE_PLY);
+      value = givesCheck ? -QSEARCH("", NT, true, (pos, ss+1, -beta, -alpha, depth - ONE_PLY))
+                         : -QSEARCH("", NT, false, (pos, ss+1, -beta, -alpha, depth - ONE_PLY));
       pos.undo_move(move);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
@@ -1314,7 +1355,7 @@ moves_loop: // When in check, search starts from here
                   tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
                             ttDepth, move, ss->staticEval, TT.generation());
 
-                  return value;
+                  EXIT2("", value, bestMove);
               }
           }
        }
@@ -1322,8 +1363,10 @@ moves_loop: // When in check, search starts from here
 
     // All legal moves have been searched. A special case: If we're in check
     // and no legal moves were found, it is checkmate.
-    if (InCheck && bestValue == -VALUE_INFINITE)
-        return mated_in(ss->ply); // Plies to mate from the root
+    if (InCheck && bestValue == -VALUE_INFINITE) {
+    	Value v = mated_in(ss->ply); // Plies to mate from the root
+    	EXIT("", v);
+    }
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               PvNode && bestValue > oldAlpha ? BOUND_EXACT : BOUND_UPPER,
@@ -1331,9 +1374,8 @@ moves_loop: // When in check, search starts from here
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
-    return bestValue;
+    EXIT2("", bestValue, bestMove);
   }
-
 
   // value_to_tt() adjusts a mate score from "plies to mate from the root" to
   // "plies to mate from the current position". Non-mate scores are unchanged.
@@ -1429,6 +1471,32 @@ moves_loop: // When in check, search starts from here
         thisThread->mainHistory.update(us, quiets[i], -bonus);
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
+  }
+
+  void trace_output(const Position& pos, Move move, string point) {
+	  trace_enter(pos, move, point);
+      std::cout << sync_endl;
+  }
+
+  /*std::ostream& output_ply(std::ostream& os, int ply) {
+	  return os << (ply / 2) << ((ply % 2) ? "." : "...");
+  }*/
+
+  void trace_enter(const Position& pos, Move move, string point) {
+	  int ply = pos.game_ply();
+	  if (move)
+	    sync_cout << ((ply + 1) / 2) << ((ply % 2) ? ". " : "... ")
+	  				  << UCI::move(move, pos.is_chess960());
+	  	else sync_cout << "root";
+	  	if (!point.empty())
+	  		std::cout << " " << point;
+  }
+  void trace_exit(const Position& pos, Move move, string point, Value value, Move bestMove) {
+	  trace_enter(pos, move, point);
+	  std::cout << " value=" << value;
+	  if (bestMove)
+		  std::cout << " bestmove=" << UCI::move(bestMove, pos.is_chess960());
+	  std::cout << sync_endl;
   }
 
   // When playing with strength handicap, choose best move among a set of RootMoves

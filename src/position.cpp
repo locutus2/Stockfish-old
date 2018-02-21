@@ -947,6 +947,7 @@ void Position::do_null_move(StateInfo& newSt) {
   st->key ^= Zobrist::side;
   prefetch(TT.first_entry(st->key));
 
+  ++gamePly;
   ++st->rule50;
   st->pliesFromNull = 0;
 
@@ -961,6 +962,7 @@ void Position::undo_null_move() {
 
   assert(!checkers());
 
+  --gamePly;
   st = st->previous;
   sideToMove = ~sideToMove;
 }

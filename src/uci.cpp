@@ -53,6 +53,8 @@ namespace {
     Move m;
     string token, fen;
 
+    Search::TraceMoves.clear();
+
     is >> token;
 
     if (token == "startpos")
@@ -134,6 +136,25 @@ namespace {
 
     Threads.start_thinking(pos, states, limits, ponderMode);
   }
+
+  void trace(Position& pos, istringstream& is, StateListPtr& states) {
+
+      string token;
+      std::deque<StateInfo> tempStates(1);
+      Position p;
+      p.set(pos.fen(), pos.is_chess960(), &tempStates.back(), pos.this_thread());
+
+      Search::TraceMoves.clear();
+
+      while (is >> token) {
+    	  Move m = token == "0000" ? MOVE_NULL : UCI::to_move(p, token);
+          Search::TraceMoves.push_back(m);
+          tempStates.emplace_back();
+          m == MOVE_NULL ? p.do_null_move(tempStates.back())
+        		         : p.do_move(m, tempStates.back());
+      }
+
+    }
 
 
   // bench() is called when engine receives the "bench" command. Firstly
@@ -227,6 +248,7 @@ void UCI::loop(int argc, char* argv[]) {
 
       else if (token == "setoption")  setoption(is);
       else if (token == "go")         go(pos, is, states);
+      else if (token == "trace")      trace(pos, is, states);
       else if (token == "position")   position(pos, is, states);
       else if (token == "ucinewgame") Search::clear();
       else if (token == "isready")    sync_cout << "readyok" << sync_endl;
@@ -298,6 +320,15 @@ string UCI::move(Move m, bool chess960) {
 
   return move;
 }
+
+/*Move UCI::to_move_no_check(string& str, bool isChess960) {
+  Square from = make_square(File(str[0] - 'a'), Rank(str[1] - '1'));
+  Square to = make_square(File(str[2] - 'a'), Rank(str[3] - '1'));
+  if (str.length() == 4)
+	  return make_move(from, to);
+  else return make_move
+
+}*/
 
 
 /// UCI::to_move() converts a string representing a move in coordinate notation
