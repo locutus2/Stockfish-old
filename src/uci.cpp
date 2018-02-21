@@ -137,13 +137,13 @@ namespace {
     Threads.start_thinking(pos, states, limits, ponderMode);
   }
 
-  void trace(Position& pos, istringstream& is, StateListPtr& states) {
+  void trace(Position& pos, istringstream& is) {
 
       string token;
       std::deque<StateInfo> tempStates(1);
       Position p;
-      p.set(pos.fen(), pos.is_chess960(), &tempStates.back(), pos.this_thread());
 
+      p.set(pos.fen(), pos.is_chess960(), &tempStates.back(), pos.this_thread());
       Search::TraceMoves.clear();
 
       while (is >> token) {
@@ -248,7 +248,7 @@ void UCI::loop(int argc, char* argv[]) {
 
       else if (token == "setoption")  setoption(is);
       else if (token == "go")         go(pos, is, states);
-      else if (token == "trace")      trace(pos, is, states);
+      else if (token == "trace")      trace(pos, is);
       else if (token == "position")   position(pos, is, states);
       else if (token == "ucinewgame") Search::clear();
       else if (token == "isready")    sync_cout << "readyok" << sync_endl;

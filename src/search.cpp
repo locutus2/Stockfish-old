@@ -40,7 +40,7 @@
 namespace Search {
 
   LimitsType Limits;
-  std::vector<Move> TraceMoves;
+  std::deque<Move> TraceMoves;
 }
 
 namespace Tablebases {
@@ -109,9 +109,11 @@ namespace {
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
 
-  void trace_output(const Position& pos, Move move, string point);
-  void trace_enter(const Position& pos, Move move, string point);
-  void trace_exit(const Position& pos, Move move, string point, Value value, Move bestMove = MOVE_NONE);
+  namespace Trace {
+    void skip(const Position& pos, Move move, string point);
+    void enter(const Position& pos, Move move, string point, bool reenter = false);
+    void exit(const Position& pos, Move move, string point, Value value, Move bestMove = MOVE_NONE);
+  }
 
   // perft() is our utility to verify move generation. All the leaf nodes up
   // to the given depth are generated and counted, and the sum is returned.
@@ -358,7 +360,7 @@ void Thread::search() {
           while (true)
           {
               if (mainThread && !TraceMoves.empty()) {
-            	  trace_enter(rootPos, MOVE_NONE, "");
+            	  Trace::enter(rootPos, MOVE_NONE, "");
             	  bestValue = ::search<PV, true>(rootPos, ss, alpha, beta, rootDepth, false, false);
               }
               else bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, false);
@@ -487,21 +489,21 @@ namespace {
 
   // search<>() is the main search function for both PV and non-PV nodes
 
-
+// helper macro used in the following collection of macros
 #define TRACING_MOVE(move) (TRACE && TraceMoves.size() >= unsigned(ss->ply) + 1\
         && move == TraceMoves[ss->ply])
 
-#define SEARCH(point, nt, args) (TRACING_MOVE(ss->currentMove) ? (trace_enter(pos, ss->currentMove, point),\
+#define SEARCH(point, nt, args) (TRACING_MOVE(ss->currentMove) ? (Trace::enter(pos, ss->currentMove, point),\
 		    search<nt, true>args) : search<nt>args)
 #define QSEARCH(point, nt, inCheck, args) (TRACING_MOVE(ss->currentMove) ?\
-		(trace_enter(pos, ss->currentMove, point), qsearch<nt, inCheck, true>args)\
+		(Trace::enter(pos, ss->currentMove, point), qsearch<nt, inCheck, true>args)\
 	    : qsearch<nt, inCheck>args)
-#define ENTER(point) { if (TRACE) trace_enter(pos, (ss-1)->currentMove, point); }
-#define EXIT(point, value) { if (TRACE) trace_exit(pos, (ss-1)->currentMove, point, value);\
+#define REENTER(point) { if (TRACE) Trace::enter(pos, (ss-1)->currentMove, point, true); }
+#define EXIT(point, value) { if (TRACE) Trace::exit(pos, (ss-1)->currentMove, point, value);\
 	    return value; }
-#define EXIT2(point, value, bestMove) { if (TRACE) trace_exit(pos, (ss-1)->currentMove, point, value, bestMove);\
+#define EXIT2(point, value, bestMove) { if (TRACE) Trace::exit(pos, (ss-1)->currentMove, point, value, bestMove);\
 	    return value; }
-#define SKIP_MOVE(point, move) { if (TRACING_MOVE(move)) trace_output(pos, move, point); continue; }
+#define SKIP_MOVE(point, move) { if (TRACING_MOVE(move)) Trace::skip(pos, move, point); continue; }
 
   template <NodeType NT, bool TRACE = false>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning) {
@@ -700,13 +702,13 @@ namespace {
         &&  eval + RazorMargin <= alpha)
     {
         if (depth <= ONE_PLY) {
-        	ENTER("razoring");
+        	REENTER("razoring");
         	Value v = qsearch<NonPV, false, TRACE>(pos, ss, alpha, alpha+1);
         	EXIT("razoring", v);
         }
 
         Value ralpha = alpha - RazorMargin;
-        ENTER("razoring");
+        REENTER("razoring");
         Value v = qsearch<NonPV, false, TRACE>(pos, ss, ralpha, ralpha+1);
         if (v <= ralpha)
         	EXIT("razoring", v);
@@ -755,7 +757,7 @@ namespace {
 
             Value v;
 
-            ENTER("nmp_ver");
+            REENTER("nmp_ver");
             v = depth-R < ONE_PLY ? qsearch<NonPV, false, TRACE>(pos, ss, beta-1, beta)
                                   :  search<NonPV, TRACE>(pos, ss, beta-1, beta, depth-R, false, true);
 
@@ -1473,30 +1475,40 @@ moves_loop: // When in check, search starts from here
     }
   }
 
-  void trace_output(const Position& pos, Move move, string point) {
-	  trace_enter(pos, move, point);
+  namespace Trace {
+
+    // helper function used to output data common to enter, exit and skip
+    void output(const Position& pos, Move move, string point) {
+  	  int ply = pos.game_ply();
+  	  if (move)
+  		std::cout << ((ply + 1) / 2) << ((ply % 2) ? ". " : "... ")
+  		  	      << UCI::move(move, pos.is_chess960());
+  	  else std::cout << "root";
+  	  if (!point.empty())
+          std::cout << " " << point;
+    }
+
+    void skip(const Position& pos, Move move, string point) {
+      sync_cout << "trace skip ";
+	  output(pos, move, point);
       std::cout << sync_endl;
-  }
+    }
 
-  /*std::ostream& output_ply(std::ostream& os, int ply) {
-	  return os << (ply / 2) << ((ply % 2) ? "." : "...");
-  }*/
+    // leaves the output stream locked; if will be unlocked after the new invocation of search() or qsearch()
+    // outputs the remaining data
+    void enter(const Position& pos, Move move, string point, bool reenter) {
+      sync_cout << "trace " << (reenter ? "reenter " : "enter ");
+	  output(pos, move, point);
+    }
 
-  void trace_enter(const Position& pos, Move move, string point) {
-	  int ply = pos.game_ply();
-	  if (move)
-	    sync_cout << ((ply + 1) / 2) << ((ply % 2) ? ". " : "... ")
-	  				  << UCI::move(move, pos.is_chess960());
-	  	else sync_cout << "root";
-	  	if (!point.empty())
-	  		std::cout << " " << point;
-  }
-  void trace_exit(const Position& pos, Move move, string point, Value value, Move bestMove) {
-	  trace_enter(pos, move, point);
+    void exit(const Position& pos, Move move, string point, Value value, Move bestMove) {
+	  sync_cout << "trace exit ";
+	  output(pos, move, point);
 	  std::cout << " value=" << value;
 	  if (bestMove)
 		  std::cout << " bestmove=" << UCI::move(bestMove, pos.is_chess960());
 	  std::cout << sync_endl;
+    }
   }
 
   // When playing with strength handicap, choose best move among a set of RootMoves
