@@ -556,7 +556,7 @@ namespace {
             || pos.is_draw(ss->ply)
             || ss->ply >= MAX_PLY) {
         	Value v = (ss->ply >= MAX_PLY && !inCheck) ? evaluate(pos) : VALUE_DRAW;
-        	EXIT("draw", v);
+        	EXIT((pos.is_draw(ss->ply) ? "draw" : ss->ply >= MAX_PLY ? "max_ply" : "stop_sig"), v);
         }
 
         // Step 3. Mate distance pruning. Even if we mate at the next move our score
@@ -906,7 +906,7 @@ moves_loop: // When in check, search starts from here
               if (moveCountPruning)
               {
                   skipQuiets = true;
-                  SKIP_MOVE("mcp", move);
+                  SKIP_MOVE("movecount", move);
               }
 
               // Reduced depth of the next LMR search
@@ -1257,7 +1257,7 @@ moves_loop: // When in check, search starts from here
             if (!ttHit)
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval, TT.generation());
-            EXIT("qs_stand_pat", bestValue);
+            EXIT("qs_standpat", bestValue);
         }
 
         if (PvNode && bestValue > alpha)
