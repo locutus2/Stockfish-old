@@ -1357,7 +1357,7 @@ moves_loop: // When in check, search starts from here
                   tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
                             ttDepth, move, ss->staticEval, TT.generation());
 
-                  EXIT2("", value, bestMove);
+                  EXIT2("", value, move);
               }
           }
        }
