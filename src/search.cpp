@@ -791,9 +791,51 @@ moves_loop: // When in check, search starts from here
     ttCapture = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
 
+    std::vector<ExtMove> moveList;
+    int moveIndex = -1;
+    
+
+    if (depth >= 2 * ONE_PLY)
+    {
+        newDepth = depth / 2;
+        ss->moveCount = 0;
+        std::cerr << "Start move loop  ply=" << ss->ply << " depth=" << depth <<  std::endl;
+        while ((move = mp.next_move(false)) != MOVE_NONE)
+        {
+            assert(is_ok(move));
+
+            if (move == excludedMove || !pos.legal(move))
+                continue;
+
+            movedPiece = pos.moved_piece(move);
+            givesCheck =  type_of(move) == NORMAL && !pos.discovered_check_candidates()
+                  ? pos.check_squares(type_of(movedPiece)) & to_sq(move)
+                  : pos.gives_check(move);
+
+            ss->currentMove = move;
+            ss->contHistory = &thisThread->contHistory[movedPiece][to_sq(move)];
+            ss->moveCount++;
+
+            std::cerr << "before move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960()) << std::endl;
+            pos.do_move(move, st, givesCheck);
+            value = -search<NT>(pos, ss+1, -beta, -alpha, newDepth, !PvNode && !cutNode, true);
+            pos.undo_move(move);
+            std::cerr << "after move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960()) << " val=" << value << std::endl;
+
+            moveList.push_back({move, value});
+        }
+        std::cerr << "End move loop  ply=" << ss->ply << " depth=" << depth <<  std::endl;
+
+        if (!moveList.empty())
+            std::stable_sort(moveList.begin() + int(ttMove == moveList[0]), moveList.end());
+
+        moveList.push_back({MOVE_NONE, 0});
+        moveIndex = 0;
+    }
+ std::cerr << "Start main move loop  moveIndex=" << moveIndex << " ply=" << ss->ply << " depth=" << depth <<  std::endl;
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
-    while ((move = mp.next_move(skipQuiets)) != MOVE_NONE)
+    while ((move = (moveIndex < 0 ? mp.next_move(skipQuiets) : moveList[moveIndex++])) != MOVE_NONE)
     {
       assert(is_ok(move));
 
@@ -912,7 +954,7 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->contHistory = &thisThread->contHistory[movedPiece][to_sq(move)];
-
+std::cerr << "before main move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960()) << std::endl;
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
@@ -1000,6 +1042,7 @@ moves_loop: // When in check, search starts from here
 
       // Step 18. Undo move
       pos.undo_move(move);
+      std::cerr << "end main move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960()) << std::endl;
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
@@ -1039,18 +1082,22 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
-
+ std::cerr << "=>start eval main move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960())
+           << " value=" << value << " alpha=" << alpha << " beta=" << beta << std::endl;
       if (value > bestValue)
       {
           bestValue = value;
 
           if (value > alpha)
           {
-              bestMove = move;
 
+              bestMove = move;
+std::cerr << "=>PV1:" << (PvNode && !rootNode) << " pv=" << ss->pv << " eval main move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960())
+           << " value=" << value << " alpha=" << alpha << " beta=" << beta << std::endl;
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
-
+std::cerr << "=>PV2:" << (PvNode && value < beta) << " eval main move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960())
+                    << " value=" << value << " alpha=" << alpha << " beta=" << beta << std::endl;
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
                   alpha = value;
               else
@@ -1060,6 +1107,7 @@ moves_loop: // When in check, search starts from here
               }
           }
       }
+       std::cerr << "=>end eval main move  ply=" << ss->ply << " depth=" << depth << " move=" << UCI::move(move, pos.is_chess960()) << std::endl;
 
       if (move != bestMove)
       {
@@ -1070,6 +1118,7 @@ moves_loop: // When in check, search starts from here
               quietsSearched[quietCount++] = move;
       }
     }
+     std::cerr << "End main move loop  ply=" << ss->ply << " depth=" << depth <<  std::endl;
 
     // The following condition would detect a stop only after move loop has been
     // completed. But in this case bestValue is valid because we have fully
