@@ -262,11 +262,11 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
                  [d][rkThem];
 
       // Less penalty for storming pawns at a6/h6 and c6/f6 if surrounded by opponent pawns at a7/h7, b6/g6 and c7/f7
-      if (    d == 0 && rkThem == RANK_3 && rkThem == rkUs + 1
+      if (    d == 0 && rkThem == rkUs + 1
           && (ourPawns   & make_square(File(f == FILE_H ? f - 1 : f + 1), relative_rank(Us, rkThem)))
           && (ourPawns   & make_square(File(f == FILE_H ? f - 2 : f + 2), relative_rank(Us, rkUs  )))
           && (theirPawns & make_square(File(f == FILE_H ? f - 2 : f + 2), relative_rank(Us, rkThem))))
-          safety += 300;
+          safety += 200;
   }
 
   return safety;
