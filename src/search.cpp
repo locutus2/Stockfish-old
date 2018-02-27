@@ -278,7 +278,7 @@ void MainThread::search() {
 
 void Thread::search() {
 
-  Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
+  Stack stack[MAX_PLY+8], *ss = stack+4; // To reference from (ss-4) to (ss+3)
   Value bestValue, alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = DEPTH_ZERO;
@@ -286,7 +286,7 @@ void Thread::search() {
   double timeReduction = 1.0;
   Color us = rootPos.side_to_move();
 
-  std::memset(ss-4, 0, 7 * sizeof(Stack));
+  std::memset(ss-4, 0, 8 * sizeof(Stack));
   for (int i = 4; i > 0; i--)
      (ss-i)->contHistory = &this->contHistory[NO_PIECE][0]; // Use as sentinel
 
@@ -553,12 +553,12 @@ namespace {
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
-    // Initialize statScore to zero for the grandchilds of the current position.
-    // So statScore is shared between all grandchilds and only the first grandchild
-    // starts with statScore = 0. Later grandchilds start with the last calculated
-    // statScore of the previous grandchild. This influences in LMR the reduction rules
+    // Initialize statScore to zero for the grand-grandchilds of the current position.
+    // So statScore is shared between all grand-grandchilds and only the first grand-grandchild
+    // starts with statScore = 0. Later grand-grandchilds start with the last calculated
+    // statScore of the previous grand-grandchild. This influences in LMR the reduction rules
     // which based on the statScore of parent position.
-    (ss+2)->statScore = 0;
+    (ss+3)->statScore = 0;
 
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
