@@ -239,8 +239,10 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
   const Color Them = (Us == WHITE ? BLACK : WHITE);
   const Bitboard ShelterMask = (Us == WHITE ? 1ULL << SQ_A2 | 1ULL << SQ_B3 | 1ULL << SQ_C2 | 1ULL << SQ_F2 | 1ULL << SQ_G3 | 1ULL << SQ_H2
                                             : 1ULL << SQ_A7 | 1ULL << SQ_B6 | 1ULL << SQ_C7 | 1ULL << SQ_F7 | 1ULL << SQ_G6 | 1ULL << SQ_H7);
-  const Bitboard StormMask   = (Us == WHITE ? 1ULL << SQ_A3 | 1ULL << SQ_C3 | 1ULL << SQ_F3 | 1ULL << SQ_H3
+  const Bitboard StormMask1  = (Us == WHITE ? 1ULL << SQ_A3 | 1ULL << SQ_C3 | 1ULL << SQ_F3 | 1ULL << SQ_H3
                                             : 1ULL << SQ_A6 | 1ULL << SQ_C6 | 1ULL << SQ_F6 | 1ULL << SQ_H6);
+  const Bitboard StormMask2  = (Us == WHITE ? 1ULL << SQ_A3 | 1ULL << SQ_H3
+                                            : 1ULL << SQ_A6 | 1ULL << SQ_H6);
 
   enum { BlockedByKing, Unopposed, BlockedByPawn, Unblocked };
 
@@ -269,8 +271,11 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
                  [d][rkThem];
   }
 
-  if (popcount((ourPawns & ShelterMask) | (theirPawns & StormMask)) == 5)
+  if (popcount((ourPawns & ShelterMask) | (theirPawns & StormMask1)) == 5)
       safety += Value(300);
+
+  else if (popcount((ourPawns & ShelterMask) | (theirPawns & StormMask2)) == 4)
+      safety += Value(150);
 
   return safety;
 }
