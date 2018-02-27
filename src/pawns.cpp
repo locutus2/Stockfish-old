@@ -275,7 +275,7 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
       safety += Value(300);
 
   else if (popcount((ourPawns & ShelterMask) | (theirPawns & StormMask2)) == 4)
-      safety += Value(150);
+      safety += Value(100);
 
   return safety;
 }
