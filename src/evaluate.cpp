@@ -331,13 +331,6 @@ namespace {
         // Penalty if the piece is far from the king
         score -= KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
 
-        // Penalty for blocking an own backward like pawn.
-        if (   relative_rank(Us, s) < RANK_6
-            && relative_rank(Us, s) > RANK_2
-            && (pos.pieces(Us, PAWN) & (s - pawn_push(Us))
-            && !(pos.pieces(Us, PAWN) & pawn_attack_span(Them, s))))
-            score -= BlockedBackwardPawn;
-
         // Bonus for blocking an opponent backward like pawn.
         if (   relative_rank(Us, s) > RANK_3
             && relative_rank(Us, s) < RANK_7
