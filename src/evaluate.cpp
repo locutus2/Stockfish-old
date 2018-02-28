@@ -179,6 +179,7 @@ namespace {
   const Score TrappedRook       = S( 92,  0);
   const Score WeakQueen         = S( 50, 10);
   const Score WeakUnopposedPawn = S(  5, 25);
+  const Score BlockedBackwardPawn = S(24, 12);
 
 #undef S
 
@@ -329,6 +330,20 @@ namespace {
 
         // Penalty if the piece is far from the king
         score -= KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
+
+        // Penalty for blocking an own backward like pawn.
+        if (   relative_rank(Us, s) < RANK_6
+            && relative_rank(Us, s) > RANK_2
+            && (pos.pieces(Us, PAWN) & (s - pawn_push(Us))
+            && !(pos.pieces(Us, PAWN) & pawn_attack_span(Them, s))))
+            score -= BlockedBackwardPawn;
+
+        // Bonus for blocking an opponent backward like pawn.
+        if (   relative_rank(Us, s) > RANK_3
+            && relative_rank(Us, s) < RANK_7
+            && (pos.pieces(Them, PAWN) & (s + pawn_push(Us))
+            && !(pos.pieces(Them, PAWN) & pawn_attack_span(Us, s))))
+            score += BlockedBackwardPawn;
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
