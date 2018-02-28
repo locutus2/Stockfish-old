@@ -163,23 +163,23 @@ namespace {
   const Score KingProtector[] = { S(3, 5), S(4, 3), S(3, 0), S(1, -1) };
 
   // Assorted bonuses and penalties
-  const Score BishopPawns       = S(  8, 12);
-  const Score CloseEnemies      = S(  7,  0);
-  const Score Hanging           = S( 52, 30);
-  const Score HinderPassedPawn  = S(  8,  1);
-  const Score LongRangedBishop  = S( 22,  0);
-  const Score MinorBehindPawn   = S( 16,  0);
-  const Score PawnlessFlank     = S( 20, 80);
-  const Score RookOnPawn        = S(  8, 24);
-  const Score ThreatByPawnPush  = S( 47, 26);
-  const Score ThreatByRank      = S( 16,  3);
-  const Score ThreatBySafePawn  = S(175,168);
-  const Score ThreatOnQueen     = S( 42, 21);
-  const Score TrappedBishopA1H1 = S( 50, 50);
-  const Score TrappedRook       = S( 92,  0);
-  const Score WeakQueen         = S( 50, 10);
-  const Score WeakUnopposedPawn = S(  5, 25);
-  const Score BlockedBackwardPawn = S(24, 12);
+  const Score BishopPawns         = S(  8, 12);
+  const Score CloseEnemies        = S(  7,  0);
+  const Score Hanging             = S( 52, 30);
+  const Score HinderPassedPawn    = S(  8,  1);
+  const Score LongRangedBishop    = S( 22,  0);
+  const Score MinorBehindPawn     = S( 16,  0);
+  const Score PawnlessFlank       = S( 20, 80);
+  const Score RookOnPawn          = S(  8, 24);
+  const Score ThreatByPawnPush    = S( 47, 26);
+  const Score ThreatByRank        = S( 16,  3);
+  const Score ThreatBySafePawn    = S(175,168);
+  const Score ThreatOnQueen       = S( 42, 21);
+  const Score TrappedBishopA1H1   = S( 50, 50);
+  const Score TrappedRook         = S( 92,  0);
+  const Score WeakQueen           = S( 50, 10);
+  const Score WeakUnopposedPawn   = S(  5, 25);
+  const Score BlockedBackwardPawn = S( 12,  6);
 
 #undef S
 
