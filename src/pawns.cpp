@@ -300,7 +300,7 @@ Score Entry::do_king_safety(const Position& pos, Square ksq) {
   if (pos.can_castle(MakeCastling<Us, QUEEN_SIDE>::right))
       bonus2 = std::max(bonus2, shelter_storm<Us>(pos, relative_square(Us, SQ_C1)));
 
-  return make_score((bonus1 + 7 * bonus2) / 8, -16 * minKingPawnDistance);
+  return make_score((bonus1 + 5 * bonus2) / 8, -16 * minKingPawnDistance);
 }
 
 // Explicit template instantiation
