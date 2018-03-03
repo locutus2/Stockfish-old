@@ -775,7 +775,7 @@ namespace {
                 // If depth sufficient and preliminary search verify move, perform the regular search.
                 if (depth > 5 * ONE_PLY && value >= rbeta)
                 {
-                    Depth r = reduction<NonPV>(true, depth - 4 * ONE_PLY, mc);
+                    Depth r = reduction<PV>(true, depth - 4 * ONE_PLY, mc);
                     newDepth = depth - 4 * ONE_PLY - r;
                     if (newDepth >= 2 * ONE_PLY)
                         value = -search<NonPV>(pos, ss+1, -rbeta, -rbeta+1, newDepth, !cutNode, false);
