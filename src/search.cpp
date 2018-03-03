@@ -758,7 +758,7 @@ namespace {
         Value rbeta = std::min(beta + 200, VALUE_INFINITE);
         MovePicker mp(pos, ttMove, rbeta - ss->staticEval, &thisThread->captureHistory);
 		int mc = 0;
-        while ((move = mp.next_move()) != MOVE_NONE && mc < depth / ONE_PLY - 4)
+        while ((move = mp.next_move()) != MOVE_NONE && mc < depth / ONE_PLY - 2)
             if (pos.legal(move))
             {
 				mc++;
