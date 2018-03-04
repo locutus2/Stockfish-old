@@ -25,6 +25,7 @@
 #include "pawns.h"
 #include "position.h"
 #include "thread.h"
+#include "tune.h"
 
 namespace {
 
@@ -42,6 +43,27 @@ namespace {
 
   // Doubled pawn penalty
   const Score Doubled = S(18, 38);
+
+  // BadPawnsInteraction[#isolated][#backward][#doubled]
+  Score BadPawnsInteraction[3][3][3] = {
+    {
+      { S(0,0), S(0,0), S(0,0) },
+      { S(0,0), S(0,0), S(0,0) },
+      { S(0,0), S(0,0), S(0,0) }
+    },
+    {
+      { S(0,0), S(0,0), S(0,0) },
+      { S(0,0), S(0,0), S(0,0) },
+      { S(0,0), S(0,0), S(0,0) }
+    },
+    {
+      { S(0,0), S(0,0), S(0,0) },
+      { S(0,0), S(0,0), S(0,0) },
+      { S(0,0), S(0,0), S(0,0) }
+    }
+  };
+
+  TUNE(SetRange(-200, 200), BadPawnsInteraction);
 
   // Weakness of our pawn shelter in front of the king by [isKingFile][distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawns or our pawn is behind our king.
@@ -93,6 +115,7 @@ namespace {
 
     Bitboard b, neighbours, stoppers, doubled, supported, phalanx;
     Bitboard lever, leverPush;
+    int n_isolated, n_backward, n_doubled;
     Square s;
     bool opposed, backward;
     Score score = SCORE_ZERO;
@@ -101,6 +124,7 @@ namespace {
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
+    n_isolated = n_backward = n_doubled = 0;
     e->passedPawns[Us] = e->pawnAttacksSpan[Us] = e->weakUnopposed[Us] = 0;
     e->semiopenFiles[Us] = 0xFF;
     e->kingSquares[Us]   = SQ_NONE;
@@ -169,14 +193,16 @@ namespace {
             score += Connected[opposed][bool(phalanx)][popcount(supported)][relative_rank(Us, s)];
 
         else if (!neighbours)
-            score -= Isolated, e->weakUnopposed[Us] += !opposed;
+            score -= Isolated, ++n_isolated, e->weakUnopposed[Us] += !opposed;
 
         else if (backward)
-            score -= Backward, e->weakUnopposed[Us] += !opposed;
+            score -= Backward, ++n_backward, e->weakUnopposed[Us] += !opposed;
 
         if (doubled && !supported)
-            score -= Doubled;
+            score -= Doubled, ++n_doubled;
     }
+
+    score -= BadPawnsInteraction[std::min(n_isolated, 2)][std::min(n_backward, 2)][std::min(n_doubled, 2)];
 
     return score;
   }
