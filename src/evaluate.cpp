@@ -748,7 +748,6 @@ namespace {
   template<Tracing T>
   Score Evaluation<T>::initiative(Value eg) const {
 
-    Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
     int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
 
@@ -760,7 +759,7 @@ namespace {
                     +   8 *  pe->pawn_asymmetry()
                     +  12 *  pos.count<PAWN>()
                     +  16 *  pawnsOnBothFlanks
-                    - 300 * !pos.count<PAWN>(strongSide)
+                    - 150 * !pos.count<PAWN>()
                     - 136 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
