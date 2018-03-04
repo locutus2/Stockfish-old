@@ -137,7 +137,8 @@ Entry* probe(const Position& pos) {
   // Map total non-pawn material into [PHASE_ENDGAME, PHASE_MIDGAME]
   e->gamePhase = Phase(((npm - EndgameLimit) * PHASE_MIDGAME) / (MidgameLimit - EndgameLimit));
   // Scale game phase down according to number of pawns
-  e->gamePhase = Phase(e->gamePhase * (112 + pos.count<PAWN>()) / 128);
+  int pawnPhase = (16 - pos.count<PAWN>()) * (16 - pos.count<PAWN>());
+  e->gamePhase = Phase(e->gamePhase * (1024 - pawnPhase) / 1024);
 
   // Let's look if we have a specialized evaluation function for this particular
   // material configuration. Firstly we look for a fixed configuration one, then
