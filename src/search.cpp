@@ -761,7 +761,7 @@ namespace {
         MovePicker mp(pos, ttMove, rbeta - ss->staticEval, &thisThread->captureHistory);
         int probCutCount = 0;
         while (  (move = mp.next_move()) != MOVE_NONE
-               && probCutCount < depth / ONE_PLY * 2 - 8)
+               && probCutCount < depth / ONE_PLY * 2 - 7)
             if (pos.legal(move))
             {
                 probCutCount++;
