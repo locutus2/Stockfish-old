@@ -280,7 +280,7 @@ void MainThread::search() {
 void Thread::search() {
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
-  Value bestValue, alpha, beta, delta;
+  Value bestValue, alpha, beta, delta, estimatedBestValue;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
@@ -291,7 +291,7 @@ void Thread::search() {
   for (int i = 4; i > 0; i--)
      (ss-i)->contHistory = this->contHistory[NO_PIECE][0].get(); // Use as sentinel
 
-  bestValue = delta = alpha = -VALUE_INFINITE;
+  bestValue = estimatedBestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
 
   if (mainThread)
@@ -343,8 +343,16 @@ void Thread::search() {
           if (rootDepth >= 5 * ONE_PLY)
           {
               delta = Value(18);
-              alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
-              beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
+              if (PVIdx == 0)
+              {
+                  alpha = std::max(estimatedBestValue - delta,-VALUE_INFINITE);
+                  beta  = std::min(estimatedBestValue + delta, VALUE_INFINITE);
+              }
+              else
+              {
+                  alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
+                  beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
+              }
 
               ct =  Options["Contempt"] * PawnValueEg / 100; // From centipawns
 
@@ -409,6 +417,9 @@ void Thread::search() {
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
+
+          if (PVIdx == 0)
+              estimatedBestValue += (bestValue - estimatedBestValue) * 17 / 20;
 
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin(), rootMoves.begin() + PVIdx + 1);
