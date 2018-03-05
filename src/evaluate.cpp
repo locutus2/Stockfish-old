@@ -759,7 +759,8 @@ namespace {
                     +   8 *  pe->pawn_asymmetry()
                     +  12 *  pos.count<PAWN>()
                     +  16 *  pawnsOnBothFlanks
-                    - 150 * !pos.count<PAWN>()
+                    -  50 * (pos.count<PAWN>() == 1)
+                    - 150 * (pos.count<PAWN>() == 0)
                     - 136 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
