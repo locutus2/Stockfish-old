@@ -419,7 +419,12 @@ void Thread::search() {
           }
 
           if (PVIdx == 0)
-              estimatedBestValue += (bestValue - estimatedBestValue) * 17 / 20;
+          {
+              if (rootDepth > ONE_PLY)
+                  estimatedBestValue += (bestValue - estimatedBestValue) * 17 / 20;
+              else
+                  estimatedBestValue = bestValue;
+          }
 
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin(), rootMoves.begin() + PVIdx + 1);
