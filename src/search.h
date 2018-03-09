@@ -104,4 +104,43 @@ void clear();
 
 } // namespace Search
 
+struct Trace {
+  typedef std::list<Move> Variation;
+  typedef std::string Point;
+
+  void init(const Position& pos, Variation&& var);
+
+  template <NodeType NT, bool TRACE = false>
+  inline Value search(Point point, Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning);
+
+  template <NodeType NT, bool inCheck = false, bool TRACE = false>
+  inline Value qsearch(Point point, Position& pos, Stack* ss, Value alpha, Value beta, Depth depth);
+
+  void on_skip(Point point, Move move);
+
+  void on_return(Point point, Move bestMove);
+
+  private:
+    int rootPly, ply;
+    Variation variation;
+    Variation::const_iterator it;
+    bool isChess960;
+
+    bool tracingMove(Move move);
+
+        // helper function used to output data common to enter, exit and skip
+    void output(const Position& pos, Move move, string point);
+    void skip(const Position& pos, Move move, string point);
+
+    // leaves the output stream locked; if will be unlocked after the new invocation of search() or qsearch()
+        // outputs the remaining data
+          void enter(const Position& pos, Move move, string point, bool reenter);
+
+        void exit(const Position& pos, Move move, string point, Value value, Move bestMove);
+    	  sync_cout << "trace exit ";
+
+  };
+
+  extern Trace trace;
+
 #endif // #ifndef SEARCH_H_INCLUDED
