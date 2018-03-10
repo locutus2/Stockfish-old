@@ -67,9 +67,12 @@ namespace {
   const int SkipSize[]  = { 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4 };
   const int SkipPhase[] = { 0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 6, 7 };
 
-  // Razoring and futility margins
-  const int RazorMargin = 590;
-  Value futility_margin(Depth d) { return Value(150 * d / ONE_PLY); }
+  // Razor and futility margins
+  const int RazorMargin1 = 590;
+  const int RazorMargin2 = 604;
+  Value futility_margin(Depth d, bool improving) {
+    return Value((175 - 50 * improving) * d / ONE_PLY);
+  }
 
   // Futility and reductions lookup tables, initialized at startup
   int FutilityMoveCounts[2][16]; // [improving][depth]
@@ -293,7 +296,7 @@ void Thread::search() {
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
   for (int i = 4; i > 0; i--)
-     (ss-i)->contHistory = &this->contHistory[NO_PIECE][0]; // Use as sentinel
+     (ss-i)->contHistory = this->contHistory[NO_PIECE][0].get(); // Use as sentinel
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -330,7 +333,7 @@ void Thread::search() {
 
       // Age out PV variability metric
       if (mainThread)
-          mainThread->bestMoveChanges *= 0.505, mainThread->failedLow = false;
+          mainThread->bestMoveChanges *= 0.517, mainThread->failedLow = false;
 
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
@@ -350,11 +353,10 @@ void Thread::search() {
               alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
 
-              // Adjust contempt based on current bestValue
-              ct =  Options["Contempt"] * PawnValueEg / 100 // From centipawns
-                  + (bestValue >  500 ?  50:                // Dynamic contempt
-                     bestValue < -500 ? -50:
-                     bestValue / 10);
+              ct =  Options["Contempt"] * PawnValueEg / 100; // From centipawns
+
+              // Adjust contempt based on current bestValue (dynamic contempt)
+              ct += int(std::round(48 * atan(float(bestValue) / 128)));
 
               Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                             : -make_score(ct, ct / 2));
@@ -453,21 +455,21 @@ void Thread::search() {
               const int F[] = { mainThread->failedLow,
                                 bestValue - mainThread->previousScore };
 
-              int improvingFactor = std::max(229, std::min(715, 357 + 119 * F[0] - 6 * F[1]));
+              int improvingFactor = std::max(246, std::min(832, 306 + 119 * F[0] - 6 * F[1]));
 
               // If the bestMove is stable over several iterations, reduce time accordingly
               timeReduction = 1.0;
               for (int i : {3, 4, 5})
                   if (lastBestMoveDepth * i < completedDepth)
-                     timeReduction *= 1.3;
+                     timeReduction *= 1.25;
 
               // Use part of the gained time from a previous stable move for the current move
               double unstablePvFactor = 1.0 + mainThread->bestMoveChanges;
-              unstablePvFactor *= std::pow(mainThread->previousTimeReduction, 0.51) / timeReduction;
+              unstablePvFactor *= std::pow(mainThread->previousTimeReduction, 0.528) / timeReduction;
 
               // Stop the search if we have only one legal move, or if available time elapsed
               if (   rootMoves.size() == 1
-                  || Time.elapsed() > Time.optimum() * unstablePvFactor * improvingFactor / 605)
+                  || Time.elapsed() > Time.optimum() * unstablePvFactor * improvingFactor / 581)
               {
                   // If we are allowed to ponder do not stop the search now but
                   // keep pondering until the GUI sends "ponderhit" or "stop".
@@ -688,7 +690,7 @@ namespace {
 
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
-    ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
+    ss->contHistory = thisThread->contHistory[NO_PIECE][0].get();
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -733,7 +735,7 @@ namespace {
             else if (!pos.capture_or_promotion(ttMove))
             {
                 int penalty = -stat_bonus(depth);
-                thisThread->mainHistory.update(pos.side_to_move(), ttMove, penalty);
+                thisThread->mainHistory[pos.side_to_move()][from_to(ttMove)] << penalty;
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
@@ -794,6 +796,7 @@ namespace {
     if (inCheck)
     {
         ss->staticEval = eval = VALUE_NONE;
+        improving = true;
         goto moves_loop;
     }
     else if (ttHit)
@@ -817,30 +820,48 @@ namespace {
                   ss->staticEval, TT.generation());
     }
 
+    improving =   ss->staticEval >= (ss-2)->staticEval
+               ||(ss-2)->staticEval == VALUE_NONE;
+
     if (skipEarlyPruning || !pos.non_pawn_material(pos.side_to_move()))
         goto moves_loop;
 
     // Step 7. Razoring (skipped when in check)
-    if (   !PvNode
-        &&  depth <= ONE_PLY
-        &&  eval + RazorMargin <= alpha)
+    if (  !PvNode
+        && depth <= 2 * ONE_PLY)
     {
-        if (TRACE)
-        	trace.on_call("razoring");
-        Value v = trace.qsearch<NonPV, false, TRACE>(pos, ss, alpha, alpha+1);
-		if (TRACE)
-			trace.on_return("razoring");
-		return v;
+        if (   depth == ONE_PLY
+            && eval + RazorMargin1 <= alpha) {
+        	if (TRACE)
+                trace.on_call("razoring");
+            Value v = qsearch<NonPV, false>(pos, ss, alpha, alpha+1);
+            if (TRACE)
+                trace.on_return("razoring");
+            return v;
+        }
+        else if (eval + RazorMargin2 <= alpha)
+        {
+            Value ralpha = alpha - RazorMargin2;
+            if (TRACE)
+                trace.on_call("razoring");
+            Value v = qsearch<NonPV, false>(pos, ss, ralpha, ralpha+1);
+            if (v <= ralpha) {
+            	if (TRACE)
+            	    trace.on_return("razoring");
+            	return v;
+            }
+        }
     }
 
     // Step 8. Futility pruning: child node (skipped when in check)
     if (   !rootNode
         &&  depth < 7 * ONE_PLY
-        &&  eval - futility_margin(depth) >= beta
-        &&  eval < VALUE_KNOWN_WIN) {// Do not return unproven wins
-    	if (TRACE)
-    		trace.on_return("futility");
-    	return eval;
+        &&  eval - futility_margin(depth, improving) >= beta
+        &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
+    {
+        if (TRACE)
+            trace.on_return("futility");
+        return eval;
     }
 
     // Step 9. Null move search with verification search
@@ -855,7 +876,7 @@ namespace {
         Depth R = ((823 + 67 * depth / ONE_PLY) / 256 + std::min((eval - beta) / PawnValueMg, 3)) * ONE_PLY;
 
         ss->currentMove = MOVE_NULL;
-        ss->contHistory = &thisThread->contHistory[NO_PIECE][0];
+        ss->contHistory = thisThread->contHistory[NO_PIECE][0].get();
 
         pos.do_null_move(st);
         if (TRACE)
@@ -908,12 +929,16 @@ namespace {
 
         Value rbeta = std::min(beta + 200, VALUE_INFINITE);
         MovePicker mp(pos, ttMove, rbeta - ss->staticEval, &thisThread->captureHistory);
+        int probCutCount = 0;
 
-        while ((move = mp.next_move()) != MOVE_NONE)
+        while (  (move = mp.next_move()) != MOVE_NONE
+               && probCutCount < depth / ONE_PLY - 3)
             if (pos.legal(move))
             {
+                probCutCount++;
+
                 ss->currentMove = move;
-                ss->contHistory = &thisThread->contHistory[pos.moved_piece(move)][to_sq(move)];
+                ss->contHistory = thisThread->contHistory[pos.moved_piece(move)][to_sq(move)].get();
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -937,10 +962,11 @@ namespace {
                 }
 
                 pos.undo_move(move);
+
                 if (value >= rbeta) {
-                	if (TRACE)
-                		trace.on_return("probcut")
-                	return value;
+                    if (TRACE)
+                        trace.on_return("probcut")
+                    return value;
                 }
             }
     }
@@ -965,9 +991,6 @@ moves_loop: // When in check, search starts from here
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
-    improving =   ss->staticEval >= (ss-2)->staticEval
-            /* || ss->staticEval == VALUE_NONE Already implicit in the previous condition */
-               ||(ss-2)->staticEval == VALUE_NONE;
 
     singularExtensionNode =   !rootNode
                            &&  depth >= 8 * ONE_PLY
@@ -1110,7 +1133,7 @@ moves_loop: // When in check, search starts from here
 
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
-      ss->contHistory = &thisThread->contHistory[movedPiece][to_sq(move)];
+      ss->contHistory = thisThread->contHistory[movedPiece][to_sq(move)].get();
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1579,7 +1602,7 @@ moves_loop: // When in check, search starts from here
 
     for (int i : {1, 2, 4})
         if (is_ok((ss-i)->currentMove))
-            (ss-i)->contHistory->update(pc, to, bonus);
+            (*(ss-i)->contHistory)[pc][to] << bonus;
   }
 
 
@@ -1591,14 +1614,14 @@ moves_loop: // When in check, search starts from here
       CapturePieceToHistory& captureHistory =  pos.this_thread()->captureHistory;
       Piece moved_piece = pos.moved_piece(move);
       PieceType captured = type_of(pos.piece_on(to_sq(move)));
-      captureHistory.update(moved_piece, to_sq(move), captured, bonus);
+      captureHistory[moved_piece][to_sq(move)][captured] << bonus;
 
       // Decrease all the other played capture moves
       for (int i = 0; i < captureCnt; ++i)
       {
           moved_piece = pos.moved_piece(captures[i]);
           captured = type_of(pos.piece_on(to_sq(captures[i])));
-          captureHistory.update(moved_piece, to_sq(captures[i]), captured, -bonus);
+          captureHistory[moved_piece][to_sq(captures[i])][captured] << -bonus;
       }
   }
 
@@ -1616,7 +1639,7 @@ moves_loop: // When in check, search starts from here
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
-    thisThread->mainHistory.update(us, move, bonus);
+    thisThread->mainHistory[us][from_to(move)] << bonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
@@ -1628,7 +1651,7 @@ moves_loop: // When in check, search starts from here
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
     {
-        thisThread->mainHistory.update(us, quiets[i], -bonus);
+        thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }

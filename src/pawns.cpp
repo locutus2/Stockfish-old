@@ -236,15 +236,23 @@ Entry* probe(const Position& pos) {
 template<Color Us>
 Value Entry::shelter_storm(const Position& pos, Square ksq) {
 
-  const Color Them = (Us == WHITE ? BLACK : WHITE);
+  constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
+  constexpr Bitboard ShelterMask =
+                Us == WHITE ? make_bitboard(SQ_A2, SQ_B3, SQ_C2, SQ_F2, SQ_G3, SQ_H2)
+                            : make_bitboard(SQ_A7, SQ_B6, SQ_C7, SQ_F7, SQ_G6, SQ_H7);
+  constexpr Bitboard StormMask =
+                Us == WHITE ? make_bitboard(SQ_A3, SQ_C3, SQ_F3, SQ_H3)
+                            : make_bitboard(SQ_A6, SQ_C6, SQ_F6, SQ_H6);
 
   enum { BlockedByKing, Unopposed, BlockedByPawn, Unblocked };
 
-  Bitboard b = pos.pieces(PAWN) & (forward_ranks_bb(Us, ksq) | rank_bb(ksq));
+  File center = std::max(FILE_B, std::min(FILE_G, file_of(ksq)));
+  Bitboard b =   pos.pieces(PAWN)
+               & (forward_ranks_bb(Us, ksq) | rank_bb(ksq))
+               & (adjacent_files_bb(center) | file_bb(center));
   Bitboard ourPawns = b & pos.pieces(Us);
   Bitboard theirPawns = b & pos.pieces(Them);
   Value safety = MaxSafetyBonus;
-  File center = std::max(FILE_B, std::min(FILE_G, file_of(ksq)));
 
   for (File f = File(center - 1); f <= File(center + 1); ++f)
   {
@@ -262,6 +270,9 @@ Value Entry::shelter_storm(const Position& pos, Square ksq) {
                   rkThem == rkUs + 1                                        ? BlockedByPawn  : Unblocked]
                  [d][rkThem];
   }
+
+  if (popcount((ourPawns & ShelterMask) | (theirPawns & StormMask)) == 5)
+      safety += Value(300);
 
   return safety;
 }
