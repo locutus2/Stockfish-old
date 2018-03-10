@@ -165,6 +165,7 @@ namespace {
   // Assorted bonuses and penalties
   const Score BishopPawns       = S(  8, 12);
   const Score CloseEnemies      = S(  7,  0);
+  const Score CloseDefenders    = S(  7,  0);
   const Score Connectivity      = S(  2,  2);
   const Score Hanging           = S( 52, 30);
   const Score HinderPassedPawn  = S(  8,  1);
@@ -492,6 +493,10 @@ namespace {
 
     // King tropism, to anticipate slow motion attacks on our king
     score -= CloseEnemies * (popcount(b1) + popcount(b2));
+
+    // Bonus for defenders on the king flank
+    b = (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING)) & kf & Camp;
+    score += CloseDefenders * popcount(b);
 
     if (T)
         Trace::add(KING, Us, score);
