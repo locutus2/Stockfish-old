@@ -604,7 +604,7 @@ namespace {
 
     // Connectivity: ensure that knights, bishops, rooks, and queens are protected
     b = (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING)) & attackedBy[Us][ALL_PIECES];
-    score += Connectivity[pos.count<QUEEN>() > 0] * popcount(b);
+    score += Connectivity[pos.count<QUEEN>(Them) > 0] * popcount(b);
 
     if (T)
         Trace::add(THREAT, Us, score);
