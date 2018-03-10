@@ -162,10 +162,12 @@ namespace {
   // KingProtector[PieceType-2] contains a penalty according to distance from king
   const Score KingProtector[] = { S(3, 5), S(4, 3), S(3, 0), S(1, -1) };
 
+  // Connectivity[has queens] contains a bonus for piece connectivity depended if queens on board or not
+  const Score Connectivity[] = { S(1, 1), S(2, 2) };
+
   // Assorted bonuses and penalties
   const Score BishopPawns       = S(  8, 12);
   const Score CloseEnemies      = S(  7,  0);
-  const Score Connectivity      = S(  2,  2);
   const Score Hanging           = S( 52, 30);
   const Score HinderPassedPawn  = S(  8,  1);
   const Score KnightOnQueen     = S( 21, 11);
@@ -602,7 +604,7 @@ namespace {
 
     // Connectivity: ensure that knights, bishops, rooks, and queens are protected
     b = (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING)) & attackedBy[Us][ALL_PIECES];
-    score += Connectivity * popcount(b);
+    score += Connectivity[pos.count<QUEEN>() > 0] * popcount(b);
 
     if (T)
         Trace::add(THREAT, Us, score);
