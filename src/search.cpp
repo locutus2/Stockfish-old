@@ -239,6 +239,7 @@ inline Value Trace<Iterator>::search(Position& pos, Stack* ss,
     sync_cout << "trace " << (reenter ? "reenter " : "enter ");
     output(lastPoint, !reenter);
     std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
+    lastPoint.clear();
 
     if (!reenter)
     {
@@ -257,6 +258,7 @@ inline Value Trace<Iterator>::search(Position& pos, Stack* ss,
     sync_cout << "trace exit ";
     output(lastPoint, !reenter);
     std::cout << " value=" << v;
+    lastPoint.clear();
 
     if (lastBestMove)
     {
@@ -278,8 +280,8 @@ inline  Value Trace<Iterator>::qsearch(Position& pos, Stack* ss, Value alpha, Va
 
     sync_cout << "trace enter ";
     output(lastPoint, true);
-    lastPoint = Point();
     std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
+    lastPoint.clear();
     ++cur;
     ++ply;
     Value v = ::qsearch<NT, inCheck, true>(pos, ss, alpha, beta, depth);
@@ -287,8 +289,8 @@ inline  Value Trace<Iterator>::qsearch(Position& pos, Stack* ss, Value alpha, Va
     --cur;
     sync_cout << "trace exit ";
     output(lastPoint, true);
-    lastPoint = Point();
     std::cout << " value=" << v;
+    lastPoint.clear();
 
     if (lastBestMove)
     {
@@ -528,10 +530,7 @@ void Thread::search() {
           while (true)
           {
               if (mainThread && !TraceMoves.empty())
-              {
-                  trace.on_call("");
                   bestValue = trace.search<PV, true>(rootPos, ss, alpha, beta, rootDepth, false, false);
-              }
               else bestValue = trace.search<PV, false>(rootPos, ss, alpha, beta, rootDepth, false, false);
 
               // Bring the best move to the front. It is critical that sorting
@@ -1283,15 +1282,10 @@ moves_loop: // When in check, search starts from here
 
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch)
-      {
-          if (TRACE)
-              trace.on_call("");
-
           value = newDepth <   ONE_PLY ?
                   givesCheck ? -trace.qsearch<NonPV, true, TRACE>(pos, ss+1, -(alpha+1), -alpha)
     		                 : -trace.qsearch<NonPV, false, TRACE>(pos, ss+1, -(alpha+1), -alpha)
     		                 : -trace.search<NonPV, TRACE>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, false);
-      }
 
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
@@ -1300,9 +1294,6 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
-
-          if (TRACE)
-              trace.on_call("");
 
           value = newDepth <   ONE_PLY ?
                   givesCheck ? -trace.qsearch<PV, true, TRACE>(pos, ss+1, -beta, -alpha)
@@ -1632,9 +1623,6 @@ moves_loop: // When in check, search starts from here
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
-
-      if (TRACE)
-          trace.on_call("");
 
       value = givesCheck ? -trace.qsearch<NT, true, TRACE>(pos, ss+1, -beta, -alpha, depth - ONE_PLY)
                          : -trace.qsearch<NT, false, TRACE>(pos, ss+1, -beta, -alpha, depth - ONE_PLY);
