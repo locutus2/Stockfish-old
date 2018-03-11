@@ -312,6 +312,10 @@ void Thread::search() {
   int ct = Options["Contempt"] * PawnValueEg / 100; // From centipawns
   Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                 : -make_score(ct, ct / 2));
+                                
+  int pct = Options["PawnContempt"] * PawnValueEg / 100; // From centipawns
+  Eval::PawnContempt = (us == WHITE ?  make_score(pct, pct / 2)
+                                    : -make_score(pct, pct / 2));
 
   // Iterative deepening loop until requested to stop or the target depth is reached
   while (   (rootDepth += ONE_PLY) < DEPTH_MAX

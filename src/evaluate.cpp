@@ -30,6 +30,7 @@
 #include "pawns.h"
 
 std::atomic<Score> Eval::Contempt;
+std::atomic<Score> Eval::PawnContempt;
 
 namespace Trace {
 
@@ -837,7 +838,7 @@ namespace {
     // the position object (material + piece square tables) and the material
     // imbalance. Score is computed internally from the white point of view.
     Score score =  pos.psq_score() + me->imbalance() + Eval::Contempt
-                 + make_score(pos.count<PAWN>(), pos.count<PAWN>() / 2);
+                 + Eval::PawnContempt * pos.count<PAWN>() / 16;
 
     // Probe the pawn hash table
     pe = Pawns::probe(pos);

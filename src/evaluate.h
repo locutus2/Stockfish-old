@@ -33,6 +33,7 @@ namespace Eval {
 const Value Tempo = Value(20); // Must be visible to search
 
 extern std::atomic<Score> Contempt;
+extern std::atomic<Score> PawnContempt;
 
 std::string trace(const Position& pos);
 
