@@ -42,7 +42,7 @@ namespace {
   // FEN string of the initial position, normal chess
   const char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-  Trace::Variation variation;
+  decltype(Search::TraceMoves) variation;
 
 
   // position() is called when engine receives the "position" UCI command.
@@ -55,7 +55,7 @@ namespace {
     Move m;
     string token, fen;
 
-    Search::TraceMoves.clear();
+    variation.clear();
 
     is >> token;
 
@@ -118,7 +118,7 @@ namespace {
 
     limits.startTime = now(); // As early as possible!
 
-    trace.init(pos, std::move(variation));
+    Search::TraceMoves = variation;
 
     while (is >> token)
         if (token == "searchmoves")
@@ -149,6 +149,7 @@ namespace {
 
       p.set(pos.fen(), pos.is_chess960(), &tempStates.back(), pos.this_thread());
       variation.clear();
+      variation.push_back(MOVE_NONE);
 
       while (is >> token) {
     	  Move m = token == "0000" ? MOVE_NULL : UCI::to_move(p, token);

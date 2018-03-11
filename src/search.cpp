@@ -40,7 +40,7 @@
 namespace Search {
 
   LimitsType Limits;
-  std::deque<Move> TraceMoves;
+  std::list<Move> TraceMoves;
 }
 
 namespace Tablebases {
@@ -112,10 +112,10 @@ namespace {
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
 
-  namespace Trace {
+  /*namespace Trace {
     void skip(const Position& pos, Move move, string point);
     void enter(const Position& pos, Move move, string point, bool reenter = false);
-    void exit(const Position& pos, Move move, string point, Value value, Move bestMove = MOVE_NONE);
+    void exit(const Position& pos, Move move, string point, Value value, Move bestMove = MOVE_NONE);*/
 
   inline bool gives_check(const Position& pos, Move move) {
     Color us = pos.side_to_move();
@@ -190,6 +190,149 @@ void Search::clear() {
   Threads.clear();
 }
 
+template <class Iterator>
+struct Trace {
+  typedef std::string Point;
+
+  void init(const Position& pos, const Iterator begin, const Iterator end);
+
+  template <NodeType NT, bool TRACE = false>
+  inline Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning);
+
+  template <NodeType NT, bool inCheck = false, bool TRACE = false>
+  inline Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth = DEPTH_ZERO);
+
+  void on_call(const Point& point);
+  void on_skip(const Point& point, Move move);
+  void on_return(const Point& point, Move bestMove = MOVE_NONE);
+
+private:
+  int rootPly, ply;
+  Iterator cur, end;
+  bool isChess960;
+  Point lastPoint;
+  Move lastBestMove;
+
+  bool tracingMove(Move move);
+
+  // helper function used to output data common to enter, exit and skip
+  void output(const Point& point, bool next);
+};
+
+template <class Iterator>
+void Trace<Iterator>::init(const Position& pos, const Iterator begin, const Iterator end) {
+    rootPly = pos.game_ply();
+    isChess960 = pos.is_chess960();
+    ply = -1;
+    cur = begin;
+    Trace::end = end;
+    lastBestMove = MOVE_NONE;
+    lastPoint = Point();
+}
+
+template <class Iterator>
+template <NodeType NT, bool TRACE>
+inline Value Trace<Iterator>::search(Position& pos, Stack* ss,
+        Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning) {
+    if (!TRACE || !tracingMove((ss-1)->currentMove))
+        return ::search<NT, false>(pos, ss, alpha, beta, depth, cutNode, skipEarlyPruning);
+
+    assert(ss->ply == ply || ss->ply == ply + 1);
+
+    bool reenter = ss->ply == ply;
+    sync_cout << "trace " << (reenter ? "reenter " : "enter ");
+    output(lastPoint, !reenter);
+    std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
+    if (!reenter) {
+        ++cur;
+        ++ply;
+    }
+    Value v = ::search<NT, true>(pos, ss, alpha, beta, depth, cutNode, skipEarlyPruning);
+    if (!reenter) {
+        --ply;
+        --cur;
+    }
+    sync_cout << "trace exit ";
+    output(lastPoint, !reenter);
+    std::cout << " value=" << v;
+    if (lastBestMove) {
+       std::cout << " bestmove=" << UCI::move(lastBestMove, isChess960);
+       lastBestMove = MOVE_NONE;
+    }
+    std::cout << sync_endl;
+    return v;
+  }
+
+template <class Iterator>
+template <NodeType NT, bool inCheck, bool TRACE>
+inline  Value Trace<Iterator>::qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
+    if (!TRACE || !tracingMove((ss-1)->currentMove))
+        return ::qsearch<NT, inCheck, false>(pos, ss, alpha, beta, depth);
+
+    assert(ss->ply == ply + 1);
+
+    sync_cout << "trace enter ";
+    output(lastPoint, true);
+    lastPoint = Point();
+    std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
+    ++cur;
+    ++ply;
+    Value v = ::qsearch<NT, inCheck, true>(pos, ss, alpha, beta, depth);
+    --ply;
+    --cur;
+    sync_cout << "trace exit ";
+    output(lastPoint, true);
+    lastPoint = Point();
+    std::cout << " value=" << v;
+    if (lastBestMove) {
+       std::cout << " bestmove=" << UCI::move(lastBestMove, isChess960);
+       lastBestMove = MOVE_NONE;
+    }
+    std::cout << sync_endl;
+    return v;
+}
+
+template <class Iterator>
+  void Trace<Iterator>::on_call(const Point& point) {
+      lastPoint = point;
+  }
+
+template <class Iterator>
+void Trace<Iterator>::on_skip(const Point& point, Move move) {
+  if (!tracingMove(move))
+      return;
+  sync_cout << "trace skip ";
+  output(point, true);
+  std::cout << sync_endl;
+}
+
+template <class Iterator>
+void Trace<Iterator>::on_return(const Point& point, Move bestMove) {
+  lastPoint = point;
+  lastBestMove = bestMove;
+}
+
+template <class Iterator>
+bool Trace<Iterator>::tracingMove(Move move) {
+  return cur != end && move == *cur;
+}
+
+// helper function used to output data common to enter, exit and skip
+template <class Iterator>
+void Trace<Iterator>::output(const Point& point, bool next) {
+    int posPly = rootPly + ply + next;
+    Iterator iter = cur;
+    if (!next)
+        --cur;
+    if (ply + next > 0)
+        std::cout << ((posPly + 1) / 2) << ((posPly % 2) ? ". " : "... ")
+                  << UCI::move(*iter, isChess960);
+    else std::cout << "root";
+    if (!point.empty())
+        std::cout << " " << point;
+}
+
+Trace<decltype(Search::TraceMoves)::const_iterator> trace;
 
 /// MainThread::search() is called by the main thread when the program receives
 /// the UCI 'go' command. It searches from the root position and outputs the "bestmove".
@@ -301,8 +444,11 @@ void Thread::search() {
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
 
-  if (mainThread)
+  if (mainThread) {
+      if (!Search::TraceMoves.empty())
+          trace.init(rootPos, Search::TraceMoves.cbegin(), Search::TraceMoves.cend());
       mainThread->bestMoveChanges = 0, mainThread->failedLow = false;
+  }
 
   size_t multiPV = Options["MultiPV"];
   Skill skill(Options["Skill Level"]);
@@ -368,8 +514,8 @@ void Thread::search() {
           while (true)
           {
               if (mainThread && !TraceMoves.empty()) {
-            	  Trace::enter(rootPos, MOVE_NONE, "");
-            	  bestValue = ::search<PV, true>(rootPos, ss, alpha, beta, rootDepth, false, false);
+            	  trace.on_call("");
+            	  bestValue = trace.search<PV, true>(rootPos, ss, alpha, beta, rootDepth, false, false);
               }
               else bestValue = ::search<PV>(rootPos, ss, alpha, beta, rootDepth, false, false);
 
@@ -492,110 +638,6 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
-  void Trace::init(const Position& pos, Variation&& var) {
-    rootPly = pos.game_ply();
-    variation = std::move(var);
-    ply = 0;
-    it = variation.cbegin();
-  }
-
-  template <NodeType NT, bool TRACE = false>
-  inline Value Trace::search(Point point, Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning) {
-	if (!TRACE || !tracingMove((ss-1)->currentMove))
-      return search<NT, false, pos, ss, alpha, beta, depth, cutNode, skipEarlyPruning);
-    bool reenter = ss->ply == ply;
-    sync_cout << "trace " << (reenter ? "reenter " : "enter ");
-    output(pos, move, point);
-    std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
-    ++it;
-    ++ply;
-    Value v = search<NT, true, pos, ss, alpha, beta, depth, cutNode, skipEarlyPruning);
-    --ply;
-    --it;
-    sync_cout << "trace exit ";
-    output(pos, move, lastPoint);
-    std::cout << " value=" << v;
-    if (lastBestMove)
-       std::cout << " bestmove=" << UCI::move(lastBestMove, isChess960);
-    std::cout << sync_endl;
-    return v;
-  }
-
-  template <NodeType NT, bool inCheck = false, bool TRACE = false>
-  inline  Value Trace::qsearch(Point point, Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
-	  if (!TRACE || !tracingMove((ss-1)->currentMove))
-	        return qsearch<NT, inCheck, false, pos, ss, alpha, beta, depth);
-	      bool reenter = ss->ply == ply;
-	      sync_cout << "trace " << (reenter ? "reenter " : "enter ");
-	      output(pos, move, point);
-	      std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
-	      ++it;
-	      ++ply;
-	      Value v = qsearch<NT, inCheck, true, pos, ss, alpha, beta, depth);
-	      --ply;
-	      --it;
-	      sync_cout << "trace exit ";
-	      output(pos, move, lastPoint);
-	      std::cout << " value=" << v;
-	      if (lastBestMove)
-	         std::cout << " bestmove=" << UCI::move(lastBestMove, isChess960);
-	      std::cout << sync_endl;
-	      return v;
-    }
-
-  void Trace::on_skip(Point point, Move move) {
-	if (!tracingMove(move))
-		return;
-	sync_cout << "trace skip ";
-	output(pos, move, point);
-	std::cout << sync_endl;
-  }
-
-  void Trace::on_return(Point point, Move bestMove) {
-	  lastPoint = point;
-	  lastBestMove = bestMove;
-  }
-
-    bool Trace::tracingMove(Move move) {
-    	return it != variation.cend() && move == *it;
-    }
-
-        // helper function used to output data common to enter, exit and skip
-        void Trace::output(const Position& pos, Move move, string point) {
-      	  int ply = pos.game_ply();
-      	  if (move)
-      		std::cout << ((ply + 1) / 2) << ((ply % 2) ? ". " : "... ")
-      		  	      << UCI::move(move, pos.is_chess960());
-      	  else std::cout << "root";
-      	  if (!point.empty())
-              std::cout << " " << point;
-        }
-
-        void Trace::skip(const Position& pos, Move move, string point) {
-          sync_cout << "trace skip ";
-    	  output(pos, move, point);
-          std::cout << sync_endl;
-        }
-
-        // leaves the output stream locked; if will be unlocked after the new invocation of search() or qsearch()
-        // outputs the remaining data
-        void Trace::enter(const Position& pos, Move move, string point, bool reenter) {
-          sync_cout << "trace " << (reenter ? "reenter " : "enter ");
-    	  output(pos, move, point);
-        }
-
-        void Trace::exit(const Position& pos, Move move, string point, Value value, Move bestMove) {
-    	  sync_cout << "trace exit ";
-    	  output(pos, move, point);
-    	  std::cout << " value=" << value;
-    	  if (bestMove)
-    		  std::cout << " bestmove=" << UCI::move(bestMove, pos.is_chess960());
-    	  std::cout << sync_endl;
-        }
-      }
-
-Trace trace;
-
 namespace {
 
   // search<>() is the main search function for both PV and non-PV nodes
@@ -681,7 +723,7 @@ namespace {
         beta = std::min(mate_in(ss->ply+1), beta);
         if (alpha >= beta) {
         	if (TRACE)
-        		on_return("mate_distance");
+        		trace.on_return("mate_distance");
         	return alpha;
         }
     }
@@ -740,7 +782,7 @@ namespace {
             }
         }
         if (TRACE)
-        	on_return("tt_cutoff");
+        	trace.on_return("tt_cutoff");
         return ttValue;
     }
 
@@ -777,7 +819,7 @@ namespace {
                               std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY),
                               MOVE_NONE, VALUE_NONE, TT.generation());
                     if (TRACE)
-                    	on_return("tb_hit")
+                    	trace.on_return("tb_hit");
 					return value;
                 }
 
@@ -915,6 +957,7 @@ namespace {
             	if (TRACE)
             		trace.on_return("nmp_ver");
             	return nullValue;
+            }
         }
     }
 
@@ -965,7 +1008,7 @@ namespace {
 
                 if (value >= rbeta) {
                     if (TRACE)
-                        trace.on_return("probcut")
+                        trace.on_return("probcut");
                     return value;
                 }
             }
@@ -1077,7 +1120,7 @@ moves_loop: // When in check, search starts from here
               {
                   skipQuiets = true;
                   if (TRACE)
-                	  on_skip("movecount", move);
+                	  trace.on_skip("movecount", move);
                   continue;
               }
 
@@ -1089,7 +1132,7 @@ moves_loop: // When in check, search starts from here
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold) {
                   if (TRACE)
-                	  on_skip("countermoves", move);
+                	  trace.on_skip("countermoves", move);
                   continue;
               }
 
@@ -1098,7 +1141,7 @@ moves_loop: // When in check, search starts from here
                   && !inCheck
                   && ss->staticEval + 256 + 200 * lmrDepth <= alpha) {
                   if (TRACE)
-                	  on_skip("futility", move);
+                	  trace.on_skip("futility", move);
                   continue;
               }
 
@@ -1106,14 +1149,15 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 8
                   && !pos.see_ge(move, Value(-35 * lmrDepth * lmrDepth))) {
             	  if (TRACE)
-            		  on_skip("see", move);
+            		  trace.on_skip("see", move);
             	  continue;
+              }
           }
           else if (    depth < 7 * ONE_PLY
                    && !extension
                    && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY))) {
         	      if (TRACE)
-        	    	  on_skip("see", move);
+        	    	  trace.on_skip("see", move);
         	      continue;
           }
       }
@@ -1192,7 +1236,9 @@ moves_loop: // When in check, search starts from here
 
           Depth d = std::max(newDepth - r, ONE_PLY);
 
-          value = -SEARCH("lmr", NonPV, (pos, ss+1, -(alpha+1), -alpha, d, true, false));
+          if (TRACE)
+        	  trace.on_call("lmr");
+          value = -trace.search<NonPV, TRACE>(pos, ss+1, -(alpha+1), -alpha, d, true, false);
 
           doFullDepthSearch = (value > alpha && d != newDepth);
       }
@@ -1201,10 +1247,12 @@ moves_loop: // When in check, search starts from here
 
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch) {
-    		  value = newDepth <   ONE_PLY ?
-    		         givesCheck ? -QSEARCH("", NonPV, true, (pos, ss+1, -(alpha+1), -alpha))
-    		                    : -QSEARCH("", NonPV, false, (pos, ss+1, -(alpha+1), -alpha))
-    		                    : -SEARCH("", NonPV, (pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, false));
+          if (TRACE)
+              trace.on_call("");
+          value = newDepth <   ONE_PLY ?
+                  givesCheck ? -trace.qsearch<NonPV, true, TRACE>(pos, ss+1, -(alpha+1), -alpha)
+    		                 : -trace.qsearch<NonPV, false, TRACE>(pos, ss+1, -(alpha+1), -alpha)
+    		                 : -trace.search<NonPV, TRACE>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, false);
       }
 
       // For PV nodes only, do a full PV search on the first move or after a fail
@@ -1214,10 +1262,12 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
+          if (TRACE)
+        	  trace.on_call("");
           value = newDepth <   ONE_PLY ?
-                  givesCheck ? -QSEARCH("", PV, true, (pos, ss+1, -beta, -alpha))
-                             : -QSEARCH("", PV, false, (pos, ss+1, -beta, -alpha))
-                             : -SEARCH("", PV, (pos, ss+1, -beta, -alpha, newDepth, false, false));
+                  givesCheck ? -trace.qsearch<PV, true, TRACE>(pos, ss+1, -beta, -alpha)
+                             : -trace.qsearch<PV, false, TRACE>(pos, ss+1, -beta, -alpha)
+                             : -trace.search<PV, TRACE>(pos, ss+1, -beta, -alpha, newDepth, false, false);
       }
 
       // Step 18. Undo move
@@ -1229,8 +1279,11 @@ moves_loop: // When in check, search starts from here
       // Finished searching the move. If a stop occurred, the return value of
       // the search cannot be trusted, and we return immediately without
       // updating best move, PV and TT.
-      if (Threads.stop.load(std::memory_order_relaxed))
-    	  EXIT("stop_sig", VALUE_ZERO);
+      if (Threads.stop.load(std::memory_order_relaxed)) {
+    	  if (TRACE)
+    		  trace.on_return("stop_sig");
+    	  return VALUE_ZERO;
+      }
       if (rootNode)
       {
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
@@ -1339,7 +1392,9 @@ moves_loop: // When in check, search starts from here
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
-    EXIT2("", bestValue, bestMove);
+    if (TRACE)
+    	trace.on_return("", bestMove);
+    return bestValue;
   }
 
 
@@ -1367,9 +1422,6 @@ moves_loop: // When in check, search starts from here
     bool ttHit, givesCheck, evasionPrunable;
     int moveCount;
 
-    if (TRACE)
-        std::cout << " depth=" << depth << " alpha=" << alpha << " beta=" << beta << sync_endl;
-
     if (PvNode)
     {
         oldAlpha = alpha; // To flag BOUND_EXACT when eval above alpha and no available moves
@@ -1385,7 +1437,9 @@ moves_loop: // When in check, search starts from here
     if (   pos.is_draw(ss->ply)
         || ss->ply >= MAX_PLY) {
     	Value v = (ss->ply >= MAX_PLY && !InCheck) ? evaluate(pos) : VALUE_DRAW;
-    	EXIT("draw", v);
+    	if (TRACE)
+    		trace.on_return("draw");
+    	return v;
     }
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
@@ -1407,7 +1461,9 @@ moves_loop: // When in check, search starts from here
         && ttValue != VALUE_NONE // Only in case of TT access race
         && (ttValue >= beta ? (tte->bound() &  BOUND_LOWER)
                             : (tte->bound() &  BOUND_UPPER))) {
-    	EXIT("tt_cutoff", ttValue);
+    	if (TRACE)
+    		trace.on_return("tt_cutoff");
+    	return ttValue;
     }
 
     // Evaluate the position statically
@@ -1440,7 +1496,9 @@ moves_loop: // When in check, search starts from here
             if (!ttHit)
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval, TT.generation());
-            EXIT("qs_standpat", bestValue);
+            if (TRACE)
+            	trace.on_return("qs_immediate");
+            return bestValue;
         }
 
         if (PvNode && bestValue > alpha)
@@ -1477,13 +1535,17 @@ moves_loop: // When in check, search starts from here
           if (futilityValue <= alpha)
           {
               bestValue = std::max(bestValue, futilityValue);
-              SKIP_MOVE("futility", move);
+              if (TRACE)
+            	  trace.on_skip("futility", move);
+              continue;
           }
 
           if (futilityBase <= alpha && !pos.see_ge(move, VALUE_ZERO + 1))
           {
               bestValue = std::max(bestValue, futilityBase);
-              SKIP_MOVE("futility", move);
+              if (TRACE)
+                  trace.on_skip("futility", move);
+              continue;
           }
       }
 
@@ -1495,8 +1557,11 @@ moves_loop: // When in check, search starts from here
 
       // Don't search moves with negative SEE values
       if (  (!InCheck || evasionPrunable)
-          && !pos.see_ge(move))
-          SKIP_MOVE("see", move);
+          && !pos.see_ge(move)) {
+    	  if (TRACE)
+    	      trace.on_skip("see", move);
+    	      continue;
+      }
 
       // Speculative prefetch as early as possible
       prefetch(TT.first_entry(pos.key_after(move)));
@@ -1512,8 +1577,11 @@ moves_loop: // When in check, search starts from here
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
-      value = givesCheck ? -QSEARCH("", NT, true, (pos, ss+1, -beta, -alpha, depth - ONE_PLY))
-                         : -QSEARCH("", NT, false, (pos, ss+1, -beta, -alpha, depth - ONE_PLY));
+
+      if (TRACE)
+    	  trace.on_call("");
+      value = givesCheck ? -trace.qsearch<NT, true, TRACE>(pos, ss+1, -beta, -alpha, depth - ONE_PLY)
+                         : -trace.qsearch<NT, false, TRACE>(pos, ss+1, -beta, -alpha, depth - ONE_PLY);
       pos.undo_move(move);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
@@ -1538,7 +1606,9 @@ moves_loop: // When in check, search starts from here
                   tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
                             ttDepth, move, ss->staticEval, TT.generation());
 
-                  EXIT2("", value, move);
+                  if (TRACE)
+                	  trace.on_return("", move);
+                  return value;
               }
           }
        }
@@ -1547,8 +1617,9 @@ moves_loop: // When in check, search starts from here
     // All legal moves have been searched. A special case: If we're in check
     // and no legal moves were found, it is checkmate.
     if (InCheck && bestValue == -VALUE_INFINITE) {
-    	Value v = mated_in(ss->ply); // Plies to mate from the root
-    	EXIT("", v);
+    	if (TRACE)
+    		trace.on_return("");
+    	return mated_in(ss->ply); // Plies to mate from the root
     }
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
@@ -1557,7 +1628,9 @@ moves_loop: // When in check, search starts from here
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
-    EXIT2("", bestValue, bestMove);
+    if (TRACE)
+    	trace.on_return("", bestMove);
+    return bestValue;
   }
 
   // value_to_tt() adjusts a mate score from "plies to mate from the root" to
@@ -1653,42 +1726,6 @@ moves_loop: // When in check, search starts from here
     {
         thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
-    }
-  }
-
-  namespace Trace {
-
-    // helper function used to output data common to enter, exit and skip
-    void output(const Position& pos, Move move, string point) {
-  	  int ply = pos.game_ply();
-  	  if (move)
-  		std::cout << ((ply + 1) / 2) << ((ply % 2) ? ". " : "... ")
-  		  	      << UCI::move(move, pos.is_chess960());
-  	  else std::cout << "root";
-  	  if (!point.empty())
-          std::cout << " " << point;
-    }
-
-    void skip(const Position& pos, Move move, string point) {
-      sync_cout << "trace skip ";
-	  output(pos, move, point);
-      std::cout << sync_endl;
-    }
-
-    // leaves the output stream locked; if will be unlocked after the new invocation of search() or qsearch()
-    // outputs the remaining data
-    void enter(const Position& pos, Move move, string point, bool reenter) {
-      sync_cout << "trace " << (reenter ? "reenter " : "enter ");
-	  output(pos, move, point);
-    }
-
-    void exit(const Position& pos, Move move, string point, Value value, Move bestMove) {
-	  sync_cout << "trace exit ";
-	  output(pos, move, point);
-	  std::cout << " value=" << value;
-	  if (bestMove)
-		  std::cout << " bestmove=" << UCI::move(bestMove, pos.is_chess960());
-	  std::cout << sync_endl;
     }
   }
 
