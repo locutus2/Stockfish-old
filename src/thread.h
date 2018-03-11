@@ -96,9 +96,7 @@ struct MainThread : public Thread {
 
 struct ThreadPool : public std::vector<Thread*> {
 
-  //void start_thinking(Position&, StateListPtr&, const Search::LimitsType&, bool = false);
-  void start_thinking(Position& pos, StateListPtr& states,
-                                  const Search::LimitsType& limits, bool ponderMode);
+  void start_thinking(Position&, StateListPtr&, const Search::LimitsType&, bool = false);
   void clear();
   void set(size_t);
 

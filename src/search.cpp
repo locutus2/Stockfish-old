@@ -112,11 +112,6 @@ namespace {
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
 
-  /*namespace Trace {
-    void skip(const Position& pos, Move move, string point);
-    void enter(const Position& pos, Move move, string point, bool reenter = false);
-    void exit(const Position& pos, Move move, string point, Value value, Move bestMove = MOVE_NONE);*/
-
   inline bool gives_check(const Position& pos, Move move) {
     Color us = pos.side_to_move();
     return  type_of(move) == NORMAL && !(pos.blockers_for_king(~us) & pos.pieces(us))
@@ -639,24 +634,6 @@ void Thread::search() {
 }
 
 namespace {
-
-  // search<>() is the main search function for both PV and non-PV nodes
-
-// helper macro used in the following collection of macros
-#define TRACING_MOVE(move) (TRACE && TraceMoves.size() >= unsigned(ss->ply) + 1\
-        && move == TraceMoves[ss->ply])
-
-#define SEARCH(point, nt, args) (TRACING_MOVE(ss->currentMove) ? (Trace::enter(pos, ss->currentMove, point),\
-		    search<nt, true>args) : search<nt>args)
-#define QSEARCH(point, nt, inCheck, args) (TRACING_MOVE(ss->currentMove) ?\
-		(Trace::enter(pos, ss->currentMove, point), qsearch<nt, inCheck, true>args)\
-	    : qsearch<nt, inCheck>args)
-#define REENTER(point) { if (TRACE) Trace::enter(pos, (ss-1)->currentMove, point, true); }
-#define EXIT(point, value) { if (TRACE) Trace::exit(pos, (ss-1)->currentMove, point, value);\
-	    return value; }
-#define EXIT2(point, value, bestMove) { if (TRACE) Trace::exit(pos, (ss-1)->currentMove, point, value, bestMove);\
-	    return value; }
-#define SKIP_MOVE(point, move) { if (TRACING_MOVE(move)) Trace::skip(pos, move, point); continue; }
 
   // search<>() is the main search function for both PV and non-PV nodes
   template <NodeType NT, bool TRACE = false>

@@ -326,15 +326,6 @@ string UCI::move(Move m, bool chess960) {
   return move;
 }
 
-/*Move UCI::to_move_no_check(string& str, bool isChess960) {
-  Square from = make_square(File(str[0] - 'a'), Rank(str[1] - '1'));
-  Square to = make_square(File(str[2] - 'a'), Rank(str[3] - '1'));
-  if (str.length() == 4)
-	  return make_move(from, to);
-  else return make_move
-
-}*/
-
 
 /// UCI::to_move() converts a string representing a move in coordinate notation
 /// (g1f3, a7a8q) to the corresponding legal Move, if any.
