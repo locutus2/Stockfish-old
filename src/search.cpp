@@ -230,12 +230,18 @@ template <class Iterator>
 template <NodeType NT, bool TRACE>
 inline Value Trace<Iterator>::search(Position& pos, Stack* ss,
         Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning) {
-    if (!TRACE || !tracingMove((ss-1)->currentMove) && (lastPoint.clear(), true))
+    if (!TRACE)
         return ::search<NT, false>(pos, ss, alpha, beta, depth, cutNode, skipEarlyPruning);
 
     assert(ss->ply == ply || ss->ply == ply + 1);
 
     bool reenter = ss->ply == ply;
+
+    if (!reenter && !tracingMove((ss-1)->currentMove))
+    {
+        lastPoint.clear();
+        return ::search<NT, false>(pos, ss, alpha, beta, depth, cutNode, skipEarlyPruning);
+    }
 
     sync_cout << "trace " << (reenter ? "reenter " : "enter ");
     output(lastPoint, !reenter);
@@ -340,7 +346,7 @@ void Trace<Iterator>::output(const Point& point, bool next) {
     Iterator iter = cur;
 
     if (!next)
-        --cur;
+        --iter;
 
     if (ply + next > 0)
         std::cout << ((posPly + 1) / 2) << ((posPly % 2) ? ". " : "... ")
