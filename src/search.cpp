@@ -199,7 +199,8 @@ struct Trace {
 
     void on_call(const Point& point);
     void on_skip(const Point& point, Move move);
-    void on_return(const Point& point, Move bestMove = MOVE_NONE);
+    void on_return(const Point& point);
+    void on_return(Move bestMove);
 
 private:
     int rootPly, ply;
@@ -229,7 +230,7 @@ template <class Iterator>
 template <NodeType NT, bool TRACE>
 inline Value Trace<Iterator>::search(Position& pos, Stack* ss,
         Value alpha, Value beta, Depth depth, bool cutNode, bool skipEarlyPruning) {
-    if (!TRACE || !tracingMove((ss-1)->currentMove))
+    if (!TRACE || !tracingMove((ss-1)->currentMove) && (lastPoint.clear(), true))
         return ::search<NT, false>(pos, ss, alpha, beta, depth, cutNode, skipEarlyPruning);
 
     assert(ss->ply == ply || ss->ply == ply + 1);
@@ -272,8 +273,8 @@ inline Value Trace<Iterator>::search(Position& pos, Stack* ss,
 
 template <class Iterator>
 template <NodeType NT, bool inCheck, bool TRACE>
-inline  Value Trace<Iterator>::qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
-    if (!TRACE || !tracingMove((ss-1)->currentMove))
+inline Value Trace<Iterator>::qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
+    if (!TRACE || !tracingMove((ss-1)->currentMove) && (lastPoint.clear(), true))
         return ::qsearch<NT, inCheck, false>(pos, ss, alpha, beta, depth);
 
     assert(ss->ply == ply + 1);
@@ -318,8 +319,12 @@ void Trace<Iterator>::on_skip(const Point& point, Move move) {
 }
 
 template <class Iterator>
-void Trace<Iterator>::on_return(const Point& point, Move bestMove) {
+void Trace<Iterator>::on_return(const Point& point) {
     lastPoint = point;
+}
+
+template <class Iterator>
+void Trace<Iterator>::on_return(Move bestMove) {
     lastBestMove = bestMove;
 }
 
@@ -1426,7 +1431,7 @@ moves_loop: // When in check, search starts from here
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
     if (TRACE)
-        trace.on_return("", bestMove);
+        trace.on_return(bestMove);
 
     return bestValue;
   }
@@ -1651,7 +1656,7 @@ moves_loop: // When in check, search starts from here
                             ttDepth, move, ss->staticEval, TT.generation());
 
                   if (TRACE)
-                      trace.on_return("", move);
+                      trace.on_return(move);
 
                   return value;
               }
@@ -1662,12 +1667,7 @@ moves_loop: // When in check, search starts from here
     // All legal moves have been searched. A special case: If we're in check
     // and no legal moves were found, it is checkmate.
     if (InCheck && bestValue == -VALUE_INFINITE)
-    {
-        if (TRACE)
-    	    trace.on_return("");
-
-        return mated_in(ss->ply); // Plies to mate from the root
-    }
+        return mated_in(ss->ply); // Plies to mate from the roots
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               PvNode && bestValue > oldAlpha ? BOUND_EXACT : BOUND_UPPER,
@@ -1676,7 +1676,7 @@ moves_loop: // When in check, search starts from here
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
     if (TRACE)
-        trace.on_return("", bestMove);
+        trace.on_return(bestMove);
 
     return bestValue;
   }
