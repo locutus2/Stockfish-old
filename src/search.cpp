@@ -347,14 +347,6 @@ void Thread::search() {
               delta = Value(18);
               alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
-
-              ct =  Options["Contempt"] * PawnValueEg / 100; // From centipawns
-
-              // Adjust contempt based on current bestValue (dynamic contempt)
-              ct += int(std::round(48 * atan(float(bestValue) / 128)));
-
-              Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
-                                            : -make_score(ct, ct / 2));
           }
 
           // Start with a small aspiration window and, in the case of a fail
