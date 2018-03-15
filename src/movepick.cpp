@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLER0, KILLER1, COUNTERMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
+    MAIN_SEARCH, CAPTURES_INIT, GOOD_CAPTURES, KILLER0, KILLER1, COUNTERMOVE, FOLLOWMOVE, QUIET_INIT, QUIET, BAD_CAPTURES,
     EVASION, EVASIONS_INIT, ALL_EVASIONS,
     PROBCUT, PROBCUT_CAPTURES_INIT, PROBCUT_CAPTURES,
     QSEARCH, QCAPTURES_INIT, QCAPTURES, QCHECKS
@@ -66,9 +66,9 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers_p)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move fm, Move* killers_p)
            : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch),
-             refutations{killers_p[0], killers_p[1], cm}, depth(d){
+             refutations{killers_p[0], killers_p[1], cm, fm}, depth(d){
 
   assert(d > DEPTH_ZERO);
 
@@ -185,12 +185,18 @@ begin_switch:
           || refutations[1] == refutations[2])
          refutations[2] = MOVE_NONE;
 
+      if (   refutations[0] == refutations[3]
+          || refutations[1] == refutations[3]
+		  || refutations[2] == refutations[3])
+              refutations[3] = MOVE_NONE;
+
       /* fallthrough */
 
   case KILLER0:
   case KILLER1:
   case COUNTERMOVE:
-      while (stage <= COUNTERMOVE)
+  case FOLLOWMOVE:
+      while (stage <= FOLLOWMOVE)
       {
           move = refutations[ stage++ - KILLER0 ];
           if (    move != MOVE_NONE
