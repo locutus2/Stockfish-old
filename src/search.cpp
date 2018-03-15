@@ -815,7 +815,7 @@ moves_loop: // When in check, search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
     Square prevSq2 = to_sq((ss-2)->currentMove);
-    Move followmove  =  cutNode && is_ok((ss-2)->currentMove) && prevSq != prevSq2
+    Move followmove  =  PvNode && is_ok((ss-2)->currentMove) && prevSq != prevSq2
                       ? thisThread->followMoves [pos.piece_on(prevSq2)][prevSq2]
                       : MOVE_NONE;
 
