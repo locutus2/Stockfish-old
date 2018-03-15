@@ -187,7 +187,7 @@ begin_switch:
 
       if (   refutations[0] == refutations[3]
           || refutations[1] == refutations[3]
-		  || refutations[2] == refutations[3])
+          || refutations[2] == refutations[3])
               refutations[3] = MOVE_NONE;
 
       /* fallthrough */

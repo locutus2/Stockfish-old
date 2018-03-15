@@ -814,7 +814,9 @@ moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    Move followmove  = is_ok((ss-2)->currentMove) && prevSq != to_sq((ss-2)->currentMove) ? thisThread->followMoves [pos.piece_on(to_sq((ss-2)->currentMove))][to_sq((ss-2)->currentMove)] : MOVE_NONE;
+    Move followmove  =  is_ok((ss-2)->currentMove) && prevSq != to_sq((ss-2)->currentMove)
+                      ? thisThread->followMoves [pos.piece_on(to_sq((ss-2)->currentMove))][to_sq((ss-2)->currentMove)]
+                      : MOVE_NONE;
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, followmove, ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
@@ -1448,12 +1450,11 @@ moves_loop: // When in check, search starts from here
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
         if (is_ok((ss-2)->currentMove) && to_sq((ss-2)->currentMove) != prevSq)
-       	{
-       		prevSq = to_sq((ss-2)->currentMove);
-       		thisThread->followMoves[pos.piece_on(prevSq)][prevSq] = move;
-       	}
+        {
+            prevSq = to_sq((ss-2)->currentMove);
+            thisThread->followMoves[pos.piece_on(prevSq)][prevSq] = move;
+        }
     }
-
 
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
