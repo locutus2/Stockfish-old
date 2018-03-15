@@ -814,8 +814,9 @@ moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    Move followmove  =  is_ok((ss-2)->currentMove) && prevSq != to_sq((ss-2)->currentMove)
-                      ? thisThread->followMoves [pos.piece_on(to_sq((ss-2)->currentMove))][to_sq((ss-2)->currentMove)]
+    Square prevSq2 = to_sq((ss-2)->currentMove);
+    Move followmove  =  is_ok((ss-2)->currentMove) && prevSq != prevSq2
+                      ? thisThread->followMoves [pos.piece_on(prevSq2)][prevSq2]
                       : MOVE_NONE;
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory, &thisThread->captureHistory, contHist, countermove, followmove, ss->killers);
@@ -1449,7 +1450,9 @@ moves_loop: // When in check, search starts from here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
-        if (is_ok((ss-2)->currentMove) && to_sq((ss-2)->currentMove) != prevSq)
+        if (   is_ok((ss-2)->currentMove)
+            && to_sq((ss-2)->currentMove) != prevSq
+            && (ss-1)->moveCount == 1)
         {
             prevSq = to_sq((ss-2)->currentMove);
             thisThread->followMoves[pos.piece_on(prevSq)][prevSq] = move;
