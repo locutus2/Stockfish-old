@@ -1450,13 +1450,11 @@ moves_loop: // When in check, search starts from here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
-        if (   is_ok((ss-2)->currentMove)
-            && to_sq((ss-2)->currentMove) != prevSq
-            && !pos.captured_piece())
-        {
-            prevSq = to_sq((ss-2)->currentMove);
-            thisThread->followMoves[pos.piece_on(prevSq)][prevSq] = move;
-        }
+    }
+    else if (is_ok((ss-2)->currentMove))
+    {
+        Square prevSq = to_sq((ss-2)->currentMove);
+        thisThread->followMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
 
     // Decrease all the other played quiet moves
