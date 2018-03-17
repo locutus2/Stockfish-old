@@ -896,7 +896,6 @@ moves_loop: // When in check, search starts from here
       // Step 14. Pruning at shallow depth
       if (  !rootNode
           && pos.non_pawn_material(pos.side_to_move())
-          && move != followmove
           && bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           if (   !captureOrPromotion
@@ -916,7 +915,8 @@ moves_loop: // When in check, search starts from here
               // Countermoves based pruning
               if (   lmrDepth < 3
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
+                  && move != followmove)
                   continue;
 
               // Futility pruning: parent node
