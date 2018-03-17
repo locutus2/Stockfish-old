@@ -961,7 +961,7 @@ moves_loop: // When in check, search starts from here
           &&  moveCount > 1
           && (!captureOrPromotion || moveCountPruning))
       {
-          Depth r = reduction<PvNode>(improving, depth, moveCount);
+          Depth r = reduction<PvNode>(improving, depth, moveCount - (move == followmove));
 
           if (captureOrPromotion)
               r -= r ? ONE_PLY : DEPTH_ZERO;
@@ -973,10 +973,6 @@ moves_loop: // When in check, search starts from here
 
               // Decrease reduction for exact PV nodes
               if (pvExact)
-                  r -= ONE_PLY;
-
-              // Decrease reduction for late follow move
-              if (move == followmove && moveCount > 15)
                   r -= ONE_PLY;
 
               // Increase reduction if ttMove is a capture
