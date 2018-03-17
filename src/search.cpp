@@ -793,7 +793,10 @@ namespace {
                 pos.undo_move(move);
 
                 if (value >= rbeta)
+                {
+                    update_capture_stats(pos, move, nullptr, 0, stat_bonus(depth - 4 * ONE_PLY));
                     return value;
+                }
             }
     }
 
