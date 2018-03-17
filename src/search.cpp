@@ -896,6 +896,7 @@ moves_loop: // When in check, search starts from here
       // Step 14. Pruning at shallow depth
       if (  !rootNode
           && pos.non_pawn_material(pos.side_to_move())
+          && move != followmove
           && bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           if (   !captureOrPromotion
@@ -973,10 +974,6 @@ moves_loop: // When in check, search starts from here
 
               // Decrease reduction for exact PV nodes
               if (pvExact)
-                  r -= ONE_PLY;
-
-              // Decrease reduction for follow move
-              if (move == followmove)
                   r -= ONE_PLY;
 
               // Increase reduction if ttMove is a capture
