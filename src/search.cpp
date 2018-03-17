@@ -975,8 +975,8 @@ moves_loop: // When in check, search starts from here
               if (pvExact)
                   r -= ONE_PLY;
 
-              // Decrease reduction for follow move
-              if (move == followmove)
+              // Decrease reduction for late follow move
+              if (move == followmove && moveCount > 15)
                   r -= ONE_PLY;
 
               // Increase reduction if ttMove is a capture
