@@ -794,14 +794,14 @@ namespace {
 
                 if (value >= rbeta)
                 {
-                    update_capture_stats(pos, move, capturesSearched, probCutCount - 1, stat_bonus(depth - 4 * ONE_PLY));
+                    update_capture_stats(pos, move, capturesSearched, captureCount, stat_bonus(depth - 4 * ONE_PLY));
                     return value;
                 }
 
-                assert(probCutCount <= 32);
-
-                capturesSearched[probCutCount - 1] = move;
+                if (value <= alpha && captureCount < 32)
+                    capturesSearched[captureCount++] = move;
             }
+        captureCount = 0;
     }
 
     // Step 11. Internal iterative deepening (skipped when in check)
