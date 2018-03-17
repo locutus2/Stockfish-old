@@ -794,9 +794,13 @@ namespace {
 
                 if (value >= rbeta)
                 {
-                    update_capture_stats(pos, move, nullptr, 0, stat_bonus(depth - 4 * ONE_PLY));
+                    update_capture_stats(pos, move, capturesSearched, probCutCount - 1, stat_bonus(depth - 4 * ONE_PLY));
                     return value;
                 }
+
+                assert(probCutCount <= 32);
+
+                capturesSearched[probCutCount - 1] = move;
             }
     }
 
