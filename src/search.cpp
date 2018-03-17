@@ -903,7 +903,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning
-              if (moveCountPruning)
+              if (moveCountPruning && move != followmove)
               {
                   skipQuiets = true;
                   continue;
@@ -915,8 +915,7 @@ moves_loop: // When in check, search starts from here
               // Countermoves based pruning
               if (   lmrDepth < 3
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && move != followmove)
+                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
                   continue;
 
               // Futility pruning: parent node
