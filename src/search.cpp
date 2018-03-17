@@ -896,6 +896,7 @@ moves_loop: // When in check, search starts from here
       // Step 14. Pruning at shallow depth
       if (  !rootNode
           && pos.non_pawn_material(pos.side_to_move())
+          && (move != followmove || move != countermove)
           && bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           if (   !captureOrPromotion
@@ -903,7 +904,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning
-              if (moveCountPruning && move != followmove)
+              if (moveCountPruning)
               {
                   skipQuiets = true;
                   continue;
