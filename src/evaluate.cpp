@@ -263,6 +263,7 @@ namespace {
     mobilityArea[Us] = ~(b | pos.square<KING>(Us) | pe->pawn_attacks(Them));
 
     // Initialise attackedBy bitboards for kings and pawns
+    attackedBy[Us][AT_LEAST_TWO_EXCLUDING_QUEEN] = 0;
     attackedBy[Us][KING] = pos.attacks_from<KING>(pos.square<KING>(Us));
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
@@ -320,7 +321,7 @@ namespace {
         }
 
         if (Pt == QUEEN)
-            b &= ~attackedBy[Us][AT_LEAST_TWO_EXCLUDING_QUEEN];
+            b &= ~attackedBy[Them][AT_LEAST_TWO_EXCLUDING_QUEEN];
         else
             attackedBy[Us][AT_LEAST_TWO_EXCLUDING_QUEEN] = attackedBy2[Us];
 
