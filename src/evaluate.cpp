@@ -320,7 +320,9 @@ namespace {
         }
 
         if (Pt == QUEEN)
-            b &= ~attackedBy2[Them];
+            b &= ~attackedBy[Us][AT_LEAST_TWO_EXCLUDING_QUEEN];
+        else
+            attackedBy[Us][AT_LEAST_TWO_EXCLUDING_QUEEN] = attackedBy2[Us];
 
         int mob = popcount(b & mobilityArea[Us]);
 
