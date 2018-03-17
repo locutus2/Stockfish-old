@@ -794,7 +794,7 @@ namespace {
 
                 if (value >= rbeta)
                 {
-                    update_capture_stats(pos, move, nullptr, 0, stat_bonus(depth - 3 * ONE_PLY));
+                    update_capture_stats(pos, move, nullptr, 0, stat_bonus(depth - 5 * ONE_PLY));
                     return value;
                 }
             }
