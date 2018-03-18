@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "thread.h"
 
 namespace {
 
@@ -109,7 +110,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Value th, const CapturePiece
 /// Captures are ordered by Most Valuable Victim (MVV), preferring captures
 /// with a good history. Quiets are ordered using the histories.
 template<GenType Type>
-void MovePicker::score() {
+void MovePicker::score(int limit) {
 
   static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
 
@@ -119,10 +120,15 @@ void MovePicker::score() {
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if (Type == QUIETS)
+      {
           m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
                    + (*contHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    + (*contHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)];
+
+          if(m == pos.this_thread()->pieceFromMoves[pos.moved_piece(m)][from_sq(m)])
+              m.value = std::max(m.value, limit);
+      }
 
       else // Type == EVASIONS
       {
@@ -142,6 +148,7 @@ void MovePicker::score() {
 Move MovePicker::next_move(bool skipQuiets) {
 
   Move move;
+  int limit;
 
 begin_switch:
 
@@ -204,8 +211,9 @@ begin_switch:
   case QUIET_INIT:
       cur = endBadCaptures;
       endMoves = generate<QUIETS>(pos, cur);
-      score<QUIETS>();
-      partial_insertion_sort(cur, endMoves, -4000 * depth / ONE_PLY);
+      limit = -4000 * depth / ONE_PLY;
+      score<QUIETS>(limit);
+      partial_insertion_sort(cur, endMoves, limit);
       ++stage;
       /* fallthrough */
 

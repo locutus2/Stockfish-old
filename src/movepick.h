@@ -120,7 +120,7 @@ public:
   Move next_move(bool skipQuiets = false);
 
 private:
-  template<GenType> void score();
+  template<GenType> void score(int limit = 0);
   ExtMove* begin() { return cur; }
   ExtMove* end() { return endMoves; }
 
