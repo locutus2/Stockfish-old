@@ -971,6 +971,11 @@ moves_loop: // When in check, search starts from here
               if (pvExact)
                   r -= ONE_PLY;
 
+              // Decrease reduction for moves which memorized as best
+              // for this piece and starting square
+              if (move == thisThread->pieceFromMoves[movedPiece][from_sq(move)])
+                  r -= ONE_PLY;
+
               // Increase reduction if ttMove is a capture
               if (ttCapture)
                   r += ONE_PLY;
@@ -1440,8 +1445,10 @@ moves_loop: // When in check, search starts from here
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
     thisThread->mainHistory[us][from_to(move)] << bonus;
-    thisThread->pieceFromMoves[pos.moved_piece(move)][from_sq(move)] = move;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
+
+    if (type_of(pos.moved_piece(move)) != PAWN)
+        thisThread->pieceFromMoves[pos.moved_piece(move)][from_sq(move)] = move;
 
     if (is_ok((ss-1)->currentMove))
     {
