@@ -66,6 +66,7 @@ namespace {
   constexpr int SkipSize[]  = { 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4 };
   constexpr int SkipPhase[] = { 0, 1, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 6, 7 };
 
+
   // Razor and futility margins
   constexpr int RazorMargin[] = {0, 590, 604};
   Value futility_margin(Depth d, bool improving) {
@@ -482,6 +483,10 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
+Value tuneImproving = Value(168);
+Value tuneNotImproving = Value(216);
+
+TUNE(SetRange(0, 500), tuneImproving, tuneNotImproving);
 
 namespace {
 
@@ -757,7 +762,7 @@ namespace {
     {
         assert(is_ok((ss-1)->currentMove));
 
-        Value rbeta = std::min(beta + 216 - 48 * improving, VALUE_INFINITE);
+        Value rbeta = std::min(beta + (improving ? tuneImproving : tuneNotImproving), VALUE_INFINITE);
         MovePicker mp(pos, ttMove, rbeta - ss->staticEval, &thisThread->captureHistory);
         int probCutCount = 0;
 
