@@ -876,7 +876,7 @@ namespace {
 
     v /= int(PHASE_MIDGAME);
 
-    v = v * (100 - pos.rule50_count()) / 100;
+    v = v * (10000 - pos.rule50_count() * pos.rule50_count()) / 10000;
 
     // In case of tracing add all remaining individual evaluation terms
     if (T)
