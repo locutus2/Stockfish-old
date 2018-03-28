@@ -31,8 +31,8 @@
 #include "movepick.h"
 #include "position.h"
 #include "search.h"
-#include "timeman.h"
 #include "thread.h"
+#include "timeman.h"
 #include "tt.h"
 #include "uci.h"
 #include "syzygy/tbprobe.h"
@@ -160,7 +160,7 @@ void Search::init() {
               Reductions[PV][imp][d][mc] = std::max(Reductions[NonPV][imp][d][mc] - 1, 0);
 
               // Increase reduction for non-PV nodes when eval is not improving
-              if (!imp && Reductions[NonPV][imp][d][mc] >= 2)
+              if (!imp && r > 1.0)
                 Reductions[NonPV][imp][d][mc]++;
           }
 
@@ -343,14 +343,15 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 5 * ONE_PLY)
           {
+              Value previousScore = rootMoves[PVIdx].previousScore;
               delta = Value(18);
-              alpha = std::max(rootMoves[PVIdx].previousScore - delta,-VALUE_INFINITE);
-              beta  = std::min(rootMoves[PVIdx].previousScore + delta, VALUE_INFINITE);
+              alpha = std::max(previousScore - delta,-VALUE_INFINITE);
+              beta  = std::min(previousScore + delta, VALUE_INFINITE);
 
               ct =  Options["Contempt"] * PawnValueEg / 100; // From centipawns
 
-              // Adjust contempt based on current bestValue (dynamic contempt)
-              ct += int(std::round(48 * atan(float(bestValue) / 128)));
+              // Adjust contempt based on root move's previousScore (dynamic contempt)
+              ct += int(std::round(48 * atan(float(previousScore) / 128)));
 
               Eval::Contempt = (us == WHITE ?  make_score(ct, ct / 2)
                                             : -make_score(ct, ct / 2));
@@ -689,12 +690,12 @@ namespace {
 
     // Step 7. Razoring (skipped when in check)
     if (  !PvNode
-        && depth <= 2 * ONE_PLY
-        && eval <= alpha - Value(RazorMargin[depth / ONE_PLY]))
+        && depth < 3 * ONE_PLY
+        && eval <= alpha - RazorMargin[depth / ONE_PLY])
     {
-        Value ralpha = alpha - Value((depth != ONE_PLY) * RazorMargin[depth / ONE_PLY]);
+        Value ralpha = alpha - (depth >= 2 * ONE_PLY) * RazorMargin[depth / ONE_PLY];
         Value v = qsearch<NonPV>(pos, ss, ralpha, ralpha+1);
-        if (depth == ONE_PLY || v <= ralpha)
+        if (depth < 2 * ONE_PLY || v <= ralpha)
             return v;
     }
 
@@ -791,7 +792,7 @@ namespace {
     // Step 11. Internal iterative deepening (skipped when in check)
     if (    depth >= 6 * ONE_PLY
         && !ttMove
-        && (PvNode || ss->staticEval + 256 >= beta))
+        && (PvNode || ss->staticEval + 128 >= beta))
     {
         Depth d = 3 * depth / 4 - 2 * ONE_PLY;
         search<NT>(pos, ss, alpha, beta, d, cutNode, true);
@@ -1148,7 +1149,6 @@ moves_loop: // When in check, search starts from here
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
 
     constexpr bool PvNode = NT == PV;
-    const bool inCheck = bool(pos.checkers());
 
     assert(alpha >= -VALUE_INFINITE && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
@@ -1162,7 +1162,7 @@ moves_loop: // When in check, search starts from here
     Move ttMove, move, bestMove;
     Depth ttDepth;
     Value bestValue, value, ttValue, futilityValue, futilityBase, oldAlpha;
-    bool ttHit, givesCheck, evasionPrunable;
+    bool ttHit, inCheck, givesCheck, evasionPrunable;
     int moveCount;
 
     if (PvNode)
@@ -1174,6 +1174,7 @@ moves_loop: // When in check, search starts from here
 
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = bestMove = MOVE_NONE;
+    inCheck = pos.checkers();
     moveCount = 0;
 
     // Check for an immediate draw or maximum ply reached
@@ -1495,7 +1496,7 @@ void MainThread::check_time() {
 
   static TimePoint lastInfoTime = now();
 
-  int elapsed = Time.elapsed();
+  TimePoint elapsed = Time.elapsed();
   TimePoint tick = Limits.startTime + elapsed;
 
   if (tick - lastInfoTime >= 1000)
@@ -1521,7 +1522,7 @@ void MainThread::check_time() {
 string UCI::pv(const Position& pos, Depth depth, Value alpha, Value beta) {
 
   std::stringstream ss;
-  int elapsed = Time.elapsed() + 1;
+  TimePoint elapsed = Time.elapsed() + 1;
   const RootMoves& rootMoves = pos.this_thread()->rootMoves;
   size_t PVIdx = pos.this_thread()->PVIdx;
   size_t multiPV = std::min((size_t)Options["MultiPV"], rootMoves.size());
