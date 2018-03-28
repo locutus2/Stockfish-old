@@ -31,28 +31,28 @@ namespace {
 
   // Polynomial material imbalance parameters
 
-  constexpr int Linear[] = { 0, 1, 1, 1, 1, 1 };
+  constexpr int Linear[] = { 1617, 12, -8, 39, 28, -53 };
 
   constexpr int QuadraticOurs[][PIECE_TYPE_NB] = {
     //            OUR PIECES
     // pair pawn knight bishop rook queen
-    {1667                               }, // Bishop pair
-    {  40,    1                         }, // Pawn
-    {  32,  255,  -3                    }, // Knight      OUR PIECES
-    {   0,  104,   4,     1             }, // Bishop
-    { -26,   -2,  47,   105,  -149      }, // Rook
-    {-189,   24, 117,   133,  -134, -10 }  // Queen
+    {   0                                }, // Bishop pair
+    {  25,  285                          }, // Pawn
+    {  -7,  222, -58                     }, // Knight      OUR PIECES
+    {   0,   86,  39,   -53              }, // Bishop
+    { -32,   80, 107,    73,  -224       }, // Rook
+    {-188,  107, 325,   247,   -35, -192 }  // Queen
   };
 
   constexpr int QuadraticTheirs[][PIECE_TYPE_NB] = {
     //           THEIR PIECES
     // pair pawn knight bishop rook queen
-    {   0                               }, // Bishop pair
-    {  36,    0                         }, // Pawn
-    {   9,   63,   0                    }, // Knight      OUR PIECES
-    {  59,   65,  42,     0             }, // Bishop
-    {  46,   39,  24,   -24,    0       }, // Rook
-    {  97,  100, -42,   137,  268,    0 }  // Queen
+    {   0                                }, // Bishop pair
+    {  54,    0                          }, // Pawn
+    { -26,  -38,   0                     }, // Knight      OUR PIECES
+    {  -4,   33,  -8,     0              }, // Bishop
+    {  46,   14,  11,   -15,    0        }, // Rook
+    {  75,   61, -36,   148,  326,    0  }  // Queen
   };
 
   constexpr int CubicOurs[][PIECE_TYPE_NB][PIECE_TYPE_NB] = {
@@ -61,42 +61,42 @@ namespace {
     {   // Pawn
         //            OUR PIECES
         // pair pawn knight bishop rook queen
-        {  0                                }, // Bishop pair
-        {  1,   1                           }  // Pawn        OUR PIECES
+        {    0                               }, // Bishop pair
+        {  -26, -212                         }  // Pawn        OUR PIECES
     },
     {   // Knight
         //            OUR PIECES
         // pair pawn knight bishop rook queen
-        {  0                                }, // Bishop pair
-        {  1,   1                           }, // Pawn
-        {  1,   1,   1                      }  // Knight      OUR PIECES
+        {    0                               }, // Bishop pair
+        {  -33,    3                         }, // Pawn
+        {   88,   44,  -12                   }  // Knight      OUR PIECES
     },
     {   // Bishop
         //            OUR PIECES
         // pair pawn knight bishop rook queen
-        {  0                                }, // Bishop pair
-        {  1,   1                           }, // Pawn
-        {  1,   1,   1                      }, // Knight      OUR PIECES
-        {  0,   1,   1,    1                }  // Bishop
+        {    0                               }, // Bishop pair
+        {   -6,   42                         }, // Pawn
+        {  -11,   20,  117                   }, // Knight      OUR PIECES
+        {    0,  -43,   82,  -18             }  // Bishop
     },
     {   // Rook
         //            OUR PIECES
         // pair pawn knight bishop rook queen
-        {  0                                }, // Bishop pair
-        {  1,   1                           }, // Pawn
-        {  1,   1,   1                      }, // Knight      OUR PIECES
-        {  0,   1,   1,    1                }, // Bishop
-        {  1,   1,   1,    1,      1        }  // Rook
+        {    0                               }, // Bishop pair
+        {   17,   29                         }, // Pawn
+        {  -73,  -49,  -14                   }, // Knight      OUR PIECES
+        {    0,   23,   48,  -14             }, // Bishop
+        {   82,   24,  -22,   87, -100       }  // Rook
     },
     {   // Queen
         //            OUR PIECES
         // pair pawn knight bishop rook queen
-        {  0                                }, // Bishop pair
-        {  1,   1                           }, // Pawn
-        {  1,   1,   1                      }, // Knight      OUR PIECES
-        {  0,   1,   1,    1                }, // Bishop
-        {  1,   1,   1,    1,      1        }, // Rook
-        {  1,   1,   1,    1,      1,   1   }  // Queen
+        {    0                               }, // Bishop pair
+        {  -27,  -19                         }, // Pawn
+        {  -42,   31,   98                   }, // Knight      OUR PIECES
+        {    0,   37,  126,  -36             }, // Bishop
+        {    4,   -6,   25,  -76, -172       }, // Rook
+        {  -35,   21,   28,  -10,   21,   23 }  // Queen
     }
   };
 
@@ -106,42 +106,42 @@ namespace {
     {   // Pawn
         //            THEIR PIECES
         // pair pawn knight bishop rook queen
-        {  1,   1,   1,     1,     1,   1   }, // Bishop pair
-        {  1,   1,   1,     1,     1,   1   }  // Pawn        OUR PIECES
+        {   70,   22,   23,  -20,  -15,   51 }, // Bishop pair
+        {  -38,  492,   64,   68,   82,  -37 }  // Pawn        OUR PIECES
     },
     {   // Knight
         //            THEIR PIECES
         // pair pawn knight bishop rook queen
-        {  1,   1,   1,     1,     1,   1   }, // Bishop pair
-        {  1,   1,   1,     1,     1,   1   }, // Pawn
-        {  1,   1,   1,     1,     1,   1   }  // Knight      OUR PIECES
+        {  -17,  -39,   33,  -32,   -4,   71 }, // Bishop pair
+        {  -32,   37,  -80,  -24,   57, -106 }, // Pawn
+        {   23,  -53,   11,   16,  -55,  -75 }  // Knight      OUR PIECES
     },
     {   // Bishop
         //            THEIR PIECES
         // pair pawn knight bishop rook queen
-        {  1,   1,   1,     1,     1,   1   }, // Bishop pair
-        {  1,   1,   1,     1,     1,   1   }, // Pawn
-        {  1,   1,   1,     1,     1,   1   }, // Knight      OUR PIECES
-        {  1,   1,   1,     1,     1,   1   }  // Bishop
+        {   66,   20,  -64,   82,   68,  -57 }, // Bishop pair
+        {   10,  -32,  -33,  -34,   19,  -48 }, // Pawn
+        {  -83,   21,    0,  -26,   55,  -63 }, // Knight      OUR PIECES
+        { -108,   46,  -69,   -3,  -12,  109 }  // Bishop
     },
     {   // Rook
         //            THEIR PIECES
         // pair pawn knight bishop rook queen
-        {  1,   1,   1,     1,     1,   1   }, // Bishop pair
-        {  1,   1,   1,     1,     1,   1   }, // Pawn
-        {  1,   1,   1,     1,     1,   1   }, // Knight      OUR PIECES
-        {  1,   1,   1,     1,     1,   1   }, // Bishop
-        {  1,   1,   1,     1,     1,   1   }  // Rook
+        {  -41,  -77,   54,  -51,   -9,   68 }, // Bishop pair
+        {   13,   28,   21, -144,    5,  -33 }, // Pawn
+        {  -65,  177,   75,  156,   44,  104 }, // Knight      OUR PIECES
+        {   12,    2,   26,  -38,   69, -160 }, // Bishop
+        {  -67,   53,   80,   70, -116,  -14 }  // Rook
     },
     {   // Queen
         //            THEIR PIECES
         // pair pawn knight bishop rook queen
-        {  1,   1,   1,     1,     1,   1   }, // Bishop pair
-        {  1,   1,   1,     1,     1,   1   }, // Pawn
-        {  1,   1,   1,     1,     1,   1   }, // Knight      OUR PIECES
-        {  1,   1,   1,     1,     1,   1   }, // Bishop
-        {  1,   1,   1,     1,     1,   1   }, // Rook
-        {  1,   1,   1,     1,     1,   1   }  // Queen
+        {  -21,  -98,   20,   34,  -77,   45 }, // Bishop pair
+        {   28,  -96,   36,   88,   21,   35 }, // Pawn
+        {   98, -137,  -44,   19,   47,  -61 }, // Knight      OUR PIECES
+        {  -86,   29,    2,   52,  -36,   69 }, // Bishop
+        {  -55,   15,   14,   -1,  -12,    3 }, // Rook
+        {  -87, -118, -105,   -3,   31,   54 }  // Queen
     }
   };
 
