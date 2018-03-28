@@ -1082,7 +1082,7 @@ moves_loop: // When in check, search starts from here
           }
       }
 
-      if (move != bestMove && move != ttMove)
+      if (move != bestMove && value < QueenValueEg)
       {
           if (captureOrPromotion && captureCount < 32)
               capturesSearched[captureCount++] = move;
