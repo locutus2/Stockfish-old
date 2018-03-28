@@ -1061,9 +1061,11 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
+      bool hasBestValue = false;
       if (value > bestValue)
       {
           bestValue = value;
+          hasBestValue = true;
 
           if (value > alpha)
           {
@@ -1082,7 +1084,7 @@ moves_loop: // When in check, search starts from here
           }
       }
 
-      if (move != bestMove)
+      if (move != bestMove && !hasBestValue)
       {
           if (captureOrPromotion && captureCount < 32)
               capturesSearched[captureCount++] = move;
