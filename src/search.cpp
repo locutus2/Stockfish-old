@@ -967,11 +967,9 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r += ONE_PLY;
 
-              // Decrease reduction for a pawn push at PV nodes if a pawn exchange can be avoided
-              if (     PvNode
-                  &&   type_of(movedPiece) == PAWN
-                  &&  (PawnAttacks[~pos.side_to_move()][from_sq(move)] & pos.pieces(pos.side_to_move(), PAWN))
-                  && !(PawnAttacks[~pos.side_to_move()][to_sq(move)]   & pos.pieces(pos.side_to_move(), PAWN)))
+              // Decrease reduction for a pawn push if attacked by opponent pawn
+              if (     type_of(movedPiece) == PAWN
+                  &&  (PawnAttacks[~pos.side_to_move()][from_sq(move)] & pos.pieces(pos.side_to_move(), PAWN)))
                   r -= ONE_PLY;
 
               // Increase reduction for cut nodes
