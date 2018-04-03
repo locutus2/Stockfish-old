@@ -325,9 +325,9 @@ namespace {
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
-        if (Pt == BISHOP)
+        if (Pt == KNIGHT)
             mob = popcount(b & mobilityArea[Us] & ~pos.pieces(Us, QUEEN, ROOK));
-        else if (Pt == KNIGHT)
+        else if (Pt == BISHOP)
             mob = popcount(b & mobilityArea[Us] & ~pos.pieces(Us, QUEEN));
         else
             mob = popcount(b & mobilityArea[Us]);
