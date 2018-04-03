@@ -326,7 +326,7 @@ namespace {
         }
 
         if (Pt == KNIGHT || Pt == BISHOP)
-            mob = popcount(b & mobilityArea[Us] & ~pos.pieces(Us, QUEEN));
+            mob = popcount(b & mobilityArea[Us] & ~pos.pieces(Us, QUEEN, ROOK));
         else
             mob = popcount(b & mobilityArea[Us]);
 
