@@ -215,8 +215,7 @@ Bitboard generate_bad_bishop_squares(const Position& pos, Pawns::Entry* e) {
   constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
 
   Bitboard b, bb, blocker, allowed, bbs = 0;
-  int mobility[2][SQUARE_NB];
-  int index = 0;
+  int mobility[SQUARE_NB];
 
   blocker = pos.pieces(PAWN);
   b = allowed = ~(pos.pieces(Us, PAWN) | e->pawnAttacks[Them]);
@@ -224,28 +223,18 @@ Bitboard generate_bad_bishop_squares(const Position& pos, Pawns::Entry* e) {
   {
      Square s = pop_lsb(&b);
      bb = allowed & attacks_bb<BISHOP>(s, blocker);
-     mobility[index][s] = popcount(bb);
-  }
-
-  for(int i = 0; i < 2; ++i)
-  {
-      b = allowed;
-      while(b)
-      {
-         Square s = pop_lsb(&b);
-         bb = allowed & attacks_bb<BISHOP>(s, blocker);
-         mobility[1 - index][s] = mobility[index][s];
-         while(bb)
-             mobility[1 - index][s] += mobility[index][pop_lsb(&bb)];
-      }
-      index = 1 - index;
+     mobility[s] = popcount(bb);
   }
 
   b = allowed;
   while(b)
   {
-      Square s = pop_lsb(&b);
-      if (mobility[index][s] <= 20)
+     Square s = pop_lsb(&b);
+     bb = allowed & attacks_bb<BISHOP>(s, blocker);
+     int sum = mobility[s];
+     while(bb && sum <= 5)
+         sum += mobility[pop_lsb(&bb)];
+     if (sum <= 5)
          bbs |= s;
   }
 
