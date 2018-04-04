@@ -206,6 +206,59 @@ void init() {
 }
 
 
+/// generate_bad_bishop_squares() calculates a bitboard of squares on which a bishop
+/// is considered bad.
+
+template<Color Us>
+Bitboard generate_bad_bishop_squares(const Position& pos, Pawns::Entry* e) {
+
+  constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
+
+  Bitboard b, bb, blocker, allowed, bbs = 0;
+  int mobility[2][SQUARE_NB];
+  int index = 0;
+
+  blocker = pos.pieces(PAWN);
+  b = allowed = ~(pos.pieces(Us, PAWN) | e->pawnAttacks[Them]);
+  while(b)
+  {
+     Square s = pop_lsb(&b);
+     bb = allowed & attacks_bb<BISHOP>(s, blocker);
+     mobility[index][s] = popcount(bb);
+  }
+
+  for(int i = 0; i < 2; ++i)
+  {
+      b = allowed;
+      while(b)
+      {
+         Square s = pop_lsb(&b);
+         bb = allowed & attacks_bb<BISHOP>(s, blocker);
+         int mob = 0;
+         if (bb)
+         {
+             int sum = 0, count = popcount(bb);
+             while(bb)
+                 sum += mobility[index][pop_lsb(&bb)];
+             mob = sum / count;
+         }
+         mobility[1 - index][s] = (mobility[index][s] + mob) / 2;
+      }
+      index = 1 - index;
+  }
+
+  b = allowed;
+  while(b)
+  {
+      Square s = pop_lsb(&b);
+      if (mobility[index][s] <= 0)
+         bbs |= s;
+  }
+
+  return bbs;
+}
+
+
 /// Pawns::probe() looks up the current position's pawns configuration in
 /// the pawns hash table. It returns a pointer to the Entry if the position
 /// is found. Otherwise a new Entry is computed and stored there, so we don't
@@ -225,6 +278,8 @@ Entry* probe(const Position& pos) {
   e->openFiles = popcount(e->semiopenFiles[WHITE] & e->semiopenFiles[BLACK]);
   e->asymmetry = popcount(  (e->passedPawns[WHITE]   | e->passedPawns[BLACK])
                           | (e->semiopenFiles[WHITE] ^ e->semiopenFiles[BLACK]));
+  e->badBishopSquares[WHITE] = generate_bad_bishop_squares<WHITE>(pos, e);
+  e->badBishopSquares[BLACK] = generate_bad_bishop_squares<BLACK>(pos, e);
 
   return e;
 }
