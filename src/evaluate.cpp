@@ -354,10 +354,6 @@ namespace {
                 // Penalty according to number of pawns on the same color square as the bishop
                 score -= BishopPawns * pe->pawns_on_same_color_squares(Us, s);
 
-                // Penalty for bad bishop
-                if (pe->bad_bishop_squares(Us) & s)
-                    score -= BadBishop;
-
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s)))
                     score += LongDiagonalBishop;
@@ -875,6 +871,14 @@ namespace {
             + space<  WHITE>() - space<  BLACK>();
 
     score += initiative(eg_value(score));
+
+    // Penalty for bad bishop if score is even
+    if (abs(mg_value(score) + eg_value(score)) < PawnValueMg/2){
+        if(pe->bad_bishop_squares<WHITE>(pos) & pos.pieces(WHITE, BISHOP))
+            score -= BadBishop;
+        if(pe->bad_bishop_squares<BLACK>(pos) & pos.pieces(BLACK, BISHOP))
+            score += BadBishop;
+    }
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = scale_factor(eg_value(score));
