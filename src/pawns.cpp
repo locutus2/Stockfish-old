@@ -311,8 +311,7 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
   constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
 
   Bitboard b, bb, blocker, allowed, bbs = 0;
-  int mobility[2][SQUARE_NB];
-  int index = 0;
+  int mobility[SQUARE_NB];
 
   blocker = pos.pieces(PAWN);
   b = allowed = ~(pos.pieces(Us, PAWN) | pawnAttacks[Them]);
@@ -320,34 +319,24 @@ Bitboard Entry::do_bad_bishop_squares(const Position& pos) {
   {
      Square s = pop_lsb(&b);
      bb = allowed & attacks_bb<BISHOP>(s, blocker);
-     mobility[index][s] = popcount(bb);
-  }
-
-  for(int i = 0; i < 2; ++i)
-  {
-      b = allowed;
-      while(b)
-      {
-         Square s = pop_lsb(&b);
-         bb = allowed & attacks_bb<BISHOP>(s, blocker);
-         int mob = 0;
-         if (bb)
-         {
-             int sum = 0, count = popcount(bb);
-             while(bb)
-                 sum += mobility[index][pop_lsb(&bb)];
-             mob = sum / count;
-         }
-         mobility[1 - index][s] = (mobility[index][s] + mob) / 2;
-      }
-      index = 1 - index;
+     mobility[s] = popcount(bb);
   }
 
   b = allowed;
   while(b)
   {
-      Square s = pop_lsb(&b);
-      if (mobility[index][s] <= 0)
+     Square s = pop_lsb(&b);
+     bb = allowed & attacks_bb<BISHOP>(s, blocker);
+     int mob = 0;
+     if (bb)
+     {
+         int sum = 0, count = popcount(bb);
+         while(bb)
+             sum += mobility[pop_lsb(&bb)];
+         mob = sum / count;
+     }
+     mob = (mobility[s] + mob) / 2;
+     if (mob <= 0)
          bbs |= s;
   }
 
