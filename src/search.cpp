@@ -404,7 +404,7 @@ void Thread::search() {
               {
                   beta = (alpha + beta) / 2;
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
-                  resolutions++;
+                  resolutions += 2;
 
                   if (mainThread)
                   {
@@ -415,7 +415,7 @@ void Thread::search() {
               else if (bestValue >= beta)
               {
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
-                  resolutions++;
+                  resolutions += 2;
               }
               else
                   break;
@@ -861,7 +861,7 @@ moves_loop: // When in check, search starts from here
       givesCheck = gives_check(pos, move);
 
       moveCountPruning =   depth < 16 * ONE_PLY
-                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY] - thisThread->resolutions;
+                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY] + thisThread->resolutions;
 
       // Step 13. Extensions (~70 Elo)
 
