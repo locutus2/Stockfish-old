@@ -358,6 +358,8 @@ void Thread::search() {
               alpha = std::max(previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(previousScore + delta, VALUE_INFINITE);
 
+              resolutions = 0;
+
               ct =  Options["Contempt"] * PawnValueEg / 100; // From centipawns
 
               // Adjust contempt based on root move's previousScore (dynamic contempt)
@@ -402,6 +404,7 @@ void Thread::search() {
               {
                   beta = (alpha + beta) / 2;
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
+                  resolutions++;
 
                   if (mainThread)
                   {
@@ -410,7 +413,10 @@ void Thread::search() {
                   }
               }
               else if (bestValue >= beta)
+              {
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
+                  resolutions++;
+              }
               else
                   break;
 
@@ -855,7 +861,7 @@ moves_loop: // When in check, search starts from here
       givesCheck = gives_check(pos, move);
 
       moveCountPruning =   depth < 16 * ONE_PLY
-                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY];
+                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY] + thisThread->resolutions;
 
       // Step 13. Extensions (~70 Elo)
 

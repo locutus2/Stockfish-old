@@ -63,6 +63,7 @@ public:
   size_t PVIdx;
   int selDepth, nmp_ply, nmp_odd;
   std::atomic<uint64_t> nodes, tbHits;
+  int resolutions;
 
   Position rootPos;
   Search::RootMoves rootMoves;
