@@ -480,7 +480,7 @@ namespace {
                      + 102 * kingAttacksCount[Them]
                      + 191 * popcount(kingRing[Us] & weak)
                      + 143 * popcount(pinned | unsafeChecks)
-                     -   7 * popcount(defenders)
+                     -  14 * popcount(defenders)
                      - 848 * !pos.count<QUEEN>(Them)
                      -   9 * mg_value(score) / 8
                      +  40;
