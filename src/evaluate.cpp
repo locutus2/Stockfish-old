@@ -164,7 +164,7 @@ namespace {
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  8, 12);
   constexpr Score CloseEnemies       = S(  7,  0);
-  constexpr Score KingDefenders      = S( 14,  0);
+  constexpr Score KingDefenders      = S(  7,  0);
   constexpr Score Connectivity       = S(  3,  1);
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score Hanging            = S( 52, 30);
@@ -423,6 +423,8 @@ namespace {
     // King shelter and enemy pawns storm
     Score score = pe->king_safety<Us>(pos, ksq);
 
+    Bitboard kf = KingFlank[file_of(ksq)];
+
     // Main king safety evaluation
     if (kingAttackersCount[Them] > 1 - pos.count<QUEEN>(Them))
     {
@@ -472,6 +474,10 @@ namespace {
         unsafeChecks &= mobilityArea[Them];
         pinned = pos.blockers_for_king(Us) & pos.pieces(Us);
 
+        // Bonus for defenders at king flank
+        b = (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING)) & kf & Camp;
+        score += KingDefenders * popcount(b);
+
         kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
                      + 102 * kingAttacksCount[Them]
                      + 191 * popcount(kingRing[Us] & weak)
@@ -489,8 +495,6 @@ namespace {
         }
     }
 
-    Bitboard kf = KingFlank[file_of(ksq)];
-
     // Penalty when our king is on a pawnless flank
     if (!(pos.pieces(PAWN) & kf))
         score -= PawnlessFlank;
@@ -502,10 +506,6 @@ namespace {
 
     // King tropism, to anticipate slow motion attacks on our king
     score -= CloseEnemies * (popcount(b1) + popcount(b2));
-
-    // Bonus for defenders at king flank
-    b = (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING)) & kf & Camp;
-    score += KingDefenders * popcount(b);
 
     if (T)
         Trace::add(KING, Us, score);
