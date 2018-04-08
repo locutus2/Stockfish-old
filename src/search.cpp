@@ -304,6 +304,7 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
+  mcpOffset = idx % 2;
 
   if (mainThread)
       mainThread->bestMoveChanges = 0, mainThread->failedLow = false;
@@ -855,7 +856,7 @@ moves_loop: // When in check, search starts from here
       givesCheck = gives_check(pos, move);
 
       moveCountPruning =   depth < 16 * ONE_PLY
-                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY];
+                        && moveCount >= FutilityMoveCounts[improving][depth / ONE_PLY] + thisThread->mcpOffset;
 
       // Step 13. Extensions (~70 Elo)
 
