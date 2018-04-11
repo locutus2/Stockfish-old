@@ -682,7 +682,7 @@ namespace {
                 if (!(pos.pieces(Them) & bb))
                     unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
 
-                else if (r == RANK_7 && !(unsafeSquares & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them))))
+                else if (r >= RANK_6 && !(unsafeSquares & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them))))
                     enemyRookFromBehindIsOnlyDefender = true;
 
                 // If there aren't any enemy attacks, assign a big bonus. Otherwise
