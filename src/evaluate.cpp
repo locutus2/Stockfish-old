@@ -691,7 +691,7 @@ namespace {
                     k += 6;
 
                 else if (defendedSquares & blockSq)
-                    k += 5;
+                    k += 3;
 
                 bonus += make_score(k * w, k * w);
             }
