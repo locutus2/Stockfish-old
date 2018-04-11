@@ -678,12 +678,18 @@ namespace {
                 if (!(pos.pieces(Us) & bb))
                     defendedSquares &= attackedBy[Us][ALL_PIECES];
 
+                bool enemyRookFromBehindIsOnlyDefender = false;
                 if (!(pos.pieces(Them) & bb))
                     unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
 
+                else if (!(unsafeSquares & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them))))
+                    enemyRookFromBehindIsOnlyDefender = true;
+
                 // If there aren't any enemy attacks, assign a big bonus. Otherwise
                 // assign a smaller bonus if the block square isn't attacked.
-                int k = !unsafeSquares ? 20 : !(unsafeSquares & blockSq) ? 9 : 0;
+                int k = !unsafeSquares                    ? 20 :
+                        !(unsafeSquares & blockSq)        ?  9 :
+                        enemyRookFromBehindIsOnlyDefender ?  1 : 0;
 
                 // If the path to the queen is fully defended, assign a big bonus.
                 // Otherwise assign a smaller bonus if the block square is defended.
