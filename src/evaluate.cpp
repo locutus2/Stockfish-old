@@ -689,7 +689,7 @@ namespace {
                 // assign a smaller bonus if the block square isn't attacked.
                 int k = !unsafeSquares                    ? 20 :
                         !(unsafeSquares & blockSq)        ?  9 :
-                        enemyRookFromBehindIsOnlyDefender ?  1 : 0;
+                        enemyRookFromBehindIsOnlyDefender ?  2 : 0;
 
                 // If the path to the queen is fully defended, assign a big bonus.
                 // Otherwise assign a smaller bonus if the block square is defended.
