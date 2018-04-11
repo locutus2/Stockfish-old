@@ -683,7 +683,7 @@ namespace {
 
                 // If there aren't any enemy attacks, assign a big bonus. Otherwise
                 // assign a smaller bonus if the block square isn't attacked.
-                int k = 20 / (1 + 2 * popcount(unsafeSquares));
+                int k = 20 / (1 + (unsafeSquares & blockSq ? 2 : 1) * popcount(unsafeSquares));
 
                 // If the path to the queen is fully defended, assign a big bonus.
                 // Otherwise assign a smaller bonus if the block square is defended.
