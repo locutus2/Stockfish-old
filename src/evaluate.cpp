@@ -693,7 +693,8 @@ namespace {
                 else if (defendedSquares & blockSq)
                     k += 4;
 
-                bonus += make_score((k - r + 4) * w, (k - r + 4) * w);
+                int v = k * w * r / 4;
+                bonus += make_score(v, v);
             }
             else if (pos.pieces(Us) & blockSq)
                 bonus += make_score(w + r * 2, w + r * 2);
