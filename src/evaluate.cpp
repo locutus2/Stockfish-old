@@ -693,7 +693,7 @@ namespace {
                 else if (defendedSquares & blockSq)
                     k += 4;
 
-                bonus += make_score(k * w, k * w * 7 / 8);
+                bonus += make_score(k * w * 7 / 8, k * w);
             }
             else if (pos.pieces(Us) & blockSq)
                 bonus += make_score(w + r * 2, w + r * 2);
