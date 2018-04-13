@@ -820,6 +820,11 @@ namespace {
                  &&  pos.count<PAWN>(strongSide) <= 2
                  && !pos.pawn_passed(~strongSide, pos.square<KING>(~strongSide)))
             sf = 37 + 7 * pos.count<PAWN>(strongSide);
+        // Drawish rook endings
+        else if (   pos.non_pawn_material(WHITE) == RookValueMg
+                 && pos.non_pawn_material(BLACK) == RookValueMg
+                 && pe->asymmetry <= 1)
+            sf = 56 + pos.count<PAWN>(strongSide);
     }
 
     return ScaleFactor(sf);
