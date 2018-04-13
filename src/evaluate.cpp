@@ -77,8 +77,8 @@ namespace {
   constexpr Bitboard CenterFiles = FileCBB | FileDBB | FileEBB | FileFBB;
   constexpr Bitboard KingSide    = FileEBB | FileFBB | FileGBB | FileHBB;
   constexpr Bitboard Center      = (FileDBB | FileEBB) & (Rank4BB | Rank5BB);
-  constexpr Bitboard ExtendedCenter[COLOR_NB] = { Center | make_bitboard(SQ_C4, SQ_F4),
-                                                  Center | make_bitboard(SQ_C5, SQ_F5)};
+  constexpr Bitboard ExtendedCenter[COLOR_NB] = { Center | make_bitboard(SQ_D6, SQ_E6),
+                                                  Center | make_bitboard(SQ_D3, SQ_E3)};
 
   constexpr Bitboard KingFlank[FILE_NB] = {
     QueenSide,   QueenSide, QueenSide,
