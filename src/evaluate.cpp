@@ -165,7 +165,7 @@ namespace {
 
   // LongDiagonalBishop[Extended Center/Center] contains a bonus for bishop
   // which attacks at least two squares of the extended center or center
-  constexpr Score LongDiagonalBishop[] = { S( 11, 0), S(22, 0) };
+  constexpr Score LongDiagonalBishop[] = { S( 5, 0), S(22, 0) };
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  8, 12);
