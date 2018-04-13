@@ -163,6 +163,10 @@ namespace {
   // KingProtector[PieceType-2] contains a penalty according to distance from king
   constexpr Score KingProtector[] = { S(3, 5), S(4, 3), S(3, 0), S(1, -1) };
 
+  // LongDiagonalBishop[Extended Center/Center] contains a bonus for bishop
+  // which attacks at least two squares of the extended center or center
+  constexpr Score LongDiagonalBishop[] = { S( 11, 0), S(22, 0) };
+
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  8, 12);
   constexpr Score CloseEnemies       = S(  7,  0);
@@ -171,7 +175,6 @@ namespace {
   constexpr Score Hanging            = S( 52, 30);
   constexpr Score HinderPassedPawn   = S(  8,  1);
   constexpr Score KnightOnQueen      = S( 21, 11);
-  constexpr Score LongDiagonalBishop = S( 13,  0);
   constexpr Score MinorBehindPawn    = S( 16,  0);
   constexpr Score Overload           = S( 10,  5);
   constexpr Score PawnlessFlank      = S( 20, 80);
@@ -356,9 +359,10 @@ namespace {
                 // Penalty according to number of pawns on the same color square as the bishop
                 score -= BishopPawns * pe->pawns_on_same_color_squares(Us, s);
 
-                // Bonus for bishop on a long diagonal which can "see" at least two of the extended center squares
-                if (more_than_one(ExtendedCenter[Us] & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s)))
-                    score += LongDiagonalBishop;
+                // Bonus for bishop on a long diagonal which can "see" at least two of the extended center or center squares
+                bb = ExtendedCenter[Us] & (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) | s);
+                if (more_than_one(bb))
+                    score += LongDiagonalBishop[more_than_one(Center & bb)];
             }
 
             // An important Chess960 pattern: A cornered bishop blocked by a friendly
