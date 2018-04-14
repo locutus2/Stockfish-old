@@ -825,7 +825,7 @@ namespace {
                  &&  pos.non_pawn_material(BLACK) == RookValueMg
                  &&  pe->asymmetry <= 1
                  && !(pos.pieces(~strongSide, PAWN) & ~attackedBy[~strongSide][ALL_PIECES]))
-            sf = 56 + pos.count<PAWN>(strongSide);
+            sf = 60 + pos.count<PAWN>(strongSide) / 2;
     }
 
     return ScaleFactor(sf);
