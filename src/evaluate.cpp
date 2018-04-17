@@ -417,7 +417,7 @@ namespace {
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
     const Square ksq = pos.square<KING>(Us);
-    Bitboard weak, b, b1, b2, safe, unsafeChecks, pinned;
+    Bitboard weak, b, b1, b2, bb, safe, unsafeChecks, discoveredChecks, pinned;
 
     // King shelter and enemy pawns storm
     Score score = pe->king_safety<Us>(pos, ksq);
@@ -450,21 +450,51 @@ namespace {
         // Enemy rooks checks
         if (b1 & safe)
             kingDanger += RookSafeCheck;
-        else
+        else if (b1)
+        {
+            discoveredChecks = pos.blockers_for_king(Us) & pos.pieces(Them, ROOK);
+            if (discoveredChecks)
+            {
+                bb = b1 & ~pos.pieces(Them);
+                while (bb)
+                    if (pos.attacks_from<ROOK>(pop_lsb(&bb)) & discoveredChecks)
+                        bb = b1 = 0, kingDanger += RookSafeCheck;
+            }
             unsafeChecks |= b1;
+        }
 
         // Enemy bishops checks
         if (b2 & safe)
             kingDanger += BishopSafeCheck;
-        else
+        else if (b2)
+        {
+            discoveredChecks = pos.blockers_for_king(Us) & pos.pieces(Them, BISHOP);
+            if (discoveredChecks)
+            {
+                bb = b2 & ~pos.pieces(Them);
+                while (bb)
+                    if (pos.attacks_from<BISHOP>(pop_lsb(&bb)) & discoveredChecks)
+                        bb = b2 = 0, kingDanger += BishopSafeCheck;
+            }
             unsafeChecks |= b2;
+        }
 
         // Enemy knights checks
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
         if (b & safe)
             kingDanger += KnightSafeCheck;
-        else
+        else if (b)
+        {
+            discoveredChecks = pos.blockers_for_king(Us) & pos.pieces(Them, KNIGHT);
+            if (discoveredChecks)
+            {
+                bb = b & ~pos.pieces(Them);
+                while (bb)
+                    if (pos.attacks_from<KNIGHT>(pop_lsb(&bb)) & discoveredChecks)
+                        bb = b = 0, kingDanger += KnightSafeCheck;
+            }
             unsafeChecks |= b;
+        }
 
         // Unsafe or occupied checking squares will also be considered, as long as
         // the square is in the attacker's mobility area.
