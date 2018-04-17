@@ -455,7 +455,7 @@ namespace {
             discoveredChecks = pos.blockers_for_king(Us) & pos.pieces(Them, ROOK);
             if (discoveredChecks)
             {
-                bb = b1 & ~pos.pieces(Them) & (~attackedBy[Us][KING] | attackedBy2[Them]);
+                bb = b1 & ~pos.pieces(Them) & (~attackedBy[Us][KING] | attackedBy2[Them] | pos.pieces(Us, ROOK, QUEEN));
                 while (bb)
                     if (pos.attacks_from<ROOK>(pop_lsb(&bb)) & discoveredChecks)
                         bb = b1 = 0, kingDanger += RookSafeCheck;
@@ -471,7 +471,7 @@ namespace {
             discoveredChecks = pos.blockers_for_king(Us) & pos.pieces(Them, BISHOP);
             if (discoveredChecks)
             {
-                bb = b2 & ~pos.pieces(Them) & (~attackedBy[Us][KING] | attackedBy2[Them]);
+                bb = b2 & ~pos.pieces(Them) & (~attackedBy[Us][KING] | attackedBy2[Them] | (pos.pieces(Us) ^ pos.pieces(Us, PAWN)));
                 while (bb)
                     if (pos.attacks_from<BISHOP>(pop_lsb(&bb)) & discoveredChecks)
                         bb = b2 = 0, kingDanger += BishopSafeCheck;
