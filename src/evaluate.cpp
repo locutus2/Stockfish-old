@@ -458,7 +458,7 @@ namespace {
                 bb = b1 & ~pos.pieces(Them);
                 while (bb)
                     if (pos.attacks_from<ROOK>(pop_lsb(&bb)) & discoveredChecks)
-                        bb = b1 = 0, kingDanger += RookSafeCheck;
+                        bb = 0, kingDanger += RookSafeCheck;
             }
             unsafeChecks |= b1;
         }
@@ -474,7 +474,7 @@ namespace {
                 bb = b2 & ~pos.pieces(Them);
                 while (bb)
                     if (pos.attacks_from<BISHOP>(pop_lsb(&bb)) & discoveredChecks)
-                        bb = b2 = 0, kingDanger += BishopSafeCheck;
+                        bb = 0, kingDanger += BishopSafeCheck;
             }
             unsafeChecks |= b2;
         }
@@ -491,7 +491,7 @@ namespace {
                 bb = b & ~pos.pieces(Them);
                 while (bb)
                     if (pos.attacks_from<KNIGHT>(pop_lsb(&bb)) & discoveredChecks)
-                        bb = b = 0, kingDanger += KnightSafeCheck;
+                        bb = 0, kingDanger += KnightSafeCheck;
             }
             unsafeChecks |= b;
         }
