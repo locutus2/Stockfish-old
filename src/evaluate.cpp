@@ -96,6 +96,7 @@ namespace {
   constexpr int RookSafeCheck   = 880;
   constexpr int BishopSafeCheck = 435;
   constexpr int KnightSafeCheck = 790;
+  constexpr int DoubleCheck     = 200;
 
 #define S(mg, eg) make_score(mg, eg)
 
@@ -458,7 +459,7 @@ namespace {
                 bb = b1 & ~pos.pieces(Them);
                 while (bb)
                     if (pos.attacks_from<ROOK>(pop_lsb(&bb)) & discoveredChecks)
-                        bb = b1 = 0, kingDanger += RookSafeCheck;
+                        bb = b1 = 0, kingDanger += RookSafeCheck + DoubleCheck;
             }
             unsafeChecks |= b1;
         }
@@ -474,7 +475,7 @@ namespace {
                 bb = b2 & ~pos.pieces(Them);
                 while (bb)
                     if (pos.attacks_from<BISHOP>(pop_lsb(&bb)) & discoveredChecks)
-                        bb = b2 = 0, kingDanger += BishopSafeCheck;
+                        bb = b2 = 0, kingDanger += BishopSafeCheck + DoubleCheck;
             }
             unsafeChecks |= b2;
         }
@@ -491,7 +492,7 @@ namespace {
                 bb = b & ~pos.pieces(Them);
                 while (bb)
                     if (pos.attacks_from<KNIGHT>(pop_lsb(&bb)) & discoveredChecks)
-                        bb = b = 0, kingDanger += KnightSafeCheck;
+                        bb = b = 0, kingDanger += KnightSafeCheck + DoubleCheck;
             }
             unsafeChecks |= b;
         }
