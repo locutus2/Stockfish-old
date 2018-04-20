@@ -809,7 +809,7 @@ namespace {
                 && pos.non_pawn_material(BLACK) == BishopValueMg)
             {
                 Bitboard bColorSquares = DarkSquares & pos.square<BISHOP>(strongSide) ? DarkSquares : ~DarkSquares;
-                sf = pos.pieces(~strongSide, PAWN) & bColorSquares ? 35 : 27;
+                sf = pos.pieces(~strongSide, PAWN) & bColorSquares ? 36 : 26;
             }
 
             // Endgame with opposite-colored bishops, but also other pieces. Still
