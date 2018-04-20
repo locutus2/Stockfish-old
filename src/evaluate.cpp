@@ -23,6 +23,7 @@
 #include <cstring>   // For std::memset
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 #include "bitboard.h"
 #include "evaluate.h"
@@ -807,7 +808,10 @@ namespace {
             // Endgame with opposite-colored bishops and no other pieces is almost a draw
             if (   pos.non_pawn_material(WHITE) == BishopValueMg
                 && pos.non_pawn_material(BLACK) == BishopValueMg)
-                sf = 31;
+            {
+                Bitboard bColorSquares = DarkSquares & pos.square<BISHOP>(strongSide) ? DarkSquares : ~DarkSquares;
+                sf = pos.pieces(~strongSide, PAWN) & bColorSquares ? 31 : 15;
+            }
 
             // Endgame with opposite-colored bishops, but also other pieces. Still
             // a bit drawish, but not as drawish as with only the two bishops.
@@ -883,7 +887,7 @@ namespace {
        + eg_value(score) * int(PHASE_MIDGAME - me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
 
     v /= int(PHASE_MIDGAME);
-
+    
     // In case of tracing add all remaining individual evaluation terms
     if (T)
     {
