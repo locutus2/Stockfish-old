@@ -791,7 +791,7 @@ namespace {
         int probCutCount = 0;
 
         while (   (move = mp.next_move()) != MOVE_NONE
-               && (probCutCount < 3 || (rbeta < ss->staticEval && ss->ply < 16)))
+               && (probCutCount < 3 || (rbeta < ss->staticEval && ss->ply < 17)))
             if (pos.legal(move))
             {
                 probCutCount++;
