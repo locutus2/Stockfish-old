@@ -1019,7 +1019,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              statOffset = ((posKey + move) & 0x03FF) - 512;
+              statOffset = ((posKey + move + depth / ONE_PLY) & 0x03FF) - 512;
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore + statOffset) / 20000) * ONE_PLY);
           }
 
