@@ -814,7 +814,7 @@ namespace {
 
                 if (value >= rbeta)
                 {
-                    update_probcut_stats(pos, move, capturesSearched, captureCount, stat_bonus(depth - 4 * ONE_PLY));
+                    update_probcut_stats(pos, move, capturesSearched, captureCount, stat_bonus(depth - 3 * ONE_PLY));
                     return value;
                 }
 
