@@ -542,7 +542,7 @@ namespace {
     bool ttHit, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, statOffset;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1019,7 +1019,8 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+              statOffset = ((posKey + move) & 0x03FF) - 512;
+              r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore + statOffset) / 20000) * ONE_PLY);
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
