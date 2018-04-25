@@ -789,13 +789,10 @@ namespace {
 
         Value rbeta = std::min(beta + 216 - 48 * improving, VALUE_INFINITE);
         MovePicker mp(pos, ttMove, rbeta - ss->staticEval, &thisThread->probcutHistory);
-        int probCutCount = 0;
 
-        while ((move = mp.next_move()) != MOVE_NONE && probCutCount < 3)
+        while ((move = mp.next_move()) != MOVE_NONE)
             if (pos.legal(move))
             {
-                probCutCount++;
-
                 ss->currentMove = move;
                 ss->contHistory = thisThread->contHistory[pos.moved_piece(move)][to_sq(move)].get();
 
