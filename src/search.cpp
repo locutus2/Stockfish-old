@@ -118,6 +118,7 @@ namespace {
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
+  void update_probcut_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
 
   inline bool gives_check(const Position& pos, Move move) {
     Color us = pos.side_to_move();
@@ -787,11 +788,10 @@ namespace {
         assert(is_ok((ss-1)->currentMove));
 
         Value rbeta = std::min(beta + 216 - 48 * improving, VALUE_INFINITE);
-        MovePicker mp(pos, ttMove, rbeta - ss->staticEval, &thisThread->captureHistory);
+        MovePicker mp(pos, ttMove, rbeta - ss->staticEval, &thisThread->probcutHistory);
         int probCutCount = 0;
 
-        while (  (move = mp.next_move()) != MOVE_NONE
-               && probCutCount < 3)
+        while ((move = mp.next_move()) != MOVE_NONE && probCutCount < 3)
             if (pos.legal(move))
             {
                 probCutCount++;
@@ -813,8 +813,15 @@ namespace {
                 pos.undo_move(move);
 
                 if (value >= rbeta)
+                {
+                    update_probcut_stats(pos, move, capturesSearched, captureCount, stat_bonus(depth - 4 * ONE_PLY));
                     return value;
+                }
+
+                capturesSearched[captureCount++] = move;
             }
+
+        captureCount = 0;
     }
 
     // Step 11. Internal iterative deepening (skipped when in check, ~2 Elo)
@@ -1442,6 +1449,26 @@ moves_loop: // When in check, search starts from here
           moved_piece = pos.moved_piece(captures[i]);
           captured = type_of(pos.piece_on(to_sq(captures[i])));
           captureHistory[moved_piece][to_sq(captures[i])][captured] << -bonus;
+      }
+  }
+
+
+  // update_probcut_stats() updates move sorting heuristics when a new capture best move in probcut is found
+
+  void update_probcut_stats(const Position& pos, Move move,
+                            Move* captures, int captureCnt, int bonus) {
+
+      CapturePieceToHistory& probcutHistory =  pos.this_thread()->probcutHistory;
+      Piece moved_piece = pos.moved_piece(move);
+      PieceType captured = type_of(pos.piece_on(to_sq(move)));
+      probcutHistory[moved_piece][to_sq(move)][captured] << bonus;
+
+      // Decrease all the other played capture moves
+      for (int i = 0; i < captureCnt; ++i)
+      {
+          moved_piece = pos.moved_piece(captures[i]);
+          captured = type_of(pos.piece_on(to_sq(captures[i])));
+          probcutHistory[moved_piece][to_sq(captures[i])][captured] << -bonus;
       }
   }
 
