@@ -1450,6 +1450,8 @@ moves_loop: // When in check, search starts from here
           captured = type_of(pos.piece_on(to_sq(captures[i])));
           captureHistory[moved_piece][to_sq(captures[i])][captured] << -bonus;
       }
+
+      update_probcut_stats(pos, move, captures, captureCnt, bonus);
   }
 
 
