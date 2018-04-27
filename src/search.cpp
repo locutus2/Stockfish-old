@@ -1365,9 +1365,10 @@ moves_loop: // When in check, search starts from here
                   return value;
               }
           }
-          else if (captureCount < 32)
-              capturesSearched[captureCount++] = move;
-       }
+      }
+
+      if (move != bestMove && captureCount < 32)
+          capturesSearched[captureCount++] = move;
     }
 
     // All legal moves have been searched. A special case: If we're in check
