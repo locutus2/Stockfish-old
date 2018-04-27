@@ -1356,7 +1356,7 @@ moves_loop: // When in check, search starts from here
               }
               else // Fail high
               {
-                  update_capture_stats(pos, move, capturesSearched, captureCount, 1);
+                  update_capture_stats(pos, move, capturesSearched, captureCount, 8);
 
                   tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
                             ttDepth, move, ss->staticEval, TT.generation());
@@ -1376,7 +1376,7 @@ moves_loop: // When in check, search starts from here
         return mated_in(ss->ply); // Plies to mate from the root
 
     if (bestMove)
-        update_capture_stats(pos, bestMove, capturesSearched, captureCount, 1);
+        update_capture_stats(pos, bestMove, capturesSearched, captureCount, 8);
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               PvNode && bestValue > oldAlpha ? BOUND_EXACT : BOUND_UPPER,
