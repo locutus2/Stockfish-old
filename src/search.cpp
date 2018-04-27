@@ -1183,7 +1183,7 @@ moves_loop: // When in check, search starts from here
     assert(depth <= DEPTH_ZERO);
     assert(depth / ONE_PLY * ONE_PLY == depth);
 
-    Move pv[MAX_PLY+1];
+    Move pv[MAX_PLY+1], capturesSearched[32];
     StateInfo st;
     TTEntry* tte;
     Key posKey;
@@ -1191,7 +1191,7 @@ moves_loop: // When in check, search starts from here
     Depth ttDepth;
     Value bestValue, value, ttValue, futilityValue, futilityBase, oldAlpha;
     bool ttHit, inCheck, givesCheck, evasionPrunable;
-    int moveCount;
+    int moveCount, captureCount;
 
     if (PvNode)
     {
@@ -1203,7 +1203,7 @@ moves_loop: // When in check, search starts from here
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = bestMove = MOVE_NONE;
     inCheck = pos.checkers();
-    moveCount = 0;
+    moveCount = captureCount = 0;
 
     // Check for an immediate draw or maximum ply reached
     if (   pos.is_draw(ss->ply)
@@ -1356,19 +1356,27 @@ moves_loop: // When in check, search starts from here
               }
               else // Fail high
               {
+                  update_capture_stats(pos, move, capturesSearched, captureCount, 1);
+
                   tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
                             ttDepth, move, ss->staticEval, TT.generation());
 
                   return value;
               }
           }
-       }
+      }
+
+      if (move != bestMove && captureCount < 32)
+          capturesSearched[captureCount++] = move;
     }
 
     // All legal moves have been searched. A special case: If we're in check
     // and no legal moves were found, it is checkmate.
     if (inCheck && bestValue == -VALUE_INFINITE)
         return mated_in(ss->ply); // Plies to mate from the root
+
+    if (bestMove)
+        update_capture_stats(pos, bestMove, capturesSearched, captureCount, 1);
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               PvNode && bestValue > oldAlpha ? BOUND_EXACT : BOUND_UPPER,
