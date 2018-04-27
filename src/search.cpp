@@ -118,6 +118,7 @@ namespace {
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
+  void update_qs_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
 
   inline bool gives_check(const Position& pos, Move move) {
     Color us = pos.side_to_move();
@@ -1183,7 +1184,7 @@ moves_loop: // When in check, search starts from here
     assert(depth <= DEPTH_ZERO);
     assert(depth / ONE_PLY * ONE_PLY == depth);
 
-    Move pv[MAX_PLY+1];
+    Move pv[MAX_PLY+1], capturesSearched[32];
     StateInfo st;
     TTEntry* tte;
     Key posKey;
@@ -1191,7 +1192,7 @@ moves_loop: // When in check, search starts from here
     Depth ttDepth;
     Value bestValue, value, ttValue, futilityValue, futilityBase, oldAlpha;
     bool ttHit, inCheck, givesCheck, evasionPrunable;
-    int moveCount;
+    int moveCount, captureCount;
 
     if (PvNode)
     {
@@ -1203,7 +1204,7 @@ moves_loop: // When in check, search starts from here
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = bestMove = MOVE_NONE;
     inCheck = pos.checkers();
-    moveCount = 0;
+    moveCount = captureCount = 0;
 
     // Check for an immediate draw or maximum ply reached
     if (   pos.is_draw(ss->ply)
@@ -1275,7 +1276,7 @@ moves_loop: // When in check, search starts from here
     // to search the moves. Because the depth is <= 0 here, only captures,
     // queen promotions and checks (only if depth >= DEPTH_QS_CHECKS) will
     // be generated.
-    MovePicker mp(pos, ttMove, depth, &pos.this_thread()->mainHistory, &pos.this_thread()->captureHistory, to_sq((ss-1)->currentMove));
+    MovePicker mp(pos, ttMove, depth, &pos.this_thread()->mainHistory, &pos.this_thread()->captureHistoryQS, to_sq((ss-1)->currentMove));
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move()) != MOVE_NONE)
@@ -1356,12 +1357,16 @@ moves_loop: // When in check, search starts from here
               }
               else // Fail high
               {
+                  update_qs_capture_stats(pos, move, capturesSearched, captureCount, 1);
+
                   tte->save(posKey, value_to_tt(value, ss->ply), BOUND_LOWER,
                             ttDepth, move, ss->staticEval, TT.generation());
 
                   return value;
               }
           }
+          else if (captureCount < 32)
+              capturesSearched[captureCount++] = move;
        }
     }
 
@@ -1369,6 +1374,9 @@ moves_loop: // When in check, search starts from here
     // and no legal moves were found, it is checkmate.
     if (inCheck && bestValue == -VALUE_INFINITE)
         return mated_in(ss->ply); // Plies to mate from the root
+
+    if (bestMove)
+        update_qs_capture_stats(pos, bestMove, capturesSearched, captureCount, 1);
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply),
               PvNode && bestValue > oldAlpha ? BOUND_EXACT : BOUND_UPPER,
@@ -1432,6 +1440,26 @@ moves_loop: // When in check, search starts from here
                             Move* captures, int captureCnt, int bonus) {
 
       CapturePieceToHistory& captureHistory =  pos.this_thread()->captureHistory;
+      Piece moved_piece = pos.moved_piece(move);
+      PieceType captured = type_of(pos.piece_on(to_sq(move)));
+      captureHistory[moved_piece][to_sq(move)][captured] << bonus;
+
+      // Decrease all the other played capture moves
+      for (int i = 0; i < captureCnt; ++i)
+      {
+          moved_piece = pos.moved_piece(captures[i]);
+          captured = type_of(pos.piece_on(to_sq(captures[i])));
+          captureHistory[moved_piece][to_sq(captures[i])][captured] << -bonus;
+      }
+  }
+
+
+  // update_qs_capture_stats() updates move sorting heuristics when a new capture best move is found during quience search
+
+  void update_qs_capture_stats(const Position& pos, Move move,
+                               Move* captures, int captureCnt, int bonus) {
+
+      CapturePieceToHistory& captureHistory =  pos.this_thread()->captureHistoryQS;
       Piece moved_piece = pos.moved_piece(move);
       PieceType captured = type_of(pos.piece_on(to_sq(move)));
       captureHistory[moved_piece][to_sq(move)][captured] << bonus;
