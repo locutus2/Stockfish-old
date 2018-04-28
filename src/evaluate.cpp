@@ -262,6 +262,12 @@ namespace {
     // are excluded from the mobility area.
     mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pe->pawn_attacks(Them));
 
+    if (!(pos.pieces() & FileABB))
+        mobilityArea[Us] &= ~FileABB;
+
+    if (!(pos.pieces() & FileHBB))
+        mobilityArea[Us] &= ~FileHBB;
+
     // Initialise attackedBy bitboards for kings and pawns
     attackedBy[Us][KING] = pos.attacks_from<KING>(pos.square<KING>(Us));
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
