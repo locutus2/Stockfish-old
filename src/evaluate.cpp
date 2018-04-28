@@ -263,7 +263,7 @@ namespace {
     // are excluded from the mobility area.
     mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pe->pawn_attacks(Them));
 
-    if (!(pos.pieces() & BaseRank))
+    if (!pe->passed_pawns(Them) && !(pos.pieces() & BaseRank))
         mobilityArea[Us] &= ~BaseRank;
 
     // Initialise attackedBy bitboards for kings and pawns
