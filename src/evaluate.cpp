@@ -647,7 +647,7 @@ namespace {
         bb = forward_file_bb(Us, s) & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
         score -= HinderPassedPawn * popcount(bb);
 
-        bb = pawn_attack_span(Us, s) & attackedBy[Them][ALL_PIECES];
+        bb = pawn_attack_span(Us, s) & pos.pieces(Them);
         score -= WeakHinderPassedPawn * popcount(bb);
 
         int r = relative_rank(Us, s);
