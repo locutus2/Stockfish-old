@@ -168,7 +168,7 @@ namespace {
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score Hanging            = S( 52, 30);
   constexpr Score HinderPassedPawn   = S(  8,  1);
-  constexpr Score WeakHinderPassedPawn = S(  2,  1);
+  constexpr Score WeakHinderPassedPawn = S(  2,  0);
   constexpr Score KnightOnQueen      = S( 21, 11);
   constexpr Score LongDiagonalBishop = S( 22,  0);
   constexpr Score MinorBehindPawn    = S( 16,  0);
@@ -647,7 +647,7 @@ namespace {
         bb = forward_file_bb(Us, s) & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
         score -= HinderPassedPawn * popcount(bb);
 
-        bb = pawn_attack_span(Us, s) & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
+        bb = pawn_attack_span(Us, s) & attackedBy[Them][ALL_PIECES];
         score -= WeakHinderPassedPawn * popcount(bb);
 
         int r = relative_rank(Us, s);
