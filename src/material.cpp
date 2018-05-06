@@ -20,6 +20,7 @@
 
 #include <algorithm> // For std::min
 #include <cassert>
+#include <cmath>
 #include <cstring>   // For std::memset
 
 #include "material.h"
