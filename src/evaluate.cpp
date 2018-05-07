@@ -465,7 +465,7 @@ namespace {
         // Enemy knights checks
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
         if (b & safe)
-            kingDanger += KnightSafeCheck * (1 + 2 * !(attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES])));
+            kingDanger += KnightSafeCheck * (1 + 3 * !(attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES])));
         else
             unsafeChecks |= b;
 
