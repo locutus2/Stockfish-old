@@ -719,7 +719,7 @@ namespace {
     // Step 7. Razoring (skipped when in check, ~2 Elo)
     if (  !PvNode
         && depth < 3 * ONE_PLY
-        && type_of(pos.captured_piece()) < ROOK
+        && (ss-1)->moveCount > 1
         && eval <= alpha - RazorMargin[depth / ONE_PLY])
     {
         Value ralpha = alpha - (depth >= 2 * ONE_PLY) * RazorMargin[depth / ONE_PLY];
