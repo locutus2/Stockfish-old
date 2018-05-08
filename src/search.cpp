@@ -719,6 +719,7 @@ namespace {
     // Step 7. Razoring (skipped when in check, ~2 Elo)
     if (  !PvNode
         && depth < 3 * ONE_PLY
+        && (ss-1)->statScore < 30000
         && eval <= alpha - RazorMargin[depth / ONE_PLY])
     {
         Value ralpha = alpha - (depth >= 2 * ONE_PLY) * RazorMargin[depth / ONE_PLY];
