@@ -713,7 +713,7 @@ namespace {
     // Step 7. Razoring (~2 Elo)
     if (  !PvNode
         && depth < 3 * ONE_PLY
-        && (ss-1)->statScore < 18000
+        && (ss-1)->statScore < 21000
         && eval <= alpha - RazorMargin[depth / ONE_PLY])
     {
         Value ralpha = alpha - (depth >= 2 * ONE_PLY) * RazorMargin[depth / ONE_PLY];
@@ -735,7 +735,7 @@ namespace {
     // Step 9. Null move search with verification search (~40 Elo)
     if (   !PvNode
         && (ss-1)->currentMove != MOVE_NULL
-        && (ss-1)->statScore < 21000
+        && (ss-1)->statScore < 22500
         &&  eval >= beta
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !ss->excludedMove
