@@ -480,7 +480,7 @@ namespace {
                      + 100 * !pos.can_castle(Us)
                      - 848 * !pos.count<QUEEN>(Them)
                      -   9 * mg_value(score) / 8
-                     +  40;
+                     -  60;
 
         // Transform the kingDanger units into a Score, and subtract it from the evaluation
         if (kingDanger > 0)
