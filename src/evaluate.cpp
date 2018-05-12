@@ -477,6 +477,7 @@ namespace {
                      + 102 * kingAttacksCount[Them]
                      + 191 * popcount(kingRing[Us] & weak)
                      + 143 * popcount(pos.blockers_for_king(Us) | unsafeChecks)
+                     + 100 * !pos.can_castle(Us)
                      - 848 * !pos.count<QUEEN>(Them)
                      -   9 * mg_value(score) / 8
                      +  40;
