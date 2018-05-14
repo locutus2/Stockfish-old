@@ -309,9 +309,9 @@ namespace {
     {
         // Find attacked squares, including x-ray attacks for bishops and rooks
         b = Pt == BISHOP ? attacks_bb<BISHOP>(s,   (pos.pieces() ^ pos.pieces(QUEEN))
-                                                & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN))))
+                                                & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING))))
           : Pt ==   ROOK ? attacks_bb<  ROOK>(s,   (pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
-                                                & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN))))
+                                                & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING))))
                          : pos.attacks_from<Pt>(s);
 
         if (pos.blockers_for_king(Us) & s)
