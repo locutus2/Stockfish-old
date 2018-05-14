@@ -312,6 +312,10 @@ namespace {
                                                 & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN))))
           : Pt ==   ROOK ? attacks_bb<  ROOK>(s,   (pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
                                                 & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN))))
+          : Pt ==  QUEEN ? attacks_bb<BISHOP>(s,    pos.pieces()
+                                                & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN))))
+                         | attacks_bb<  ROOK>(s,    pos.pieces()
+                                                & ~(pos.blockers_for_king(Them) & (pos.pieces(Us) ^ pos.pieces(Us, PAWN))))
                          : pos.attacks_from<Pt>(s);
 
         if (pos.blockers_for_king(Us) & s)
