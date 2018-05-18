@@ -749,6 +749,7 @@ namespace {
         &&  eval >= beta
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !excludedMove
+        && (!ttHit || tte->bound() != BOUND_UPPER)
         &&  pos.non_pawn_material(pos.side_to_move())
         && (ss->ply >= thisThread->nmp_ply || ss->ply % 2 != thisThread->nmp_odd))
     {
