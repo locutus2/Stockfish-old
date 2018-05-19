@@ -431,10 +431,10 @@ namespace {
         int kingDanger = 0;
         unsafeChecks = 0;
 
-        // Attacked squares defended at most once by our queen or king
-        weak =  attackedBy[Them][ALL_PIECES]
-              & ~attackedBy2[Us]
-              & (~attackedBy[Us][ALL_PIECES] | attackedBy[Us][KING] | attackedBy[Us][QUEEN]);
+        // Attacked squares defended at most once by our queen, rook or king
+        weak =    attackedBy[Them][ALL_PIECES]
+              & ~(  attackedBy[Us][KNIGHT] | attackedBy[Us][PAWN]
+                  | attackedBy[Us][BISHOP] | attackedBy2[Us]);
 
         // Analyse the safe enemy's checks which are possible on next move
         safe  = ~pos.pieces(Them);
@@ -444,14 +444,15 @@ namespace {
         b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
         // Enemy queen safe checks
-        if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
+        if (   (b1 | b2) & attackedBy[Them][QUEEN] & safe
+            & ~(attackedBy[Us][QUEEN] | attackedBy[Us][ROOK]))
             kingDanger += QueenSafeCheck;
 
         b1 &= attackedBy[Them][ROOK];
         b2 &= attackedBy[Them][BISHOP];
 
         // Enemy rooks checks
-        if (b1 & safe)
+        if (b1 & safe & ~attackedBy[Us][ROOK])
             kingDanger += RookSafeCheck;
         else
             unsafeChecks |= b1;
