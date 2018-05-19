@@ -749,13 +749,14 @@ namespace {
         &&  eval >= beta
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !excludedMove
+        && (cutNode || improving)
         &&  pos.non_pawn_material(pos.side_to_move())
         && (ss->ply >= thisThread->nmp_ply || ss->ply % 2 != thisThread->nmp_odd))
     {
         assert(eval - beta >= 0);
 
         // Null move dynamic reduction based on depth and value
-        Depth R = ((567 + 67 * depth / ONE_PLY) / 256 + (cutNode || improving) + std::min((eval - beta) / PawnValueMg, 3)) * ONE_PLY;
+        Depth R = ((567 + 67 * depth / ONE_PLY) / 256 + cutNode + std::min((eval - beta) / PawnValueMg, 3)) * ONE_PLY;
 
         ss->currentMove = MOVE_NULL;
         ss->contHistory = thisThread->contHistory[NO_PIECE][0].get();
