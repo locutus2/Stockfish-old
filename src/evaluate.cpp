@@ -310,8 +310,8 @@ namespace {
         // Find attacked squares, including x-ray attacks for bishops and rooks
         b = Pt == BISHOP ?  attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN))
           : Pt ==   ROOK ?  attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
-          : Pt ==  QUEEN ?  attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, BISHOP))
-                          | attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
+          : Pt ==  QUEEN ?  attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN))
+                          | attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN))
                          :  pos.attacks_from<Pt>(s);
 
         if (pos.blockers_for_king(Us) & s)
@@ -321,16 +321,23 @@ namespace {
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
 
+        int mob = popcount(b & mobilityArea[Us]);
+
+        mobility[Us] += MobilityBonus[Pt - 2][mob];
+
+        if (Pt == QUEEN)
+        {
+            b = pos.attacks_from<Pt>(s);
+            if (pos.blockers_for_king(Us) & s)
+                b &= LineBB[pos.square<KING>(Us)][s];
+        }
+
         if (b & kingRing[Them])
         {
             kingAttackersCount[Us]++;
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
-
-        int mob = popcount(b & mobilityArea[Us]);
-
-        mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         // Penalty if the piece is far from the king
         score -= KingProtector[Pt - 2] * distance(s, pos.square<KING>(Us));
