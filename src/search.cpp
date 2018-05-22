@@ -749,7 +749,7 @@ namespace {
         &&  eval >= beta
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !excludedMove
-        && (!pos.captured_piece() || thisThread->captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] < 10000)
+        && (!pos.captured_piece() || thisThread->captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] < 9000)
         &&  pos.non_pawn_material(pos.side_to_move())
         && (ss->ply >= thisThread->nmp_ply || ss->ply % 2 != thisThread->nmp_odd))
     {
