@@ -97,6 +97,9 @@ typedef Stats<int16_t, 10368, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceTo
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
 typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 
+/// NullmoveHistory is like PieceToHistory but use other update weights for null move history
+typedef Stats<int16_t, 10368, PIECE_NB, SQUARE_NB> NullmoveHistory;
+
 /// ContinuationHistory is the combined history of a given pair of moves, usually
 /// the current one given a previous one. The nested history table is based on
 /// PieceToHistory instead of ButterflyBoards.

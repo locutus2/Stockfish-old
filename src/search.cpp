@@ -539,7 +539,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, inCheck, givesCheck, improving;
+    bool ttHit, inCheck, givesCheck, improving, nmpFailed;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -550,6 +550,7 @@ namespace {
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
+    nmpFailed = false;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -749,6 +750,7 @@ namespace {
         &&  eval >= beta
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !excludedMove
+        && (pos.captured_piece() || thisThread->nullmoveHistory[pos.piece_on(prevSq)][prevSq] < 5000)
         &&  pos.non_pawn_material(pos.side_to_move())
         && (ss->ply >= thisThread->nmp_ply || ss->ply % 2 != thisThread->nmp_odd))
     {
@@ -787,6 +789,8 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+
+        nmpFailed = true;
     }
 
     // Step 10. ProbCut (~10 Elo)
@@ -1162,12 +1166,20 @@ moves_loop: // When in check, search starts from here
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
             update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+
+        if (!pos.captured_piece() && nmpFailed)
+            thisThread->nullmoveHistory[pos.piece_on(prevSq)][prevSq] << -stat_bonus(depth);
     }
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 * ONE_PLY || PvNode)
              && !pos.captured_piece()
              && is_ok((ss-1)->currentMove))
+    {
         update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
+
+        if (nmpFailed)
+            thisThread->nullmoveHistory[pos.piece_on(prevSq)][prevSq] << stat_bonus(depth);
+    }
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
