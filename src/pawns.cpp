@@ -45,7 +45,7 @@ namespace {
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = we have no pawn on the file or our pawn is behind our king.
-  constexpr Value ShelterStrength[int(FILE_NB) / 2][RANK_NB] = {
+   Value ShelterStrength[int(FILE_NB) / 2][RANK_NB] = {
     { V(  7), V(76), V( 84), V( 38), V(  7), V( 30), V(-19) },
     { V(-13), V(83), V( 42), V(-27), V(  2), V(-32), V(-45) },
     { V(-26), V(63), V(  5), V(-44), V( -5), V(  2), V(-59) },
@@ -54,15 +54,23 @@ namespace {
 
   // Danger of enemy pawns moving toward our king by [distance from edge][rank].
   // RANK_1 = the opponent has no pawn on the file or the pawn is behind our king
-  constexpr Value UnBlocked[4][RANK_NB] =
+   Value UnBlocked[4][RANK_NB] =
     { { V( 25), V( 79), V(107), V( 51), V( 27), V(  0), V(  0) },
       { V(  5), V( 35), V(121), V( -2), V( 15), V(-10), V(-10) },
       { V(-20), V( 22), V( 98), V( 36), V(  7), V(-20), V(-20) },
       { V(-27), V( 24), V( 80), V( 25), V( -4), V(-30), V(-30) } };
 
   // Danger of blocked pawns ahead of our king by rank.
-  constexpr Value BlockedByPawn[RANK_NB] =
+   Value BlockedByPawn[RANK_NB] =
       { V(  0), V(  0), V( 75), V(-10), V(-20), V(-20), V(-20) };
+
+  Value A = V(5), B = V(-5), C = V(374);
+
+  inline Range centered_range(int v) {
+    return v != 0 ? Range(v - 50, v + 50) : Range(0, 0);
+  }
+
+  TUNE(SetRange(centered_range), ShelterStrength, UnBlocked, BlockedByPawn, A, B, C);
 
   #undef S
   #undef V
@@ -214,10 +222,10 @@ Value Entry::evaluate_shelter(const Position& pos, Square ksq) {
   Bitboard ourPawns = b & pos.pieces(Us);
   Bitboard theirPawns = b & pos.pieces(Them);
 
-  Value safety = (ourPawns & file_bb(ksq)) ? Value(5) : Value(-5);
+  Value safety = (ourPawns & file_bb(ksq)) ? A : B;
 
   if (shift<Down>(theirPawns) & (FileABB | FileHBB) & BlockRanks & ksq)
-      safety += Value(374);
+      safety += C;
 
   File center = std::max(FILE_B, std::min(FILE_G, file_of(ksq)));
   for (File f = File(center - 1); f <= File(center + 1); ++f)
