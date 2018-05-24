@@ -475,7 +475,7 @@ namespace {
             while (bb)
                 if (pos.attacks_from<KNIGHT>(pop_lsb(&bb)) & safe & attackedBy[Them][KNIGHT])
                 {
-                    kingDanger += KnightSafeCheck / 2;
+                    kingDanger += KnightSafeCheck / 4;
                     break;
                 }
         }
