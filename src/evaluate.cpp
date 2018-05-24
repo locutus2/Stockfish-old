@@ -460,7 +460,18 @@ namespace {
         if (b2 & safe)
             kingDanger += BishopSafeCheck;
         else
+        {
             unsafeChecks |= b2;
+
+            // Enemy two move bishop checks
+            Bitboard bb = pos.attacks_from<BISHOP>(ksq) & safe;
+            while (bb)
+                if (pos.attacks_from<BISHOP>(pop_lsb(&bb)) & safe & attackedBy[Them][BISHOP])
+                {
+                    kingDanger += BishopSafeCheck / 2;
+                    break;
+                }
+        }
 
         // Enemy knights checks
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
