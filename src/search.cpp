@@ -1101,11 +1101,13 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
-      if (value > bestValue)
+      int offset = PvNode ? thisThread->getID() % 2 : 0;
+
+      if (value + offset > bestValue)
       {
           bestValue = value;
 
-          if (value > alpha)
+          if (value + offset > alpha)
           {
               bestMove = move;
 

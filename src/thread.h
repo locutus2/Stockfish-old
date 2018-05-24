@@ -57,6 +57,8 @@ public:
   void start_searching();
   void wait_for_search_finished();
 
+  size_t getID() const { return idx; }
+
   Pawns::Table pawnsTable;
   Material::Table materialTable;
   Endgames endgames;
