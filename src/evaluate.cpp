@@ -457,7 +457,7 @@ namespace {
         {
             unsafeChecks |= b1;
 
-            // Enemy two move bishop checks
+            // Enemy two move rook checks
             Bitboard bb = pos.attacks_from<ROOK>(ksq) & safe;
             while (bb)
                 if (pos.attacks_from<ROOK>(pop_lsb(&bb)) & safe & attackedBy[Them][ROOK])
