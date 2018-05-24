@@ -453,7 +453,7 @@ namespace {
             while (bb)
                 if (pos.attacks_from<QUEEN>(pop_lsb(&bb)) & safe & attackedBy[Them][QUEEN] & ~attackedBy[Us][QUEEN])
                 {
-                    kingDanger += QueenSafeCheck / 2;
+                    kingDanger += QueenSafeCheck / 4;
                     break;
                 }
         }
