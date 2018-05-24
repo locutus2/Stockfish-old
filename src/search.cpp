@@ -536,7 +536,7 @@ namespace {
     StateInfo st;
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove;
+    Move ttMove, move, excludedMove, bestMove, searchMoveFirst;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, inCheck, givesCheck, improving;
@@ -550,6 +550,7 @@ namespace {
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
+    searchMoveFirst = MOVE_NONE;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -612,8 +613,9 @@ namespace {
     posKey = pos.key() ^ Key(excludedMove << 16); // Isn't a very good hash
     tte = TT.probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
-    ttMove =  rootNode ? thisThread->rootMoves[thisThread->PVIdx + thisThread->getID() % std::min(2, int(thisThread->rootMoves.size() - thisThread->PVIdx))].pv[0]
+    ttMove =  rootNode ? thisThread->rootMoves[thisThread->PVIdx].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
+    searchMoveFirst = rootNode ? thisThread->rootMoves[thisThread->PVIdx + thisThread->getID() % std::min(2, int(thisThread->rootMoves.size() - thisThread->PVIdx))].pv[0] : MOVE_NONE;
 
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
@@ -848,7 +850,8 @@ moves_loop: // When in check, search starts from here
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
-                                      ss->killers);
+                                      ss->killers,
+                                      searchMoveFirst);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
 
     skipQuiets = false;

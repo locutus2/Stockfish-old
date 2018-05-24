@@ -25,8 +25,8 @@
 namespace {
 
   enum Stages {
-    MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
-    EVASION_TT, EVASION_INIT, EVASION,
+    MAIN_FIRST_MOVE, MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
+    EVASION_FIRST_MOVE, EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
     QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
   };
@@ -60,15 +60,19 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm,
+                       Move* killers, Move smf)
            : pos(p), mainHistory(mh), captureHistory(cph), contHistory(ch),
              refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d) {
 
   assert(d > DEPTH_ZERO);
 
-  stage = pos.checkers() ? EVASION_TT : MAIN_TT;
+  stage = pos.checkers() ? EVASION_FIRST_MOVE : MAIN_FIRST_MOVE;
   ttMove = ttm && pos.pseudo_legal(ttm) ? ttm : MOVE_NONE;
-  stage += (ttMove == MOVE_NONE);
+  searchMoveFirst = smf && smf != ttm && pos.pseudo_legal(smf) ? smf : MOVE_NONE;
+  if (searchMoveFirst && !ttMove)
+      ttMove = searchMoveFirst, searchMoveFirst = MOVE_NONE;
+  stage += (searchMoveFirst == MOVE_NONE) + (ttMove == MOVE_NONE);
 }
 
 /// MovePicker constructor for quiescence search
@@ -141,7 +145,7 @@ Move MovePicker::select(Pred filter) {
 
       move = *cur++;
 
-      if (move != ttMove && filter())
+      if (move != ttMove && move != searchMoveFirst && filter())
           return move;
   }
   return move = MOVE_NONE;
@@ -154,6 +158,10 @@ Move MovePicker::next_move(bool skipQuiets) {
 
 top:
   switch (stage) {
+  case MAIN_FIRST_MOVE:
+  case EVASION_FIRST_MOVE:
+      ++stage;
+      return searchMoveFirst;
 
   case MAIN_TT:
   case EVASION_TT:

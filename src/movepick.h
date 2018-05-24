@@ -124,7 +124,8 @@ public:
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
                                            Move,
-                                           Move*);
+                                           Move*,
+                                           Move);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -137,7 +138,7 @@ private:
   const ButterflyHistory* mainHistory;
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** contHistory;
-  Move ttMove;
+  Move ttMove, searchMoveFirst = MOVE_NONE;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
   int stage;
   Move move;
