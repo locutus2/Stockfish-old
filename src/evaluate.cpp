@@ -462,7 +462,7 @@ namespace {
             while (bb)
                 if (pos.attacks_from<ROOK>(pop_lsb(&bb)) & safe & attackedBy[Them][ROOK])
                 {
-                    kingDanger += RookSafeCheck / 2;
+                    kingDanger += RookSafeCheck / 4;
                     break;
                 }
         }
