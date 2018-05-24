@@ -1145,7 +1145,7 @@ moves_loop: // When in check, search starts from here
               capturesSearched[captureCount++] = move;
 
           else if (!captureOrPromotion && quietCount < 64)
-              quietsSearched[quietCount++] = ExtMove(move, searchDepth / ONE_PLY - stat_bonus(depth));
+              quietsSearched[quietCount++] = ExtMove(move, -stat_bonus(std::min(depth, 9 * searchDepth)));
       }
     }
 
