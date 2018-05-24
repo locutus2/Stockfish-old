@@ -1101,13 +1101,11 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
-      int offset = PvNode ? thisThread->getID() % 2 : 0;
-
-      if (value + offset > bestValue)
+      if (value > bestValue)
       {
           bestValue = value;
 
-          if (value + offset > alpha)
+          if (value > alpha)
           {
               bestMove = move;
 
@@ -1115,7 +1113,7 @@ moves_loop: // When in check, search starts from here
                   update_pv(ss->pv, move, (ss+1)->pv);
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
-                  alpha = value;
+                  alpha = value - Value(thisThread->getID() % 2);
               else
               {
                   assert(value >= beta); // Fail high
