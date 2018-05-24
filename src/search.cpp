@@ -116,7 +116,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
+  void update_quiet_stats(const Position& pos, Stack* ss, Move move, ExtMove* quiets, int quietsCnt, int bonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
 
   inline bool gives_check(const Position& pos, Move move) {
@@ -532,7 +532,8 @@ namespace {
     assert(!(PvNode && cutNode));
     assert(depth / ONE_PLY * ONE_PLY == depth);
 
-    Move pv[MAX_PLY+1], capturesSearched[32], quietsSearched[64];
+    Move pv[MAX_PLY+1], capturesSearched[32];
+    ExtMove quietsSearched[64];
     StateInfo st;
     TTEntry* tte;
     Key posKey;
@@ -1129,7 +1130,7 @@ moves_loop: // When in check, search starts from here
               capturesSearched[captureCount++] = move;
 
           else if (!captureOrPromotion && quietCount < 64)
-              quietsSearched[quietCount++] = move;
+              quietsSearched[quietCount++] = ExtMove(move, -stat_bonus(depth));
       }
     }
 
@@ -1464,7 +1465,7 @@ moves_loop: // When in check, search starts from here
   // update_quiet_stats() updates move sorting heuristics when a new quiet best move is found
 
   void update_quiet_stats(const Position& pos, Stack* ss, Move move,
-                          Move* quiets, int quietsCnt, int bonus) {
+                          ExtMove* quiets, int quietsCnt, int bonus) {
 
     if (ss->killers[0] != move)
     {
@@ -1486,8 +1487,8 @@ moves_loop: // When in check, search starts from here
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
     {
-        thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
-        update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        thisThread->mainHistory[us][from_to(quiets[i].move)] << quiets[i].value;
+        update_continuation_histories(ss, pos.moved_piece(quiets[i].move), to_sq(quiets[i].move), quiets[i].value);
     }
   }
 
