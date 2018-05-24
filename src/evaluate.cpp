@@ -454,7 +454,18 @@ namespace {
         if (b1 & safe)
             kingDanger += RookSafeCheck;
         else
+        {
             unsafeChecks |= b1;
+
+            // Enemy two move bishop checks
+            Bitboard bb = pos.attacks_from<ROOK>(ksq) & safe;
+            while (bb)
+                if (pos.attacks_from<ROOK>(pop_lsb(&bb)) & safe & attackedBy[Them][ROOK])
+                {
+                    kingDanger += RookSafeCheck / 2;
+                    break;
+                }
+        }
 
         // Enemy bishops checks
         if (b2 & safe)
