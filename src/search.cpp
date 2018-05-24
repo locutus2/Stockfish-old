@@ -538,7 +538,7 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
-    Depth extension, newDepth;
+    Depth extension, newDepth, searchDepth;
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
@@ -920,7 +920,7 @@ moves_loop: // When in check, search starts from here
           extension = ONE_PLY;
 
       // Calculate new depth for this move
-      newDepth = depth - ONE_PLY + extension;
+      searchDepth = newDepth = depth - ONE_PLY + extension;
 
       // Step 14. Pruning at shallow depth (~170 Elo)
       if (  !rootNode
@@ -1037,6 +1037,7 @@ moves_loop: // When in check, search starts from here
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
+          searchDepth = d;
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
@@ -1047,7 +1048,10 @@ moves_loop: // When in check, search starts from here
 
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch)
+      {
+          searchDepth = newDepth;
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode);
+      }
 
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
@@ -1056,6 +1060,7 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
+          searchDepth = newDepth;
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
       }
@@ -1130,7 +1135,7 @@ moves_loop: // When in check, search starts from here
               capturesSearched[captureCount++] = move;
 
           else if (!captureOrPromotion && quietCount < 64)
-              quietsSearched[quietCount++] = ExtMove(move, -stat_bonus(depth));
+              quietsSearched[quietCount++] = ExtMove(move, -stat_bonus(searchDepth));
       }
     }
 
