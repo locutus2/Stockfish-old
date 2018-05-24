@@ -612,7 +612,7 @@ namespace {
     posKey = pos.key() ^ Key(excludedMove << 16); // Isn't a very good hash
     tte = TT.probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
-    ttMove =  rootNode ? thisThread->rootMoves[thisThread->PVIdx].pv[thisThread->getID() % std::min(2, int(thisThread->rootMoves.size()))]
+    ttMove =  rootNode ? thisThread->rootMoves[thisThread->PVIdx + thisThread->getID() % (thisThread->rootMoves.size() - thisThread->PVIdx)].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
 
     // At non-PV nodes we check for an early TT cutoff
