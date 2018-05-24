@@ -467,7 +467,18 @@ namespace {
         if (b & safe)
             kingDanger += KnightSafeCheck;
         else
+        {
             unsafeChecks |= b;
+
+            // Enemy two move knight checks
+            Bitboard bb = pos.attacks_from<KNIGHT>(ksq) & safe;
+            while (bb)
+                if (pos.attacks_from<KNIGHT>(pop_lsb(&bb)) & safe & attackedBy[Them][KNIGHT])
+                {
+                    kingDanger += KnightSafeCheck / 2;
+                    break;
+                }
+        }
 
         // Unsafe or occupied checking squares will also be considered, as long as
         // the square is in the attacker's mobility area.
