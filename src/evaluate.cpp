@@ -468,7 +468,7 @@ namespace {
             while (bb)
                 if (pos.attacks_from<BISHOP>(pop_lsb(&bb)) & safe & attackedBy[Them][BISHOP])
                 {
-                    kingDanger += BishopSafeCheck / 4;
+                    kingDanger += BishopSafeCheck / 8;
                     break;
                 }
         }
