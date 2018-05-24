@@ -446,6 +446,17 @@ namespace {
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
             kingDanger += QueenSafeCheck;
+        else
+        {
+            // Enemy two move queen checks
+            Bitboard bb = (b1 | b2) & safe & ~attackedBy[Us][QUEEN];
+            while (bb)
+                if (pos.attacks_from<QUEEN>(pop_lsb(&bb)) & safe & attackedBy[Them][QUEEN] & ~attackedBy[Us][QUEEN])
+                {
+                    kingDanger += QueenSafeCheck / 2;
+                    break;
+                }
+        }
 
         b1 &= attackedBy[Them][ROOK];
         b2 &= attackedBy[Them][BISHOP];
