@@ -1123,7 +1123,7 @@ moves_loop: // When in check, search starts from here
                   update_pv(ss->pv, move, (ss+1)->pv);
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
-                  alpha = value - Value(thisThread->getID() % 2);
+                  alpha = value - Value(thisThread->getID() % 4 == 3);
               else
               {
                   assert(value >= beta); // Fail high
