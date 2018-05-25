@@ -936,7 +936,7 @@ moves_loop: // When in check, search starts from here
               // Move count based pruning (~30 Elo)
               if (moveCountPruning)
               {
-                  if ((ss-1)->statScore < 22500)
+                  if ((ss-1)->statScore < 35000)
                       skipQuiets = true;
                   continue;
               }
