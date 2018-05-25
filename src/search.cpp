@@ -934,7 +934,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning (~30 Elo)
-              if (moveCountPruning && (ss-1)->statScore < 30000)
+              if (moveCountPruning)
               {
                   skipQuiets = true;
                   continue;
@@ -962,6 +962,7 @@ moves_loop: // When in check, search starts from here
           }
           else if (    depth < 7 * ONE_PLY // (~20 Elo)
                    && !extension
+                   && (ss-1)->statScore < 30000
                    && !pos.see_ge(move, -Value(CapturePruneMargin[depth / ONE_PLY])))
                   continue;
       }
