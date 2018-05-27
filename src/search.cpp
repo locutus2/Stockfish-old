@@ -996,7 +996,7 @@ moves_loop: // When in check, search starts from here
 
           if (captureOrPromotion) // (~5 Elo)
           {
-              ss->statScore = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())];
+              ss->statScore = (7 * thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] - 66536) / 2;
 
               //Increase reduction by comparing opponent's stat score
               if (  (ss-1)->statScore >= 0
