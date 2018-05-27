@@ -776,8 +776,8 @@ namespace {
                     + 12 * pos.count<PAWN>()
                     + 16 * pawnsOnBothFlanks
                     + 48 * !pos.non_pawn_material()
-                    + king_eg / 4
-                    - 134;
+                    + king_eg / 12
+                    - 138;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
@@ -858,7 +858,7 @@ namespace {
     initialize<WHITE>();
     initialize<BLACK>();
 
-    
+
     // Pieces should be evaluated first (populate attack tables)
     score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
