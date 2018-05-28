@@ -92,6 +92,8 @@ namespace {
     e->pawnsOnSquares[Us][BLACK] = popcount(ourPawns & DarkSquares);
     e->pawnsOnSquares[Us][WHITE] = pos.count<PAWN>(Us) - e->pawnsOnSquares[Us][BLACK];
 
+    Bitboard safe = e->pawnAttacks[Us] | ~pawn_attacks_bb<Them>(theirPawns);
+
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
     {
@@ -123,8 +125,8 @@ namespace {
         // not attacked more times than defended.
         if (   !(stoppers ^ lever ^ leverPush)
             && !(ourPawns & forward_file_bb(Us, s))
-            && popcount(supported) >= popcount(lever) - 1
-            && popcount(phalanx)   >= popcount(leverPush))
+            && popcount(supported & safe) >= popcount(lever) - 1
+            && popcount(phalanx)          >= popcount(leverPush))
             e->passedPawns[Us] |= s;
 
         else if (   stoppers == SquareBB[s + Up]
