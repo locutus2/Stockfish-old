@@ -289,6 +289,8 @@ void MainThread::search() {
 
 void Thread::search() {
 
+  const int ESTIMATION_SCALE = 64;
+
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
   Value bestValue, alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
@@ -378,8 +380,8 @@ void Thread::search() {
           {
               Value previousScore = rootMoves[PVIdx].previousScore;
               delta = Value(18);
-              alpha = std::max(estimatedValue[PVIdx] - delta,-VALUE_INFINITE);
-              beta  = std::min(estimatedValue[PVIdx] + delta, VALUE_INFINITE);
+              alpha = std::max(estimatedValue[PVIdx] / ESTIMATION_SCALE - delta,-VALUE_INFINITE);
+              beta  = std::min(estimatedValue[PVIdx] / ESTIMATION_SCALE + delta, VALUE_INFINITE);
 
               // Adjust contempt based on root move's previousScore (dynamic contempt)
               int dct = ct + 88 * previousScore / (abs(previousScore) + 200);
@@ -441,11 +443,11 @@ void Thread::search() {
           }
 
           if(rootDepth == ONE_PLY)
-              estimatedValue[PVIdx] = bestValue;
+              estimatedValue[PVIdx] = bestValue * ESTIMATION_SCALE;
           else
           {
-              estimatedValueChange[PVIdx] += (bestValue - estimatedValue[PVIdx]) / 32;
-              estimatedValue[PVIdx] = bestValue + estimatedValueChange[PVIdx];
+              estimatedValueChange[PVIdx] += (bestValue * ESTIMATION_SCALE - estimatedValue[PVIdx]) / 32;
+              estimatedValue[PVIdx] = bestValue * ESTIMATION_SCALE + estimatedValueChange[PVIdx];
           }
 
           // Sort the PV lines searched so far and update the GUI
