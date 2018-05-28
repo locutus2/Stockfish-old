@@ -317,6 +317,9 @@ void Thread::search() {
 
   multiPV = std::min(multiPV, rootMoves.size());
 
+  std::vector<Value> estimatedValue(multiPV, VALUE_ZERO);
+  std::vector<Value> estimatedValueChange(multiPV, VALUE_ZERO);
+
   int ct = int(Options["Contempt"]) * PawnValueEg / 100; // From centipawns
 
   // In analysis mode, adjust contempt in accordance with user preference
@@ -375,8 +378,8 @@ void Thread::search() {
           {
               Value previousScore = rootMoves[PVIdx].previousScore;
               delta = Value(18);
-              alpha = std::max(previousScore - delta,-VALUE_INFINITE);
-              beta  = std::min(previousScore + delta, VALUE_INFINITE);
+              alpha = std::max(estimatedValue[PVIdx] - delta,-VALUE_INFINITE);
+              beta  = std::min(estimatedValue[PVIdx] + delta, VALUE_INFINITE);
 
               // Adjust contempt based on root move's previousScore (dynamic contempt)
               int dct = ct + 88 * previousScore / (abs(previousScore) + 200);
@@ -435,6 +438,14 @@ void Thread::search() {
               delta += delta / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
+          }
+
+          if(rootDepth == ONE_PLY)
+              estimatedValue[PVIdx] = bestValue;
+          else
+          {
+              estimatedValueChange[PVIdx] += (bestValue - estimatedValue[PVIdx]) / 32;
+              estimatedValue[PVIdx] = bestValue + estimatedValueChange[PVIdx];
           }
 
           // Sort the PV lines searched so far and update the GUI
