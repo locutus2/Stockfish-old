@@ -289,7 +289,7 @@ void MainThread::search() {
 
 void Thread::search() {
 
-  const int ESTIMATION_SCALE = 256;
+  const int ESTIMATION_SCALE = 4096;
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
   Value bestValue, alpha, beta, delta;
