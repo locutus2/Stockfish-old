@@ -444,7 +444,7 @@ void Thread::search() {
               estimatedValue[PVIdx] = bestValue;
           else
           {
-              estimatedValueChange[PVIdx] += (bestValue - estimatedValue[PVIdx]) / 36;
+              estimatedValueChange[PVIdx] -= (bestValue - estimatedValue[PVIdx]) / 32;
               estimatedValue[PVIdx] = bestValue + estimatedValueChange[PVIdx];
           }
 
