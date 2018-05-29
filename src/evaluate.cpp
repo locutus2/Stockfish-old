@@ -613,8 +613,10 @@ namespace {
         score += SliderOnQueen * popcount(b & safeThreats & attackedBy2[Us]);
     }
 
-    // Connectivity: ensure that knights, bishops, and rooks are protected
-    b = (pos.pieces(Us, KNIGHT, BISHOP) ^ pos.pieces(Us, ROOK)) & attackedBy[Us][ALL_PIECES];
+    // Connectivity: ensure that knights, bishops, rooks and queens are protected
+    b =  (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING))
+       &  attackedBy[Us][ALL_PIECES]
+       & (attackedBy2[Us] | ~attackedBy[Us][KING]);
     score += Connectivity * popcount(b);
 
     if (T)
