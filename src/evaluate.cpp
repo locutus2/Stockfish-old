@@ -169,7 +169,7 @@ namespace {
   constexpr Score Hanging            = S( 52, 30);
   constexpr Score HinderPassedPawn   = S(  8,  1);
   constexpr Score KnightOnQueen      = S( 21, 11);
-  constexpr Score LongDiagonalBishop = S( 24,  0);
+  constexpr Score LongDiagonalBishop = S( 22,  0);
   constexpr Score MinorBehindPawn    = S( 16,  0);
   constexpr Score Overload           = S( 10,  5);
   constexpr Score PawnlessFlank      = S( 20, 80);
@@ -358,7 +358,7 @@ namespace {
                                      * (1 + popcount(blocked & CenterFiles));
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
-                if (more_than_one(Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN) | (pos.pieces(Them, KNIGHT, BISHOP) & attackedBy[Them][PAWN])) | s)))
+                if (more_than_one(Center & (attacks_bb<BISHOP>(s, pos.pieces(PAWN) | (pos.pieces(Them, KNIGHT) & attackedBy[Them][PAWN])) | s)))
                     score += LongDiagonalBishop;
             }
 
