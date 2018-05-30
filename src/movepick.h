@@ -87,9 +87,9 @@ enum StatsParams { NOT_USED = 0 };
 /// the move's from and to squares, see chessprogramming.wikispaces.com/Butterfly+Boards
 typedef Stats<int16_t, 10368, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
 
-/// CounterMoveHistory stores counter moves indexed by [piece][to][captured piece type] of the previous
+/// CounterMoveHistory stores counter moves indexed by [piece][to][non-capture/capture] of the previous
 /// move, see chessprogramming.wikispaces.com/Countermove+Heuristic
-typedef Stats<Move, NOT_USED, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CounterMoveHistory;
+typedef Stats<Move, NOT_USED, PIECE_NB, SQUARE_NB, 2> CounterMoveHistory;
 
 /// CapturePieceToHistory is addressed by a move's [piece][to][captured piece type]
 typedef Stats<int16_t, 10368, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
