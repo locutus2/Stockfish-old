@@ -1491,8 +1491,8 @@ moves_loop: // When in check, search starts from here
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][bool(pos.captured_piece())] = move;
 
-        if(pos.captured_piece())
-            thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][0] = move;
+        if(!pos.captured_piece())
+            thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][1] = move;
     }
 
     // Decrease all the other played quiet moves
