@@ -598,6 +598,7 @@ namespace {
     ss->contHistory = thisThread->contHistory[NO_PIECE][0].get();
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
+    Piece prevMovedPiece = type_of((ss-1)->currentMove) == PROMOTION ? make_piece(~pos.side_to_move(), PAWN) : pos.piece_on(prevSq);
 
     // Initialize statScore to zero for the grandchildren of the current position.
     // So statScore is shared between all grandchildren and only the first grandchild
@@ -634,7 +635,7 @@ namespace {
 
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
-                    update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+                    update_continuation_histories(ss-1, prevMovedPiece, prevSq, -stat_bonus(depth + ONE_PLY));
             }
             // Penalty for a quiet ttMove that fails low
             else if (!pos.capture_or_promotion(ttMove))
@@ -844,7 +845,7 @@ namespace {
 moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
-    Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move countermove = thisThread->counterMoves[prevMovedPiece][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
@@ -1170,13 +1171,13 @@ moves_loop: // When in check, search starts from here
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
-            update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+            update_continuation_histories(ss-1, prevMovedPiece, prevSq, -stat_bonus(depth + ONE_PLY));
     }
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 * ONE_PLY || PvNode)
              && !pos.captured_piece()
              && is_ok((ss-1)->currentMove))
-        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
+        update_continuation_histories(ss-1, prevMovedPiece, prevSq, stat_bonus(depth));
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
@@ -1489,7 +1490,8 @@ moves_loop: // When in check, search starts from here
     if (is_ok((ss-1)->currentMove))
     {
         Square prevSq = to_sq((ss-1)->currentMove);
-        thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
+        Piece prevMovedPiece = type_of((ss-1)->currentMove) == PROMOTION ? make_piece(~pos.side_to_move(), PAWN) : pos.piece_on(prevSq);
+        thisThread->counterMoves[prevMovedPiece][prevSq] = move;
     }
 
     // Decrease all the other played quiet moves
