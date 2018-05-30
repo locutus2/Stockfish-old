@@ -846,6 +846,9 @@ moves_loop: // When in check, search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][bool(pos.captured_piece())];
 
+    if(!pos.pseudo_legal(countermove))
+        countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][!pos.captured_piece()];
+
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
@@ -1490,9 +1493,6 @@ moves_loop: // When in check, search starts from here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][bool(pos.captured_piece())] = move;
-
-        if(!pos.captured_piece())
-            thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][1] = move;
     }
 
     // Decrease all the other played quiet moves
