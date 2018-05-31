@@ -772,7 +772,7 @@ namespace {
     bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
                             && (pos.pieces(PAWN) & KingSide);
 
-    bool blockedPosition = !pe->open_files() && !pe->pawn_breaks(strongSide);
+    bool blockedPosition = !pos.pieces(strongSide, KNIGHT) && !pe->open_files() && !pe->pawn_breaks(strongSide);
 
     // Compute the initiative bonus for the attacking side
     int complexity =   8 * outflanking
