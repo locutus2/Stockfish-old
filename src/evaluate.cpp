@@ -660,7 +660,7 @@ namespace {
             Square blockSq = s + Up;
 
             if (attackedBy[Us][PAWN] & s)
-                w += r;
+                w += 1;
 
             // Adjust bonus based on the king's proximity
             bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
