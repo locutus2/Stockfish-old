@@ -1178,7 +1178,7 @@ moves_loop: // When in check, search starts from here
              && is_ok((ss-1)->currentMove))
     {
         if (pos.captured_piece())
-            thisThread->captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] << stat_bonus(depth);
+            thisThread->captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] << (stat_bonus(depth) / 2);
         else
             update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
     }
