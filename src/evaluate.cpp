@@ -654,19 +654,10 @@ namespace {
         int w = PassedDanger[r];
 
         Score bonus = PassedRank[r];
+        Square blockSq = s + Up;
 
         if (w)
         {
-            Square blockSq = s + Up;
-
-            // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
-                                    - king_proximity(Us,   blockSq) * 2) * w);
-
-            // If blockSq is not the queening square then consider also a second push
-            if (r != RANK_7)
-                bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
-
             // If the pawn is free to advance, then increase the bonus
             if (pos.empty(blockSq))
             {
@@ -700,6 +691,16 @@ namespace {
             else if (pos.pieces(Us) & blockSq)
                 bonus += make_score(w + r * 2, w + r * 2);
         } // w != 0
+        else
+            w = 1;
+
+        // Adjust bonus based on the king's proximity
+        bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
+                                - king_proximity(Us,   blockSq) * 2) * w);
+
+        // If blockSq is not the queening square then consider also a second push
+        if (r != RANK_7)
+            bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
 
         // Scale down bonus for candidate passers which need more than one
         // pawn push to become passed, or have a pawn in front of them.
