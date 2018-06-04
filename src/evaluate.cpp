@@ -701,8 +701,7 @@ namespace {
         } // w != 0
         else
             // Adjust bonus based on the king's proximity
-            bonus += make_score(0,  king_proximity(Them, blockSq) * 3
-                                  - king_proximity(Us,   blockSq));
+            bonus += make_score(0,  king_proximity(Them, blockSq) * 5);
 
         // Scale down bonus for candidate passers which need more than one
         // pawn push to become passed, or have a pawn in front of them.
