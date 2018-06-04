@@ -149,6 +149,12 @@ namespace {
     S(0, 0), S(5, 7), S(5, 13), S(18, 23), S(74, 58), S(164, 166), S(268, 243)
   };
 
+  // DiscoveredAttack[attacked PieceType] contains bonuses according to
+  // which piece type is discovered attacked.
+  constexpr Score DiscoveredAttack[PIECE_TYPE_NB] = {
+    S(0, 0), S(0, 16), S(20, 21), S(29, 22), S(34, 56)
+  };
+
   // PassedFile[File] contains a bonus according to the file of a passed pawn
   constexpr Score PassedFile[FILE_NB] = {
     S( 15,  7), S(-5, 14), S( 1, -5), S(-22,-11),
@@ -611,6 +617,34 @@ namespace {
            | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
 
         score += SliderOnQueen * popcount(b & safeThreats & attackedBy2[Us]);
+    }
+
+    // Enemy pieces (excluding queens) not protected and under our discovered attack
+    weak =  (pos.pieces(Them) ^ pos.pieces(Them, QUEEN))
+          & ~attackedBy[Them][ALL_PIECES]
+          & ~attackedBy[Us][ALL_PIECES];
+
+    while (weak)
+    {
+        Square s = pop_lsb(&weak);
+
+        // Diagonal discovered attacks
+        if (!(pos.pieces(Them, BISHOP) & s))
+        {
+            b  = pos.attacks_from<BISHOP>(s);
+            b ^= attacks_bb<BISHOP>(s, pos.pieces() ^ (b & pos.pieces(Us, KNIGHT, ROOK)));
+            if (b & pos.pieces(Us, BISHOP, QUEEN))
+                score += DiscoveredAttack[type_of(pos.piece_on(s))];
+        }
+
+        // Horizontal and vertical discovered attacks
+        if (!(pos.pieces(Them, ROOK) & s))
+        {
+            b  = pos.attacks_from<ROOK>(s);
+            b ^= attacks_bb<ROOK>(s, pos.pieces() ^ (b & pos.pieces(Us, KNIGHT, BISHOP)));
+            if (b & pos.pieces(Us, ROOK, QUEEN))
+                score += DiscoveredAttack[type_of(pos.piece_on(s))];
+        }
     }
 
     // Connectivity: ensure that knights, bishops, rooks, and queens are protected
