@@ -152,7 +152,7 @@ namespace {
   // DiscoveredAttack[attacked PieceType] contains bonuses according to
   // which piece type is discovered attacked.
   constexpr Score DiscoveredAttack[PIECE_TYPE_NB] = {
-    S(0, 0), S(0, 8), S(10, 11), S(15, 11), S(17, 28)
+    S(0, 0), S(1, 4), S(5, 6), S(8, 6), S(9, 14)
   };
 
   // PassedFile[File] contains a bonus according to the file of a passed pawn
