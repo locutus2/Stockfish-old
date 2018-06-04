@@ -633,7 +633,7 @@ namespace {
         {
             b  = pos.attacks_from<BISHOP>(s);
             b ^= attacks_bb<BISHOP>(s, pos.pieces() ^ (b & pos.pieces(Us, KNIGHT, ROOK)));
-            if (b & pos.pieces(Us, BISHOP, QUEEN))
+            if (b & pos.pieces(Us, BISHOP, QUEEN) & ~attackedBy[Them][ALL_PIECES])
                 score += DiscoveredAttack[type_of(pos.piece_on(s))];
         }
 
@@ -642,7 +642,7 @@ namespace {
         {
             b  = pos.attacks_from<ROOK>(s);
             b ^= attacks_bb<ROOK>(s, pos.pieces() ^ (b & pos.pieces(Us, KNIGHT, BISHOP)));
-            if (b & pos.pieces(Us, ROOK, QUEEN))
+            if (b & pos.pieces(Us, ROOK, QUEEN) & ~attackedBy[Them][ALL_PIECES])
                 score += DiscoveredAttack[type_of(pos.piece_on(s))];
         }
     }
