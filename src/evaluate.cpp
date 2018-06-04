@@ -155,6 +155,30 @@ namespace {
     S(-22,-11), S( 1, -5), S(-5, 14), S( 15,  7)
   };
 
+  // PassedKingProximity[passed side][rank][king proximity] contains a bonus according 
+  // to the rank and king proximity of a passed pawn for both sides
+  constexpr int SC = 1;
+  constexpr Score PassedKingProximity[COLOR_NB][RANK_NB][8] = {
+    {
+      {},
+      { S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0) , S(0, 0) },
+      { S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0) , S(0, 0) },
+      { S(0, 0), S(0, SC*5*3*1), S(0, SC*5*3*2), S(0, SC*5*3*3), S(0, SC*5*3*4), S(0, SC*5*3*5), S(0, SC*5*3*5) , S(0, SC*5*3*5) },
+      { S(0, 0), S(0, SC*5*6*1), S(0, SC*5*6*2), S(0, SC*5*6*3), S(0, SC*5*6*4), S(0, SC*5*6*5), S(0, SC*5*6*5) , S(0, SC*5*6*5) },
+      { S(0, 0), S(0, SC*5*12*1), S(0, SC*5*12*2), S(0, SC*5*12*3), S(0, SC*5*12*4), S(0, SC*5*12*5), S(0, SC*5*12*5) , S(0, SC*5*12*5) },
+      { S(0, 0), S(0, SC*5*21*1), S(0, SC*5*21*2), S(0, SC*5*21*3), S(0, SC*5*21*4), S(0, SC*5*21*5), S(0, SC*5*21*5) , S(0, SC*5*21*5) } 
+    },
+    {
+      {},
+      { S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0) , S(0, 0) },
+      { S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0) , S(0, 0) },
+      { S(0, 0), S(0, SC*2*3*1), S(0, SC*2*3*2), S(0, SC*2*3*3), S(0, SC*2*3*4), S(0, SC*2*3*5), S(0, SC*2*3*5) , S(0, SC*2*3*5) },
+      { S(0, 0), S(0, SC*2*6*1), S(0, SC*2*6*2), S(0, SC*2*6*3), S(0, SC*2*6*4), S(0, SC*2*6*5), S(0, SC*2*6*5) , S(0, SC*2*6*5) },
+      { S(0, 0), S(0, SC*2*12*1), S(0, SC*2*12*2), S(0, SC*2*12*3), S(0, SC*2*12*4), S(0, SC*2*12*5), S(0, SC*2*12*5) , S(0, SC*2*12*5) },
+      { S(0, 0), S(0, SC*2*21*1), S(0, SC*2*21*2), S(0, SC*2*21*3), S(0, SC*2*21*4), S(0, SC*2*21*5), S(0, SC*2*21*5) , S(0, SC*2*21*5) } 
+    }
+  };
+
   // PassedDanger[Rank] contains a term to weight the passed score
   constexpr int PassedDanger[RANK_NB] = { 0, 0, 0, 3, 6, 12, 21 };
 
@@ -654,15 +678,14 @@ namespace {
         int w = PassedDanger[r];
 
         Score bonus = PassedRank[r];
+        Square blockSq = s + Up;
+
+        // Adjust bonus based on the king's proximity
+        bonus += (  PassedKingProximity[0][r][distance(pos.square<KING>(Them), blockSq)] 
+                  - PassedKingProximity[1][r][distance(pos.square<KING>(Us)  , blockSq)]) / SC;
 
         if (w)
         {
-            Square blockSq = s + Up;
-
-            // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
-                                    - king_proximity(Us,   blockSq) * 2) * w);
-
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
                 bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
