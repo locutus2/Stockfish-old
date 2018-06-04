@@ -658,6 +658,10 @@ namespace {
 
         if (w)
         {
+            // Adjust bonus based on the king's proximity
+            bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
+                                    - king_proximity(Us,   blockSq) * 2) * w);
+
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
                 bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
@@ -696,11 +700,9 @@ namespace {
                 bonus += make_score(w + r * 2, w + r * 2);
         } // w != 0
         else
-            w = 1;
-
-        // Adjust bonus based on the king's proximity
-        bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
-                                - king_proximity(Us,   blockSq) * 2) * w);
+            // Adjust bonus based on the king's proximity
+            bonus += make_score(0,  king_proximity(Them, blockSq) * 3
+                                  - king_proximity(Us,   blockSq));
 
         // Scale down bonus for candidate passers which need more than one
         // pawn push to become passed, or have a pawn in front of them.
