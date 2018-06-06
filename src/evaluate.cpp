@@ -863,15 +863,14 @@ namespace {
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
-    score += mobility[WHITE] - mobility[BLACK];
-s
-    Score passedScore = passed< WHITE>() - passed< BLACK>();
-    score += make_score(mg_value(pos.this_thread()->contempt) * int(mg_value(passedScore)) / 256,
-                        eg_value(pos.this_thread()->contempt) * int(eg_value(passedScore)) / 256);
+    Score mobilityScore = mobility[WHITE] - mobility[BLACK];
+    score += make_score(mg_value(pos.this_thread()->contempt) * int(mg_value(mobilityScore)) / 256,
+                        eg_value(pos.this_thread()->contempt) * int(eg_value(mobilityScore)) / 256);
 
-    score +=  king<   WHITE>() - king<   BLACK>()
+    score +=  mobilityScore
+            + king<   WHITE>() - king<   BLACK>()
             + threats<WHITE>() - threats<BLACK>()
-            + passedScore
+            + passed< WHITE>() - passed< BLACK>()
             + space<  WHITE>() - space<  BLACK>();
 
     score += initiative(eg_value(score));
