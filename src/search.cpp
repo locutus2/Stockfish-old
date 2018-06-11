@@ -519,12 +519,24 @@ namespace {
   template <NodeType NT>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
-    // Use quiescence search when needed
-    if (depth < ONE_PLY)
-        return qsearch<NT>(pos, ss, alpha, beta);
-
     constexpr bool PvNode = NT == PV;
     const bool rootNode = PvNode && ss->ply == 0;
+
+    // Check if we have an upcoming move which draws by repetition, or 
+    // if the opponent had an alternative move earlier to this position.
+    if (   pos.rule50_count() >= 3
+        && alpha < VALUE_DRAW
+        && !rootNode
+        && pos.has_game_cycle(ss->ply))
+    {
+        alpha = VALUE_DRAW;
+        if (alpha >= beta)
+            return alpha;
+    }
+
+    // Dive into quiescence search when the depth reaches zero
+    if (depth < ONE_PLY)
+        return qsearch<NT>(pos, ss, alpha, beta);
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
@@ -578,17 +590,6 @@ namespace {
         beta = std::min(mate_in(ss->ply+1), beta);
         if (alpha >= beta)
             return alpha;
-
-        // Check if there exists a move which draws by repetition, or an alternative
-        // earlier move to this position.
-        if (   pos.rule50_count() >= 3
-            && alpha < VALUE_DRAW
-            && pos.has_game_cycle(ss->ply))
-        {
-            alpha = VALUE_DRAW;
-            if (alpha >= beta)
-                return alpha;
-        }
     }
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
@@ -751,7 +752,7 @@ namespace {
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !excludedMove
         &&  pos.non_pawn_material(us)
-        && (ss->ply > thisThread->nmpMinPly || us != thisThread->nmpColor))
+        && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
 
@@ -780,7 +781,7 @@ namespace {
 
             // Do verification search at high depths, with null move pruning disabled
             // for us, until ply exceeds nmpMinPly.
-            thisThread->nmpMinPly = ss->ply + 3 * (depth-R) / 4 - 1;
+            thisThread->nmpMinPly = ss->ply + 3 * (depth-R) / 4;
             thisThread->nmpColor = us;
 
             Value v = search<NonPV>(pos, ss, beta-1, beta, depth-R, false);
@@ -996,8 +997,7 @@ moves_loop: // When in check, search starts from here
           if (captureOrPromotion) // (~5 Elo)
           {
               // Increase reduction by comparing opponent's stat score
-              if (   (ss-1)->statScore >= 0
-                  && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 0)
+              if ((ss-1)->statScore >= 0)
                   r += ONE_PLY;
 
               r -= r ? ONE_PLY : DEPTH_ZERO;
@@ -1164,10 +1164,10 @@ moves_loop: // When in check, search starts from here
     {
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
-            update_quiet_stats(pos, ss, bestMove, quietsSearched, quietCount, stat_bonus(depth));
+            update_quiet_stats(pos, ss, bestMove, quietsSearched, quietCount, 
+							   stat_bonus(depth + (bestValue > beta + PawnValueMg ? ONE_PLY : DEPTH_ZERO)));
         else
-            update_capture_stats(pos, bestMove, capturesSearched, captureCount,
-                                 stat_bonus(depth + (bestValue > beta + KnightValueMg ? ONE_PLY : DEPTH_ZERO)));
+            update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth + ONE_PLY));
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
