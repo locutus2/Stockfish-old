@@ -539,7 +539,7 @@ namespace {
     StateInfo st;
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove, singularMove;
+    Move ttMove, move, excludedMove, bestMove, singularBestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, inCheck, givesCheck, improving;
@@ -586,7 +586,7 @@ namespace {
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
     (ss+1)->ply = ss->ply + 1;
-    ss->currentMove = (ss+1)->excludedMove = bestMove = singularMove = MOVE_NONE;
+    ss->currentMove = (ss+1)->excludedMove = bestMove = singularBestMove = MOVE_NONE;
     ss->contHistory = thisThread->contHistory[NO_PIECE][0].get();
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
@@ -906,8 +906,8 @@ moves_loop: // When in check, search starts from here
 
           if (value < rBeta)
               extension = ONE_PLY;
-          else
-              singularMove = ss->currentMove;
+          else if (value > alpha)
+              singularBestMove = ss->currentMove;
       }
       else if (    givesCheck // Check extension (~2 Elo)
                && !moveCountPruning
@@ -1125,7 +1125,7 @@ moves_loop: // When in check, search starts from here
           }
       }
 
-      if (move != bestMove && move != singularMove)
+      if (move != bestMove && move != singularBestMove)
       {
           if (captureOrPromotion && captureCount < 32)
               capturesSearched[captureCount++] = move;
