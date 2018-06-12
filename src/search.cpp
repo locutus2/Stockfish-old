@@ -900,9 +900,11 @@ moves_loop: // When in check, search starts from here
           &&  pos.legal(move))
       {
           Value rBeta = std::max(ttValue - 2 * depth / ONE_PLY, -VALUE_MATE);
+          int statScore = ss->statScore;
           ss->excludedMove = move;
           value = search<NonPV>(pos, ss, rBeta - 1, rBeta, depth / 2, cutNode);
           ss->excludedMove = MOVE_NONE;
+          ss->statScore = statScore;
 
           if (value < rBeta)
               extension = ONE_PLY;
