@@ -1007,7 +1007,7 @@ moves_loop: // When in check, search starts from here
 
               // Decrease reduction for pawn pushes
               if (type_of(movedPiece) == PAWN)
-                  r -= ONE_PLY;
+                  r -= ONE_PLY / 2;
 
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
@@ -1034,7 +1034,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - (ss->statScore - 6000) / 20000) * ONE_PLY);
+              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
