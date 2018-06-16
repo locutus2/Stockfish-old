@@ -907,9 +907,9 @@ moves_loop: // When in check, search starts from here
           if (value < rBeta)
               extension = ONE_PLY;
       }
-      else if (    givesCheck
-               && !moveCountPruning) // Check extension (~2 Elo)
-          extension = pos.see_ge(move) ? ONE_PLY : ONE_PLY / 2;
+      else if (   givesCheck
+               && pos.see_ge(move)) // Check extension (~2 Elo)
+          extension = moveCountPruning ? ONE_PLY / 2: ONE_PLY;
 
       // Calculate new depth for this move
       newDepth = depth - ONE_PLY + extension;
