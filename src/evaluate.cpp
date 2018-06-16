@@ -764,11 +764,17 @@ namespace {
   template<Tracing T>
   Score Evaluation<T>::initiative(Value eg) const {
 
+    Color strongSide = eg > VALUE_ZERO ? WHITE : BLACK;
+
     int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
 
     bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
                             && (pos.pieces(PAWN) & KingSide);
+
+    Bitboard blocked = (strongSide == WHITE ? shift<SOUTH> : shift<NORTH>)
+                       (pos.pieces(strongSide, PAWN) | pos.pieces(~strongSide));
+    int pawnMobility = popcount(pos.pieces(strongSide, PAWN) & (~blocked | attackedBy[~strongSide][PAWN]));
 
     // Compute the initiative bonus for the attacking side
     int complexity =   8 * outflanking
@@ -776,6 +782,7 @@ namespace {
                     + 12 * pos.count<PAWN>()
                     + 16 * pawnsOnBothFlanks
                     + 48 * !pos.non_pawn_material()
+                    +      pawnMobility
                     -136 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
