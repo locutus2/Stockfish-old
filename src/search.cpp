@@ -76,7 +76,7 @@ namespace {
   int Reductions[2][2][64][64];  // [pv][improving][depth][moveNumber]
 
   template <bool PvNode> Depth reduction(bool i, Depth d, int mn) {
-    return Reductions[PvNode][i][std::min(d / ONE_PLY, 63)][std::min(mn, 63)] * ONE_PLY;
+    return Depth(Reductions[PvNode][i][std::min(d / ONE_PLY, 63)][std::min(mn, 63)]);
   }
 
   // History and stats update bonus, based on depth
@@ -155,12 +155,12 @@ void Search::init() {
           {
               double r = log(d) * log(mc) / 1.95;
 
-              Reductions[NonPV][imp][d][mc] = int(std::round(r));
-              Reductions[PV][imp][d][mc] = std::max(Reductions[NonPV][imp][d][mc] - 1, 0);
+              Reductions[NonPV][imp][d][mc] = int(std::round(r * int(ONE_PLY)));
+              Reductions[PV][imp][d][mc] = std::max(Reductions[NonPV][imp][d][mc] - ONE_PLY, 0);
 
               // Increase reduction for non-PV nodes when eval is not improving
               if (!imp && r > 1.0)
-                Reductions[NonPV][imp][d][mc]++;
+                Reductions[NonPV][imp][d][mc] += ONE_PLY;
           }
 
   for (int d = 0; d < 16; ++d)
@@ -989,7 +989,7 @@ moves_loop: // When in check, search starts from here
               if ((ss-1)->statScore >= 0)
                   r += ONE_PLY;
 
-              r -= r ? ONE_PLY : DEPTH_ZERO;
+              r -= r >= ONE_PLY ? ONE_PLY : DEPTH_ZERO;
           }
           else
           {
@@ -1030,7 +1030,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
+              r = std::max(DEPTH_ZERO, r - ss->statScore / 20000 * ONE_PLY);
           }
 
           Depth d = std::max(newDepth - r, ONE_PLY);
