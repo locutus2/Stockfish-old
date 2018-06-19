@@ -210,6 +210,7 @@ enum Depth : int {
 
   ONE_PLY = 2,
   HALF_PLY = ONE_PLY / 2,
+  THREE_HALF_PLY = 3 * HALF_PLY,
 
   DEPTH_ZERO          =  0 * ONE_PLY,
   DEPTH_QS_CHECKS     =  0 * ONE_PLY,

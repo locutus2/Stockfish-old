@@ -1008,7 +1008,7 @@ moves_loop: // When in check, search starts from here
               // Increase reduction for a non-pawn move if target square is attacked by an opponent pawn
               if (    type_of(movedPiece) != PAWN
                   && (PawnAttacks[~pos.side_to_move()][to_sq(move)] & pos.pieces(pos.side_to_move(), PAWN)))
-                  r += HALF_PLY;
+                  r += THREE_HALF_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
