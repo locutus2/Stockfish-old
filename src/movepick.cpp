@@ -117,7 +117,7 @@ void MovePicker::score() {
           m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
                    + (*contHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    + (*contHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   + (*contHistory[2])[pos.moved_piece(m)][to_sq(m)] / 16
+                   + (*contHistory[2])[pos.moved_piece(m)][to_sq(m)] / 32
                    + (*contHistory[3])[pos.moved_piece(m)][to_sq(m)];
 
       else // Type == EVASIONS
