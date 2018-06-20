@@ -181,6 +181,7 @@ namespace {
   constexpr Score TrappedRook        = S( 92,  0);
   constexpr Score WeakQueen          = S( 50, 10);
   constexpr Score WeakUnopposedPawn  = S(  5, 25);
+  constexpr Score UndefendedWeakPawn = S( 20, 20);
 
 #undef S
 
@@ -611,6 +612,20 @@ namespace {
            | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
 
         score += SliderOnQueen * popcount(b & safeThreats & attackedBy2[Us]);
+    }
+
+    // If opponent have only knights and we have queens or rooks
+    // give bonus for attacking weak pawns if opponent pieces far away
+    if (!pos.pieces(Them, BISHOP) && !pos.pieces(Them, ROOK, QUEEN) && pos.pieces(Us, ROOK, QUEEN))
+    {
+        b =   pos.pieces(Them, PAWN)
+           & ~attackedBy[Them][ALL_PIECES]
+           &  (attackedBy[Us][ROOK] | attackedBy[Us][QUEEN] | attackedBy[Us][KING])
+           & ~DistanceRingBB[pos.square<KING>(Them)][1];
+        safeThreats = attackedBy[Them][KNIGHT] & ~(pos.pieces(Them) | attackedBy[Us][ALL_PIECES]);
+        while (b)
+            if (!(pos.attacks_from<KNIGHT>(pop_lsb(&b)) & safeThreats))
+                score += UndefendedWeakPawn;
     }
 
     // Connectivity: ensure that knights, bishops, rooks, and queens are protected
