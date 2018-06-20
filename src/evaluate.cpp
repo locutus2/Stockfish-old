@@ -158,6 +158,9 @@ namespace {
   // PassedDanger[Rank] contains a term to weight the passed score
   constexpr int PassedDanger[RANK_NB] = { 0, 0, 0, 3, 6, 12, 21 };
 
+  // PassedRank[Rank] contains a bonus according to the rank of a passed pawn
+  constexpr Score PromotionThreat = S(1000, 1000);
+
   // KingProtector[PieceType-2] contains a penalty according to distance from king
   constexpr Score KingProtector[] = { S(3, 5), S(4, 3), S(3, 0), S(1, -1) };
 
@@ -654,11 +657,10 @@ namespace {
         int w = PassedDanger[r];
 
         Score bonus = PassedRank[r];
+        Square blockSq = s + Up;
 
         if (w)
         {
-            Square blockSq = s + Up;
-
             // Adjust bonus based on the king's proximity
             bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
                                     - king_proximity(Us,   blockSq) * 2) * w);
@@ -708,6 +710,10 @@ namespace {
             bonus = bonus / 2;
 
         score += bonus + PassedFile[file_of(s)];
+
+        if (r == RANK_7 && !((pos.pieces() | attackedBy[Them][ALL_PIECES]) & blockSq)
+                        && !(attacks_bb<ROOK>(blockSq, pos.pieces() ^ s) & pos.pieces(Them, ROOK, QUEEN)))
+           score += PromotionThreat;
     }
 
     if (T)
