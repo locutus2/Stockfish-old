@@ -168,6 +168,7 @@ namespace {
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score Hanging            = S( 52, 30);
   constexpr Score HinderPassedPawn   = S(  8,  1);
+  constexpr Score HinderPassedPawnThreat = S(  4,  0);
   constexpr Score KnightOnQueen      = S( 21, 11);
   constexpr Score LongDiagonalBishop = S( 22,  0);
   constexpr Score MinorBehindPawn    = S( 16,  0);
@@ -649,6 +650,12 @@ namespace {
 
         bb = forward_file_bb(Us, s) & (attackedBy[Them][ALL_PIECES] | pos.pieces(Them));
         score -= HinderPassedPawn * popcount(bb);
+
+        if (!bb)
+        {
+            bb = (adjacent_files_bb(file_of(s)) | forward_file_bb(Them, s + Up)) & attackedBy[Them][ALL_PIECES];
+            score -= HinderPassedPawnThreat * popcount(bb);
+        }
 
         int r = relative_rank(Us, s);
         int w = PassedDanger[r];
