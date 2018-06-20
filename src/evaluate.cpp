@@ -181,7 +181,7 @@ namespace {
   constexpr Score TrappedRook         = S( 92,  0);
   constexpr Score WeakQueen           = S( 50, 10);
   constexpr Score WeakUnopposedPawn   = S(  5, 25);
-  constexpr Score KnightOutpostThreat = S(  1,  1);
+  constexpr Score KnightOutpostThreat = S( 11,  3);
 
 #undef S
 
@@ -619,14 +619,18 @@ namespace {
     // Bonus for threats of knights reaching in two moves an outpost square
     if (pos.pieces(Us, KNIGHT))
     {
-        b = OutpostRanks & ~(pe->pawn_attacks_span(Them) | pos.pieces(Us) | attackedBy[Us][KNIGHT]);
-        safeThreats = attackedBy[Us][KNIGHT] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
-        while (b)
-            if (pos.attacks_from<KNIGHT>(pop_lsb(&b)) & safeThreats)
-            {
-                score += KnightOutpostThreat;
-                break;
-            }
+        b = OutpostRanks & ~pe->pawn_attacks_span(Them);
+        if (!(b & (pos.pieces(Us, KNIGHT) | attackedBy[Us][KNIGHT])))
+        {
+            b &= ~pos.pieces(Us);
+            safeThreats = attackedBy[Us][KNIGHT] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
+            while (b)
+                if (pos.attacks_from<KNIGHT>(pop_lsb(&b)) & safeThreats)
+                {
+                    score += KnightOutpostThreat;
+                    break;
+                }
+        }
     }
 
     // Connectivity: ensure that knights, bishops, rooks, and queens are protected
