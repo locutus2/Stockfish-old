@@ -653,7 +653,10 @@ namespace {
 
         if (!bb)
         {
-            bb = (adjacent_files_bb(file_of(s)) | forward_file_bb(Them, s + Up)) & attackedBy[Them][ALL_PIECES];
+            bb  = pawn_attack_span(Us, s - Up);
+            bb |= shift<WEST>(bb) | shift<EAST>(bb);
+            bb &= ~file_bb(file_of(s));
+            bb = (bb | s) & attackedBy[Them][ALL_PIECES];
             score -= HinderPassedPawnThreat * popcount(bb);
         }
 
