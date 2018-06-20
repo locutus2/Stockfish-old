@@ -197,6 +197,7 @@ namespace {
   private:
     template<Color Us> void initialize();
     template<Color Us, PieceType Pt> Score pieces();
+    template<Color Us, PieceType Pt> void generateAttackThreats();
     template<Color Us> Score king() const;
     template<Color Us> Score threats() const;
     template<Color Us> Score passed() const;
@@ -214,6 +215,11 @@ namespace {
     // attacked by a given color and piece type. Special "piece types" which
     // is also calculated is ALL_PIECES.
     Bitboard attackedBy[COLOR_NB][PIECE_TYPE_NB];
+
+    // attackThreatBy[color][piece type] is a bitboard representing all squares
+    // which are threated to safely attacked by a given color and piece type on next move.
+    // Special "piece types" which is also calculated is ALL_PIECES.
+    Bitboard attackThreatBy[COLOR_NB][PIECE_TYPE_NB];
 
     // attackedBy2[color] are the squares attacked by 2 pieces of a given color,
     // possibly via x-ray or by one pawn and one piece. Diagonal x-ray through
@@ -267,6 +273,7 @@ namespace {
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
     attackedBy2[Us]            = attackedBy[Us][KING] & attackedBy[Us][PAWN];
+    attackThreatBy[Us][ALL_PIECES] = 0;
 
     // Init our king safety tables only if we are going to use them
     if (pos.non_pawn_material(Them) >= RookValueMg + KnightValueMg)
@@ -288,6 +295,60 @@ namespace {
         kingRing[Us] = kingAttackersCount[Them] = 0;
   }
 
+
+  // Evaluation::generateAttackThreats() generate attack threats for pieces of a given color and type
+  template<Tracing T> template<Color Us, PieceType Pt>
+  void Evaluation<T>::generateAttackThreats() {
+
+      constexpr Color     Them     = (Us == WHITE ? BLACK : WHITE);
+      constexpr Direction Up       = (Us == WHITE ? NORTH : SOUTH);
+      constexpr Bitboard  TRank3BB = (Us == WHITE ? Rank3BB : Rank6BB);
+      constexpr Bitboard  TRank8BB = (Us == WHITE ? Rank8BB : Rank1BB);
+
+      Bitboard b, bb, safe;
+      Square s;
+
+      if (Pt == KING)
+          bb = attackedBy[Us][Pt];
+      else
+      {
+          // generate pawn moves
+          bb = attackedBy[Us][PAWN] & pos.pieces(Them);
+          bb |= b = shift<Up>(pos.pieces(Us, PAWN)) & ~pos.pieces();
+
+          if (Pt == PAWN)
+          {
+              bb &= ~TRank8BB; // exclude promotions
+              bb |= shift<Up>(b & TRank3BB & ~attackedBy[Them][PAWN]) & ~pos.pieces();
+          }
+          else
+          {
+              bb &= TRank8BB; // only promotions
+              bb |= attackedBy[Us][Pt];
+          }
+      }
+
+      attackThreatBy[Us][Pt] = 0;
+      safe = ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
+      bb &= safe;
+
+      while (bb)
+      {
+          s = pop_lsb(&bb);
+
+          // Find attacked squares, including x-ray attacks for bishops and rooks
+          b = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN))
+            : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
+            : Pt ==   PAWN ? pos.attacks_from<Pt>(s, Us)
+                           : pos.attacks_from<Pt>(s);
+
+          if (Pt != KING && pos.blockers_for_king(Us) & s)
+              b &= LineBB[pos.square<KING>(Us)][s];
+
+          attackThreatBy[Us][Pt] |= b;
+          attackThreatBy[Us][ALL_PIECES] |= b;
+      }
+  }
 
   // Evaluation::pieces() scores pieces of a given color and type
   template<Tracing T> template<Color Us, PieceType Pt>
@@ -855,6 +916,17 @@ namespace {
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+
+    generateAttackThreats<WHITE, PAWN>();
+    generateAttackThreats<BLACK, PAWN>();
+    generateAttackThreats<WHITE, KNIGHT>();
+    generateAttackThreats<BLACK, KNIGHT>();
+    generateAttackThreats<WHITE, BISHOP>();
+    generateAttackThreats<BLACK, BISHOP>();
+    generateAttackThreats<WHITE, ROOK>();
+    generateAttackThreats<BLACK, ROOK>();
+    generateAttackThreats<WHITE, KING>();
+    generateAttackThreats<BLACK, KING>();
 
     score += mobility[WHITE] - mobility[BLACK];
 
