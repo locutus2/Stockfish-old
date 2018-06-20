@@ -159,7 +159,7 @@ namespace {
   constexpr int PassedDanger[RANK_NB] = { 0, 0, 0, 3, 6, 12, 21 };
 
   // PassedRank[Rank] contains a bonus according to the rank of a passed pawn
-  constexpr Score PromotionThreat = S(1000, 1000);
+  constexpr Score PromotionThreat = S(100, 100);
 
   // KingProtector[PieceType-2] contains a penalty according to distance from king
   constexpr Score KingProtector[] = { S(3, 5), S(4, 3), S(3, 0), S(1, -1) };
