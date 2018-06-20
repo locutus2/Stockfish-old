@@ -807,7 +807,7 @@ namespace {
             // Endgame with opposite-colored bishops and no other pieces is almost a draw
             sf = 31;
         else
-            sf = std::min(36 + (pos.opposite_bishops()? 2 : 7) * pos.count<PAWN>(strongSide), sf);
+            sf = std::min(44 + (pos.opposite_bishops()? 2 : 7) * pos.count<PAWN>(strongSide), sf);
     }
 
     return ScaleFactor(sf);
