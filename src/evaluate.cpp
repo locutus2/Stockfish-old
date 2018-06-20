@@ -162,25 +162,26 @@ namespace {
   constexpr Score KingProtector[] = { S(3, 5), S(4, 3), S(3, 0), S(1, -1) };
 
   // Assorted bonuses and penalties
-  constexpr Score BishopPawns        = S(  3,  5);
-  constexpr Score CloseEnemies       = S(  7,  0);
-  constexpr Score Connectivity       = S(  3,  1);
-  constexpr Score CorneredBishop     = S( 50, 50);
-  constexpr Score Hanging            = S( 52, 30);
-  constexpr Score HinderPassedPawn   = S(  8,  1);
-  constexpr Score KnightOnQueen      = S( 21, 11);
-  constexpr Score LongDiagonalBishop = S( 22,  0);
-  constexpr Score MinorBehindPawn    = S( 16,  0);
-  constexpr Score Overload           = S( 10,  5);
-  constexpr Score PawnlessFlank      = S( 20, 80);
-  constexpr Score RookOnPawn         = S(  8, 24);
-  constexpr Score SliderOnQueen      = S( 42, 21);
-  constexpr Score ThreatByPawnPush   = S( 47, 26);
-  constexpr Score ThreatByRank       = S( 16,  3);
-  constexpr Score ThreatBySafePawn   = S(175,168);
-  constexpr Score TrappedRook        = S( 92,  0);
-  constexpr Score WeakQueen          = S( 50, 10);
-  constexpr Score WeakUnopposedPawn  = S(  5, 25);
+  constexpr Score BishopPawns         = S(  3,  5);
+  constexpr Score CloseEnemies        = S(  7,  0);
+  constexpr Score Connectivity        = S(  3,  1);
+  constexpr Score CorneredBishop      = S( 50, 50);
+  constexpr Score Hanging             = S( 52, 30);
+  constexpr Score HinderPassedPawn    = S(  8,  1);
+  constexpr Score KnightOnQueen       = S( 21, 11);
+  constexpr Score LongDiagonalBishop  = S( 22,  0);
+  constexpr Score MinorBehindPawn     = S( 16,  0);
+  constexpr Score Overload            = S( 10,  5);
+  constexpr Score PawnlessFlank       = S( 20, 80);
+  constexpr Score RookOnPawn          = S(  8, 24);
+  constexpr Score SliderOnQueen       = S( 42, 21);
+  constexpr Score ThreatByPawnPush    = S( 47, 26);
+  constexpr Score ThreatByRank        = S( 16,  3);
+  constexpr Score ThreatBySafePawn    = S(175,168);
+  constexpr Score TrappedRook         = S( 92,  0);
+  constexpr Score WeakQueen           = S( 50, 10);
+  constexpr Score WeakUnopposedPawn   = S(  5, 25);
+  constexpr Score KnightOutpostThreat = S( 11,  3);
 
 #undef S
 
@@ -519,6 +520,8 @@ namespace {
     constexpr Color     Them     = (Us == WHITE ? BLACK   : WHITE);
     constexpr Direction Up       = (Us == WHITE ? NORTH   : SOUTH);
     constexpr Bitboard  TRank3BB = (Us == WHITE ? Rank3BB : Rank6BB);
+    constexpr Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
+                                                   : Rank5BB | Rank4BB | Rank3BB);
 
     Bitboard b, weak, defended, nonPawnEnemies, stronglyProtected, safeThreats;
     Score score = SCORE_ZERO;
@@ -611,6 +614,19 @@ namespace {
            | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
 
         score += SliderOnQueen * popcount(b & safeThreats & attackedBy2[Us]);
+    }
+
+    // Bonus for threats of knights reaching in two moves an outpost square
+    if (pos.pieces(Us, KNIGHT))
+    {
+        b = OutpostRanks & ~(pe->pawn_attacks_span(Them) | pos.pieces(Us) | attackedBy[Us][KNIGHT]);
+        safeThreats = attackedBy[Us][KNIGHT] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
+        while (b)
+            if (pos.attacks_from<KNIGHT>(pop_lsb(&b)) & safeThreats)
+            {
+                score += KnightOutpostThreat;
+                break;
+            }
     }
 
     // Connectivity: ensure that knights, bishops, rooks, and queens are protected
