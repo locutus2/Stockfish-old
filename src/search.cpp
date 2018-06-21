@@ -525,9 +525,21 @@ namespace {
             return alpha;
     }
 
-    // Dive into quiescence search when the depth reaches zero
+    ss->extendedPV = (ss-1)->extendedPV;
+
     if (depth < ONE_PLY)
-        return qsearch<NT>(pos, ss, alpha, beta);
+    {
+        // Search at a PV leaf node a little bit deeper
+        if (PvNode && !ss->extendedPV)
+        {
+            depth += ONE_PLY;
+            ss->extendedPV = true;
+        }
+
+        // Dive into quiescence search when the depth reaches zero
+        else
+            return qsearch<NT>(pos, ss, alpha, beta);
+    }
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
