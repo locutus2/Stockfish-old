@@ -564,14 +564,17 @@ namespace {
     b1 = attackedBy[Them][ALL_PIECES] & kf & Camp;
     b2 = b1 & attackedBy2[Them] & ~attackedBy[Us][PAWN];
 
-    // King tropism, to anticipate slow motion attacks on our king
-    score -= CloseEnemies * (popcount(b1) + popcount(b2));
+    if (b1)
+        // King tropism, to anticipate slow motion attacks on our king
+        score -= CloseEnemies * (popcount(b1) + popcount(b2));
+    else
+    {
+        // Find the squares that opponent threat to attack in our king flank.
+        b = attackThreatBy[Them][ALL_PIECES] & kf & Camp;
 
-    // Find the squares that opponent threat to attack in our king flank.
-    b = attackThreatBy[Them][ALL_PIECES] & kf & Camp;
-
-    // King tropism, to anticipate very slow motion attacks on our king
-    score -= CloseEnemiesThreat * popcount(b);
+        // King tropism, to anticipate very slow motion attacks on our king
+        score -= CloseEnemiesThreat * popcount(b);
+    }
 
     if (T)
         Trace::add(KING, Us, score);
