@@ -348,6 +348,8 @@ namespace {
           attackThreatBy[Us][Pt] |= b;
           attackThreatBy[Us][ALL_PIECES] |= b;
       }
+
+      attackThreatBy[Us][Pt] &= ~attackedBy[Us][Pt];
   }
 
   // Evaluation::pieces() scores pieces of a given color and type
@@ -923,8 +925,13 @@ namespace {
     generateAttackThreats<BLACK, BISHOP>();
     generateAttackThreats<WHITE, ROOK>();
     generateAttackThreats<BLACK, ROOK>();
+    generateAttackThreats<WHITE, QUEEN>();
+    generateAttackThreats<BLACK, QUEEN>();
     generateAttackThreats<WHITE, KING>();
     generateAttackThreats<BLACK, KING>();
+
+    attackThreatBy[WHITE][ALL_PIECES] &= ~attackedBy[WHITE][ALL_PIECES];
+    attackThreatBy[BLACK][ALL_PIECES] &= ~attackedBy[BLACK][ALL_PIECES];
 
     score += mobility[WHITE] - mobility[BLACK];
 
