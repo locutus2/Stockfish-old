@@ -347,6 +347,9 @@ namespace {
 
           attackThreatBy[Us][Pt] |= b;
           attackThreatBy[Us][ALL_PIECES] |= b;
+
+          if (Pt != KING && (b & kingRing[Them] & ~attackedBy[Us][Pt]))
+              kingAttackersWeight[Us] += KingAttackWeights[Pt] / 2;
       }
   }
 
