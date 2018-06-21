@@ -559,6 +559,10 @@ namespace {
     if (thisThread == Threads.main())
         static_cast<MainThread*>(thisThread)->check_time();
 
+    // Extend on average each 256th PV node
+    if (PvNode && !(thisThread->nodes & 0xFF))
+        depth += ONE_PLY;
+
     // Used to send selDepth info to GUI (selDepth counts from 1, ply from 0)
     if (PvNode && thisThread->selDepth < ss->ply + 1)
         thisThread->selDepth = ss->ply + 1;
