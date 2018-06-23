@@ -162,6 +162,7 @@ namespace {
   constexpr Score KingProtector[] = { S(4, 6), S(6, 3), S(1, 0), S(0, -2) };
 
   // Assorted bonuses and penalties
+  constexpr Score AttackNeighborhood = S( 10, 10);
   constexpr Score BishopPawns        = S(  3,  5);
   constexpr Score CloseEnemies       = S(  8,  0);
   constexpr Score Connectivity       = S(  3,  1);
@@ -226,6 +227,10 @@ namespace {
     // and h6. It is set to 0 when king safety evaluation is skipped.
     Bitboard kingRing[COLOR_NB];
 
+    // neighborhood[color] are the squares adjacent to a piece of the given color.
+    // King and pawns are excluded.
+    Bitboard neighborhood[COLOR_NB];
+
     // kingAttackersCount[color] is the number of pieces of the given color
     // which attack a square in the kingRing of the enemy king.
     int kingAttackersCount[COLOR_NB];
@@ -263,6 +268,7 @@ namespace {
     mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pe->pawn_attacks(Them));
 
     // Initialise attackedBy bitboards for kings and pawns
+    neighborhood[Us]     = 0;
     attackedBy[Us][KING] = pos.attacks_from<KING>(pos.square<KING>(Us));
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
@@ -318,6 +324,7 @@ namespace {
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
+        neighborhood[Us] |= DistanceRingBB[s][0];
 
         if (b & kingRing[Them])
         {
@@ -616,6 +623,13 @@ namespace {
     // Connectivity: ensure that knights, bishops, rooks, and queens are protected
     b = (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING)) & attackedBy[Us][ALL_PIECES];
     score += Connectivity * popcount(b);
+
+    // Bonus for attacking undefended squares in the neighbothood of opponent pieces
+    b =   neighborhood[Them] & ~attackedBy[Them][ALL_PIECES]
+       & ~neighborhood[Us]   &  attackedBy[Us][ALL_PIECES]
+       & (attackedBy2[Us]    | ~attackedBy[Us][PAWN])
+       & ~pos.pieces();
+    score += AttackNeighborhood * popcount(b);
 
     if (T)
         Trace::add(THREAT, Us, score);
