@@ -324,7 +324,7 @@ namespace {
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
-        neighborhood[Us] |= DistanceRingBB[s][0];
+        neighborhood[Us] |= DistanceRingBB[s][0] | DistanceRingBB[s][1];
 
         if (b & kingRing[Them])
         {
