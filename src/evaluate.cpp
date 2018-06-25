@@ -23,6 +23,7 @@
 #include <cstring>   // For std::memset
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 #include "bitboard.h"
 #include "evaluate.h"
@@ -170,6 +171,7 @@ namespace {
   constexpr Score HinderPassedPawn   = S(  5, -1);
   constexpr Score KnightOnQueen      = S( 21, 11);
   constexpr Score LongDiagonalBishop = S( 22,  0);
+  constexpr Score LowMobility        = S( 10, 10);
   constexpr Score MinorBehindPawn    = S( 16,  0);
   constexpr Score Overload           = S( 10,  5);
   constexpr Score PawnlessFlank      = S( 20, 80);
@@ -624,6 +626,9 @@ namespace {
     b = (pos.pieces(Us) ^ pos.pieces(Us, PAWN, KING)) & attackedBy[Us][ALL_PIECES];
     score += Connectivity * popcount(b);
 
+    // Quadratic bonus for opponent low mobility pieces
+    score += LowMobility * lowMobilityCount[Them] * lowMobilityCount[Them];
+
     if (T)
         Trace::add(THREAT, Us, score);
 
@@ -771,15 +776,11 @@ namespace {
   template<Tracing T>
   Score Evaluation<T>::initiative(Value eg) const {
 
-    Color strongSide = eg > VALUE_ZERO ? WHITE : BLACK;
-
     int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
 
     bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
                             && (pos.pieces(PAWN) & KingSide);
-
-    int betterMobility = lowMobilityCount[~strongSide] - lowMobilityCount[strongSide];
 
     // Compute the initiative bonus for the attacking side
     int complexity =   8 * pe->pawn_asymmetry()
@@ -787,7 +788,6 @@ namespace {
                     + 12 * outflanking
                     + 16 * pawnsOnBothFlanks
                     + 48 * !pos.non_pawn_material()
-                    + 16 * betterMobility
                     -136 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
