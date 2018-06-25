@@ -162,25 +162,26 @@ namespace {
   constexpr Score KingProtector[] = { S(4, 6), S(6, 3), S(1, 0), S(0, -2) };
 
   // Assorted bonuses and penalties
-  constexpr Score BishopPawns        = S(  3,  5);
-  constexpr Score CloseEnemies       = S(  8,  0);
-  constexpr Score Connectivity       = S(  3,  1);
-  constexpr Score CorneredBishop     = S( 50, 50);
-  constexpr Score Hanging            = S( 52, 30);
-  constexpr Score HinderPassedPawn   = S(  5, -1);
-  constexpr Score KnightOnQueen      = S( 21, 11);
-  constexpr Score LongDiagonalBishop = S( 22,  0);
-  constexpr Score MinorBehindPawn    = S( 16,  0);
-  constexpr Score Overload           = S( 10,  5);
-  constexpr Score PawnlessFlank      = S( 20, 80);
-  constexpr Score RookOnPawn         = S(  8, 24);
-  constexpr Score SliderOnQueen      = S( 42, 21);
-  constexpr Score ThreatByPawnPush   = S( 49, 30);
-  constexpr Score ThreatByRank       = S( 16,  3);
-  constexpr Score ThreatBySafePawn   = S(165,133);
-  constexpr Score TrappedRook        = S( 92,  0);
-  constexpr Score WeakQueen          = S( 50, 10);
-  constexpr Score WeakUnopposedPawn  = S(  5, 26);
+  constexpr Score BishopPawns         = S(  3,  5);
+  constexpr Score CloseEnemies        = S(  8,  0);
+  constexpr Score Connectivity        = S(  3,  1);
+  constexpr Score CorneredBishop      = S( 50, 50);
+  constexpr Score Hanging             = S( 52, 30);
+  constexpr Score HinderPassedPawn    = S(  5, -1);
+  constexpr Score KnightOnQueen       = S( 21, 11);
+  constexpr Score LongDiagonalBishop  = S( 22,  0);
+  constexpr Score MinorBehindPawn     = S( 16,  0);
+  constexpr Score Overload            = S( 10,  5);
+  constexpr Score PawnlessFlank       = S( 20, 80);
+  constexpr Score ProtectedPassedPawn = S( 10, 10);
+  constexpr Score RookOnPawn          = S(  8, 24);
+  constexpr Score SliderOnQueen       = S( 42, 21);
+  constexpr Score ThreatByPawnPush    = S( 49, 30);
+  constexpr Score ThreatByRank        = S( 16,  3);
+  constexpr Score ThreatBySafePawn    = S(165,133);
+  constexpr Score TrappedRook         = S( 92,  0);
+  constexpr Score WeakQueen           = S( 50, 10);
+  constexpr Score WeakUnopposedPawn   = S(  5, 26);
 
 #undef S
 
@@ -654,6 +655,9 @@ namespace {
         int w = PassedDanger[r];
 
         Score bonus = PassedRank[r];
+
+        if (r > RANK_5 && pos.pawn_passed(Us, s) && (attackedBy[Us][PAWN] & s))
+            score += ProtectedPassedPawn;
 
         if (w)
         {
