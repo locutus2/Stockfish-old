@@ -334,7 +334,7 @@ namespace {
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
-        if (MobilityBonus[Pt - 2][mob] <= 0)
+        if (mob == 0)
             ++lowMobilityCount[Us];
 
         // Penalty if the piece is far from the king
