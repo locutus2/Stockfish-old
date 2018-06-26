@@ -106,7 +106,7 @@ namespace {
   Value value_from_tt(Value v, int ply);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus);
+  void update_quiet_stats(const Position& pos, Stack* ss, Move move, Move* quiets, int quietsCnt, int bonus, int deepBonus);
   void update_capture_stats(const Position& pos, Move move, Move* captures, int captureCnt, int bonus);
 
   inline bool gives_check(const Position& pos, Move move) {
@@ -622,7 +622,7 @@ namespace {
             if (ttValue >= beta)
             {
                 if (!pos.capture_or_promotion(ttMove))
-                    update_quiet_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth));
+                    update_quiet_stats(pos, ss, ttMove, nullptr, 0, stat_bonus(depth), stat_bonus(depth / 2));
 
                 // Extra penalty for a quiet TT move in previous ply when it gets refuted
                 if ((ss-1)->moveCount == 1 && !pos.captured_piece())
@@ -633,6 +633,7 @@ namespace {
             {
                 int penalty = -stat_bonus(depth);
                 thisThread->mainHistory[us][from_to(ttMove)] << penalty;
+                thisThread->deepMainHistory[us][from_to(ttMove)] << -stat_bonus(depth / 2);
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
@@ -685,6 +686,8 @@ namespace {
             }
         }
     }
+
+    const ButterflyHistory& mainHistory = (depth > 17 * ONE_PLY ? thisThread->deepMainHistory : thisThread->mainHistory);
 
     // Step 6. Static evaluation of the position
     if (inCheck)
@@ -838,7 +841,7 @@ moves_loop: // When in check, search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
+    MovePicker mp(pos, ttMove, depth, &mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
@@ -1016,7 +1019,7 @@ moves_loop: // When in check, search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
-              ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+              ss->statScore =  mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
@@ -1154,7 +1157,8 @@ moves_loop: // When in check, search starts from here
         // Quiet best move: update move sorting heuristics
         if (!pos.capture_or_promotion(bestMove))
             update_quiet_stats(pos, ss, bestMove, quietsSearched, quietCount,
-                               stat_bonus(depth + (bestValue > beta + PawnValueMg ? ONE_PLY : DEPTH_ZERO)));
+                               stat_bonus(depth + (bestValue > beta + PawnValueMg ? ONE_PLY : DEPTH_ZERO)),
+                               stat_bonus((depth + (bestValue > beta + PawnValueMg ? ONE_PLY : DEPTH_ZERO)) / 2));
         else
             update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth + ONE_PLY));
 
@@ -1463,7 +1467,7 @@ moves_loop: // When in check, search starts from here
   // update_quiet_stats() updates move sorting heuristics when a new quiet best move is found
 
   void update_quiet_stats(const Position& pos, Stack* ss, Move move,
-                          Move* quiets, int quietsCnt, int bonus) {
+                          Move* quiets, int quietsCnt, int bonus, int deepBonus) {
 
     if (ss->killers[0] != move)
     {
@@ -1474,6 +1478,7 @@ moves_loop: // When in check, search starts from here
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
     thisThread->mainHistory[us][from_to(move)] << bonus;
+    thisThread->deepMainHistory[us][from_to(move)] << deepBonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
@@ -1486,6 +1491,7 @@ moves_loop: // When in check, search starts from here
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
+        thisThread->deepMainHistory[us][from_to(quiets[i])] << -deepBonus;
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }
