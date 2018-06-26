@@ -687,7 +687,7 @@ namespace {
         }
     }
 
-    const ButterflyHistory& mainHistory = (depth > 16 * ONE_PLY ? thisThread->deepMainHistory : thisThread->mainHistory);
+    const ButterflyHistory& mainHistory = (depth > 15 * ONE_PLY ? thisThread->deepMainHistory : thisThread->mainHistory);
 
     // Step 6. Static evaluation of the position
     if (inCheck)
