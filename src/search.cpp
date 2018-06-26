@@ -554,7 +554,7 @@ namespace {
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
-    forcePositiveUpdate = ss->ply <= 1;
+    forcePositiveUpdate = PvNode && ss->ply <= 1;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
