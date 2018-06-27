@@ -687,8 +687,6 @@ namespace {
         }
     }
 
-    const ButterflyHistory& mainHistory = (depth > 15 * ONE_PLY ? thisThread->deepMainHistory : thisThread->mainHistory);
-
     // Step 6. Static evaluation of the position
     if (inCheck)
     {
@@ -838,6 +836,7 @@ namespace {
 
 moves_loop: // When in check, search starts from here
 
+    const ButterflyHistory& mainHistory = (depth > 13 * ONE_PLY ? thisThread->deepMainHistory : thisThread->mainHistory);
     const PieceToHistory* contHist[] = { (ss-1)->contHistory, (ss-2)->contHistory, nullptr, (ss-4)->contHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
