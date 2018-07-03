@@ -1451,6 +1451,8 @@ moves_loop: // When in check, search starts from here
     
       if (pos.capture_or_promotion(move))
           captureHistory[moved_piece][to_sq(move)][captured] << bonus;
+      else
+          bonus /= 2;
 
       // Decrease all the other played capture moves
       for (int i = 0; i < captureCnt; ++i)
