@@ -1452,7 +1452,7 @@ moves_loop: // When in check, search starts from here
       if (pos.capture_or_promotion(move))
           captureHistory[moved_piece][to_sq(move)][captured] << bonus;
       else
-          bonus = std::min(10272, bonus * 9 / 8);
+          bonus = std::min(10272, bonus * 5 / 4);
 
       // Decrease all the other played capture moves
       for (int i = 0; i < captureCnt; ++i)
