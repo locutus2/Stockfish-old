@@ -1484,11 +1484,16 @@ moves_loop: // When in check, search starts from here
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
 
-    // Decrease all the other played quiet moves
-    for (int i = 0; i < quietsCnt; ++i)
+    if (quietsCnt > 0)
     {
-        thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
-        update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        bonus /= quietsCnt;
+
+        // Decrease all the other played quiet moves
+        for (int i = 0; i < quietsCnt; ++i)
+        {
+            thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
+            update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+        }
     }
   }
 
