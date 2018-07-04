@@ -251,10 +251,9 @@ void MainThread::search() {
       for (Thread* th : Threads)
       {
           votes[th->rootMoves[0]] +=  double(th->rootMoves[0].score) + std::log(int(th->completedDepth) + 1)  - std::log(++ct);
-          double votesDiff  = votes[th->rootMoves[0]] - votes[bestThread->rootMoves[0]];
 
-          // Select the thread with the best score, always if it is a mate
-          if (votesDiff > 0)
+          // Select the thread with the most votes
+          if (votes[th->rootMoves[0]] > votes[bestThread->rootMoves[0]])
               bestThread = th;
       }
   }
