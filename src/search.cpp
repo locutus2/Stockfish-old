@@ -1484,7 +1484,7 @@ moves_loop: // When in check, search starts from here
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
 
-    bonus = std::max(1, bonus - quietsCnt / 2);
+    bonus = std::max(bonus / 2, bonus - quietsCnt + 1);
 
     // Decrease all the other played quiet moves
     for (int i = 0; i < quietsCnt; ++i)
