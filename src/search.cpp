@@ -246,17 +246,19 @@ void MainThread::search() {
       && !Skill(Options["Skill Level"]).enabled()
       &&  rootMoves[0].pv[0] != MOVE_NONE)
   {
+      std::map<Search::RootMove, double> votes;
+      int ct = 0;
       for (Thread* th : Threads)
       {
-          Depth depthDiff = th->completedDepth - bestThread->completedDepth;
-          Value scoreDiff = th->rootMoves[0].score - bestThread->rootMoves[0].score;
+          votes[th->rootMoves[0]] +=  double(th->rootMoves[0].score) + std::log(int(th->completedDepth) + 1)  - std::log(++ct);
+          double votesDiff  = votes[th->rootMoves[0]] - votes[bestThread->rootMoves[0]];
 
           // Select the thread with the best score, always if it is a mate
-          if (    scoreDiff > 0
-              && (depthDiff >= 0 || th->rootMoves[0].score >= VALUE_MATE_IN_MAX_PLY))
+          if (votesDiff > 0)
               bestThread = th;
       }
   }
+
 
   previousScore = bestThread->rootMoves[0].score;
 
