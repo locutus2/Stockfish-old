@@ -1486,7 +1486,7 @@ moves_loop: // When in check, search starts from here
 
     if (quietsCnt > 0)
     {
-        bonus /= quietsCnt;
+        bonus /= 1 + msb(quietsCnt);
 
         // Decrease all the other played quiet moves
         for (int i = 0; i < quietsCnt; ++i)
