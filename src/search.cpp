@@ -1484,16 +1484,13 @@ moves_loop: // When in check, search starts from here
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
 
-    if (quietsCnt > 0)
-    {
-        bonus /= 1 + msb(quietsCnt);
+    bonus = std::max(1, bonus - quietsCnt + 1);
 
-        // Decrease all the other played quiet moves
-        for (int i = 0; i < quietsCnt; ++i)
-        {
-            thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
-            update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
-        }
+    // Decrease all the other played quiet moves
+    for (int i = 0; i < quietsCnt; ++i)
+    {
+        thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
+        update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }
 
