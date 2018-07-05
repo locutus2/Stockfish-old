@@ -250,7 +250,7 @@ void MainThread::search() {
       int ct = 0;
       for (Thread* th : Threads)
       {
-          votes[th->rootMoves[0]] +=  std::max(0.0, double(th->rootMoves[0].score) + std::log(int(th->completedDepth) + 1)  - std::log(++ct));
+          votes[th->rootMoves[0]] +=  std::max(0, int(th->rootMoves[0].score) + int(th->completedDepth) - int(std::round(std::log(++ct))));
 
           // Select the thread with the most votes
           if (votes[th->rootMoves[0]] > votes[bestThread->rootMoves[0]])
