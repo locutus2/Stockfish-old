@@ -328,7 +328,7 @@ namespace {
         if (Pt == KNIGHT)
         {
             int forwardMob = 2 * popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s));
-            mobility[Us] += (MobilityBonus[Pt - 2][forwardMob] * 3 + MobilityBonus[Pt - 2][mob]) / 4;
+            mobility[Us] += (MobilityBonus[Pt - 2][forwardMob] * 2 + MobilityBonus[Pt - 2][mob]) / 3;
         }
         else
             mobility[Us] += MobilityBonus[Pt - 2][mob];
