@@ -325,7 +325,7 @@ namespace {
         }
 
         if (Pt == KNIGHT)
-            mob = (  3 * popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s))
+            mob = (  2 * popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s))
                    + 7 * popcount(b & mobilityArea[Us])) / 8;
         else
             mob = popcount(b & mobilityArea[Us]);
