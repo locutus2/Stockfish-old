@@ -299,7 +299,6 @@ namespace {
     Bitboard b, bb;
     Square s;
     Score score = SCORE_ZERO;
-    int mob;
 
     attackedBy[Us][Pt] = 0;
 
@@ -324,14 +323,15 @@ namespace {
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
-        if (Pt == KNIGHT)
-            mob = (  3 * popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s))
-                   + 3 * popcount(b & mobilityArea[Us])
-                   - 1) / 4;
-        else
-            mob = popcount(b & mobilityArea[Us]);
+        int mob = popcount(b & mobilityArea[Us]);
 
-        mobility[Us] += MobilityBonus[Pt - 2][mob];
+        if (Pt == KNIGHT)
+        {
+            int forwardMob = 2 * popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s));
+            mobility[Us] += (MobilityBonus[Pt - 2][forwardMob] + MobilityBonus[Pt - 2][mob]) / 2;
+        }
+        else
+            mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
