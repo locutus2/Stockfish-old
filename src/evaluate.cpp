@@ -106,7 +106,7 @@ namespace {
       S( 22, 26), S( 29, 29), S( 36, 29) },
     { S(-48,-59), S(-20,-23), S( 16, -3), S( 26, 13), S( 38, 24), S( 51, 42), // Bishops
       S( 55, 54), S( 63, 57), S( 63, 65), S( 68, 73), S( 81, 78), S( 81, 86),
-      S( 91, 88), S( 98, 97) },
+      S( 91, 88), S( 98, 97), S(101,101) },
     { S(-58,-76), S(-27,-18), S(-15, 28), S(-10, 55), S( -5, 69), S( -2, 82), // Rooks
       S(  9,112), S( 16,118), S( 30,132), S( 29,142), S( 32,155), S( 38,165),
       S( 46,166), S( 48,169), S( 58,171) },
@@ -325,10 +325,10 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
-        if (Pt == KNIGHT)
+        if (Pt == BISHOP || Pt == KNIGHT)
         {
             int forwardMob = 2 * popcount(b & mobilityArea[Us] & forward_ranks_bb(Us, s));
-            mobility[Us] += (MobilityBonus[Pt - 2][forwardMob] * 2 + MobilityBonus[Pt - 2][mob]) / 3;
+            mobility[Us] += (MobilityBonus[Pt - 2][forwardMob] + MobilityBonus[Pt - 2][mob]) / 2;
         }
         else
             mobility[Us] += MobilityBonus[Pt - 2][mob];
