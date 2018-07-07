@@ -153,7 +153,7 @@ void MonteCarlo::create_root() {
     // Prepare the stack to go down and up in the game tree
     std::memset(stackBuffer, 0, sizeof(stackBuffer));
     for (int i = -4; i <= MAX_PLY + 2; i++)
-      stack[i].contHistory = &(pos.this_thread()->contHistory[NO_PIECE][0]); // Use as sentinel
+      stack[i].contHistory = pos.this_thread()->contHistory[NO_PIECE][0].get(); // Use as sentinel
 
     // TODO : what to do with killers ???
 
@@ -535,7 +535,7 @@ void MonteCarlo::do_move(Move m) {
 
     stack[ply].ply         = ply;
     stack[ply].currentMove = m;
-    stack[ply].contHistory = &(pos.this_thread()->contHistory[pos.moved_piece(m)][to_sq(m)]);
+    stack[ply].contHistory = pos.this_thread()->contHistory[pos.moved_piece(m)][to_sq(m)].get();
 
     pos.do_move(m, states[ply]);
 
