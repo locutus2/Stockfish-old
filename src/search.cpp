@@ -1033,7 +1033,7 @@ moves_loop: // When in check, search starts from here
               int statDiff =  (*contHist[0])[movedPiece][to_sq(move)] - (*contHist[0])[NO_PIECE][0]
                             + (*contHist[1])[movedPiece][to_sq(move)] - (*contHist[1])[NO_PIECE][0]
                             + (*contHist[3])[movedPiece][to_sq(move)] - (*contHist[3])[NO_PIECE][0];
-              r -= statDiff / 20000 * ONE_PLY;
+              r -= (statDiff + 15000) / 20000 * ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
