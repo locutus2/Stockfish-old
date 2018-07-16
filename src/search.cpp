@@ -544,13 +544,14 @@ namespace {
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
-    Piece movedPiece;
+    Piece movedPiece, lastCapturedPiece;
     int moveCount, captureCount, quietCount;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
     Color us = pos.side_to_move();
+    lastCapturedPiece = pos.captured_piece();
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
@@ -993,13 +994,6 @@ moves_loop: // When in check, search starts from here
           }
           else
           {
-              // Decrease reduction if contHistory[0] of move order prevMove/currentMove
-              // is significant better than the opposite
-              if(   !pos.captured_piece()
-                 &&  is_ok((ss-1)->currentMove)
-                 && (*contHist[0])[movedPiece][to_sq(move)] > 30000 + (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq])
-                  r -= ONE_PLY;
-
               // Decrease reduction if opponent's move count is high (~5 Elo)
               if ((ss-1)->moveCount > 15)
                   r -= ONE_PLY;
@@ -1044,7 +1038,7 @@ moves_loop: // When in check, search starts from here
                   && is_ok((ss-3)->currentMove)
                   && is_ok((ss-2)->currentMove)
                   && is_ok((ss-1)->currentMove)
-                  && !pos.captured_piece()
+                  && !lastCapturedPiece
                   && contHistScore >  (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq]
                                     + (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(to_sq((ss-2)->currentMove))][to_sq((ss-2)->currentMove)]
                                     + (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(to_sq((ss-4)->currentMove))][to_sq((ss-4)->currentMove)]
