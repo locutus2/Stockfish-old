@@ -309,14 +309,11 @@ namespace {
                : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
                               : pos.attacks_from<Pt>(s);
 
-        if (Pt == BISHOP)
-            bb = attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Them, ROOK));
-
         if (pos.blockers_for_king(Us) & s)
-        {
             b  &= LineBB[pos.square<KING>(Us)][s];
-            bb &= LineBB[pos.square<KING>(Us)][s];
-        }
+
+        else if (Pt == BISHOP)
+            bb = attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Them, ROOK));
 
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
