@@ -1023,10 +1023,12 @@ moves_loop: // When in check, search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
+              int contHistScore =  (*contHist[0])[movedPiece][to_sq(move)]
+                                 + (*contHist[1])[movedPiece][to_sq(move)]
+                                 + (*contHist[3])[movedPiece][to_sq(move)];
+
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
-                             + (*contHist[0])[movedPiece][to_sq(move)]
-                             + (*contHist[1])[movedPiece][to_sq(move)]
-                             + (*contHist[3])[movedPiece][to_sq(move)]
+                             + contHistScore
                              - 4000;
 
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
@@ -1035,6 +1037,19 @@ moves_loop: // When in check, search starts from here
 
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
+
+              // Decrease reduction if combined contHistories of current move order
+              // is significant better than for the opposite direction
+              if (   is_ok((ss-4)->currentMove)
+                  && is_ok((ss-3)->currentMove)
+                  && is_ok((ss-2)->currentMove)
+                  && is_ok((ss-1)->currentMove)
+                  && !pos.captured_piece()
+                  && contHistScore >  (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq]
+                                    + (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(to_sq((ss-2)->currentMove))][to_sq((ss-2)->currentMove)]
+                                    + (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(to_sq((ss-4)->currentMove))][to_sq((ss-4)->currentMove)]
+                                    + 50000)
+                  r -= ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
