@@ -1035,8 +1035,8 @@ moves_loop: // When in check, search starts from here
               if(   !lastCapturedPiece
                  &&  is_ok((ss-1)->currentMove))
                   r -= (  (*contHist[0])[movedPiece][to_sq(move)]
-                        - (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq])
-                       / 30000 * ONE_PLY;
+                        - (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq]
+                        + 3000) / 30000 * ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
