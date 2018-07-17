@@ -998,13 +998,6 @@ moves_loop: // When in check, search starts from here
               if ((ss-1)->moveCount > 15)
                   r -= ONE_PLY;
 
-              // Decrease reduction if contHistory[0] of move order prevMove/currentMove
-              // is significant better than the opposite
-              else if(   !lastCapturedPiece
-                      &&  is_ok((ss-1)->currentMove)
-                      && (*contHist[0])[movedPiece][to_sq(move)] > 30000 + (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq])
-                  r -= ONE_PLY;
-
               // Decrease reduction for exact PV nodes (~0 Elo)
               if (pvExact)
                   r -= ONE_PLY;
@@ -1036,6 +1029,14 @@ moves_loop: // When in check, search starts from here
 
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
+
+              // Decrease/increase reduction if contHistory[0] of move order prevMove/currentMove
+              // is better/worse than the opposite
+              if(   !lastCapturedPiece
+                 &&  is_ok((ss-1)->currentMove))
+                  r -= (  (*contHist[0])[movedPiece][to_sq(move)]
+                        - (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq])
+                       / 30000 * ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r = std::max(DEPTH_ZERO, (r / ONE_PLY - ss->statScore / 20000) * ONE_PLY);
