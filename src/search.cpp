@@ -996,7 +996,7 @@ moves_loop: // When in check, search starts from here
           {
               // Decrease reduction if contHistory[0] of move order prevMove/currentMove
               // is significant better than the opposite
-              if(   (ss-1)->moveCount == 1
+              if(    depth >= 12 * ONE_PLY
                  && !lastCapturedPiece
                  &&  is_ok((ss-1)->currentMove)
                  && (*contHist[0])[movedPiece][to_sq(move)] > 30000 + (*thisThread->contHistory[movedPiece][to_sq(move)].get())[pos.piece_on(prevSq)][prevSq])
