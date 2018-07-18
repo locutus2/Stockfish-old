@@ -59,7 +59,7 @@ namespace {
 /// ordering is at the current node.
 
 /// MovePicker constructor for the main search
-MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const ButterflyHistory* mch,
+MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const MoveCountHistory* mch,
                        const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers)
            : pos(p), mainHistory(mh), moveCountHistory(mch), captureHistory(cph), contHistory(ch),
              refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d) {
