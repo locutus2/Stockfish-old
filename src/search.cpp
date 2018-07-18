@@ -986,7 +986,10 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           // Decrease reduction if move gives check adjacent to opponent king
-          if (givesCheck && (pos.checkers() & nearOppKing & to_sq(move)))
+          // and the checking piece only atacked by the opponent king
+          if (    givesCheck
+              && (pos.checkers() & nearOppKing & to_sq(move))
+              && !more_than_one(pos.attackers_to(to_sq(move))))
               r -= ONE_PLY;
 
           if (captureOrPromotion) // (~5 Elo)
