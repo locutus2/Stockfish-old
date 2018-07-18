@@ -87,7 +87,7 @@ namespace {
 
   // History and stats update bonus, based on move count
   int stat_bonus2(int mc) {
-    return 20 * mc;
+    return 10 * mc;
   }
 
   // Skill structure is used to implement strength limit
