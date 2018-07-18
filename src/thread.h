@@ -70,6 +70,7 @@ public:
   Depth rootDepth, completedDepth;
   CounterMoveHistory counterMoves;
   ButterflyHistory mainHistory;
+  MoveCountHistory moveCountHistory;
   CapturePieceToHistory captureHistory;
   ContinuationHistory contHistory;
   Score contempt;

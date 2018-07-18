@@ -86,6 +86,7 @@ enum StatsParams { NOT_USED = 0 };
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see chessprogramming.wikispaces.com/Butterfly+Boards
 typedef Stats<int16_t, 10368, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
+typedef Stats<int16_t, 10368, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> MoveCountHistory;
 
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
 /// move, see chessprogramming.wikispaces.com/Countermove+Heuristic
@@ -121,6 +122,7 @@ public:
                                            const CapturePieceToHistory*,
                                            Square);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*,
+                                           const MoveCountHistory*,
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
                                            Move,
@@ -135,6 +137,7 @@ private:
 
   const Position& pos;
   const ButterflyHistory* mainHistory;
+  const MoveCountHistory* moveCountHistory;
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** contHistory;
   Move ttMove;
