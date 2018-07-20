@@ -82,7 +82,8 @@ namespace {
   // History and stats update bonus, based on depth
   int stat_bonus(Depth depth) {
     int d = depth / ONE_PLY;
-    return d > 17 ? 0 : 32 * d * d + 64 * d - 64;
+    return d < 18 ? (77 - d) * d * d / 2 + 64 * d - 64 :
+           d < 19 ? 10272 : 0;
   }
 
   // Skill structure is used to implement strength limit
