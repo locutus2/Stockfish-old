@@ -84,7 +84,7 @@ namespace {
     int d = depth / ONE_PLY;
     int rd = std::min(20, rootDepth / ONE_PLY);
     return d < 18 ? (61 + rd - d) * d * d / 2 + 64 * d - 64 :
-           d < 19 ? 10272 : 0;
+           d < 20 ? 10272 : 0;
   }
 
   // Skill structure is used to implement strength limit
