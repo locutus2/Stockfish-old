@@ -489,9 +489,14 @@ void Thread::search() {
                       Threads.stop = true;
               }
           }
-        if (mainThread && !Threads.stop)
-		   playout(lastBestMove, ss);
-          
+
+      for (const RootMove &rm : rootMoves)
+      {
+          if (Threads.stop)
+              break;
+
+          playout(rm.pv[0], ss);
+      }
   }
 
   if (!mainThread)
@@ -530,7 +535,7 @@ Value Thread::playout(Move playMove, Stack* ss) {
     TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
 	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size() && newDepth > ONE_PLY)
 	   {
-	    playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
+	    playoutValue = -::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
 	    tte    = TT.probe(rootPos.key(), ttHit);
 	   }
     
@@ -539,7 +544,7 @@ Value Thread::playout(Move playMove, Stack* ss) {
       && ttMove != MOVE_NONE 
       && ss->ply < MAX_PLY - 2
       && abs(playoutValue) < VALUE_KNOWN_WIN)
-        playoutValue = playout(ttMove, ss+1);
+        playoutValue = -playout(ttMove, ss+1);
 
     rootPos.undo_move(playMove);
 	return playoutValue;
