@@ -280,7 +280,7 @@ void MainThread::search() {
 void Thread::search() {
 
   Stack stack[MAX_PLY+7], *ss = stack+4; // To reference from (ss-4) to (ss+2)
-  Value bestValue, alpha, beta, delta;
+  Value alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = DEPTH_ZERO;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
@@ -489,6 +489,9 @@ void Thread::search() {
                       Threads.stop = true;
               }
           }
+        if (mainThread && !Threads.stop)
+		   playout(lastBestMove, ss);
+          
   }
 
   if (!mainThread)
@@ -502,6 +505,45 @@ void Thread::search() {
                 skill.best ? skill.best : skill.pick_best(multiPV)));
 }
 
+// Playout a game, in the hope of meaningfully filling the TT beyond the horizon
+Value Thread::playout(Move playMove, Stack* ss) {
+    StateInfo st;
+    bool ttHit;
+
+    if (     Threads.stop 
+        ||  (Limits.use_time_management() && Time.elapsed() >= Time.optimum()*3/4)
+        ||  !rootPos.pseudo_legal(playMove)
+        ||  !rootPos.legal(playMove))
+        return VALUE_NONE;
+
+    if (rootPos.is_draw(ss->ply))
+        return VALUE_DRAW;
+
+    Value playoutValue = ::search<NonPV>(rootPos, ss, -VALUE_INFINITE, VALUE_INFINITE, ONE_PLY, false);
+    ss->currentMove = playMove;
+    ss->continuationHistory = continuationHistory[rootPos.moved_piece(playMove)][to_sq(playMove)].get();
+
+    rootPos.do_move(playMove, st);
+
+    (ss+1)->ply = ss->ply + 1;
+	Depth newDepth  = std::min(rootDepth - 8 * ONE_PLY, (MAX_PLY - ss->ply) * ONE_PLY);
+    TTEntry* tte    = TT.probe(rootPos.key(), ttHit);
+	if ((!ttHit || tte->depth() < newDepth) && MoveList<LEGAL>(rootPos).size() && newDepth > ONE_PLY)
+	   {
+	    playoutValue = ::search<NonPV>(rootPos, ss+1, - playoutValue,  - playoutValue + 1, newDepth, true);
+	    tte    = TT.probe(rootPos.key(), ttHit);
+	   }
+    
+    Move ttMove  = ttHit ? tte->move() : MOVE_NONE;
+    if(  ttHit 
+      && ttMove != MOVE_NONE 
+      && ss->ply < MAX_PLY - 2
+      && abs(playoutValue) < VALUE_KNOWN_WIN)
+        playoutValue = playout(ttMove, ss+1);
+
+    rootPos.undo_move(playMove);
+	return playoutValue;
+}
 
 namespace {
 
@@ -530,7 +572,6 @@ namespace {
         return qsearch<NT>(pos, ss, alpha, beta);
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
-    assert(PvNode || (alpha == beta - 1));
     assert(DEPTH_ZERO < depth && depth < DEPTH_MAX);
     assert(!(PvNode && cutNode));
     assert(depth / ONE_PLY * ONE_PLY == depth);
@@ -1114,7 +1155,6 @@ moves_loop: // When in check, search starts from here
                   alpha = value;
               else
               {
-                  assert(value >= beta); // Fail high
                   ss->statScore = 0;
                   break;
               }
