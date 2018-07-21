@@ -490,13 +490,8 @@ void Thread::search() {
               }
           }
 
-      for (const RootMove &rm : rootMoves)
-      {
-          if (Threads.stop)
-              break;
-
-          playout(rm.pv[0], ss);
-      }
+      for (int i = 0; i < std::min(2, int(rootMoves.size())) && !Threads.stop; ++i)
+          playout(rootMoves[i].pv[0], ss);
   }
 
   if (!mainThread)
