@@ -983,6 +983,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
+          if ((ss-1)->currentMove == MOVE_NULL)
+              r -= ONE_PLY;
+
           if (captureOrPromotion) // (~5 Elo)
           {
               // Decrease reduction by comparing opponent's stat score
@@ -1028,8 +1031,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              if ((ss-1)->currentMove != MOVE_NULL || ss->statScore > 0)
-                  r -= ss->statScore / 20000 * ONE_PLY;
+              r -= ss->statScore / 20000 * ONE_PLY;
           }
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
