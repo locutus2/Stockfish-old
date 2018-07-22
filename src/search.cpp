@@ -1004,7 +1004,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
-              if (cutNode)
+              if (cutNode && (ss-1)->currentMove != MOVE_NULL)
                   r += 2 * ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
@@ -1024,7 +1024,7 @@ moves_loop: // When in check, search starts from here
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
                   r -= ONE_PLY;
 
-              else if ((ss-1)->statScore >= 0 && ss->statScore < 0 && (ss-1)->currentMove != MOVE_NULL)
+              else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
