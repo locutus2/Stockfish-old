@@ -979,6 +979,7 @@ moves_loop: // When in check, search starts from here
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1
+          && (ss-1)->currentMove != MOVE_NULL
           && (!captureOrPromotion || moveCountPruning))
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
@@ -1004,7 +1005,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
-              if (cutNode && (ss-1)->currentMove != MOVE_NULL)
+              if (cutNode)
                   r += 2 * ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
