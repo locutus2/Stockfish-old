@@ -965,7 +965,7 @@ moves_loop: // When in check, search starts from here
           continue;
       }
 
-      if (move == ttMove && captureOrPromotion && (ss-1)->currentMove != MOVE_NULL)
+      if (move == ttMove && captureOrPromotion)
           ttCapture = true;
 
       // Update the current move (this must be done after singular extension search)
@@ -1024,7 +1024,7 @@ moves_loop: // When in check, search starts from here
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
                   r -= ONE_PLY;
 
-              else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
+              else if ((ss-1)->statScore >= 0 && ss->statScore < 0 && (ss-1)->currentMove != MOVE_NULL)
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
