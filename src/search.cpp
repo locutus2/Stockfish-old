@@ -882,7 +882,7 @@ moves_loop: // When in check, search starts from here
 
       moveCountPruning =   depth < 16 * ONE_PLY
                         && moveCount >=  FutilityMoveCounts[improving][depth / ONE_PLY]
-                                       + ((ss-1)->currentMove == MOVE_NULL);
+                                       + 8 * ((ss-1)->currentMove == MOVE_NULL);
 
       // Step 13. Extensions (~70 Elo)
 
