@@ -1453,7 +1453,7 @@ moves_loop: // When in check, search starts from here
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
 
     if (is_ok((ss-1)->currentMove) && is_ok((ss-2)->currentMove))
-        (*(ss-1)->twoMoveHistory)[pc][to] << bonus;
+        (*(ss-1)->twoMoveHistory)[pc][to] << bonus * 2;
   }
 
 
