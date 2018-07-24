@@ -20,6 +20,8 @@
 
 #include <algorithm> // For std::count
 #include <cassert>
+#include <iostream>
+#include <cstdlib>
 
 #include "movegen.h"
 #include "search.h"
@@ -65,6 +67,9 @@ void Thread::clear() {
       for (auto& h : to)
           h.get()->fill(0);
 
+  for (auto& h : twoMoveHistory)
+      h.get()->fill(0);
+                  
   continuationHistory[NO_PIECE][0].get()->fill(Search::CounterMovePruneThreshold - 1);
 }
 

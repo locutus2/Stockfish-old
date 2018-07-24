@@ -80,6 +80,19 @@ struct Stats<T, D, Size> : public std::array<StatsEntry<T, D>, Size> {
 /// In stats table, D=0 means that the template parameter is not used
 enum StatsParams { NOT_USED = 0 };
 
+template <int Size, typename T>
+struct TwoMoveHistoryStats : public Stats<T, NOT_USED, Size> {
+
+    typedef T History;
+
+    std::hash<int> hash_fn;
+
+    T* get(Piece prevPc, Square prevSq, Piece pc, Square sq) { 
+        unsigned index = hash_fn(64 * 16 * 64 * prevPc + 16 * 64 * prevSq + 64 * pc + sq);
+        return this->at(index % Size).get();
+    }
+};
+
 
 /// ButterflyHistory records how often quiet moves have been successful or
 /// unsuccessful during the current search, and is used for reduction and move
@@ -102,6 +115,7 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
+typedef TwoMoveHistoryStats<16 * 1024, PieceToHistory> TwoMoveHistory;
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a

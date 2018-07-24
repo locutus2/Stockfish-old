@@ -290,7 +290,10 @@ void Thread::search() {
 
   std::memset(ss-4, 0, 7 * sizeof(Stack));
   for (int i = 4; i > 0; i--)
+  {
      (ss-i)->continuationHistory = this->continuationHistory[NO_PIECE][0].get(); // Use as sentinel
+     (ss-i)->twoMoveHistory = this->twoMoveHistory[0].get(); // Use as sentinel
+  }
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -588,6 +591,7 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->continuationHistory = thisThread->continuationHistory[NO_PIECE][0].get();
+    ss->twoMoveHistory = thisThread->twoMoveHistory[0].get();
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -752,6 +756,7 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = thisThread->continuationHistory[NO_PIECE][0].get();
+        ss->twoMoveHistory = thisThread->twoMoveHistory[0].get();
 
         pos.do_null_move(st);
 
@@ -803,6 +808,8 @@ namespace {
 
                 ss->currentMove = move;
                 ss->continuationHistory = thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)].get();
+                ss->twoMoveHistory = thisThread->twoMoveHistory.get(pos.piece_on(prevSq), prevSq,
+                                                                    pos.moved_piece(move), to_sq(move));
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -971,6 +978,8 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = thisThread->continuationHistory[movedPiece][to_sq(move)].get();
+      ss->twoMoveHistory = thisThread->twoMoveHistory.get(pos.piece_on(prevSq), prevSq,
+                                                          movedPiece, to_sq(move));
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
