@@ -85,10 +85,9 @@ struct TwoMoveHistoryStats : public Stats<T, NOT_USED, Size> {
 
     typedef T History;
 
-    std::hash<int> hash_fn;
-
     T* get(Piece prevPc, Square prevSq, Piece pc, Square sq) { 
-        unsigned index = hash_fn(64 * 16 * 64 * prevPc + 16 * 64 * prevSq + 64 * pc + sq);
+        unsigned index = 64 * 16 * 64 * prevPc + 16 * 64 * prevSq + 64 * pc + sq;
+        index += (index << 22) ^ (index >> 10);
         return this->at(index % Size).get();
     }
 };
