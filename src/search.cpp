@@ -82,7 +82,7 @@ namespace {
   // History and stats update bonus, based on depth
   int stat_bonus(Depth depth) {
     int d = depth / ONE_PLY;
-    return d > 17 ? 0 : 32 * d * d + 64 * d - 64;
+    return d > 17 ? 0 : 16 * d * d + 32 * d - 32;
   }
 
   // Skill structure is used to implement strength limit
@@ -1437,6 +1437,8 @@ moves_loop: // When in check, search starts from here
   // by moves at ply -1, -2, and -4 with current move.
 
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus) {
+
+    bonus *= 2;
 
     for (int i : {1, 2, 4})
         if (is_ok((ss-i)->currentMove))
