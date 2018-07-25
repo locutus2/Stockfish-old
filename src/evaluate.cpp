@@ -567,7 +567,8 @@ namespace {
 
     // Our safe or protected pawns
     b =   pos.pieces(Us, PAWN)
-       & (~attackedBy[Them][ALL_PIECES] | attackedBy[Us][ALL_PIECES]);
+       & (~attackedBy[Them][ALL_PIECES] | attackedBy[Us][ALL_PIECES])
+       & ~pos.blockers_for_king(Us);
 
     safeThreats = pawn_attacks_bb<Us>(b) & nonPawnEnemies;
     score += ThreatBySafePawn * popcount(safeThreats);
