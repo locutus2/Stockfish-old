@@ -521,15 +521,15 @@ namespace {
 
     // Squares strongly protected by the enemy, either because they defend the
     // square with a pawn, or because they defend the square twice and we don't.
-    stronglyProtected =  attackedBy[Them][PAWN]
-                       | (attackedBy2[Them] & ~attackedBy2[Us]);
+    stronglyProtected = (   attackedBy[Them][PAWN]
+                         | (attackedBy2[Them] & ~attackedBy2[Us]))
+                        & ~pos.blockers_for_king(Them);
 
     // Non-pawn enemies, strongly protected
     defended = nonPawnEnemies & stronglyProtected;
 
     // Enemies not strongly protected and under our attack
-    weak =   pos.pieces(Them) & attackedBy[Us][ALL_PIECES]
-           & (~stronglyProtected | pos.blockers_for_king(Them));
+    weak = pos.pieces(Them) & ~stronglyProtected & attackedBy[Us][ALL_PIECES];
 
     // Bonus according to the kind of attacking pieces
     if (defended | weak)
