@@ -249,8 +249,8 @@ namespace {
     constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
     constexpr Bitboard LowRanks = (Us == WHITE ? Rank2BB | Rank3BB: Rank7BB | Rank6BB);
 
-    // Find our pawns that are blocked, on the first two ranks or are pinned
-    Bitboard b = pos.pieces(Us, PAWN) & (shift<Down>(pos.pieces()) | LowRanks | pos.blockers_for_king(Us));
+    // Find our pawns that are blocked or on the first two ranks and our pinned pieces
+    Bitboard b = (pos.pieces(Us, PAWN) & (shift<Down>(pos.pieces()) | LowRanks)) | pos.blockers_for_king(Us);
 
     // Squares occupied by those pawns, by our king or queen, or controlled by enemy pawns
     // are excluded from the mobility area.
