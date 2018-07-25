@@ -537,18 +537,24 @@ namespace {
         while (b)
         {
             Square s = pop_lsb(&b);
-            score += ThreatByMinor[type_of(pos.piece_on(s))] * (pos.blockers_for_king(Them) & s ? 2 : 1);
+            score += ThreatByMinor[type_of(pos.piece_on(s))];
             if (type_of(pos.piece_on(s)) != PAWN)
                 score += ThreatByRank * (int)relative_rank(Them, s);
+
+            else if (pos.blockers_for_king(Them) & s)
+                score += ThreatByRank;
         }
 
         b = weak & attackedBy[Us][ROOK];
         while (b)
         {
             Square s = pop_lsb(&b);
-            score += ThreatByRook[type_of(pos.piece_on(s))] * (pos.blockers_for_king(Them) & s ? 2 : 1);
+            score += ThreatByRook[type_of(pos.piece_on(s))];
             if (type_of(pos.piece_on(s)) != PAWN)
                 score += ThreatByRank * (int)relative_rank(Them, s);
+
+            else if (pos.blockers_for_king(Them) & s)
+                score += ThreatByRank;
         }
 
         if (weak & attackedBy[Us][KING])
