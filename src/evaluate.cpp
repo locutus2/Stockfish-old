@@ -513,7 +513,7 @@ namespace {
     constexpr Direction Up       = (Us == WHITE ? NORTH   : SOUTH);
     constexpr Bitboard  TRank3BB = (Us == WHITE ? Rank3BB : Rank6BB);
 
-    Bitboard b, weak, defended, nonPawnEnemies, stronglyProtected, safeThreats;
+    Bitboard b, blocker, weak, defended, nonPawnEnemies, stronglyProtected, safeThreats;
     Score score = SCORE_ZERO;
 
     // Non-pawn enemies
@@ -578,8 +578,9 @@ namespace {
     score += ThreatBySafePawn * popcount(safeThreats);
 
     // Find squares where our pawns can push on the next move
-    b  = shift<Up>(pos.pieces(Us, PAWN)) & ~(pos.pieces() ^ pos.pieces(Us, QUEEN));
-    b |= shift<Up>(b & TRank3BB) & ~(pos.pieces() ^ pos.pieces(Us, QUEEN));
+    blocker = pos.pieces() ^ (pos.pieces(Us, QUEEN) & attackedBy[Them][ALL_PIECES]);
+    b  = shift<Up>(pos.pieces(Us, PAWN)) & ~blocker;
+    b |= shift<Up>(b & TRank3BB) & ~blocker;
 
     // Keep only the squares which are relatively safe
     b &= ~attackedBy[Them][PAWN]
