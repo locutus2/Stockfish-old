@@ -635,7 +635,7 @@ namespace {
 
         assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
 
-        bb = forward_file_bb(Us, s) & (pos.pieces(Them) ^ pos.pieces(Them, PAWN));
+        bb = forward_file_bb(Us, s) & pos.pieces(Them) & ~attackedBy[Us][ALL_PIECES];
         score -= HinderPassedPawn * bool(bb);
 
         int r = relative_rank(Us, s);
