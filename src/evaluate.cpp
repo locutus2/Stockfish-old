@@ -538,10 +538,12 @@ namespace {
         {
             Square s = pop_lsb(&b);
             score += ThreatByMinor[type_of(pos.piece_on(s))];
-            if (type_of(pos.piece_on(s)) != PAWN)
+
+            if (   type_of(pos.piece_on(s)) != PAWN
+                || (pe->passed_pawns(Them) & s))
                 score += ThreatByRank * (int)relative_rank(Them, s);
 
-            else if ((pos.blockers_for_king(Them) | pe->passed_pawns(Them)) & s)
+            else if (pos.blockers_for_king(Them) & s)
                 score += ThreatByRank * (int)relative_rank(Them, s) / 2;
         }
 
@@ -550,6 +552,7 @@ namespace {
         {
             Square s = pop_lsb(&b);
             score += ThreatByRook[type_of(pos.piece_on(s))];
+
             if (type_of(pos.piece_on(s)) != PAWN)
                 score += ThreatByRank * (int)relative_rank(Them, s);
 
