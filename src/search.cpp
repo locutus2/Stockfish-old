@@ -1311,7 +1311,6 @@ moves_loop: // When in check, search starts from here
       if (   !inCheck
           && !givesCheck
           &&  futilityBase > -VALUE_KNOWN_WIN
-          &&  move != countermove
           && !pos.advanced_pawn_push(move))
       {
           assert(type_of(move) != ENPASSANT); // Due to !pos.advanced_pawn_push
@@ -1339,6 +1338,7 @@ moves_loop: // When in check, search starts from here
 
       // Don't search moves with negative SEE values
       if (  (!inCheck || evasionPrunable)
+          &&  move != countermove
           && !pos.see_ge(move))
           continue;
 
