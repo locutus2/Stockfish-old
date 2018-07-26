@@ -28,7 +28,7 @@ namespace {
     MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
     EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
-    QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QREFUTATION, QCHECK_INIT, QCHECK
+    QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK, QREFUTATION
   };
 
   // Helper filter used with select()
@@ -251,19 +251,6 @@ top:
       if (depth != DEPTH_QS_CHECKS)
           return MOVE_NONE;
 
-      // Prepare the pointers to loop over the refutations array
-      cur = std::begin(refutations);
-      endMoves = cur + 1;
-
-      ++stage;
-      /* fallthrough */
-
-  case QREFUTATION:
-      if (select<Next>([&](){ return    move != MOVE_NONE
-                                    && !pos.capture_or_promotion(move)
-                                    &&  pos.pseudo_legal(move); }))
-          return move;
-
       ++stage;
       /* fallthrough */
 
@@ -275,7 +262,21 @@ top:
       /* fallthrough */
 
   case QCHECK:
-      return select<Next>([&](){return move != refutations[0];});
+      if (select<Next>([&](){ return move != refutations[0];}))
+          return move;
+
+      // Prepare the pointers to loop over the refutations array
+      cur = std::begin(refutations);
+      endMoves = cur + 1;
+
+      ++stage;
+      /* fallthrough */
+
+  case QREFUTATION:
+      return select<Next>([&](){ return    move != MOVE_NONE
+                                       && !pos.capture_or_promotion(move)
+                                       &&  pos.pseudo_legal(move); });
+
   }
 
   assert(false);
