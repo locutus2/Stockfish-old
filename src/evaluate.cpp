@@ -578,7 +578,9 @@ namespace {
     score += ThreatBySafePawn * popcount(safeThreats);
 
     // Find squares where our pawns can push on the next move
-    blocker = pos.pieces() ^ (pos.pieces(Them, QUEEN) & attackedBy[Us][ALL_PIECES]);
+    blocker = pos.pieces() ^ (   pos.pieces(Them, QUEEN)
+                              &  attackedBy[Us][ALL_PIECES]
+                              & ~attackedBy[Us][QUEEN]);
     b  = shift<Up>(pos.pieces(Us, PAWN)) & ~blocker;
     b |= shift<Up>(b & TRank3BB) & ~blocker;
 
