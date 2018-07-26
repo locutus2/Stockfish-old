@@ -542,7 +542,7 @@ namespace {
                 score += ThreatByRank * (int)relative_rank(Them, s);
 
             else if (pos.blockers_for_king(Them) & s)
-                score += ThreatByRank * (int)relative_rank(Them, s) / 2;
+                score += ThreatByRank;
         }
 
         b = weak & attackedBy[Us][ROOK];
@@ -554,7 +554,7 @@ namespace {
                 score += ThreatByRank * (int)relative_rank(Them, s);
 
             else if (pos.blockers_for_king(Them) & s)
-                score += ThreatByRank * (int)relative_rank(Them, s) / 2;
+                score += ThreatByRank;
         }
 
         if (weak & attackedBy[Us][KING])
