@@ -26,7 +26,7 @@ namespace {
 
   enum Stages {
     MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
-    EVASION_TT, EVASION_INIT, EVASION,
+    EVASION_TT, EVASION_REFUTATION_INIT, EVASION_REFUTATION, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
     QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
   };
@@ -66,15 +66,23 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 
   assert(d > DEPTH_ZERO);
 
-  stage = pos.checkers() ? EVASION_TT : MAIN_TT;
+  if (pos.checkers())
+  {
+      stage = EVASION_TT;
+      refutations[0] = MOVE_NONE;
+  }
+  else
+      stage = MAIN_TT;
+
   ttMove = ttm && pos.pseudo_legal(ttm) ? ttm : MOVE_NONE;
   stage += (ttMove == MOVE_NONE);
 }
 
 /// MovePicker constructor for quiescence search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Square rs)
-           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), recaptureSquare(rs), depth(d) {
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move crm, Square rs)
+           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
+             refutations{{crm, 0}}, recaptureSquare(rs), depth(d) {
 
   assert(d <= DEPTH_ZERO);
 
@@ -227,6 +235,22 @@ top:
   case BAD_CAPTURE:
       return select<Next>(Any);
 
+  case EVASION_REFUTATION_INIT:
+      // Prepare the pointers to loop over the refutations array
+      cur = std::begin(refutations);
+      endMoves = cur + 1;
+
+      ++stage;
+      /* fallthrough */
+
+  case EVASION_REFUTATION:
+      if (select<Next>([&](){ return   move != MOVE_NONE
+                                    && pos.pseudo_legal(move); }))
+          return move;
+
+      ++stage;
+      /* fallthrough */
+
   case EVASION_INIT:
       cur = moves;
       endMoves = generate<EVASIONS>(pos, cur);
@@ -236,7 +260,7 @@ top:
       /* fallthrough */
 
   case EVASION:
-      return select<Best>(Any);
+      return select<Best>([&](){ return move != refutations[0]; });
 
   case PROBCUT:
       return select<Best>([&](){ return pos.see_ge(move, threshold); });
@@ -247,7 +271,7 @@ top:
           return move;
 
       // If we did not find any move and we do not try checks, we have finished
-      if (depth != DEPTH_QS_CHECKS)
+      if (depth < DEPTH_QS_CHECKS)
           return MOVE_NONE;
 
       ++stage;
