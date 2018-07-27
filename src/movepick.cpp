@@ -66,22 +66,39 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 
   assert(d > DEPTH_ZERO);
 
-  stage = pos.checkers() ? EVASION_TT : MAIN_TT;
+  if (pos.checkers())
+  {
+      stage = EVASION_TT;
+      refutations[0] = MOVE_NONE;
+  }
+  else
+      stage = MAIN_TT;
+
   ttMove = ttm && pos.pseudo_legal(ttm) ? ttm : MOVE_NONE;
   stage += (ttMove == MOVE_NONE);
 }
 
 /// MovePicker constructor for quiescence search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Square rs)
-           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), recaptureSquare(rs), depth(d) {
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move crm, Square rs)
+           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
+             refutations{{crm, 0}}, recaptureSquare(rs), depth(d) {
 
   assert(d <= DEPTH_ZERO);
 
-  stage = pos.checkers() ? EVASION_TT : QSEARCH_TT;
   ttMove =    ttm
            && pos.pseudo_legal(ttm)
            && (depth > DEPTH_QS_RECAPTURES || to_sq(ttm) == recaptureSquare) ? ttm : MOVE_NONE;
+
+  if (pos.checkers())
+  {
+      stage = EVASION_TT;
+      if (ttMove == refutations[0])
+          refutations[0] = MOVE_NONE;
+  }
+  else
+      stage = QSEARCH_TT;
+
   stage += (ttMove == MOVE_NONE);
 }
 
@@ -121,7 +138,9 @@ void MovePicker::score() {
 
       else // Type == EVASIONS
       {
-          if (pos.capture(m))
+          if (m.move == refutations[0].move)
+              m.value = 1 << 28;
+          else if (pos.capture(m))
               m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
                        - Value(type_of(pos.moved_piece(m)));
           else
@@ -247,7 +266,7 @@ top:
           return move;
 
       // If we did not find any move and we do not try checks, we have finished
-      if (depth != DEPTH_QS_CHECKS)
+      if (depth < DEPTH_QS_CHECKS)
           return MOVE_NONE;
 
       ++stage;
