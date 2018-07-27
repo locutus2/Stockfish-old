@@ -1334,11 +1334,11 @@ moves_loop: // When in check, search starts from here
       evasionPrunable =    inCheck
                        &&  (depth != DEPTH_ZERO || moveCount > 2)
                        &&  bestValue > VALUE_MATED_IN_MAX_PLY
+                       &&  move != countermove
                        && !pos.capture(move);
 
       // Don't search moves with negative SEE values
       if (  (!inCheck || evasionPrunable)
-          &&  move != countermove
           && !pos.see_ge(move))
           continue;
 
