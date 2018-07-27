@@ -73,9 +73,9 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 
 /// MovePicker constructor for quiescence search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Square rs)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move* killers, Square rs)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
-             refutations{{cm, 0}}, recaptureSquare(rs), depth(d) {
+             refutations{{killers[0], 0}, {killers[1], 0}}, recaptureSquare(rs), depth(d) {
 
   assert(d <= DEPTH_ZERO);
 
@@ -253,7 +253,7 @@ top:
 
       // Prepare the pointers to loop over the refutations array
       cur = std::begin(refutations);
-      endMoves = cur + 1;
+      endMoves = cur + 2;
 
       ++stage;
       /* fallthrough */
@@ -275,7 +275,8 @@ top:
       /* fallthrough */
 
   case QCHECK:
-      return select<Next>([&](){return move != refutations[0];});
+      return select<Next>([&](){ return   move != refutations[0]
+                                       && move != refutations[1];});
   }
 
   assert(false);
