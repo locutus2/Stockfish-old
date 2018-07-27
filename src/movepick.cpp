@@ -248,7 +248,7 @@ top:
           return move;
 
       // If we did not find any move and we do not try checks, we have finished
-      if (depth != DEPTH_QS_CHECKS)
+      if (depth < DEPTH_QS_CHECKS)
           return MOVE_NONE;
 
       // Prepare the pointers to loop over the refutations array
