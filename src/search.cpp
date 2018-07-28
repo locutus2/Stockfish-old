@@ -927,9 +927,6 @@ moves_loop: // When in check, search starts from here
               // Move count based pruning (~30 Elo)
               if (moveCountPruning)
               {
-                  if (quietCount < 64)
-                      quietsSearched[quietCount++] = move;
-
                   skipQuiets = true;
                   continue;
               }
@@ -941,7 +938,13 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth <= ((ss-1)->statScore > 0 ? 3 : 2)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+              {
+                  if (quietCount < 64)
+                      quietsSearched[quietCount++] = move;
+
                   continue;
+              }
+
 
               // Futility pruning: parent node (~2 Elo)
               if (   lmrDepth < 7
