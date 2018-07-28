@@ -938,19 +938,19 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth <= ((ss-1)->statScore > 0 ? 3 : 2)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-              {
-                  if (quietCount < 64)
-                      quietsSearched[quietCount++] = move;
-
                   continue;
-              }
 
 
               // Futility pruning: parent node (~2 Elo)
               if (   lmrDepth < 7
                   && !inCheck
                   && ss->staticEval + 256 + 200 * lmrDepth <= alpha)
+              {
+                  if (quietCount < 64)
+                      quietsSearched[quietCount++] = move;
+
                   continue;
+              }
 
               // Prune moves with negative SEE (~10 Elo)
               if (!pos.see_ge(move, Value(-29 * lmrDepth * lmrDepth)))
