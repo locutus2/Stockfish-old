@@ -93,7 +93,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
   if (pos.checkers())
   {
       stage = EVASION_TT;
-      if (ttMove == refutations[0])
+      if (ttMove == refutations[0] || depth >= DEPTH_ZERO)
           refutations[0] = MOVE_NONE;
   }
   else
