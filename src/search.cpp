@@ -927,6 +927,9 @@ moves_loop: // When in check, search starts from here
               // Move count based pruning (~30 Elo)
               if (moveCountPruning)
               {
+                  if (quietCount < 64)
+                      quietsSearched[quietCount++] = move;
+
                   skipQuiets = true;
                   continue;
               }
@@ -952,12 +955,7 @@ moves_loop: // When in check, search starts from here
           }
           else if (   !extension // (~20 Elo)
                    && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY)))
-          {
-              if (captureOrPromotion && captureCount < 32)
-                  capturesSearched[captureCount++] = move;
-
-              continue;
-          }
+                  continue;
       }
 
       // Speculative prefetch as early as possible
