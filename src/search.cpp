@@ -960,10 +960,7 @@ moves_loop: // When in check, search starts from here
 
           if (pruned)
           {
-              if (captureOrPromotion && captureCount < 32)
-                  capturesSearched[captureCount++] = move;
-
-              else if (!captureOrPromotion && quietCount < 64)
+              if (!captureOrPromotion && quietCount < 64)
                   quietsSearched[quietCount++] = move;
 
               continue;
