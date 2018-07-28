@@ -920,6 +920,8 @@ moves_loop: // When in check, search starts from here
           && pos.non_pawn_material(us)
           && bestValue > VALUE_MATED_IN_MAX_PLY)
       {
+          bool pruned = false;
+
           if (   !captureOrPromotion
               && !givesCheck
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
@@ -928,31 +930,44 @@ moves_loop: // When in check, search starts from here
               if (moveCountPruning)
               {
                   skipQuiets = true;
-                  continue;
+                  pruned = true;
               }
+              else
+              {
+                  // Reduced depth of the next LMR search
+                  int lmrDepth = std::max(newDepth - reduction<PvNode>(improving, depth, moveCount), DEPTH_ZERO) / ONE_PLY;
 
-              // Reduced depth of the next LMR search
-              int lmrDepth = std::max(newDepth - reduction<PvNode>(improving, depth, moveCount), DEPTH_ZERO) / ONE_PLY;
+                  // Countermoves based pruning (~20 Elo)
+                  if (   lmrDepth <= ((ss-1)->statScore > 0 ? 3 : 2)
+                      && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
+                      && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+                      pruned = true;
 
-              // Countermoves based pruning (~20 Elo)
-              if (   lmrDepth <= ((ss-1)->statScore > 0 ? 3 : 2)
-                  && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-                  continue;
+                  // Futility pruning: parent node (~2 Elo)
+                  else if (   lmrDepth < 7
+                      && !inCheck
+                      && ss->staticEval + 256 + 200 * lmrDepth <= alpha)
+                      pruned = true;
 
-              // Futility pruning: parent node (~2 Elo)
-              if (   lmrDepth < 7
-                  && !inCheck
-                  && ss->staticEval + 256 + 200 * lmrDepth <= alpha)
-                  continue;
-
-              // Prune moves with negative SEE (~10 Elo)
-              if (!pos.see_ge(move, Value(-29 * lmrDepth * lmrDepth)))
-                  continue;
+                  // Prune moves with negative SEE (~10 Elo)
+                  else if (!pos.see_ge(move, Value(-29 * lmrDepth * lmrDepth)))
+                      pruned = true;
+              }
           }
           else if (   !extension // (~20 Elo)
                    && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY)))
-                  continue;
+                  pruned = true;
+
+          if (pruned)
+          {
+              if (captureOrPromotion && captureCount < 32)
+                  capturesSearched[captureCount++] = move;
+
+              else if (!captureOrPromotion && quietCount < 64)
+                  quietsSearched[quietCount++] = move;
+
+              continue;
+          }
       }
 
       // Speculative prefetch as early as possible
