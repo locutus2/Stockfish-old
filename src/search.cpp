@@ -166,7 +166,7 @@ void Search::init() {
   for (int d = 0; d < 16; ++d)
   {
       FutilityMoveCounts[0][d] = int(2.4 + 0.74 * pow(d, 1.78));
-      FutilityMoveCounts[1][d] = int(5.0 + 1.00 * pow(d, 2.00)) + (d < 3);
+      FutilityMoveCounts[1][d] = int(7.0 + 1.00 * pow(d, 2.00));
   }
 }
 
