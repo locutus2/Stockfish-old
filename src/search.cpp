@@ -249,7 +249,7 @@ void MainThread::search() {
       std::map<Move, int> votes;
       Value minScore = this->rootMoves[0].score;
 
-      // Find out minimum score and reset votes
+      // Find out minimum score and reset votes for moves which can be voted
       for (Thread* th: Threads){
           minScore = std::min(minScore, th->rootMoves[0].score);
           votes[th->rootMoves[0].pv[0]] = 0;
