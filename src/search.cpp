@@ -257,7 +257,7 @@ void MainThread::search() {
       for (Thread* th: Threads)
           minScore = std::min(minScore, th->rootMoves[0].score);
 
-      // Vote
+      // Vote according to score and depth
       for (Thread* th : Threads)
           votes[th->rootMoves[0]] +=  int(th->rootMoves[0].score - minScore)  + int(th->completedDepth);
 
