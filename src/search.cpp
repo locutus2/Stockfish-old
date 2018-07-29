@@ -249,13 +249,11 @@ void MainThread::search() {
       std::map<Move, int> votes;
       Value minScore = this->rootMoves[0].score;
 
-      // Reset votes
-      for (size_t moveIdx = 0; moveIdx < rootMoves.size(); ++moveIdx)
-          votes[rootMoves[moveIdx].pv[0]] = 0;
-
-      // Find out minimum score
-      for (Thread* th: Threads)
+      // Find out minimum score and reset votes
+      for (Thread* th: Threads){
           minScore = std::min(minScore, th->rootMoves[0].score);
+          votes[th->rootMoves[0].pv[0]] = 0;
+      }
 
       // Vote according to score and depth
       for (Thread* th : Threads)
