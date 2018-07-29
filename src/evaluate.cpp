@@ -249,18 +249,33 @@ namespace {
     constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
     constexpr Bitboard LowRanks = (Us == WHITE ? Rank2BB | Rank3BB: Rank7BB | Rank6BB);
 
+    // Initialise attackedBy bitboards for kings and pawns
+    Square ksq = pos.square<KING>(Us);
+    Bitboard b;
+
+    // calculate pawn attacks considering pinned pawns
+    if (pos.pieces(Us, PAWN) & pos.blockers_for_king(Us))
+    {
+        b  = pawn_attacks_bb<Us>(   pos.pieces(Us, PAWN)
+                                 & ~pos.blockers_for_king(Us));
+        b |=  pawn_attacks_bb<Us>(  pos.pieces(Us, PAWN)
+                                  & PseudoAttacks[BISHOP][ksq])
+            & PseudoAttacks[BISHOP][ksq];
+    }
+    else
+        b = pe->pawn_attacks(Us);
+
+    attackedBy[Us][PAWN] = b;
+    attackedBy[Us][KING] = pos.attacks_from<KING>(ksq);
+    attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
+    attackedBy2[Us]            = attackedBy[Us][KING] & attackedBy[Us][PAWN];
+
     // Find our pawns that are blocked or on the first two ranks
-    Bitboard b = pos.pieces(Us, PAWN) & (shift<Down>(pos.pieces()) | LowRanks);
+    b = pos.pieces(Us, PAWN) & (shift<Down>(pos.pieces()) | LowRanks);
 
     // Squares occupied by those pawns, by our king or queen, or controlled by enemy pawns
     // are excluded from the mobility area.
     mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pe->pawn_attacks(Them));
-
-    // Initialise attackedBy bitboards for kings and pawns
-    attackedBy[Us][KING] = pos.attacks_from<KING>(pos.square<KING>(Us));
-    attackedBy[Us][PAWN] = pawn_attacks_bb<Us>(pos.pieces(Us, PAWN) & ~pos.blockers_for_king(Us));
-    attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
-    attackedBy2[Us]            = attackedBy[Us][KING] & attackedBy[Us][PAWN];
 
     // Init our king safety tables only if we are going to use them
     if (pos.non_pawn_material(Them) >= RookValueMg + KnightValueMg)
