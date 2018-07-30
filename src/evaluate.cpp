@@ -771,7 +771,7 @@ namespace {
 
     // Now apply the bonus. Note that we find the attacking side by extracting
     // the sign of the endgame value.
-    int margin = ((eg > 0) - (eg < 0)) * eg_value(pos.this_thread()->contempt);
+    int margin = ((eg > 0) - (eg < 0)) * eg_value(pos.this_thread()->contempt) * 2;
     int v      = ((eg > 0) - (eg < 0)) * std::max(complexity, -abs(eg) - margin);
 
     if (T)
