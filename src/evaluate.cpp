@@ -772,7 +772,7 @@ namespace {
     // Now apply the bonus. Note that we find the attacking side by extracting
     // the sign of the endgame value.
     int margin = ((eg > 0) - (eg < 0)) * eg_value(pos.this_thread()->contempt);
-    int v      = ((eg > 0) - (eg < 0)) * std::max(complexity, -abs(eg) - std::max(margin, 0));
+    int v      = ((eg > 0) - (eg < 0)) * std::max(complexity, -abs(eg) - std::min(margin, 0));
 
     if (T)
         Trace::add(INITIATIVE, make_score(0, v));
