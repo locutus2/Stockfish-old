@@ -128,7 +128,7 @@ public:
                                            const PieceToHistory**,
                                            Move,
                                            Move*,
-										   Move);
+                                           Move);
   Move next_move(bool skipQuiets = false);
 
 private:
