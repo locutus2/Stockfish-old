@@ -837,16 +837,16 @@ moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory, nullptr, (ss-4)->continuationHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    Move cm2 = MOVE_NONE;
+    Move countermove2 = MOVE_NONE;
     if (is_ok((ss-1)->currentMove) && is_ok((ss-3)->currentMove))
-        cm2 =	thisThread->counterPlanMoves[moveHash((ss-3)->currentMove)][moveHash((ss-1)->currentMove)];
+        countermove2 = thisThread->counterPlanMoves[us][to_sq((ss-3)->currentMove)][to_sq((ss-1)->currentMove)];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      cm2);
+                                      countermove2);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
 
     skipQuiets = false;
@@ -1485,7 +1485,7 @@ moves_loop: // When in check, search starts from here
     Thread* thisThread = pos.this_thread();
 
     if (is_ok((ss-1)->currentMove) && is_ok((ss-3)->currentMove))
-        thisThread->counterPlanMoves[moveHash((ss-3)->currentMove)][moveHash((ss-1)->currentMove)] = move;
+        thisThread->counterPlanMoves[us][to_sq((ss-3)->currentMove)][to_sq((ss-1)->currentMove)] = move;
 
     thisThread->mainHistory[us][from_to(move)] << bonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);

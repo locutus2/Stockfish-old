@@ -440,10 +440,6 @@ constexpr int from_to(Move m) {
  return m & 0xFFF;
 }
 
-constexpr int moveHash(Move m) {
- return (((m >> 6) & 0x3F) + (m & 0x3F)) % SQUARE_NB;
-}
-
 constexpr MoveType type_of(Move m) {
   return MoveType(m & (3 << 14));
 }
