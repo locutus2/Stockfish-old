@@ -838,7 +838,8 @@ moves_loop: // When in check, search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory, nullptr, (ss-4)->continuationHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
     Move countermove2 = MOVE_NONE;
-    if (is_ok((ss-1)->currentMove) && is_ok((ss-3)->currentMove) && !pos.captured_piece())
+    if (    is_ok((ss-1)->currentMove) && is_ok((ss-3)->currentMove)
+        && (between_bb(from_sq((ss-1)->currentMove), to_sq((ss-1)->currentMove)) & from_sq((ss-3)->currentMove)))
         countermove2 = thisThread->counterPlanMoves[us][to_sq((ss-3)->currentMove)][to_sq((ss-1)->currentMove)];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
@@ -1484,7 +1485,8 @@ moves_loop: // When in check, search starts from here
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
 
-    if (is_ok((ss-1)->currentMove) && is_ok((ss-3)->currentMove) && !pos.captured_piece())
+    if (    is_ok((ss-1)->currentMove) && is_ok((ss-3)->currentMove)
+        && (between_bb(from_sq((ss-1)->currentMove), to_sq((ss-1)->currentMove)) & from_sq((ss-3)->currentMove)))
         thisThread->counterPlanMoves[us][to_sq((ss-3)->currentMove)][to_sq((ss-1)->currentMove)] = move;
 
     thisThread->mainHistory[us][from_to(move)] << bonus;
