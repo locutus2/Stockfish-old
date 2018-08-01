@@ -1218,6 +1218,8 @@ moves_loop: // When in check, search starts from here
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = bestMove = MOVE_NONE;
     ss->continuationHistory = thisThread->continuationHistory[NO_PIECE][0].get();
+    ss->kingHistory[WHITE] = thisThread->kingHistory[WHITE][pos.square<KING>(WHITE)].get();
+    ss->kingHistory[BLACK] = thisThread->kingHistory[BLACK][pos.square<KING>(BLACK)].get();
     inCheck = pos.checkers();
     moveCount = 0;
 
@@ -1296,6 +1298,7 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
+                                      const_cast<const PieceToHistory**>(ss->kingHistory),
                                       to_sq((ss-1)->currentMove));
 
     // Loop through the moves until no moves remain or a beta cutoff occurs

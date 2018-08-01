@@ -73,8 +73,8 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 
 /// MovePicker constructor for quiescence search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Square rs)
-           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), recaptureSquare(rs), depth(d) {
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const PieceToHistory** kh, Square rs)
+           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),  kingHistory(kh), recaptureSquare(rs), depth(d) {
 
   assert(d <= DEPTH_ZERO);
 
@@ -115,8 +115,6 @@ void MovePicker::score() {
 
       else if (Type == QUIETS)
           m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + (*kingHistory[WHITE])[pos.moved_piece(m)][to_sq(m)]
-                   + (*kingHistory[BLACK])[pos.moved_piece(m)][to_sq(m)]
                    + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)];
@@ -129,6 +127,8 @@ void MovePicker::score() {
           else
               m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
                        + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                       + (*kingHistory[WHITE])[pos.moved_piece(m)][to_sq(m)]
+                       + (*kingHistory[BLACK])[pos.moved_piece(m)][to_sq(m)]
                        - (1 << 28);
       }
 }
