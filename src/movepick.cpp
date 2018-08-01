@@ -60,7 +60,7 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const PieceToHistory* kh, Move cm, Move* killers)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const PieceToKingHistory* kh, Move cm, Move* killers)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), kingHistory(kh),
              refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d) {
 
@@ -73,7 +73,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 
 /// MovePicker constructor for quiescence search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const PieceToHistory* kh, Square rs)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const PieceToKingHistory* kh, Square rs)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),  kingHistory(kh), recaptureSquare(rs), depth(d) {
 
   assert(d <= DEPTH_ZERO);
