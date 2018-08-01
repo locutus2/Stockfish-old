@@ -61,7 +61,8 @@ void Thread::clear() {
   mainHistory.fill(0);
   captureHistory.fill(0);
 
-  for (auto& h : kingHistory)
+  for (auto& c : kingHistory)
+      for (auto& h : c)
           h.get()->fill(0);
 
   for (auto& to : continuationHistory)
