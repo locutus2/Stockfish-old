@@ -85,6 +85,11 @@ namespace {
     return d > 17 ? 0 : 33 * d * d + 66 * d - 66;
   }
 
+  int cap_stat_bonus(Depth depth) {
+    int d = depth / ONE_PLY;
+    return d > 17 ? 0 : 21 * d * d + 282 * d - 270;
+  }
+
   // Skill structure is used to implement strength limit
   struct Skill {
     explicit Skill(int l) : level(l) {}
@@ -1154,7 +1159,7 @@ moves_loop: // When in check, search starts from here
             update_quiet_stats(pos, ss, bestMove, quietsSearched, quietCount,
                                stat_bonus(depth + (bestValue > beta + PawnValueMg ? ONE_PLY : DEPTH_ZERO)));
 
-        update_capture_stats(pos, bestMove, capturesSearched, captureCount, stat_bonus(depth + ONE_PLY));
+        update_capture_stats(pos, bestMove, capturesSearched, captureCount, cap_stat_bonus(depth + ONE_PLY));
 
         // Extra penalty for a quiet TT move in previous ply when it gets refuted
         if ((ss-1)->moveCount == 1 && !pos.captured_piece())
