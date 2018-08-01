@@ -102,7 +102,7 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
-typedef Stats<int16_t, 10692, PIECE_NB, SQUARE_NB> PieceToKingHistory;
+typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToKingHistory;
 typedef Stats<PieceToKingHistory, NOT_USED, COLOR_NB, SQUARE_NB> KingHistory;
 
 
