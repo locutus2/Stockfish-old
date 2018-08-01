@@ -588,8 +588,7 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = (ss+1)->excludedMove = bestMove = MOVE_NONE;
     ss->continuationHistory = thisThread->continuationHistory[NO_PIECE][0].get();
-    ss->kingHistory[WHITE] = thisThread->kingHistory[WHITE][pos.square<KING>(WHITE)].get();
-    ss->kingHistory[BLACK] = thisThread->kingHistory[BLACK][pos.square<KING>(BLACK)].get();
+    ss->kingHistory = thisThread->kingHistory[us][pos.square<KING>(us)].get();
 
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
@@ -844,7 +843,7 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
-                                      const_cast<const PieceToHistory**>(ss->kingHistory),
+                                      ss->kingHistory,
                                       countermove,
                                       ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
@@ -1215,11 +1214,11 @@ moves_loop: // When in check, search starts from here
     }
 
     Thread* thisThread = pos.this_thread();
+    Color us = pos.side_to_move();
     (ss+1)->ply = ss->ply + 1;
     ss->currentMove = bestMove = MOVE_NONE;
     ss->continuationHistory = thisThread->continuationHistory[NO_PIECE][0].get();
-    ss->kingHistory[WHITE] = thisThread->kingHistory[WHITE][pos.square<KING>(WHITE)].get();
-    ss->kingHistory[BLACK] = thisThread->kingHistory[BLACK][pos.square<KING>(BLACK)].get();
+    ss->kingHistory = thisThread->kingHistory[us][pos.square<KING>(us)].get();
     inCheck = pos.checkers();
     moveCount = 0;
 
@@ -1298,7 +1297,7 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
-                                      const_cast<const PieceToHistory**>(ss->kingHistory),
+                                      ss->kingHistory,
                                       to_sq((ss-1)->currentMove));
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
@@ -1486,12 +1485,9 @@ moves_loop: // When in check, search starts from here
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
-    PieceToHistory * ourKing = ss->kingHistory[us];
-    PieceToHistory * theirKing = ss->kingHistory[~us];
 
     thisThread->mainHistory[us][from_to(move)] << bonus;
-    (*ourKing)[pos.moved_piece(move)][to_sq(move)] << bonus;
-    (*theirKing)[pos.moved_piece(move)][to_sq(move)] << bonus;
+    (*ss->kingHistory)[pos.moved_piece(move)][to_sq(move)] << bonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     if (is_ok((ss-1)->currentMove))
@@ -1504,8 +1500,7 @@ moves_loop: // When in check, search starts from here
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
-        (*ourKing)[pos.moved_piece(quiets[i])][to_sq(quiets[i])] << -bonus;
-        (*theirKing)[pos.moved_piece(quiets[i])][to_sq(quiets[i])] << -bonus;
+        (*ss->kingHistory)[pos.moved_piece(quiets[i])][to_sq(quiets[i])] << -bonus;
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
     }
   }
