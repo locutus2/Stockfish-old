@@ -844,7 +844,7 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
-                                      const_cast<const PieceToHistory**>(ss->kingHistory),
+                                      const_cast<const PieceToKingHistory**>(ss->kingHistory),
                                       countermove,
                                       ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
@@ -1298,7 +1298,7 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
-                                      const_cast<const PieceToHistory**>(ss->kingHistory),
+                                      const_cast<const PieceToKingHistory**>(ss->kingHistory),
                                       to_sq((ss-1)->currentMove));
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
@@ -1486,8 +1486,8 @@ moves_loop: // When in check, search starts from here
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
-    PieceToHistory * ourKing = ss->kingHistory[us];
-    PieceToHistory * theirKing = ss->kingHistory[~us];
+    PieceToKingHistory *ourKing = ss->kingHistory[us];
+    PieceToKingHistory *theirKing = ss->kingHistory[~us];
 
     thisThread->mainHistory[us][from_to(move)] << bonus;
     (*ourKing)[pos.moved_piece(move)][to_sq(move)] << bonus;
