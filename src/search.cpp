@@ -1484,11 +1484,14 @@ moves_loop: // When in check, search starts from here
     }
 
     Color us = pos.side_to_move();
+    bool inCheck = pos.checkers();
     Thread* thisThread = pos.this_thread();
 
     thisThread->mainHistory[us][from_to(move)] << bonus;
-    (*ss->kingHistory)[pos.moved_piece(move)][to_sq(move)] << bonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
+
+    if (inCheck)
+        (*ss->kingHistory)[pos.moved_piece(move)][to_sq(move)] << bonus;
 
     if (is_ok((ss-1)->currentMove))
     {
@@ -1500,8 +1503,11 @@ moves_loop: // When in check, search starts from here
     for (int i = 0; i < quietsCnt; ++i)
     {
         thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
-        (*ss->kingHistory)[pos.moved_piece(quiets[i])][to_sq(quiets[i])] << -bonus;
+
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+
+        if (inCheck)
+            (*ss->kingHistory)[pos.moved_piece(quiets[i])][to_sq(quiets[i])] << -bonus;
     }
   }
 
