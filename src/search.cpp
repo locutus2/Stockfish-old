@@ -78,11 +78,46 @@ namespace {
   template <bool PvNode> Depth reduction(bool i, Depth d, int mn) {
     return Reductions[PvNode][i][std::min(d / ONE_PLY, 63)][std::min(mn, 63)] * ONE_PLY;
   }
+  
+
+  int StatBonus[18];
+  
+  int StatBonusDiff[18] = {
+    0,
+    33,
+    165,
+    231,
+    297,
+    363,
+    429,
+    495,
+    561,
+    627,
+    693,
+    759,
+    825,
+    891,
+    957,
+    1023,
+    1089,
+    1155
+  };
+
+  void initBonus()
+  {
+    for(int d = 1; d <= 17; ++d)
+    {
+        StatBonus[d] = StatBonus[d-1] + StatBonusDiff[d];
+    }
+  }
+
+
+  TUNE(StatBonusDiff, initBonus);
 
   // History and stats update bonus, based on depth
   int stat_bonus(Depth depth) {
     int d = depth / ONE_PLY;
-    return d > 17 ? 0 : 33 * d * d + 66 * d - 66;
+    return d > 17 ? 0 : StatBonus[d];
   }
 
   // Skill structure is used to implement strength limit
