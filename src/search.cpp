@@ -1003,6 +1003,11 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r += ONE_PLY;
 
+              // Increase reduction if non-pawn moves to a pawn attacked square
+              if (   type_of(movedPiece) != PAWN
+                  && (PawnAttacks[us][to_sq(move)] & pos.pieces(~us, PAWN)))
+                  r += ONE_PLY;
+
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
                   r += 2 * ONE_PLY;
