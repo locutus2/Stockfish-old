@@ -1027,8 +1027,8 @@ moves_loop: // When in check, search starts from here
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
 
-              // Increase reduction for rook and queen moves to a pawn attacked square
-              if (   (pos.pieces(us, ROOK, QUEEN) & to_sq(move))
+              // Increase reduction for knight moves to a pawn attacked square
+              if (   type_of(movedPiece) == KNIGHT
                   && (PawnAttacks[us][to_sq(move)] & pos.pieces(~us, PAWN)))
                   r += ONE_PLY;
 
