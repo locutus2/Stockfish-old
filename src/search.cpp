@@ -1005,6 +1005,7 @@ moves_loop: // When in check, search starts from here
 
               // Increase reduction if non-pawn moves to a pawn attacked square
               if (   type_of(movedPiece) != PAWN
+                  && !givesCheck
                   && (PawnAttacks[us][to_sq(move)] & pos.pieces(~us, PAWN)))
                   r += ONE_PLY;
 
