@@ -1003,12 +1003,6 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r += ONE_PLY;
 
-              // Increase reduction non-pawn check moves to a pawn attacked square
-              if (   givesCheck
-                  && type_of(movedPiece) != PAWN
-                  && (PawnAttacks[us][to_sq(move)] & pos.pieces(~us, PAWN)))
-                  r += ONE_PLY;
-
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
                   r += 2 * ONE_PLY;
@@ -1031,6 +1025,12 @@ moves_loop: // When in check, search starts from here
                   r -= ONE_PLY;
 
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
+                  r += ONE_PLY;
+
+              // Increase reduction for bad non-pawn moves to a pawn attacked square
+              if (   ss->statScore < 0
+                  && type_of(movedPiece) != PAWN
+                  && (PawnAttacks[us][to_sq(move)] & pos.pieces(~us, PAWN)))
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
