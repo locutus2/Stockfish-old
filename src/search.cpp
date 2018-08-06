@@ -915,7 +915,7 @@ moves_loop: // When in check, search starts from here
       // Calculate new depth for this move
       newDepth = depth - ONE_PLY + extension;
 
-      if (captureOrPromotion)
+      if (PvNode && captureOrPromotion)
           newDepth = std::max(newDepth, ONE_PLY);
 
       // Step 14. Pruning at shallow depth (~170 Elo)
