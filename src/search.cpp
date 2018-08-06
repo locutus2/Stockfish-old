@@ -915,6 +915,9 @@ moves_loop: // When in check, search starts from here
       // Calculate new depth for this move
       newDepth = depth - ONE_PLY + extension;
 
+      if (captureOrPromotion)
+          newDepth = std::max(newDepth, ONE_PLY);
+
       // Step 14. Pruning at shallow depth (~170 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1051,9 +1054,6 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
-
-          if (captureOrPromotion)
-              newDepth = std::max(newDepth, ONE_PLY);
 
           value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
       }
