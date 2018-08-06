@@ -1052,6 +1052,9 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
+          if (captureOrPromotion)
+              newDepth = std::max(newDepth, ONE_PLY);
+
           value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false);
       }
 
