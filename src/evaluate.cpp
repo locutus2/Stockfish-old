@@ -413,7 +413,7 @@ namespace {
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
     const Square ksq = pos.square<KING>(Us);
-    Bitboard kingFlank, weak, b, b1, b2, safe, unsafeChecks, possiblePins;
+    Bitboard kingFlank, weak, b, b1, b2, b1_with_pins, b2_with_pins, safe, unsafeChecks, possiblePins;
 
     // King shelter and enemy pawns storm
     Score score = pe->king_safety<Us>(pos, ksq);
@@ -441,18 +441,12 @@ namespace {
         safe  = ~pos.pieces(Them);
         safe &= ~attackedBy[Us][ALL_PIECES] | (weak & attackedBy2[Them]);
 
-        // Enemy knights checks
-        b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
-        if (b & safe)
-            kingDanger += KnightSafeCheck;
-        else
-            unsafeChecks |= b;
-
-        safe &= pos.attacks_from<QUEEN>(ksq);
+        b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
+        b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
         possiblePins = pos.attacks_from<QUEEN>(ksq) & pos.pieces(Us) & ~pos.blockers_for_king(Us);
-        b1 = attacks_bb<ROOK  >(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
-        b2 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
+        b1_with_pins = attacks_bb<ROOK  >(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
+        b2_with_pins = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
 
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
@@ -465,13 +459,20 @@ namespace {
         if (b1 & safe)
             kingDanger += RookSafeCheck;
         else
-            unsafeChecks |= b1;
+            unsafeChecks |= b1 | (b1_with_pins & safe & attackedBy[Them][ROOK]);
 
         // Enemy bishops checks
         if (b2 & safe)
             kingDanger += BishopSafeCheck;
         else
-            unsafeChecks |= b2;
+            unsafeChecks |= b2 | (b2_with_pins & safe & attackedBy[Them][BISHOP]);
+
+        // Enemy knights checks
+        b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
+        if (b & safe)
+            kingDanger += KnightSafeCheck;
+        else
+            unsafeChecks |= b;
 
         // Unsafe or occupied checking squares will also be considered, as long as
         // the square is in the attacker's mobility area.
