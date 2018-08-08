@@ -445,8 +445,6 @@ namespace {
         b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
         b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
-        possiblePins = pos.attacks_from<QUEEN>(ksq) & pos.pieces(Us) & ~pos.blockers_for_king(Us);
-
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
             kingDanger += QueenSafeCheck;
@@ -461,6 +459,7 @@ namespace {
             unsafeChecks |= b1;
         else
         {
+            possiblePins = pos.attacks_from<QUEEN>(ksq) & pos.pieces(Us) & ~pos.blockers_for_king(Us);
             b1 = attacks_bb<ROOK  >(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
             safePins |= b1 & safe & attackedBy[Them][ROOK];
         }
@@ -468,13 +467,8 @@ namespace {
         // Enemy bishops checks
         if (b2 & safe)
             kingDanger += BishopSafeCheck;
-        else if (b2)
-            unsafeChecks |= b2;
         else
-        {
-            b2 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
-            safePins |= b2 & safe & attackedBy[Them][BISHOP];
-        }
+            unsafeChecks |= b2;
 
         // Enemy knights checks
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
@@ -491,7 +485,7 @@ namespace {
                      +  69 * kingAttacksCount[Them]
                      + 185 * popcount(kingRing[Us] & weak)
                      + 129 * popcount(pos.blockers_for_king(Us) | unsafeChecks)
-                     +   8 * popcount(safePins)
+                     +  16 * popcount(safePins)
                      +   4 * tropism
                      - 873 * !pos.count<QUEEN>(Them)
                      -   6 * mg_value(score) / 8
