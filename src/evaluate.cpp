@@ -413,7 +413,7 @@ namespace {
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
     const Square ksq = pos.square<KING>(Us);
-    Bitboard kingFlank, weak, b, b1, b2, b1_with_pins, b2_with_pins, safe, unsafeChecks, possiblePins, safePins;
+    Bitboard kingFlank, weak, b, b1, b2, safe, unsafeChecks, possiblePins, safePins;
 
     // King shelter and enemy pawns storm
     Score score = pe->king_safety<Us>(pos, ksq);
@@ -446,8 +446,6 @@ namespace {
         b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
         possiblePins = pos.attacks_from<QUEEN>(ksq) & pos.pieces(Us) & ~pos.blockers_for_king(Us);
-        b1_with_pins = attacks_bb<ROOK  >(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
-        b2_with_pins = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
 
         // Enemy queen safe checks
         if ((b1 | b2) & attackedBy[Them][QUEEN] & safe & ~attackedBy[Us][QUEEN])
@@ -459,14 +457,24 @@ namespace {
         // Enemy rooks checks
         if (b1 & safe)
             kingDanger += RookSafeCheck;
+        else if (b1)
+            unsafeChecks |= b1;
         else
-            unsafeChecks |= b1, safePins |= b1_with_pins & safe & attackedBy[Them][ROOK];
+        {
+            b1 = attacks_bb<ROOK  >(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
+            safePins |= b1 & safe & attackedBy[Them][ROOK];
+        }
 
         // Enemy bishops checks
         if (b2 & safe)
             kingDanger += BishopSafeCheck;
+        else if (b2)
+            unsafeChecks |= b2;
         else
-            unsafeChecks |= b2, safePins |= b2_with_pins & safe & attackedBy[Them][BISHOP];
+        {
+            b2 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
+            safePins |= b2 & safe & attackedBy[Them][BISHOP];
+        }
 
         // Enemy knights checks
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
