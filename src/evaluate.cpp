@@ -413,7 +413,7 @@ namespace {
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
     const Square ksq = pos.square<KING>(Us);
-    Bitboard kingFlank, weak, b, b1, b2, b1_with_pins, b2_with_pins, safe, unsafeChecks, possiblePins;
+    Bitboard kingFlank, weak, b, b1, b2, b1_with_pins, b2_with_pins, safe, unsafeChecks, possiblePins, safePins;
 
     // King shelter and enemy pawns storm
     Score score = pe->king_safety<Us>(pos, ksq);
@@ -431,6 +431,7 @@ namespace {
     {
         int kingDanger = 0;
         unsafeChecks = 0;
+        safePins = 0;
 
         // Attacked squares defended at most once by our queen or king
         weak =  attackedBy[Them][ALL_PIECES]
@@ -459,13 +460,13 @@ namespace {
         if (b1 & safe)
             kingDanger += RookSafeCheck;
         else
-            unsafeChecks |= b1 | (b1_with_pins & safe & attackedBy[Them][ROOK]);
+            unsafeChecks |= b1, safePins |= b1_with_pins & safe & attackedBy[Them][ROOK];
 
         // Enemy bishops checks
         if (b2 & safe)
             kingDanger += BishopSafeCheck;
         else
-            unsafeChecks |= b2 | (b2_with_pins & safe & attackedBy[Them][BISHOP]);
+            unsafeChecks |= b2, safePins |= b2_with_pins & safe & attackedBy[Them][BISHOP];
 
         // Enemy knights checks
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
@@ -482,6 +483,7 @@ namespace {
                      +  69 * kingAttacksCount[Them]
                      + 185 * popcount(kingRing[Us] & weak)
                      + 129 * popcount(pos.blockers_for_king(Us) | unsafeChecks)
+                     +  64 * popcount(safePins)
                      +   4 * tropism
                      - 873 * !pos.count<QUEEN>(Them)
                      -   6 * mg_value(score) / 8
