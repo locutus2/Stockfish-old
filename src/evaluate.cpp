@@ -441,6 +441,15 @@ namespace {
         safe  = ~pos.pieces(Them);
         safe &= ~attackedBy[Us][ALL_PIECES] | (weak & attackedBy2[Them]);
 
+        // Enemy knights checks
+        b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
+        if (b & safe)
+            kingDanger += KnightSafeCheck;
+        else
+            unsafeChecks |= b;
+
+        safe &= pos.attacks_from<QUEEN>(ksq);
+
         possiblePins = pos.attacks_from<QUEEN>(ksq) & pos.pieces(Us) & ~pos.blockers_for_king(Us);
         b1 = attacks_bb<ROOK  >(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
         b2 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ pos.pieces(Us, QUEEN)) & ~possiblePins);
@@ -463,13 +472,6 @@ namespace {
             kingDanger += BishopSafeCheck;
         else
             unsafeChecks |= b2;
-
-        // Enemy knights checks
-        b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
-        if (b & safe)
-            kingDanger += KnightSafeCheck;
-        else
-            unsafeChecks |= b;
 
         // Unsafe or occupied checking squares will also be considered, as long as
         // the square is in the attacker's mobility area.
