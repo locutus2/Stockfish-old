@@ -79,8 +79,8 @@ namespace {
     return Reductions[PvNode][i][std::min(d / ONE_PLY, 63)][std::min(mn, 63)] * ONE_PLY;
   }
 
-  constexpr int StatBonus[18] = { 0,  28,  216,  491,  786,  1223,  1562,  2016,  2476,  3112,
-                                  3824,  4616,  5315,  5943,  6930,  8022,  8906,  10279 };
+  constexpr int StatBonus[18] = { 0, 24, 222, 527, 812, 1260, 1553, 1968, 2384,  
+                                  3146, 3755, 4562, 5147, 5553, 6414, 7644, 8376, 9896 };
 
   // History and stats update bonus, based on depth
   int stat_bonus(Depth depth) {
