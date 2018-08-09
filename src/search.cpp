@@ -860,6 +860,8 @@ moves_loop: // When in check, search starts from here
                                       ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
 
+    Move singularExtensionMove = ttMove;
+
     skipQuiets = false;
     ttCapture = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
@@ -906,7 +908,7 @@ moves_loop: // When in check, search starts from here
       // a reduced search on on all the other moves but the ttMove and if the
       // result is lower than ttValue minus a margin then we will extend the ttMove.
       if (    depth >= 8 * ONE_PLY
-          &&  move == ttMove
+          &&  move == singularExtensionMove
           && !rootNode
           && !excludedMove // Recursive singular search is not allowed
           &&  ttValue != VALUE_NONE
@@ -921,6 +923,8 @@ moves_loop: // When in check, search starts from here
 
           if (value < rBeta)
               extension = ONE_PLY;
+          else
+              singularExtensionMove = ss->currentMove;
       }
       else if (    givesCheck // Check extension (~2 Elo)
                && !moveCountPruning
