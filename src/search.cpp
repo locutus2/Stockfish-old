@@ -852,6 +852,7 @@ moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory, nullptr, (ss-4)->continuationHistory };
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move singularExtensionMove = thisThread->singularExtensionMoves[pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
@@ -859,8 +860,6 @@ moves_loop: // When in check, search starts from here
                                       countermove,
                                       ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
-
-    Move singularExtensionMove = ttMove;
 
     skipQuiets = false;
     ttCapture = false;
@@ -908,7 +907,7 @@ moves_loop: // When in check, search starts from here
       // a reduced search on on all the other moves but the ttMove and if the
       // result is lower than ttValue minus a margin then we will extend the ttMove.
       if (    depth >= 8 * ONE_PLY
-          &&  move == singularExtensionMove
+          && (move == ttMove || move == singularExtensionMove)
           && !rootNode
           && !excludedMove // Recursive singular search is not allowed
           &&  ttValue != VALUE_NONE
@@ -922,9 +921,10 @@ moves_loop: // When in check, search starts from here
           ss->excludedMove = MOVE_NONE;
 
           if (value < rBeta)
+          {
               extension = ONE_PLY;
-          else
-              singularExtensionMove = ss->currentMove;
+              thisThread->singularExtensionMoves[pos.piece_on(prevSq)][prevSq] = move;
+          }
       }
       else if (    givesCheck // Check extension (~2 Elo)
                && !moveCountPruning
