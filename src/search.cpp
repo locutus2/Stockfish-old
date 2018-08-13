@@ -1000,7 +1000,7 @@ moves_loop: // When in check, search starts from here
           if (!captureOrPromotion)
           {
               // Decrease reduction if current best move indicates a draw
-              if (bestMoveIsDraw)
+              if (bestMoveIsDraw && !givesCheck)
                   r -= ONE_PLY;
 
               // Decrease reduction for exact PV nodes (~0 Elo)
@@ -1119,7 +1119,7 @@ moves_loop: // When in check, search starts from here
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
                   alpha = value;
-                  bestMoveIsDraw = value == VALUE_DRAW;
+                  bestMoveIsDraw = value == VALUE_DRAW && ss->staticEval < VALUE_DRAW;
               }
               else
               {
