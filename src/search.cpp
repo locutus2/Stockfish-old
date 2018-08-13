@@ -1115,7 +1115,7 @@ moves_loop: // When in check, search starts from here
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
                   alpha = value;
-                  bestMoveIsDraw = value == VALUE_DRAW && ss->staticEval < VALUE_DRAW;
+                  bestMoveIsDraw = value == VALUE_DRAW;
               }
               else
               {
