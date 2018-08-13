@@ -1000,7 +1000,7 @@ moves_loop: // When in check, search starts from here
           if (!captureOrPromotion)
           {
               // Decrease reduction if current best move indicates a draw
-              if (bestMoveIsDraw && !givesCheck)
+              if (bestMoveIsDraw && givesCheck)
                   r -= ONE_PLY;
 
               // Decrease reduction for exact PV nodes (~0 Elo)
