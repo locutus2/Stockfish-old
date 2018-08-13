@@ -926,16 +926,17 @@ moves_loop: // When in check, search starts from here
       newDepth = depth - ONE_PLY + extension;
 
       // Step 14. Pruning at shallow depth (~170 Elo)
-      if (  !rootNode
-          && pos.non_pawn_material(us)
-          && bestValue > VALUE_MATED_IN_MAX_PLY)
+      if (   !rootNode
+          &&  pos.non_pawn_material(us)
+          && !bestMoveIsDraw
+          &&  bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           if (   !captureOrPromotion
               && !givesCheck
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning (~30 Elo)
-              if (moveCountPruning && !bestMoveIsDraw)
+              if (moveCountPruning)
               {
                   skipQuiets = true;
                   continue;
@@ -1115,7 +1116,7 @@ moves_loop: // When in check, search starts from here
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
                   alpha = value;
-                  bestMoveIsDraw = value == VALUE_DRAW;
+                  bestMoveIsDraw = value == VALUE_DRAW && ss->staticEval < VALUE_DRAW;
               }
               else
               {
