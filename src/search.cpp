@@ -1108,7 +1108,7 @@ moves_loop: // When in check, search starts from here
       if (value > bestValue)
       {
           bestValue = value;
-          positionIsPessimistic = ss->staticEval >= VALUE_DRAW && value < VALUE_DRAW;
+          positionIsPessimistic = PvNode && ss->staticEval >= VALUE_DRAW && value < VALUE_DRAW;
 
           if (value > alpha)
           {
