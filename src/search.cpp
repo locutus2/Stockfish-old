@@ -1104,6 +1104,7 @@ moves_loop: // When in check, search starts from here
       if (value > bestValue)
       {
           bestValue = value;
+          bestMoveIsOptimistic = PvNode && value > ss->staticEval;
 
           if (value > alpha)
           {
@@ -1113,10 +1114,7 @@ moves_loop: // When in check, search starts from here
                   update_pv(ss->pv, move, (ss+1)->pv);
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
-              {
                   alpha = value;
-                  bestMoveIsOptimistic = value > ss->staticEval;
-              }
               else
               {
                   assert(value >= beta); // Fail high
