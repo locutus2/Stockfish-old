@@ -557,7 +557,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, inCheck, givesCheck, improving, bestMoveIsPessimistic;
+    bool ttHit, inCheck, givesCheck, improving, positionIsPessimistic;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -856,7 +856,7 @@ moves_loop: // When in check, search starts from here
 
     skipQuiets = false;
     ttCapture = false;
-    bestMoveIsPessimistic = false;
+    positionIsPessimistic = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
@@ -994,7 +994,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
           // Decrease reduction if the value of the current best move is bad
-          if (bestMoveIsPessimistic)
+          if (positionIsPessimistic)
               r -= ONE_PLY;
 
           // Decrease reduction if opponent's move count is high (~10 Elo)
@@ -1108,6 +1108,7 @@ moves_loop: // When in check, search starts from here
       if (value > bestValue)
       {
           bestValue = value;
+          positionIsPessimistic = ss->staticEval >= VALUE_DRAW && value < VALUE_DRAW;
 
           if (value > alpha)
           {
@@ -1117,10 +1118,7 @@ moves_loop: // When in check, search starts from here
                   update_pv(ss->pv, move, (ss+1)->pv);
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
-              {
                   alpha = value;
-                  bestMoveIsPessimistic = ss->staticEval >= VALUE_DRAW && value < VALUE_DRAW;
-              }
               else
               {
                   assert(value >= beta); // Fail high
