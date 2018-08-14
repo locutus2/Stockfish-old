@@ -1104,7 +1104,7 @@ moves_loop: // When in check, search starts from here
       if (value > bestValue)
       {
           bestValue = value;
-          isDraw = value == VALUE_DRAW && ss->staticEval < VALUE_DRAW;
+          isDraw = PvNode && value == VALUE_DRAW && ss->staticEval < VALUE_DRAW;
 
           if (value > alpha)
           {
