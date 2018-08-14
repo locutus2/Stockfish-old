@@ -557,7 +557,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, inCheck, givesCheck, improving, isDraw;
+    bool ttHit, inCheck, givesCheck, improving, isDrawish;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -856,7 +856,7 @@ moves_loop: // When in check, search starts from here
 
     skipQuiets = false;
     ttCapture = false;
-    isDraw = false;
+    isDrawish = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
@@ -935,7 +935,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning (~30 Elo)
-              if (moveCountPruning && !isDraw)
+              if (moveCountPruning && !isDrawish)
               {
                   skipQuiets = true;
                   continue;
@@ -1104,7 +1104,6 @@ moves_loop: // When in check, search starts from here
       if (value > bestValue)
       {
           bestValue = value;
-          isDraw = PvNode && value == VALUE_DRAW && ss->staticEval < VALUE_DRAW;
 
           if (value > alpha)
           {
@@ -1114,7 +1113,10 @@ moves_loop: // When in check, search starts from here
                   update_pv(ss->pv, move, (ss+1)->pv);
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
+              {
                   alpha = value;
+                  isDrawish = abs(value) <= 10 && ss->staticEval < value;
+              }
               else
               {
                   assert(value >= beta); // Fail high
