@@ -557,7 +557,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, inCheck, givesCheck, improving, bestMoveIsOptimistic;
+    bool ttHit, inCheck, givesCheck, improving, bestMoveIsPessimistic;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -856,7 +856,7 @@ moves_loop: // When in check, search starts from here
 
     skipQuiets = false;
     ttCapture = false;
-    bestMoveIsOptimistic = false;
+    bestMoveIsPessimistic = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
@@ -935,7 +935,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning (~30 Elo)
-              if (moveCountPruning && !bestMoveIsOptimistic)
+              if (moveCountPruning && !bestMoveIsPessimistic)
               {
                   skipQuiets = true;
                   continue;
@@ -1115,7 +1115,7 @@ moves_loop: // When in check, search starts from here
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
                   alpha = value;
-                  bestMoveIsOptimistic = value > ss->staticEval;
+                  bestMoveIsPessimistic = value < ss->staticEval;
               }
               else
               {
