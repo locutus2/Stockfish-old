@@ -993,8 +993,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction<PvNode>(improving, depth, moveCount);
 
-          // Decrease reduction if the value of the current best move is below
-          // the static eval of current the position
+          // Decrease reduction if the value of the current best move is bad
           if (bestMoveIsPessimistic)
               r -= ONE_PLY;
 
@@ -1120,7 +1119,7 @@ moves_loop: // When in check, search starts from here
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
                   alpha = value;
-                  bestMoveIsPessimistic = value < ss->staticEval;
+                  bestMoveIsPessimistic = value < VALUE_DRAW && value < ss->staticEval;
               }
               else
               {
