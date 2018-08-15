@@ -166,8 +166,7 @@ void init() {
           for (int support = 0; support <= 2; ++support)
               for (Rank r = RANK_2; r < RANK_8; ++r)
   {
-      int v = 17 * support;
-      v += (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposedBlocked;
+      int v = (30 * support + Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposedBlocked;
 
       Connected[opposedBlocked][phalanx][support][r] = make_score(v, v * (r - 2) / 4);
   }
