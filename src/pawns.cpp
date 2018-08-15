@@ -159,7 +159,7 @@ namespace Pawns {
 
 void init() {
 
-  static constexpr int Seed[RANK_NB] = { 0, 13, 24, 18, 65, 100, 175, 330 };
+  static constexpr int Seed[RANK_NB] = { 0, 8, 15, 12, 42, 64, 113, 213 };
 
   for (int blocked = 0; blocked <= 1; ++blocked)
       for (int phalanx = 0; phalanx <= 1; ++phalanx)
