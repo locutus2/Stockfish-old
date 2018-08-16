@@ -161,15 +161,19 @@ void init() {
 
   static constexpr int Seed[RANK_NB] = { 0, 13, 24, 18, 65, 100, 175, 330 };
 
-  for (int opposedBlocked = 0; opposedBlocked <= 2; ++opposedBlocked)
-      for (int phalanx = 0; phalanx <= 1; ++phalanx)
-          for (int support = 0; support <= 2; ++support)
-              for (Rank r = RANK_2; r < RANK_8; ++r)
+  for (int opposed = 0; opposed <= 1; ++opposed)
+      for (int blocked = 0; blocked <= opposed; ++blocked)
+          for (int phalanx = 0; phalanx <= 1; ++phalanx)
+              for (int support = 0; support <= 2; ++support)
+                  for (Rank r = RANK_2; r < RANK_8; ++r)
   {
-      int v = 17 * support;
-      v += (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposedBlocked;
+      int v = (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
+      if (blocked)
+          v -= v / 4;
 
-      Connected[opposedBlocked][phalanx][support][r] = make_score(v, v * (r - 2) / 4);
+      v += 17 * support;
+
+      Connected[opposed + blocked][phalanx][support][r] = make_score(v, v * (r - 2) / 4);
   }
 }
 
