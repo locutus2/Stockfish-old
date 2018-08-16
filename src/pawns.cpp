@@ -150,6 +150,10 @@ namespace {
 
 } // namespace
 
+int opposed_support[2][3] = { { 0, 17, 34}, { 0, 17, 34 } };
+
+TUNE(SetRange(-100, 100), opposed_support);
+
 namespace Pawns {
 
 /// Pawns::init() initializes some tables needed by evaluation. Instead of using
@@ -165,7 +169,7 @@ void init() {
           for (int support = 0; support <= 2; ++support)
               for (Rank r = RANK_2; r < RANK_8; ++r)
   {
-      int v = 17 * support;
+      int v = opposed_support[opposed][support];
       v += (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
 
       Connected[opposed][phalanx][support][r] = make_score(v, v * (r - 2) / 4);
