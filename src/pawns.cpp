@@ -169,7 +169,7 @@ void init() {
   {
       int v = (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
       if (blocked)
-         v -= v / 3;
+         v /= 3;
 
       v += 17 * support;
 
