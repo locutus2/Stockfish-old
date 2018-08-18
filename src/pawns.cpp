@@ -150,6 +150,11 @@ namespace {
 
 } // namespace
 
+int Seed[2][RANK_NB] = {
+    { 0, 13, 24, 18, 65, 100, 175, 330 },
+    { 0,  7, 12,  9, 33,  50,  88, 165 }
+};
+
 namespace Pawns {
 
 /// Pawns::init() initializes some tables needed by evaluation. Instead of using
@@ -158,15 +163,13 @@ namespace Pawns {
 
 void init() {
 
-  static constexpr int Seed[RANK_NB] = { 0, 13, 24, 18, 65, 100, 175, 330 };
-
   for (int opposed = 0; opposed <= 1; ++opposed)
       for (int phalanx = 0; phalanx <= 1; ++phalanx)
           for (int support = 0; support <= 2; ++support)
               for (Rank r = RANK_2; r < RANK_8; ++r)
   {
       int v = 17 * support;
-      v += (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
+      v += Seed[opposed][r] + (phalanx ? (Seed[opposed][r + 1] - Seed[opposed][r]) / 2 : 0);
 
       Connected[opposed][phalanx][support][r] = make_score(v, v * (r - 2) / 4);
   }
@@ -262,5 +265,7 @@ Score Entry::do_king_safety(const Position& pos, Square ksq) {
 // Explicit template instantiation
 template Score Entry::do_king_safety<WHITE>(const Position& pos, Square ksq);
 template Score Entry::do_king_safety<BLACK>(const Position& pos, Square ksq);
+
+TUNE(Seed);
 
 } // namespace Pawns
