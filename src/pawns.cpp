@@ -151,8 +151,8 @@ namespace {
 } // namespace
 
 int Seed[2][RANK_NB] = {
-    { 0, 13, 24, 18, 65, 100, 175, 330 },
-    { 0,  7, 12,  9, 33,  50,  88, 165 }
+    { 0, 13, 24, 18, 65, 100, 175},
+    { 0, 18, 21, 41, 82, 137, 252}
 };
 
 namespace Pawns {
@@ -168,8 +168,7 @@ void init() {
           for (int support = 0; support <= 2; ++support)
               for (Rank r = RANK_2; r < RANK_8; ++r)
   {
-      int v = 17 * support;
-      v += Seed[opposed][r] + (phalanx ? (Seed[opposed][r + 1] - Seed[opposed][r]) / 2 : 0);
+      int v = 17 * support + (Seed[phalanx][r] >> opposed);
 
       Connected[opposed][phalanx][support][r] = make_score(v, v * (r - 2) / 4);
   }
@@ -266,6 +265,7 @@ Score Entry::do_king_safety(const Position& pos, Square ksq) {
 template Score Entry::do_king_safety<WHITE>(const Position& pos, Square ksq);
 template Score Entry::do_king_safety<BLACK>(const Position& pos, Square ksq);
 
-TUNE(Seed);
 
 } // namespace Pawns
+
+TUNE(Seed);
