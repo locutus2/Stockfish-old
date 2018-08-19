@@ -158,7 +158,10 @@ namespace Pawns {
 
 void init() {
 
-  static constexpr int Seed[RANK_NB] = { 0, 13, 24, 18, 65, 100, 175, 330 };
+  static constexpr int Seed[2][RANK_NB] = {
+    { 0, 12, 25, 18, 68, 98, 171, 334 },
+    { 0,  7, 12,  9, 31, 51,  87, 173 }
+  };
 
   for (int opposed = 0; opposed <= 1; ++opposed)
       for (int phalanx = 0; phalanx <= 1; ++phalanx)
@@ -166,7 +169,7 @@ void init() {
               for (Rank r = RANK_2; r < RANK_8; ++r)
   {
       int v = 17 * support;
-      v += (Seed[r] + (phalanx ? (Seed[r + 1] - Seed[r]) / 2 : 0)) >> opposed;
+      v += Seed[opposed][r] + (phalanx ? (Seed[opposed][r + 1] - Seed[opposed][r]) / 2 : 0);
 
       Connected[opposed][phalanx][support][r] = make_score(v, v * (r - 2) / 4);
   }
