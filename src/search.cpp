@@ -712,8 +712,10 @@ namespace {
     else if (ttHit)
     {
         // Never assume anything on values stored in TT
-        if ((ss->staticEval = pureStaticEval = eval = tte->eval()) == VALUE_NONE)
-            eval = ss->staticEval = (pureStaticEval = evaluate(pos)) - 10 * ((ss-1)->statScore > 0);
+        if ((pureStaticEval = tte->eval()) == VALUE_NONE)
+            pureStaticEval = evaluate(pos);
+
+        eval = ss->staticEval = pureStaticEval - 10 * ((ss-1)->statScore > 0);
 
         // Can ttValue be used as a better position evaluation?
         if (    ttValue != VALUE_NONE
