@@ -761,11 +761,14 @@ namespace {
     bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
                             && (pos.pieces(PAWN) & KingSide);
 
+    int kingAttacks = kingAttackersCount[WHITE] + kingAttackersCount[BLACK];
+
     // Compute the initiative bonus for the attacking side
     int complexity =   8 * pe->pawn_asymmetry()
                     + 12 * pos.count<PAWN>()
                     + 12 * outflanking
                     + 16 * pawnsOnBothFlanks
+                    + 16 * kingAttacks
                     + 48 * !pos.non_pawn_material()
                     -136 ;
 
