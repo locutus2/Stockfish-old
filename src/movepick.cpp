@@ -61,7 +61,7 @@ namespace {
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
                        const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm,
-                       Move* killers, bool cutNode)
+                       Move* killers, bool swapRefutations)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
              refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d) {
 
@@ -71,7 +71,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
   ttMove = ttm && pos.pseudo_legal(ttm) ? ttm : MOVE_NONE;
   stage += (ttMove == MOVE_NONE);
 
-  if (cutNode && refutations[0].move != refutations[2].move)
+  if (swapRefutations && refutations[0].move != refutations[2].move)
       std::swap(refutations[1], refutations[2]);
 }
 
