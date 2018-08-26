@@ -855,7 +855,7 @@ moves_loop: // When in check, search starts from here
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      pos.captured_piece());
+                                      (ss-1)->currentMove == MOVE_NULL);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
 
     skipQuiets = false;
