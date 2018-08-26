@@ -734,8 +734,7 @@ namespace {
 
     // Step 7. Razoring (~2 Elo)
     if (   depth < 2 * ONE_PLY
-        && eval <= alpha - RazorMargin
-        && !(pos.blockers_for_king(pos.side_to_move()) & pos.pieces(pos.side_to_move())))
+        && eval <= alpha - RazorMargin)
         return qsearch<NT>(pos, ss, alpha, beta);
 
     improving =   ss->staticEval >= (ss-2)->staticEval
@@ -756,6 +755,7 @@ namespace {
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !excludedMove
         &&  pos.non_pawn_material(us)
+        && !(pos.blockers_for_king(pos.side_to_move()) & pos.pieces(pos.side_to_move()))
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
