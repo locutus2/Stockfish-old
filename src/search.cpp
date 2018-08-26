@@ -116,6 +116,13 @@ namespace {
           : pos.gives_check(move);
   }
 
+  inline bool discovered_check(const Position& pos, Move move) {
+    Color us = pos.side_to_move();
+    return   !(pos.check_squares(type_of(pos.moved_piece(move))) & to_sq(move))
+          &&  (pos.blockers_for_king(~us) & from_sq(move))
+          && !aligned(from_sq(move), to_sq(move), pos.square<KING>(~us));
+  }
+
   // perft() is our utility to verify move generation. All the leaf nodes up
   // to the given depth are generated and counted, and the sum is returned.
   template<bool Root>
@@ -963,6 +970,7 @@ moves_loop: // When in check, search starts from here
                   continue;
           }
           else if (   !extension // (~20 Elo)
+                   && !discovered_check(pos, move)
                    && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY)))
                   continue;
       }
