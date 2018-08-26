@@ -126,7 +126,8 @@ public:
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
                                            Move,
-                                           Move*);
+                                           Move*,
+                                           bool);
   Move next_move(bool skipQuiets = false);
 
 private:
