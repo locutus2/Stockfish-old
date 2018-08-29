@@ -1008,6 +1008,13 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Increase reduction for normal king moves if not in check and a castle is available
+              if (    type_of(movedPiece) == KING
+                  &&  type_of(move) == NORMAL
+                  &&  canCastle
+                  && !inCheck)
+                  r += ONE_PLY;
+
               // Decrease reduction for exact PV nodes (~0 Elo)
               if (pvExact)
                   r -= ONE_PLY;
@@ -1019,13 +1026,6 @@ moves_loop: // When in check, search starts from here
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
                   r += 2 * ONE_PLY;
-
-              // Increase reduction for normal king moves if not in check and a castle is available
-              else if (    type_of(movedPiece) == KING
-                       &&  type_of(move) == NORMAL
-                       &&  canCastle
-                       && !inCheck)
-                  r += ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
