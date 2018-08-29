@@ -557,7 +557,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, pureStaticEval;
-    bool ttHit, inCheck, givesCheck, improving;
+    bool ttHit, inCheck, givesCheck, improving, canCastle;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -863,6 +863,7 @@ moves_loop: // When in check, search starts from here
                                       ss->killers);
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
 
+    canCastle = pos.can_castle(pos.side_to_move());
     skipQuiets = false;
     ttCapture = false;
     pvExact = PvNode && ttHit && tte->bound() == BOUND_EXACT;
@@ -1019,11 +1020,11 @@ moves_loop: // When in check, search starts from here
               if (cutNode)
                   r += 2 * ONE_PLY;
 
-              // Increase reduction for normal king moves during middle game if not in check
+              // Increase reduction for normal king moves if not in check and a castle is available
               else if (    type_of(movedPiece) == KING
                        &&  type_of(move) == NORMAL
-                       && !inCheck
-                       &&  pos.non_pawn_material() >= 2 * QueenValueMg +  4 * RookValueMg)
+                       &&  canCastle
+                       && !inCheck)
                   r += ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
