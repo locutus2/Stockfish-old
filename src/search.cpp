@@ -1007,13 +1007,6 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction for normal king moves during middle game if not in check
-              if (    type_of(movedPiece) == KING
-                  &&  type_of(move) == NORMAL
-                  && !inCheck
-                  &&  pos.non_pawn_material() >= 2 * QueenValueMg +  4 * RookValueMg)
-                  r += ONE_PLY;
-
               // Decrease reduction for exact PV nodes (~0 Elo)
               if (pvExact)
                   r -= ONE_PLY;
@@ -1025,6 +1018,13 @@ moves_loop: // When in check, search starts from here
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
                   r += 2 * ONE_PLY;
+
+              // Increase reduction for normal king moves during middle game if not in check
+              else if (    type_of(movedPiece) == KING
+                       &&  type_of(move) == NORMAL
+                       && !inCheck
+                       &&  pos.non_pawn_material() >= 2 * QueenValueMg +  4 * RookValueMg)
+                  r += ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
