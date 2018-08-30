@@ -943,7 +943,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material() >= Value(5000)))
           {
               // Move count based pruning (~30 Elo)
-              if (moveCountPruning)
+              if (moveCountPruning && !inCheck)
               {
                   skipQuiets = true;
                   continue;
