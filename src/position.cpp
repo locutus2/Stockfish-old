@@ -376,7 +376,7 @@ void Position::set_check_info(StateInfo* si) const {
 
 void Position::set_state(StateInfo* si) const {
 
-  si->key = si->materialKey = 0;
+  si->key = si->hKey = si->materialKey = 0;
   si->pawnKey = Zobrist::noPawns;
   si->nonPawnMaterial[WHITE] = si->nonPawnMaterial[BLACK] = VALUE_ZERO;
   si->checkersBB = attackers_to(square<KING>(sideToMove)) & pieces(~sideToMove);
@@ -388,15 +388,23 @@ void Position::set_state(StateInfo* si) const {
       Square s = pop_lsb(&b);
       Piece pc = piece_on(s);
       si->key ^= Zobrist::psq[pc][s];
+      si->hKey += Zobrist::psq[pc][s];
   }
 
   if (si->epSquare != SQ_NONE)
+  {
       si->key ^= Zobrist::enpassant[file_of(si->epSquare)];
+      si->hKey += Zobrist::enpassant[file_of(si->epSquare)];
+  }
 
   if (sideToMove == BLACK)
+  {
       si->key ^= Zobrist::side;
+      si->hKey += Zobrist::side;
+  }
 
   si->key ^= Zobrist::castling[si->castlingRights];
+  si->hKey += Zobrist::castling[si->castlingRights];
 
   for (Bitboard b = pieces(PAWN); b; )
   {
@@ -715,6 +723,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
 
   thisThread->nodes.fetch_add(1, std::memory_order_relaxed);
   Key k = st->key ^ Zobrist::side;
+  Key hk = st->hKey + Zobrist::side;
 
   // Copy some fields of the old state to our new StateInfo object except the
   // ones which are going to be recalculated from scratch anyway and then switch
@@ -749,6 +758,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
       do_castling<true>(us, from, to, rfrom, rto);
 
       k ^= Zobrist::psq[captured][rfrom] ^ Zobrist::psq[captured][rto];
+      hk += Zobrist::psq[captured][rfrom] + Zobrist::psq[captured][rto];
       captured = NO_PIECE;
   }
 
@@ -783,6 +793,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
 
       // Update material hash key and prefetch access to materialTable
       k ^= Zobrist::psq[captured][capsq];
+      hk += Zobrist::psq[captured][capsq];
       st->materialKey ^= Zobrist::psq[captured][pieceCount[captured]];
       prefetch(thisThread->materialTable[st->materialKey]);
 
@@ -792,11 +803,13 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
 
   // Update hash key
   k ^= Zobrist::psq[pc][from] ^ Zobrist::psq[pc][to];
+  hk += Zobrist::psq[pc][from] + Zobrist::psq[pc][to];
 
   // Reset en passant square
   if (st->epSquare != SQ_NONE)
   {
       k ^= Zobrist::enpassant[file_of(st->epSquare)];
+      hk += Zobrist::enpassant[file_of(st->epSquare)];
       st->epSquare = SQ_NONE;
   }
 
@@ -805,6 +818,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
   {
       int cr = castlingRightsMask[from] | castlingRightsMask[to];
       k ^= Zobrist::castling[st->castlingRights & cr];
+      hk += Zobrist::castling[st->castlingRights & cr];
       st->castlingRights &= ~cr;
   }
 
@@ -821,6 +835,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
       {
           st->epSquare = to - pawn_push(us);
           k ^= Zobrist::enpassant[file_of(st->epSquare)];
+          hk += Zobrist::enpassant[file_of(st->epSquare)];
       }
 
       else if (type_of(m) == PROMOTION)
@@ -835,6 +850,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
 
           // Update hash keys
           k ^= Zobrist::psq[pc][to] ^ Zobrist::psq[promotion][to];
+          hk += Zobrist::psq[pc][to] + Zobrist::psq[promotion][to];
           st->pawnKey ^= Zobrist::psq[pc][to];
           st->materialKey ^=  Zobrist::psq[promotion][pieceCount[promotion]-1]
                             ^ Zobrist::psq[pc][pieceCount[pc]];
@@ -856,6 +872,7 @@ void Position::do_move(Move m, StateInfo& newSt, bool givesCheck) {
 
   // Update the key with the final value
   st->key = k;
+  st->hKey = hk;
 
   // Calculate checkers bitboard (if move gives check)
   st->checkersBB = givesCheck ? attackers_to(square<KING>(them)) & pieces(us) : 0;
@@ -967,11 +984,13 @@ void Position::do_null_move(StateInfo& newSt) {
   if (st->epSquare != SQ_NONE)
   {
       st->key ^= Zobrist::enpassant[file_of(st->epSquare)];
+      st->hKey += Zobrist::enpassant[file_of(st->epSquare)];
       st->epSquare = SQ_NONE;
   }
 
   st->key ^= Zobrist::side;
-  prefetch(TT.first_entry(st->key));
+  st->hKey += Zobrist::side;
+  prefetch(TT.first_entry(st->hKey));
 
   ++st->rule50;
   st->pliesFromNull = 0;
@@ -1002,12 +1021,12 @@ Key Position::key_after(Move m) const {
   Square to = to_sq(m);
   Piece pc = piece_on(from);
   Piece captured = piece_on(to);
-  Key k = st->key ^ Zobrist::side;
+  Key k = st->hKey + Zobrist::side;
 
   if (captured)
-      k ^= Zobrist::psq[captured][to];
+      k += Zobrist::psq[captured][to];
 
-  return k ^ Zobrist::psq[pc][to] ^ Zobrist::psq[pc][from];
+  return k + Zobrist::psq[pc][to] + Zobrist::psq[pc][from];
 }
 
 

@@ -47,6 +47,7 @@ struct StateInfo {
 
   // Not copied when making a move (will be recomputed anyhow)
   Key        key;
+  Key        hKey;
   Bitboard   checkersBB;
   Piece      capturedPiece;
   StateInfo* previous;
@@ -319,7 +320,7 @@ inline bool Position::advanced_pawn_push(Move m) const {
 }
 
 inline Key Position::key() const {
-  return st->key;
+  return st->hKey;
 }
 
 inline Key Position::pawn_key() const {
