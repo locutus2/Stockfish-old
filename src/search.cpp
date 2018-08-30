@@ -945,7 +945,7 @@ moves_loop: // When in check, search starts from here
               // Move count based pruning (~30 Elo)
               if (moveCountPruning)
               {
-                  skipQuiets = !pvExact;
+                  skipQuiets = !improving;
                   continue;
               }
 
