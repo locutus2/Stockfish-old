@@ -556,11 +556,11 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, ttValue, eval, maxValue, pureStaticEval;
+    Value bestValue, value, ttValue, eval, maxValue, pureStaticEval, valueTotal;
     bool ttHit, inCheck, givesCheck, improving;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, skipQuiets, ttCapture, pvExact;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, valueTotalCount;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -569,6 +569,8 @@ namespace {
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
+    valueTotal = VALUE_ZERO;
+    valueTotalCount = 0;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -1109,6 +1111,9 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
+      valueTotal += value;
+      ++valueTotalCount;
+
       if (value > bestValue)
       {
           bestValue = value;
@@ -1186,6 +1191,12 @@ moves_loop: // When in check, search starts from here
                   bestValue >= beta ? BOUND_LOWER :
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
                   depth, bestMove, pureStaticEval);
+
+    if (valueTotalCount > 1 && abs(bestValue) < VALUE_KNOWN_WIN)
+    {
+        Value advantage = bestValue - valueTotal / valueTotalCount;
+        bestValue -= 10 * advantage / (advantage + 25);
+    }
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
