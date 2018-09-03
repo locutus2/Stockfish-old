@@ -1195,7 +1195,7 @@ moves_loop: // When in check, search starts from here
     if (valueTotalCount > 1 && abs(bestValue) < VALUE_KNOWN_WIN)
     {
         Value advantage = bestValue - valueTotal / valueTotalCount;
-        bestValue -= 10 * advantage / (advantage + 25);
+        bestValue -= 10 * advantage / (advantage + 50);
     }
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
