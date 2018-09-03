@@ -1187,6 +1187,9 @@ moves_loop: // When in check, search starts from here
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
                   depth, bestMove, pureStaticEval);
 
+    if (!bestMove && moveCount && abs(bestValue) < VALUE_KNOWN_WIN)
+        bestValue -= 1;
+
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
     return bestValue;
