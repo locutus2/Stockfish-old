@@ -761,11 +761,11 @@ namespace {
     bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)		
                             && (pos.pieces(PAWN) & KingSide);
 
-    int pawns = 12 - std::abs(pos.count<PAWN>() - 12);
+    int pawns = 2 * std::min(pos.count<PAWN>(), 12) - std::max(16 - pos.count<PAWN>(), 0);
 
     // Compute the initiative bonus for the attacking side
     int complexity =   8 * pe->pawn_asymmetry()
-                    + 16 * pawns
+                    +  8 * pawns
                     + 12 * outflanking
                     + 16 * pawnsOnBothFlanks
                     + 48 * !pos.non_pawn_material()
