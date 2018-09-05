@@ -80,6 +80,7 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
+    Bitboard theirAttacks = pawn_attacks_bb<Them>(theirPawns);
 
     e->passedPawns[Us]   = e->pawnAttacksSpan[Us] = 0;
     e->weakUnopposed[Us] = e->pawnBreaks[Us]      = 0;
@@ -145,8 +146,14 @@ namespace {
         if (doubled && !supported)
             score -= Doubled;
 
-        if (lever || (leverPush && (phalanx || !more_than_one(leverPush))))
-            e->pawnBreaks[Us]++;
+        b = theirAttacks & forward_file_bb(Us, s - Up);
+        if (b)
+        {
+            Square sq = backmost_sq(Us, b);
+            if (   !(between_bb(s, sq + Up) & (ourPawns | theirPawns))
+                && ((e->pawnAttacks[Us] & sq) || !more_than_one(PawnAttacks[Us][s] & theirPawns)))
+                e->pawnBreaks[Us]++;
+        }
     }
 
     return score;
