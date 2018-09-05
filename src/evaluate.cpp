@@ -96,6 +96,7 @@ namespace {
   constexpr int RookSafeCheck   = 880;
   constexpr int BishopSafeCheck = 435;
   constexpr int KnightSafeCheck = 790;
+  constexpr int PawnSafeCheck   = 100;
 
 #define S(mg, eg) make_score(mg, eg)
 
@@ -408,8 +409,9 @@ namespace {
   template<Tracing T> template<Color Us>
   Score Evaluation<T>::king() const {
 
-    constexpr Color    Them = (Us == WHITE ? BLACK : WHITE);
-    constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
+    constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
+    constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
+    constexpr Bitboard  Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
     const Square ksq = pos.square<KING>(Us);
@@ -467,6 +469,15 @@ namespace {
         b = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
         if (b & safe)
             kingDanger += KnightSafeCheck;
+        else
+            unsafeChecks |= b;
+
+        // Enemy pawn checks
+        b =  PawnAttacks[Us][ksq]
+           & (  ( pos.pieces(Us) & attackedBy[Them][PAWN])
+              | (~pos.pieces()   & shift<Down>(pos.pieces(Them, PAWN))));
+        if (b & safe)
+            kingDanger += PawnSafeCheck;
         else
             unsafeChecks |= b;
 
