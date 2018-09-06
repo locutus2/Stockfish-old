@@ -786,18 +786,10 @@ namespace {
   template<Tracing T>
   Score Evaluation<T>::trend(Score score) const {
 
-    Value evalDiff = eg_value(score) - mg_value(score);
+    Value eg = eg_value(score);
+    Value evalDiff = eg - mg_value(score);
 
-    int pieceAttacks = popcount(  (pos.pieces(WHITE) & attackedBy[BLACK][ALL_PIECES])
-                                | (pos.pieces(BLACK) & attackedBy[WHITE][ALL_PIECES]));
-
-    // Compute the trend bonus for the side which better future eval
-    int trend = 8 * pieceAttacks;
-
-    // Now apply the bonus: note that we find the better side by extracting
-    // the sign of the value difference, and that we carefully cap the bonus so
-    // that the value difference will never change sign after the bonus.
-    int v = ((evalDiff > 0) - (evalDiff < 0)) * std::min(trend, abs(evalDiff));
+    int v = eg * int(evalDiff) > 0 ? evalDiff / 2 : 0;
 
     if (T)
         Trace::add(TREND, make_score(v, 0));
