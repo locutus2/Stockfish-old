@@ -756,7 +756,8 @@ namespace {
   Score Evaluation<T>::initiative(Score score) const {
 
     Value eg = eg_value(score);
-    int trend = eg - mg_value(score);
+
+    int trend = ((eg > 0) - (eg < 0)) * (eg - mg_value(score));
 
     int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
@@ -770,18 +771,18 @@ namespace {
                     + 12 * outflanking
                     + 16 * pawnsOnBothFlanks
                     + 48 * !pos.non_pawn_material()
+                    +      trend / 16
                     -118 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
     // that the endgame score will never change sign after the bonus.
     int v = ((eg > 0) - (eg < 0)) * std::max(complexity, -abs(eg));
-    int u = eg * trend < 0 ? trend / 16 : 0;
 
     if (T)
-        Trace::add(INITIATIVE, make_score(u, v));
+        Trace::add(INITIATIVE, make_score(0, v));
 
-    return make_score(u, v);
+    return make_score(0, v);
   }
 
 
