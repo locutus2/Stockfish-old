@@ -878,8 +878,8 @@ namespace {
             + passed< WHITE>() - passed< BLACK>()
             + space<  WHITE>() - space<  BLACK>();
 
-    score += trend(score);
     score += initiative(eg_value(score));
+    score += trend(score);
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = scale_factor(eg_value(score));
