@@ -757,7 +757,7 @@ namespace {
 
     Value eg = eg_value(score);
 
-    int trend = ((eg > 0) - (eg < 0)) * (eg - mg_value(score));
+    int trend = ((eg > 0) - (eg < 0)) * (eg - mg_value(score)) * me->game_phase() / PHASE_MIDGAME;
 
     int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
@@ -771,8 +771,8 @@ namespace {
                     + 12 * outflanking
                     + 16 * pawnsOnBothFlanks
                     + 48 * !pos.non_pawn_material()
-                    +      std::min(trend, 0) / 16
-                    -118 ;
+                    +      trend / 8
+                    -118;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
