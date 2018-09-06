@@ -788,8 +788,8 @@ namespace {
 
     Value evalDiff = eg_value(score) - mg_value(score);
 
-    int pieceAttacks = popcount(  (pos.pieces(WHITE) & attackedBy[BLACK][ALL_PIECES])
-                                | (pos.pieces(BLACK) & attackedBy[WHITE][ALL_PIECES]));
+    int pieceAttacks = popcount(  ((pos.pieces(WHITE) ^ pos.pieces(WHITE, PAWN)) & attackedBy[BLACK][ALL_PIECES])
+                                | ((pos.pieces(BLACK) ^ pos.pieces(BLACK, PAWN)) & attackedBy[WHITE][ALL_PIECES]));
 
     // Compute the trend bonus for the side which better future eval
     int trend = pieceAttacks;
