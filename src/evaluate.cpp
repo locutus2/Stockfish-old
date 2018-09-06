@@ -776,7 +776,7 @@ namespace {
     // the sign of the endgame value, and that we carefully cap the bonus so
     // that the endgame score will never change sign after the bonus.
     int v = ((eg > 0) - (eg < 0)) * std::max(complexity, -abs(eg));
-    int u = eg * trend > 0 ? trend / 16 : 0;
+    int u = eg * trend < 0 ? trend / 16 : 0;
 
     if (T)
         Trace::add(INITIATIVE, make_score(u, v));
