@@ -35,7 +35,7 @@ namespace Trace {
   enum Tracing { NO_TRACE, TRACE };
 
   enum Term { // The first 8 entries are reserved for PieceType
-    MATERIAL = 8, IMBALANCE, MOBILITY, THREAT, PASSED, SPACE, INITIATIVE, TOTAL, TERM_NB
+    MATERIAL = 8, IMBALANCE, MOBILITY, THREAT, PASSED, SPACE, INITIATIVE, TREND, TOTAL, TERM_NB
   };
 
   Score scores[TERM_NB][COLOR_NB];
@@ -59,7 +59,7 @@ namespace Trace {
 
   std::ostream& operator<<(std::ostream& os, Term t) {
 
-    if (t == MATERIAL || t == IMBALANCE || t == INITIATIVE || t == TOTAL)
+    if (t == MATERIAL || t == IMBALANCE || t == INITIATIVE || t == TREND || t == TOTAL)
         os << " ----  ----"    << " | " << " ----  ----";
     else
         os << scores[t][WHITE] << " | " << scores[t][BLACK];
@@ -197,6 +197,7 @@ namespace {
     template<Color Us> Score space() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
+    Score trend(Score score) const;
 
     const Position& pos;
     Material::Entry* me;
@@ -780,6 +781,30 @@ namespace {
     return make_score(0, v);
   }
 
+  // Evaluation::trend() considers the evaluation trend from mid- to endgame.
+
+  template<Tracing T>
+  Score Evaluation<T>::trend(Score score) const {
+
+    Value evalDiff = eg_value(score) - mg_value(score);
+
+    int pieceAttacks = popcount(  (pos.pieces(WHITE) & attackedBy[BLACK][ALL_PIECES])
+                                | (pos.pieces(BLACK) & attackedBy[WHITE][ALL_PIECES]));
+
+    // Compute the trend bonus for the side which better future eval
+    int trend = 8 * pieceAttacks;
+
+    // Now apply the bonus: note that we find the better side by extracting
+    // the sign of the value difference, and that we carefully cap the bonus so
+    // that the value difference will never change sign after the bonus.
+    int v = ((evalDiff > 0) - (evalDiff < 0)) * std::min(trend, abs(evalDiff));
+
+    if (T)
+        Trace::add(TREND, make_score(v, 0));
+
+    return make_score(v, 0);
+  }
+
 
   // Evaluation::scale_factor() computes the scale factor for the winning side
 
@@ -854,6 +879,7 @@ namespace {
             + space<  WHITE>() - space<  BLACK>();
 
     score += initiative(eg_value(score));
+    score += trend(score);
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = scale_factor(eg_value(score));
@@ -909,6 +935,7 @@ std::string Eval::trace(const Position& pos) {
      << "    Material | " << Term(MATERIAL)
      << "   Imbalance | " << Term(IMBALANCE)
      << "  Initiative | " << Term(INITIATIVE)
+     << "       Trend | " << Term(TREND)
      << "       Pawns | " << Term(PAWN)
      << "     Knights | " << Term(KNIGHT)
      << "     Bishops | " << Term(BISHOP)
