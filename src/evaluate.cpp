@@ -792,7 +792,7 @@ namespace {
                                 | (pos.pieces(BLACK) & attackedBy[WHITE][ALL_PIECES]));
 
     // Compute the trend bonus for the side which better future eval
-    int trend = 8 * pieceAttacks;
+    int trend = pieceAttacks;
 
     // Now apply the bonus: note that we find the better side by extracting
     // the sign of the value difference, and that we carefully cap the bonus so
