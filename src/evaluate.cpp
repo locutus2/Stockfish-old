@@ -787,9 +787,9 @@ namespace {
   Score Evaluation<T>::trend(Score score) const {
 
     Value evalDiff = eg_value(score) - mg_value(score);
+    Color betterSide = evalDiff > 0 ? WHITE : BLACK;
 
-    int pieceAttacks = popcount(  (pos.pieces(WHITE) & attackedBy[BLACK][ALL_PIECES])
-                                | (pos.pieces(BLACK) & attackedBy[WHITE][ALL_PIECES]));
+    int pieceAttacks = popcount(pos.pieces(~betterSide) & attackedBy[betterSide][ALL_PIECES]);
 
     // Compute the trend bonus for the side which better future eval
     int trend = pieceAttacks;
