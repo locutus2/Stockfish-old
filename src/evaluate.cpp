@@ -789,7 +789,7 @@ namespace {
     Value evalDiff = eg_value(score) - mg_value(score);
 
     // Compute the trend bonus for the side which better future eval
-    int trend = 32 - pos.count<ALL_PIECES>();
+    int trend = 16 - pos.count<PAWN>();
 
     // Now apply the bonus: note that we find the better side by extracting
     // the sign of the value difference, and that we carefully cap the bonus so
