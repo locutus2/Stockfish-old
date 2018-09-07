@@ -798,7 +798,8 @@ namespace {
             sf = 31;
         else if (    pos.non_pawn_material( strongSide) == RookValueMg
                  &&  pos.non_pawn_material(~strongSide) == BishopValueMg
-                 && !pe->passed_pawns(strongSide))
+                 && !pe->passed_pawns(strongSide)
+                 && !(pos.pieces(~strongSide, PAWN) & ~attackedBy[~strongSide][ALL_PIECES]))
         {
             int pawnsOnBishopColor = pe->pawns_on_same_color_squares(~strongSide, pos.square<BISHOP>(~strongSide));
             sf = std::min(40 + 7 *  pos.count<PAWN>( strongSide)
