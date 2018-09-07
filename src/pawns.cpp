@@ -62,6 +62,10 @@ namespace {
   constexpr Value BlockedStorm[RANK_NB] =
     { V(0), V(0), V(66), V(6), V(5), V(1), V(15) };
 
+  // Bonus for king at a/h-file blocking a storming pawn, by rank
+  constexpr Value BlockingEdgeKing[RANK_NB] =
+    { V(374), V(374), V(75) };
+
   #undef S
   #undef V
 
@@ -205,14 +209,15 @@ Value Entry::evaluate_shelter(const Position& pos, Square ksq) {
 
   constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
   constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
-  constexpr Bitboard  BlockRanks = (Us == WHITE ? Rank1BB | Rank2BB : Rank8BB | Rank7BB);
+  constexpr Bitboard  BlockRanks = (Us == WHITE ? Rank1BB | Rank2BB | Rank3BB
+                                                : Rank8BB | Rank7BB | Rank6BB);
 
   Bitboard b = pos.pieces(PAWN) & ~forward_ranks_bb(Them, ksq);
   Bitboard ourPawns = b & pos.pieces(Us);
   Bitboard theirPawns = b & pos.pieces(Them);
 
   Value safety = (shift<Down>(theirPawns) & (FileABB | FileHBB) & BlockRanks & ksq) ?
-                 (relative_rank(Us, ksq) == RANK_1 ? Value(374) : Value(329)) : Value(5);
+                 BlockingEdgeKing[relative_rank(Us, ksq)] : Value(5);
 
   File center = std::max(FILE_B, std::min(FILE_G, file_of(ksq)));
   for (File f = File(center - 1); f <= File(center + 1); ++f)
