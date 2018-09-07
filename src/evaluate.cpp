@@ -801,7 +801,8 @@ namespace {
                  && !pe->passed_pawns(strongSide))
         {
             int pawnsOnBishopColor = pe->pawns_on_same_color_squares(~strongSide, pos.square<BISHOP>(~strongSide));
-            sf = std::min(24 + 7 * (pos.count<PAWN>() - pawnsOnBishopColor), sf);
+            sf = std::min(40 + 7 *  pos.count<PAWN>( strongSide)
+                             - 7 * (pos.count<PAWN>(~strongSide) == pawnsOnBishopColor), sf);
         }
         else
             sf = std::min(40 + (pos.opposite_bishops() ? 2 : 7) * pos.count<PAWN>(strongSide), sf);
