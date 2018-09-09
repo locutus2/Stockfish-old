@@ -131,6 +131,13 @@ namespace {
                     e->passedPawns[Us] |= s;
         }
 
+        // Check if a 2 vs 1 pawn majority can create a passed pawn (par example pawns a2,b2 vs a7)
+        else if (   !opposed
+                 &&  popcount(stoppers) == 1
+                 && (b = (supported | phalanx) & file_bb(lsb(stoppers)))
+                 && (theirPawns & passed_pawn_mask(Us, frontmost_sq(Us, b))) == stoppers)
+            e->passedPawns[Us] |= s;
+
         // Score this pawn
         if (supported | phalanx)
             score += Connected[opposed][bool(phalanx)][popcount(supported)][relative_rank(Us, s)];
