@@ -692,10 +692,13 @@ namespace {
                 bonus += make_score(w + r * 2, w + r * 2);
         } // w != 0
 
+        if (pe->candidate_passed_pawns(Us) & s)
+            bonus = bonus / 4;
+
         // Scale down bonus for candidate passers which need more than one
         // pawn push to become passed, or have a pawn in front of them.
-        if (   !pos.pawn_passed(Us, s + Up)
-            || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
+        else if (   !pos.pawn_passed(Us, s + Up)
+                 || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
             bonus = bonus / 2;
 
         score += bonus + PassedFile[file_of(s)];
