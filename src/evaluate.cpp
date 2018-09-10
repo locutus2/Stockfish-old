@@ -706,7 +706,8 @@ namespace {
   template<Tracing T> template<Color Us>
   Score Evaluation<T>::passed() const {
 
-    constexpr Direction Up = (Us == WHITE ? NORTH : SOUTH);
+    constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
+    constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
 
     Bitboard b;
     Score score = SCORE_ZERO;
@@ -717,7 +718,7 @@ namespace {
     {
         Square s = pop_lsb(&b);
 
-        if (relative_rank(Us, s) != RANK_7 && pos.empty(s + Up))
+        if (relative_rank(Us, s) != RANK_7 && !(pos.pieces(Them) & (s + Up)))
             score += single_passed<Us>(s) + single_passed<Us>(s + Up);
         else
             score += single_passed<Us>(s) * 2;
