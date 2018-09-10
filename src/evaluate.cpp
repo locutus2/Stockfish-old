@@ -718,7 +718,7 @@ namespace {
         Square s = pop_lsb(&b);
 
         if (relative_rank(Us, s) != RANK_7 && pos.empty(s + Up))
-            score += (single_passed<Us>(s) * 3 + single_passed<Us>(s + Up)) / 4;
+            score += (single_passed<Us>(s) * 7 + single_passed<Us>(s + Up)) / 8;
         else
             score += single_passed<Us>(s);
     }
