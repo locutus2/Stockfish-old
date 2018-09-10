@@ -194,6 +194,7 @@ namespace {
     template<Color Us> Score king() const;
     template<Color Us> Score threats() const;
     template<Color Us> Score passed() const;
+    template<Color Us> Score single_passed(Square s) const;
     template<Color Us> Score space() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
@@ -614,20 +615,100 @@ namespace {
     return score;
   }
 
+
+  // Evaluation::single_passed() evaluates the passed pawn or candidate passed
+  // pawn on the given square and of the given color.
+
+  template<Tracing T> template<Color Us>
+  Score Evaluation<T>::single_passed(Square s) const {
+
+    constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
+    constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
+
+    auto king_proximity = [&](Color c, Square sq) {
+      return std::min(distance(pos.square<KING>(c), sq), 5);
+    };
+
+    Bitboard b, squaresToQueen, defendedSquares, unsafeSquares;
+    Score score = SCORE_ZERO;
+
+    assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
+
+    if (forward_file_bb(Us, s) & pos.pieces(Them))
+        score -= HinderPassedPawn;
+
+    int r = relative_rank(Us, s);
+    int w = PassedDanger[r];
+
+    Score bonus = PassedRank[r];
+
+    if (w)
+    {
+        Square blockSq = s + Up;
+
+        // Adjust bonus based on the king's proximity
+        bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
+                                - king_proximity(Us,   blockSq) * 2) * w);
+
+        // If blockSq is not the queening square then consider also a second push
+        if (r != RANK_7)
+            bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
+
+        // If the pawn is free to advance, then increase the bonus
+        if (pos.empty(blockSq))
+        {
+            // If there is a rook or queen attacking/defending the pawn from behind,
+            // consider all the squaresToQueen. Otherwise consider only the squares
+            // in the pawn's path attacked or occupied by the enemy.
+            defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, s);
+
+            b = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN) & pos.attacks_from<ROOK>(s);
+
+            if (!(pos.pieces(Us) & b))
+                defendedSquares &= attackedBy[Us][ALL_PIECES];
+
+            if (!(pos.pieces(Them) & b))
+                unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
+
+            // If there aren't any enemy attacks, assign a big bonus. Otherwise
+            // assign a smaller bonus if the block square isn't attacked.
+            int k = !unsafeSquares ? 20 : !(unsafeSquares & blockSq) ? 9 : 0;
+
+            // If the path to the queen is fully defended, assign a big bonus.
+            // Otherwise assign a smaller bonus if the block square is defended.
+            if (defendedSquares == squaresToQueen)
+                k += 6;
+
+            else if (defendedSquares & blockSq)
+                k += 4;
+
+            bonus += make_score(k * w, k * w);
+        }
+        else if (pos.pieces(Us) & blockSq)
+            bonus += make_score(w + r * 2, w + r * 2);
+    } // w != 0
+
+    // Scale down bonus for candidate passers which need more than one
+    // pawn push to become passed, or have a pawn in front of them.
+    if (   !pos.pawn_passed(Us, s + Up)
+        || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
+        bonus = bonus / 2;
+
+    score += bonus + PassedFile[file_of(s)];
+
+    return score;
+  }
+
+
   // Evaluation::passed() evaluates the passed pawns and candidate passed
   // pawns of the given color.
 
   template<Tracing T> template<Color Us>
   Score Evaluation<T>::passed() const {
 
-    constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
-    constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
+    constexpr Direction Up = (Us == WHITE ? NORTH : SOUTH);
 
-    auto king_proximity = [&](Color c, Square s) {
-      return std::min(distance(pos.square<KING>(c), s), 5);
-    };
-
-    Bitboard b, bb, squaresToQueen, defendedSquares, unsafeSquares;
+    Bitboard b;
     Score score = SCORE_ZERO;
 
     b = pe->passed_pawns(Us);
@@ -636,70 +717,12 @@ namespace {
     {
         Square s = pop_lsb(&b);
 
-        assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
-
-        if (forward_file_bb(Us, s) & pos.pieces(Them))
-            score -= HinderPassedPawn;
-
-        int r = relative_rank(Us, s);
-        int w = PassedDanger[r];
-
-        Score bonus = PassedRank[r];
-
-        if (w)
-        {
-            Square blockSq = s + Up;
-
-            // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
-                                    - king_proximity(Us,   blockSq) * 2) * w);
-
-            // If blockSq is not the queening square then consider also a second push
-            if (r != RANK_7)
-                bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
-
-            // If the pawn is free to advance, then increase the bonus
-            if (pos.empty(blockSq))
-            {
-                // If there is a rook or queen attacking/defending the pawn from behind,
-                // consider all the squaresToQueen. Otherwise consider only the squares
-                // in the pawn's path attacked or occupied by the enemy.
-                defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, s);
-
-                bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN) & pos.attacks_from<ROOK>(s);
-
-                if (!(pos.pieces(Us) & bb))
-                    defendedSquares &= attackedBy[Us][ALL_PIECES];
-
-                if (!(pos.pieces(Them) & bb))
-                    unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
-
-                // If there aren't any enemy attacks, assign a big bonus. Otherwise
-                // assign a smaller bonus if the block square isn't attacked.
-                int k = !unsafeSquares ? 20 : !(unsafeSquares & blockSq) ? 9 : 0;
-
-                // If the path to the queen is fully defended, assign a big bonus.
-                // Otherwise assign a smaller bonus if the block square is defended.
-                if (defendedSquares == squaresToQueen)
-                    k += 6;
-
-                else if (defendedSquares & blockSq)
-                    k += 4;
-
-                bonus += make_score(k * w, k * w);
-            }
-            else if (pos.pieces(Us) & blockSq)
-                bonus += make_score(w + r * 2, w + r * 2);
-        } // w != 0
-
-        // Scale down bonus for candidate passers which need more than one
-        // pawn push to become passed, or have a pawn in front of them.
-        if (   !pos.pawn_passed(Us, s + Up)
-            || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
-            bonus = bonus / 2;
-
-        score += bonus + PassedFile[file_of(s)];
+        if (relative_rank(Us, s) != RANK_7)
+            score += single_passed<Us>(s) + single_passed<Us>(s + Up);
+        else
+            score += single_passed<Us>(s) * 2;
     }
+    score = score / 2;
 
     if (T)
         Trace::add(PASSED, Us, score);
