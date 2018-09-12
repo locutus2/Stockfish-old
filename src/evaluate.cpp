@@ -765,7 +765,7 @@ namespace {
     int complexity =   8 * pe->pawn_asymmetry()
                     + 12 * pos.count<PAWN>()
                     + 12 * outflanking
-                    +  5 * pawnsOnBothFlanks * pos.count<PAWN>() / 3
+                    +      pawnsOnBothFlanks * (8 + 5 * pos.count<PAWN>() / 6)
                     + 48 * !pos.non_pawn_material()
                     -118;
 
