@@ -764,9 +764,9 @@ namespace {
     int pawnImbalance = std::abs(pos.count<PAWN>(WHITE) - pos.count<PAWN>(BLACK));
 
     // Compute the initiative bonus for the attacking side
-    int complexity =   4 * pawnImbalance
-                    +  8 * pe->pawn_asymmetry()
-                    + 13 * pos.count<PAWN>()
+    int complexity =   8 * pe->pawn_asymmetry()
+                    + 11 * pawnImbalance
+                    + 12 * pos.count<PAWN>()
                     + 12 * outflanking
                     + 16 * pawnsOnBothFlanks
                     + 48 * !pos.non_pawn_material()
