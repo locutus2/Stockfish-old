@@ -630,7 +630,7 @@ namespace {
 
         if (r > RANK_3)
         {
-            int w = (r-2) * (r-2) + 1;
+            int w = (r-2) * (r-2) + 3;
             Square blockSq = s + Up;
 
             // Adjust bonus based on the king's proximity
