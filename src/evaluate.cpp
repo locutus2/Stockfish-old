@@ -630,7 +630,8 @@ namespace {
 
         if (r > RANK_3)
         {
-            int w = (r-2) * (r-2) + 2;
+            int w = (r-2) * (r-2) + 2 + popcount(pe->passed_pawns(Us)) 
+                                      - popcount(pe->passed_pawns(Them));
             Square blockSq = s + Up;
 
             // Adjust bonus based on the king's proximity
