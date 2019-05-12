@@ -1018,8 +1018,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction if singular extension was done at this node
-          if (singularExtension)
+          // Decrease reduction if singular extension was done at Pv node
+          if (PvNode && singularExtension)
               r -= ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
