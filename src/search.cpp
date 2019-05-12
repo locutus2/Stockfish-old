@@ -1014,6 +1014,10 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Decrease reduction each eigth ply
+          if (ss->ply % 8 == 7)
+              r -= ONE_PLY;
+
           // Decrease reduction if position is or has been on the PV
           if (ttPv)
               r -= 2 * ONE_PLY;
