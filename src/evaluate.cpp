@@ -628,15 +628,15 @@ namespace {
 
         Score bonus = PassedRank[r];
 
-        if (r > RANK_2)
+        int w = (r-2) * std::abs(r-2) + 2;
+        Square blockSq = s + Up;
+
+        // Adjust bonus based on the king's proximity
+        bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
+                                - king_proximity(Us,   blockSq) * 2) * w);
+
+        if (r > RANK_3)
         {
-            int w = (r-2) * (r-2) + 2;
-            Square blockSq = s + Up;
-
-            // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
-                                    - king_proximity(Us,   blockSq) * 2) * w);
-
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
                 bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
