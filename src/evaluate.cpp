@@ -628,7 +628,7 @@ namespace {
 
         Score bonus = PassedRank[r];
 
-        if (r > RANK_3)
+        if (r > RANK_2)
         {
             int w = (r-2) * (r-2) + 2;
             Square blockSq = s + Up;
