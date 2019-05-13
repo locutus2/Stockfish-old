@@ -605,7 +605,7 @@ namespace {
             int d = 8 - distance(ksq, pop_lsb(&b));
             v += d * d;
         }
-        score += make_score(0, v / 2);
+        score += make_score(0, v / 3);
     }
 
     if (T)
