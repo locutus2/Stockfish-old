@@ -440,6 +440,12 @@ void Thread::search() {
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
+
+         if(!rootPos.capture_or_promotion(rootMoves[0].pv[0]))
+         {
+             bestMoves[1] = bestMoves[0];
+             bestMoves[0] = rootMoves[0].pv[0];
+         }
       }
 
       // Have we found a "mate in x"?
@@ -850,7 +856,7 @@ moves_loop: // When in check, search starts from here
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
-                                      ss->killers);
+                                      rootNode ? thisThread->bestMoves : ss->killers);
 
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
