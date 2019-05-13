@@ -153,7 +153,6 @@ namespace {
   constexpr Score TrappedRook        = S( 47,  4);
   constexpr Score WeakQueen          = S( 49, 15);
   constexpr Score WeakUnopposedPawn  = S( 12, 23);
-  constexpr Score WeakPawn           = S(  0,  3);
 
 #undef S
 
@@ -503,7 +502,6 @@ namespace {
     constexpr Bitboard  TRank3BB = (Us == WHITE ? Rank3BB : Rank6BB);
 
     Bitboard b, weak, defended, nonPawnEnemies, stronglyProtected, safe;
-    Square ksq = pos.square<KING>(Us);
     Score score = SCORE_ZERO;
 
     // Non-pawn enemies
@@ -596,10 +594,19 @@ namespace {
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
 
-    // Bonus for each enemy weak pawn dependant on the distance to our king.
+    // Bonus for enemy weak pawn based on the distance to our king.
     b = pe->weak_pawns(Them) & ~attackedBy[Us][KING] & ~attackedBy[Them][ALL_PIECES];
-    while (b)
-        score += WeakPawn * (8 - distance(ksq, pop_lsb(&b)));
+    if (b)
+    {
+        Square ksq = pos.square<KING>(Us);
+        int v = 0;
+        while (b)
+        {
+            int d = 8 - distance(ksq, pop_lsb(&b));
+            v += d * d;
+        }
+        score += make_score(0, v);
+    }
 
     if (T)
         Trace::add(THREAT, Us, score);
