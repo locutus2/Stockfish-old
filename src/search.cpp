@@ -295,8 +295,8 @@ void Thread::search() {
      (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
   ss->pv = pv;
 
-  ss->killers[0] = bestMoves[0];
-  ss->killers[1] = bestMoves[1];
+  ss->killers[0] = bestMoves[1];
+  ss->killers[1] = bestMoves[2];
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -446,6 +446,7 @@ void Thread::search() {
 
          if(!rootPos.capture_or_promotion(rootMoves[0].pv[0]))
          {
+             bestMoves[2] = bestMoves[1];
              bestMoves[1] = bestMoves[0];
              bestMoves[0] = rootMoves[0].pv[0];
          }
