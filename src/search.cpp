@@ -295,6 +295,9 @@ void Thread::search() {
      (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
   ss->pv = pv;
 
+  ss->killers[0] = bestMoves[0];
+  ss->killers[1] = bestMoves[1];
+
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
 
@@ -856,7 +859,7 @@ moves_loop: // When in check, search starts from here
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
-                                      rootNode ? thisThread->bestMoves : ss->killers);
+                                      ss->killers);
 
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
