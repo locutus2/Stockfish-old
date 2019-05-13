@@ -597,7 +597,7 @@ namespace {
     }
 
     // Bonus for each enemy weak pawn dependant on the distance to our king.
-    b = pe->weak_pawns(Them) & ~attackedBy[Us][KING];
+    b = pe->weak_pawns(Them) & ~attackedBy[Us][KING] & ~attackedBy[Them][ALL_PIECES];
     while (b)
         score += WeakPawn * (8 - distance(ksq, pop_lsb(&b)));
 
