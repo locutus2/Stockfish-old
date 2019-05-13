@@ -441,7 +441,8 @@ void Thread::search() {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
 
-         if(!rootPos.capture_or_promotion(rootMoves[0].pv[0]))
+         if(  !rootPos.capture_or_promotion(rootMoves[0].pv[0])
+            && rootMoves[0].pv[0] != bestMoves[0])
          {
              bestMoves[1] = bestMoves[0];
              bestMoves[0] = rootMoves[0].pv[0];
