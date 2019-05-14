@@ -856,6 +856,15 @@ moves_loop: // When in check, search starts from here
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
+    if (rootNode && !ss->killers[1])
+        for (unsigned i = 1; i < thisThread->rootMoves.size(); ++i)
+            if (    ss->killers[0] != thisThread->rootMoves[i].pv[0]
+                && !pos.capture_or_promotion(thisThread->rootMoves[i].pv[0]))
+            {
+                ss->killers[ss->killers[0] ? 1 : 0] = thisThread->rootMoves[i].pv[0];
+                break;
+            }
+
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
