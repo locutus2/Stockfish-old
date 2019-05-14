@@ -74,6 +74,7 @@ public:
   ContinuationHistory continuationHistory;
   Score contempt;
   Move bestMoves[2];
+  std::map<Move, Move[2]> bestMoves_ply1;
 };
 
 

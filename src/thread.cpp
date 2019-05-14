@@ -68,6 +68,7 @@ void Thread::clear() {
   continuationHistory[NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
 
   bestMoves[0] = bestMoves[1] = MOVE_NONE;
+  bestMoves_ply1.clear();
 }
 
 /// Thread::start_searching() wakes up the thread that will start the search

@@ -448,6 +448,30 @@ void Thread::search() {
          }
       }
 
+      for(RootMove &rm : rootMoves)
+      {
+          if (rm.pv.size() >= 2)
+          {
+              StateInfo st;
+              rootPos.do_move(rm.pv[0], st);
+              if (!rootPos.capture_or_promotion(rm.pv[1]))
+              {
+                  auto bm = bestMoves_ply1.find(rm.pv[0]);
+                  if (bm == bestMoves_ply1.end())
+                  {
+                      bestMoves_ply1[(ss-1)->currentMove][0] = rm.pv[1];
+                      bestMoves_ply1[(ss-1)->currentMove][1] = MOVE_NONE;
+                  }
+                  else if(rm.pv[1] != bm->second[0])
+                  {
+                      bm->second[1] = bm->second[0];
+                      bm->second[0] = rm.pv[1];
+                  }
+              }
+              rootPos.undo_move(rm.pv[0]);
+          }
+      }
+
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
@@ -851,12 +875,23 @@ moves_loop: // When in check, search starts from here
                                           nullptr, (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move* killers = ss->killers;
+
+    if (rootNode)
+       killers = thisThread->bestMoves;
+
+    else if (ss->ply == 1)
+    {
+        auto bm = thisThread->bestMoves_ply1.find((ss-1)->currentMove);
+        if (bm != thisThread->bestMoves_ply1.end())
+            killers = bm->second;
+    }
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
-                                      rootNode ? thisThread->bestMoves : ss->killers);
+                                      killers);
 
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
