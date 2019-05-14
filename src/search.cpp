@@ -859,7 +859,8 @@ moves_loop: // When in check, search starts from here
     if (rootNode && !ss->killers[1] && !thisThread->rootMoves.empty())
         for (unsigned i = 2; i < thisThread->rootMoves[0].pv.size(); i += 2)
            if (    ss->killers[0] != thisThread->rootMoves[0].pv[i]
-               && !pos.capture_or_promotion(thisThread->rootMoves[0].pv[i]))
+               && !pos.capture_or_promotion(thisThread->rootMoves[0].pv[i])
+               &&  pos.pseudo_legal(thisThread->rootMoves[0].pv[i]))
            {
                ss->killers[ss->killers[0] ? 1 : 0] = thisThread->rootMoves[0].pv[i];
                break;
