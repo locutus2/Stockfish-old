@@ -857,7 +857,6 @@ moves_loop: // When in check, search starts from here
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
     if (    rootNode
-        && !ss->killers[1]
         && !thisThread->rootMoves.empty()
         &&  thisThread->rootMoves[0].pv.size() >= 3
         &&  ss->killers[0] != thisThread->rootMoves[0].pv[2]
