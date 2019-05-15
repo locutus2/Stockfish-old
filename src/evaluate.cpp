@@ -313,7 +313,7 @@ namespace {
             if (bb & s)
             {
                 if (b & attackedBy[Them][KING])
-                    ++outpostsKingAttack[Us];
+                    outpostsKingAttack[Us] += (Pt == KNIGHT ? 2 : 1);
                 score += Outpost * (Pt == KNIGHT ? 4 : 2)
                                  * ((attackedBy[Us][PAWN] & s) ? 2 : 1);
             }
@@ -480,7 +480,7 @@ namespace {
                  -   6 * mg_value(score) / 8
                  +       mg_value(mobility[Them] - mobility[Us])
                  +   5 * kingFlankAttacks * kingFlankAttacks / 16
-                 + 100 * outpostsKingAttack[Them]
+                 +  50 * outpostsKingAttack[Them]
                  -   7;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
