@@ -117,8 +117,6 @@ namespace Material {
 
 Entry* probe(const Position& pos) {
 
-  constexpr Value PawnValuePhase = PawnValueMg;
-
   Key key = pos.material_key();
   Entry* e = pos.this_thread()->materialTable[key];
 
