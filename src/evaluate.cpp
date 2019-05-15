@@ -313,7 +313,7 @@ namespace {
             if (bb & s)
             {
                 if (b & attackedBy[Them][KING])
-                    outpostsKingAttack[Us] += (Pt == KNIGHT ? 2 : 1);
+                    outpostsKingAttack[Us] += (Pt == BISHOP ? 2 : 1);
                 score += Outpost * (Pt == KNIGHT ? 4 : 2)
                                  * ((attackedBy[Us][PAWN] & s) ? 2 : 1);
             }
