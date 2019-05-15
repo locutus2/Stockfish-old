@@ -309,7 +309,7 @@ namespace {
             if (bb & s)
                 score += Outpost * (Pt == KNIGHT ? 4 : 2)
                                  * (attackedBy[Us][PAWN] & s ? 2 : 1)
-                                 * (b & attackedBy[Them][KING] ? 9 : 7) / 8;
+                                 * (b & attackedBy[Them][KING] ? 4 : 3) / 4;
 
             else if (bb &= b & ~pos.pieces(Us))
                 score += Outpost * (Pt == KNIGHT ? 2 : 1)
