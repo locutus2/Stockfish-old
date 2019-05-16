@@ -1025,7 +1025,7 @@ moves_loop: // When in check, search starts from here
 
           // Increase reduction for higher depth at non-PV nodes
           if (!PvNode)
-              r += depth / (12 * ONE_PLY) * ONE_PLY;
+              r += depth / (10 * ONE_PLY) * ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
           r -= singularExtensionLMRmultiplier * ONE_PLY;
