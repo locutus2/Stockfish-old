@@ -1022,6 +1022,7 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if opponent's move count is high (~10 Elo)
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
+
           // Decrease reduction if move has been singularly extended
           r -= singularExtensionLMRmultiplier * ONE_PLY;
 
@@ -1059,7 +1060,7 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 20000 * ONE_PLY;
           }
 
-          Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), newDepth / (2 * ONE_PLY) * ONE_PLY);
+          Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), newDepth / (3 * ONE_PLY) * ONE_PLY);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
