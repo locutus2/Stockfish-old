@@ -651,10 +651,10 @@ namespace {
 
                 bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
 
-                if (!(pos.pieces(Us) & bb))
+                if (!(pos.pieces(Us) & bb & attacks_bb<ROOK>(s, pos.pieces(Them))))
                     defendedSquares &= attackedBy[Us][ALL_PIECES];
 
-                if (!(pos.pieces(Them) & bb))
+                if (!(pos.pieces(Them) & bb & attacks_bb<ROOK>(s, pos.pieces(Us))))
                     unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
 
                 // If there aren't any enemy attacks, assign a big bonus. Otherwise
