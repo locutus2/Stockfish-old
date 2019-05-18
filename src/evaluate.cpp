@@ -608,6 +608,7 @@ namespace {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
+    constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
 
     auto king_proximity = [&](Color c, Square s) {
       return std::min(distance(pos.square<KING>(c), s), 5);
@@ -633,7 +634,7 @@ namespace {
             int w = (r-2) * (r-2) + 2;
             Square blockSq = s + Up;
 
-            if (pe->passed_pawns(Us) & pos.attacks_from<PAWN>(s, Them))
+            if (pe->passed_pawns(Us) & pos.attacks_from<PAWN>(s, Them) & ~shift<Down>(pos.pieces(Them)))
                 ++w;
 
             // Adjust bonus based on the king's proximity
