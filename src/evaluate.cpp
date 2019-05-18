@@ -670,7 +670,7 @@ namespace {
                     k += 4;
 
                 else
-                    k += popcount(defendedSquares & attackedBy[Us][PAWN]);
+                    k += popcount(defendedSquares & attackedBy[Us][ALL_PIECES]);
 
                 bonus += make_score(k * w, k * w);
             }
