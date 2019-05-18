@@ -633,7 +633,7 @@ namespace {
             int w = (r-2) * (r-2) + 2;
             Square blockSq = s + Up;
 
-            if (adjacent_files_bb(file_of(s)) & pe->passed_pawns(Us) & pos.attacks_from<PAWN>(s, Them))
+            if (pe->passed_pawns(Us) & pos.attacks_from<PAWN>(s, Them))
                 ++w;
 
             // Adjust bonus based on the king's proximity
