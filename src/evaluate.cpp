@@ -669,7 +669,8 @@ namespace {
                 else if (defendedSquares & blockSq)
                     k += 4;
 
-                k += popcount(defendedSquares & attackedBy[Us][PAWN]);
+                else
+                    k += popcount(defendedSquares & attackedBy[Us][PAWN]);
 
                 bonus += make_score(k * w, k * w);
             }
