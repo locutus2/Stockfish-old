@@ -672,7 +672,10 @@ namespace {
                 bonus += make_score(k * w, k * w);
             }
             else if (pos.pieces(Us) & blockSq)
-                bonus += make_score(w, w);
+            {
+                int k = popcount(forward_file_bb(Us, s) & ~(attackedBy[Them][ALL_PIECES] | pos.pieces(Them)));
+                bonus += make_score(k, k);
+            }
         } // r > RANK_3
 
         // Scale down bonus for candidate passers which need more than one
