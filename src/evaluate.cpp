@@ -669,7 +669,7 @@ namespace {
                 else if (defendedSquares & blockSq)
                     k += 4;
 
-                bonus += make_score(k * w, k * w * pos.empty(blockSq));
+                bonus += make_score(k * w, k * w * (1 + pos.empty(blockSq)) / 2);
             }
         } // r > RANK_3
 
