@@ -673,8 +673,8 @@ namespace {
             }
             else if (pos.pieces(Us) & blockSq)
             {
-                int k = popcount(forward_file_bb(Us, s) & ~(attackedBy[Them][ALL_PIECES] | pos.pieces(Them)));
-                bonus += make_score(k, k);
+                int k = popcount(forward_file_bb(Us, s) & attackedBy[Us][ALL_PIECES]);
+                bonus += make_score(k * w, k * w);
             }
         } // r > RANK_3
 
