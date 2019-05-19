@@ -642,7 +642,7 @@ namespace {
                 bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
 
             // If the pawn is not blocked by an opponent piece or own pawn, then increase the bonus
-            if (!((pos.pieces(Them) | pos.pieces(Us, PAWN)) & blockSq))
+            if (!((pos.pieces() ^ pos.pieces(Us, PAWN)) & blockSq))
             {
                 // If there is a rook or queen attacking/defending the pawn from behind,
                 // consider all the squaresToQueen. Otherwise consider only the squares
