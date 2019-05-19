@@ -670,7 +670,7 @@ namespace {
                     k += 4;
 
                 else
-                    k += popcount(defendedSquares & unsafeSquares);
+                    k += 2 * popcount(defendedSquares);
 
                 bonus += make_score(k * w, k * w);
             }
