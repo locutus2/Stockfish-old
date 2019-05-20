@@ -679,8 +679,8 @@ namespace {
             || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
             bonus = bonus / 2;
 
-        if (!pos.empty(blockSq))
-            bonus = make_score(mg_value(bonus), 0);
+        if (!pos.empty(blockSq) && pos.non_pawn_material(Us) < QueenValueMg)
+            bonus = make_score(mg_value(bonus), eg_value(bonus) * int(pos.non_pawn_material(Us)) / QueenValueMg);
 
         score += bonus + PassedFile[file_of(s)];
     }
