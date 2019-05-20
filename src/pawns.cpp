@@ -76,11 +76,11 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
-    Bitboard badBishopSquares = ourPawns;
 
     e->passedPawns[Us] = e->pawnAttacksSpan[Us] = e->weakUnopposed[Us] = 0;
     e->kingSquares[Us]   = SQ_NONE;
     e->pawnAttacks[Us]   = pawn_attacks_bb<Us>(ourPawns);
+    e->badBishopSquares[Us] = ourPawns;
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
@@ -90,7 +90,7 @@ namespace {
         File f = file_of(s);
         Rank r = relative_rank(Us, s);
 
-        badBishopSquares |= forward_ranks_bb(Them, s) & attacks_bb<BISHOP>(s, pos.pieces(PAWN));
+        e->badBishopSquares[Us] |= forward_ranks_bb(Them, s) & attacks_bb<BISHOP>(s, pos.pieces(PAWN));
 
         e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
 
@@ -144,16 +144,13 @@ namespace {
             score -= Doubled;
     }
 
-    bb = ~badBishopSquares;
+    bb = ~e->badBishopSquares[Us];
     while (bb)
     {
         b = attacks_bb<BISHOP>(pop_lsb(&bb), pos.pieces(PAWN)) & ~ourPawns;
-        bb |= b & badBishopSquares;
-        badBishopSquares &= ~b;
+        bb |= b & e->badBishopSquares[Us];
+        e->badBishopSquares[Us] &= ~b;
     }
-
-    e->badBishopSquares[Us][WHITE] = popcount(badBishopSquares & ~DarkSquares);
-    e->badBishopSquares[Us][BLACK] = popcount(badBishopSquares &  DarkSquares);
 
     return score;
   }
