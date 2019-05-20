@@ -70,12 +70,13 @@ namespace {
     Bitboard b, bb, neighbours, stoppers, doubled, support, phalanx;
     Bitboard lever, leverPush;
     Square s;
-    bool opposed, backward;
+    bool opposed, backward, blocked;
     Score score = SCORE_ZERO;
     const Square* pl = pos.squares<PAWN>(Us);
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
+    Bitboard badBishopPawns = 0;
 
     e->passedPawns[Us] = e->pawnAttacksSpan[Us] = e->weakUnopposed[Us] = 0;
     e->kingSquares[Us]   = SQ_NONE;
@@ -90,8 +91,6 @@ namespace {
         File f = file_of(s);
         Rank r = relative_rank(Us, s);
 
-        e->badBishopSquares[Us] |= forward_ranks_bb(Them, s) & attacks_bb<BISHOP>(s, pos.pieces(PAWN));
-
         e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
 
         // Flag the pawn
@@ -103,6 +102,13 @@ namespace {
         neighbours = ourPawns   & adjacent_files_bb(f);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
+        blocked    = (ourPawns | theirPawns) & (s + Up);
+
+        if (!lever && (blocked || (leverPush && !support)))
+        {
+            e->badBishopSquares[Us] |= forward_ranks_bb(Them, s) & attacks_bb<BISHOP>(s, pos.pieces(PAWN));
+            badBishopPawns |= s;
+        }
 
         // A pawn is backward when it is behind all pawns of the same color
         // on the adjacent files and cannot be safely advanced.
@@ -147,7 +153,7 @@ namespace {
     bb = ~e->badBishopSquares[Us];
     while (bb)
     {
-        b = attacks_bb<BISHOP>(pop_lsb(&bb), pos.pieces(PAWN)) & ~ourPawns;
+        b = attacks_bb<BISHOP>(pop_lsb(&bb), pos.pieces(Them, PAWN) | badBishopPawns) & ~ourPawns;
         bb |= b & e->badBishopSquares[Us];
         e->badBishopSquares[Us] &= ~b;
     }
