@@ -1022,18 +1022,19 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if opponent's move count is high (~10 Elo)
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
+
           // Decrease reduction if move has been singularly extended
           r -= singularExtensionLMRmultiplier * ONE_PLY;
 
           if (!captureOrPromotion)
           {
-              // Increase reduction if ttMove is a capture (~0 Elo)
-              if (ttCapture)
+              // Increase reduction if ttMove is a capture. Exclude pawn moves. (~0 Elo)
+              if (ttCapture && type_of(movedPiece) != PAWN)
                   r += ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
-                  r += type_of(movedPiece) == PAWN ? ONE_PLY : 2 * ONE_PLY;
+                  r += 2 * ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
