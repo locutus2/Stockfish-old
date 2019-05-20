@@ -1018,11 +1018,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Increase reduction if target square was already entered
-          // by the same side along the path to current node
-          if ((ss-1)->triedSquares & to_sq(move))
-              r += ONE_PLY;
-
           // Decrease reduction if position is or has been on the PV
           if (ttPv)
               r -= 2 * ONE_PLY;
@@ -1035,6 +1030,11 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Increase reduction if target square was already entered
+              // by the same side along the path to current node
+              if ((ss-1)->triedSquares & to_sq(move))
+                  r += ONE_PLY;
+
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r += ONE_PLY;
