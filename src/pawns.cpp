@@ -20,7 +20,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <iostream>
 
 #include "bitboard.h"
 #include "pawns.h"
@@ -68,8 +67,8 @@ namespace {
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
 
-    Bitboard b, b1, b2, neighbours, stoppers, doubled, support, phalanx;
-    Bitboard lever, leverPush, badBishopSquares;
+    Bitboard b, bb, neighbours, stoppers, doubled, support, phalanx;
+    Bitboard lever, leverPush;
     Square s;
     bool opposed, backward;
     Score score = SCORE_ZERO;
@@ -77,13 +76,11 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
+    Bitboard badBishopSquares = ourPawns;
 
     e->passedPawns[Us] = e->pawnAttacksSpan[Us] = e->weakUnopposed[Us] = 0;
     e->kingSquares[Us]   = SQ_NONE;
     e->pawnAttacks[Us]   = pawn_attacks_bb<Us>(ourPawns);
-    badBishopSquares = ourPawns;
-
-    b1 = 0;
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
@@ -93,9 +90,7 @@ namespace {
         File f = file_of(s);
         Rank r = relative_rank(Us, s);
 
-        b = forward_ranks_bb(Them, s) & attacks_bb<BISHOP>(s, pos.pieces(PAWN));
-        badBishopSquares |= b1 & b;
-        b1  |= b;
+        badBishopSquares |= forward_ranks_bb(Them, s) & attacks_bb<BISHOP>(s, pos.pieces(PAWN));
 
         e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
 
@@ -149,14 +144,12 @@ namespace {
             score -= Doubled;
     }
 
-    b2 = b1;
-    badBishopSquares |= b2 &= ~ourPawns & (FileABB | FileHBB);
-
-    while (b2)
+    bb = ~badBishopSquares;
+    while (bb)
     {
-        s = pop_lsb(&b2);
-        b = forward_ranks_bb(Them, s) & attacks_bb<BISHOP>(s, pos.pieces(PAWN));
-        badBishopSquares |= b1 & b;
+        b = attacks_bb<BISHOP>(pop_lsb(&bb), pos.pieces(PAWN)) & ~ourPawns;
+        bb |= b & badBishopSquares;
+        badBishopSquares &= ~b;
     }
 
     e->badBishopSquares[Us][WHITE] = popcount(badBishopSquares & ~DarkSquares);
