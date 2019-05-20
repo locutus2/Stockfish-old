@@ -1028,8 +1028,8 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction if ttMove is a capture. Exclude pawn moves. (~0 Elo)
-              if (ttCapture && type_of(movedPiece) != PAWN)
+              // Increase reduction if ttMove is a capture (~0 Elo)
+              if (ttCapture)
                   r += ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
@@ -1053,7 +1053,7 @@ moves_loop: // When in check, search starts from here
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
                   r -= ONE_PLY;
 
-              else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
+              else if ((ss-1)->statScore >= 0 && ss->statScore < 0 && type_of(movedPiece) != PAWN)
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
