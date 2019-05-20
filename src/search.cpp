@@ -753,6 +753,7 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[NO_PIECE][0];
+        (ss+1)->triedSquares = (ss-1)->triedSquares;
 
         pos.do_null_move(st);
 
@@ -804,6 +805,7 @@ namespace {
 
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)];
+                (ss+1)->triedSquares = (ss-1)->triedSquares | to_sq(move);
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -1001,6 +1003,7 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
+      (ss+1)->triedSquares = (ss-1)->triedSquares | to_sq(move);
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1014,6 +1017,11 @@ moves_loop: // When in check, search starts from here
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Increase reduction if target square was already entered
+          // by the same side along the path to current node
+          if ((ss-1)->triedSquares & to_sq(move))
+              r += ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
           if (ttPv)
