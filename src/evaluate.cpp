@@ -621,6 +621,7 @@ namespace {
     while (b)
     {
         Square s = pop_lsb(&b);
+        Square blockSq = s + Up;
 
         assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
 
@@ -631,7 +632,6 @@ namespace {
         if (r > RANK_3)
         {
             int w = (r-2) * (r-2) + 2;
-            Square blockSq = s + Up;
 
             // Adjust bonus based on the king's proximity
             bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
@@ -678,6 +678,9 @@ namespace {
         if (   !pos.pawn_passed(Us, s + Up)
             || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
             bonus = bonus / 2;
+
+        if (!pos.empty(blockSq))
+            bonus = make_score(mg_value(bonus), 0);
 
         score += bonus + PassedFile[file_of(s)];
     }
