@@ -805,7 +805,11 @@ namespace {
 
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)];
-                (ss+1)->triedSquares = (ss-1)->triedSquares | to_sq(move);
+
+                if (pos.capture_or_promotion(move))
+                    (ss+1)->triedSquares = (ss-1)->triedSquares;
+                else
+                    (ss+1)->triedSquares = (ss-1)->triedSquares | to_sq(move);
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -1003,7 +1007,11 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
-      (ss+1)->triedSquares = (ss-1)->triedSquares | to_sq(move);
+
+      if (captureOrPromotion)
+          (ss+1)->triedSquares = (ss-1)->triedSquares;
+      else
+          (ss+1)->triedSquares = (ss-1)->triedSquares | to_sq(move);
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
