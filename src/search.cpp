@@ -851,6 +851,7 @@ moves_loop: // When in check, search starts from here
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
     int singularExtensionLMRmultiplier = 0;
+    Piece capturedPiece = pos.captured_piece();
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
@@ -1060,8 +1061,8 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 20000 * ONE_PLY;
           }
 
-          // Increase reduction if the previous moved piece is captured
-          else if(to_sq(move) == to_sq((ss-1)->currentMove))
+          // Increase reduction if the previous move was a non-capture and the moved piece is captured
+          else if(!capturedPiece && to_sq(move) == to_sq((ss-1)->currentMove))
               r += ONE_PLY;
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
