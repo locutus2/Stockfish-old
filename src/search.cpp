@@ -1025,7 +1025,7 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if move has been singularly extended
           if (singularExtensionLMRmultiplier)
-              r -= (singularExtensionLMRmultiplier + inCheck) * ONE_PLY;
+              r -= (singularExtensionLMRmultiplier + !(PvNode || cutNode)) * ONE_PLY;
 
           if (!captureOrPromotion)
           {
