@@ -1023,10 +1023,6 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Decrease reduction if move count pruning active at PV nodes
-          if (PvNode && moveCountPruning)
-              r -= ONE_PLY;
-
           // Decrease reduction if move has been singularly extended
           r -= singularExtensionLMRmultiplier * ONE_PLY;
 
@@ -1063,6 +1059,10 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
           }
+
+          // Increase reduction if the previous moved piece is captured
+          else if(to_sq(move) == to_sq((ss-1)->currentMove))
+              r += ONE_PLY;
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
