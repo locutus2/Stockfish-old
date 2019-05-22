@@ -1023,6 +1023,10 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
+          // Decrease reduction if move count pruning active at PV nodes
+          if (PvNode && moveCountPruning)
+              r -= ONE_PLY;
+
           // Decrease reduction if move has been singularly extended
           r -= singularExtensionLMRmultiplier * ONE_PLY;
 
@@ -1051,7 +1055,7 @@ moves_loop: // When in check, search starts from here
 
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
               if (ss->statScore >= 0 && (ss-1)->statScore < 0)
-                  r -= (1 + !(PvNode || cutNode)) * ONE_PLY;
+                  r -= ONE_PLY;
 
               else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
                   r += ONE_PLY;
