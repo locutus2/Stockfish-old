@@ -845,7 +845,7 @@ moves_loop: // When in check, search starts from here
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
-                                      ss->killers);
+                                      ((ss-1)->currentMove == MOVE_NULL ? ss : ss-2)->killers);
 
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
@@ -1501,12 +1501,6 @@ moves_loop: // When in check, search starts from here
     {
         ss->killers[1] = ss->killers[0];
         ss->killers[0] = move;
-    }
-
-    if ((ss-1)->currentMove == MOVE_NULL && (ss-2)->killers[0] != move)
-    {
-        (ss-2)->killers[1] = (ss-2)->killers[0];
-        (ss-2)->killers[0] = move;
     }
 
     Color us = pos.side_to_move();
