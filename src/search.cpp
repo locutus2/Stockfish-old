@@ -845,7 +845,7 @@ moves_loop: // When in check, search starts from here
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
-                                      ((ss-1)->currentMove == MOVE_NULL && !ss->killers[0] ? ss : ss-2)->killers);
+                                      ((ss-1)->currentMove == MOVE_NULL ? ss-2 : ss)->killers);
 
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
