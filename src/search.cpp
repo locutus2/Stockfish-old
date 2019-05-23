@@ -1023,9 +1023,9 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Decrease reduction if move has been singularly extended
+          // Increase reduction if move has been singularly extended
           if (singularExtensionLMRmultiplier)
-              r -= (singularExtensionLMRmultiplier + moveCountPruning) * ONE_PLY;
+              r -= (singularExtensionLMRmultiplier - moveCountPruning) * ONE_PLY;
 
           if (!captureOrPromotion)
           {
