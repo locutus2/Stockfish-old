@@ -1024,14 +1024,17 @@ moves_loop: // When in check, search starts from here
               r -= ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
-          if (singularExtensionLMRmultiplier)
-              r -= (singularExtensionLMRmultiplier - (PvNode && bestMove)) * ONE_PLY;
+          r -= singularExtensionLMRmultiplier * ONE_PLY;
 
           if (!captureOrPromotion)
           {
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r += ONE_PLY;
+
+              // Decrease reduction if counter move and noce count pruning active
+              if (move == countermove && moveCountPruning)
+                  r -= ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
