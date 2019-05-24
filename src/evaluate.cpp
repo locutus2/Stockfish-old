@@ -655,8 +655,7 @@ namespace {
                       & attacks_bb<ROOK>(s, pos.pieces(Us, PAWN) | (pos.pieces(Them) & attackedBy[Them][PAWN]))))
                     defendedSquares &= attackedBy[Us][ALL_PIECES];
 
-                if (!(  pos.pieces(Them, ROOK, QUEEN) & bb
-                      & attacks_bb<ROOK>(s, pos.pieces(Them, PAWN) | (pos.pieces(Us) & attackedBy[Us][PAWN]))))
+                if (!(pos.pieces(Them, ROOK, QUEEN) & bb))
                     unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
 
                 // If there aren't any enemy attacks, assign a big bonus. Otherwise
