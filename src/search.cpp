@@ -1023,12 +1023,9 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Increase reduction if at PV node a best move was found and in check
-          if (PvNode && bestMove && inCheck)
-              r += ONE_PLY;
-
           // Decrease reduction if move has been singularly extended
-          r -= singularExtensionLMRmultiplier * ONE_PLY;
+          if (singularExtensionLMRmultiplier)
+              r -= (singularExtensionLMRmultiplier - (PvNode && bestMove)) * ONE_PLY;
 
           if (!captureOrPromotion)
           {
