@@ -72,7 +72,7 @@ namespace {
 
   Depth reduction(bool i, Depth d, int mn) {
     int r = Reductions[d / ONE_PLY] * Reductions[mn];
-    return ((r + 128) / 256 + (!i && r > 256)) * ONE_PLY;
+    return ((r + 512) / 1024 + (!i && r > 1024)) * ONE_PLY;
   }
 
   constexpr int futility_move_count(bool improving, int depth) {
@@ -149,7 +149,7 @@ namespace {
 void Search::init() {
 
   for (int i = 1; i < MAX_MOVES; ++i)
-     Reductions[i] = int(11.45 * std::log(i));
+     Reductions[i] = int(0.09 + 22.9 * std::log(i));
 }
 
 
