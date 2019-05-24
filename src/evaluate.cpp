@@ -651,7 +651,7 @@ namespace {
 
                 bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
 
-                if (r == RANK_7)
+                if (r >= RANK_6)
                     bb &= pos.attacks_from<ROOK>(s);
 
                 if (!(pos.pieces(Us) & bb))
