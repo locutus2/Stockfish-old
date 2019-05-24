@@ -649,11 +649,9 @@ namespace {
                 // in the pawn's path attacked or occupied by the enemy.
                 defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, s);
 
-                bb =  forward_file_bb(Them, s)
-                    & pos.pieces(ROOK, QUEEN)
-                    & attacks_bb<ROOK>(s, pos.pieces(Them) & attackedBy[Them][PAWN]);
+                bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
 
-                if (!(pos.pieces(Us) & bb))
+                if (!(pos.pieces(Us) & bb & attacks_bb<ROOK>(s, pos.pieces(Them) & attackedBy[Them][PAWN])))
                     defendedSquares &= attackedBy[Us][ALL_PIECES];
 
                 if (!(pos.pieces(Them) & bb))
