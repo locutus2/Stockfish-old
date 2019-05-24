@@ -649,12 +649,14 @@ namespace {
                 // in the pawn's path attacked or occupied by the enemy.
                 defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, s);
 
-                bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
+                bb = forward_file_bb(Them, s);
 
-                if (!(pos.pieces(Us) & bb & attacks_bb<ROOK>(s, pos.pieces(Them) & attackedBy[Them][PAWN])))
+                if (!(  pos.pieces(Us, ROOK, QUEEN) & bb
+                      & attacks_bb<ROOK>(s, pos.pieces(Us, PAWN) | (pos.pieces(Them) & attackedBy[Them][PAWN]))))
                     defendedSquares &= attackedBy[Us][ALL_PIECES];
 
-                if (!(pos.pieces(Them) & bb))
+                if (!(  pos.pieces(Them, ROOK, QUEEN) & bb
+                      & attacks_bb<ROOK>(s, pos.pieces(Them, PAWN) | (pos.pieces(Us) & attackedBy[Us][PAWN]))))
                     unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
 
                 // If there aren't any enemy attacks, assign a big bonus. Otherwise
