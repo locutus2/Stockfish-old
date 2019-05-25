@@ -1033,7 +1033,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease reduction if late counter move
-              if (moveCount > 5 && move == countermove)
+              if (moveCount > 7 && move == countermove)
                   r -= ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
