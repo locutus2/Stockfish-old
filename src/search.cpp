@@ -1013,7 +1013,7 @@ moves_loop: // When in check, search starts from here
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha))
       {
-          Depth r = reduction(improving, depth, moveCount);
+          Depth r = reduction(improving, depth, move == countermove ? quietCount : moveCount);
 
           // Decrease reduction if position is or has been on the PV
           if (ttPv)
@@ -1031,10 +1031,6 @@ moves_loop: // When in check, search starts from here
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r += ONE_PLY;
-
-              // Decrease reduction if late counter move
-              if (moveCount > 7 && move == countermove)
-                  r -= ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
