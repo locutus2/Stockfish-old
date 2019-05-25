@@ -1014,7 +1014,7 @@ moves_loop: // When in check, search starts from here
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha))
       {
           Depth r = reduction(improving, depth,
-                              move == countermove && !captureOrPromotion ? 2 : moveCount);
+                              move == countermove && !captureOrPromotion ? moveCount - 1 : moveCount);
 
           // Decrease reduction if position is or has been on the PV
           if (ttPv)
