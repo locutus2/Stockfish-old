@@ -1132,14 +1132,16 @@ moves_loop: // When in check, search starts from here
           if (value > alpha)
           {
               bestMove = move;
-              if (moveCount > 1)
-                  --moveCount;
 
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
+              {
                   alpha = value;
+                  if (moveCount > 2 + 3 * rootNode)
+                      --moveCount;
+              }
               else
               {
                   assert(value >= beta); // Fail high
