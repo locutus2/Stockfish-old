@@ -1032,8 +1032,8 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r += ONE_PLY;
 
-              // Increase reduction if in check and king moves
-              if (inCheck && type_of(movedPiece) == KING)
+              // Increase reduction if in check and late king move
+              if (inCheck && type_of(movedPiece) == KING && moveCount > 4 + 3 * rootNode)
                   r += ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
