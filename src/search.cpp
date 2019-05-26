@@ -1032,9 +1032,9 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r += ONE_PLY;
 
-              // Decrease reduction if counter move and noce count pruning active
-              if (move == countermove && moveCountPruning)
-                  r -= 2 * ONE_PLY;
+              // Decrease reduction for late counter move
+              if (move == countermove && moveCount >= futility_move_count(improving, depth / ONE_PLY) - 1)
+                  r -= ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
