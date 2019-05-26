@@ -653,8 +653,7 @@ namespace {
 
                 if (pos.pieces(Us) & bb)
                     defendedSquares &=   attackedBy[Us][ALL_PIECES]
-                                      | (  attacks_bb<ROOK>(s, pos.pieces(Them) & ~attackedBy[Us][ALL_PIECES])
-                                         & ~pos.pieces(Them));
+                                      | (attacks_bb<ROOK>(s, pos.pieces(Them)) & ~pos.pieces(Them));
                 else
                     defendedSquares &= attackedBy[Us][ALL_PIECES];
 
@@ -668,7 +667,7 @@ namespace {
                 // If the path to the queen is fully defended, assign a big bonus.
                 // Otherwise assign a smaller bonus if the block square is defended.
                 if (defendedSquares == squaresToQueen)
-                    k += 6;
+                    k += 9;
 
                 else if (defendedSquares & blockSq)
                     k += 4;
