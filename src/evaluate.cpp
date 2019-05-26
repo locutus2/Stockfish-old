@@ -653,7 +653,8 @@ namespace {
 
                 if (pos.pieces(Us) & bb)
                     defendedSquares &=   attackedBy[Us][ALL_PIECES]
-                                      | (attacks_bb<ROOK>(s, pos.pieces(Them)) & ~pos.pieces(Them));
+                                      | (  attacks_bb<ROOK>(s, pos.pieces(Them) & ~attackedBy[Us][ALL_PIECES])
+                                         & ~pos.pieces(Them));
                 else
                     defendedSquares &= attackedBy[Us][ALL_PIECES];
 
