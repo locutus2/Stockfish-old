@@ -131,7 +131,46 @@ namespace {
     S( -1,  7), S( 0,  9), S(-9, -8), S(-30,-14),
     S(-30,-14), S(-9, -8), S( 0,  9), S( -1,  7)
   };
+  
+  // PassedKingProximity[Rank-1][Us/Them] contains a weight according to the rank and the considered king
+  int PassedKingProximity[RANK_NB-2][COLOR_NB] = {
+    {  0,  0 },
+    {  0,  0 },
+    {  6, 15 },
+    { 12, 30 },
+    { 22, 55 },
+    { 36, 90 }
+  }; 
+  
+  // PassedKingProximityAdditional[Rank-1][Us/Them] contains a weight according to the rank and the considered king
+  int PassedKingProximityAdditional[RANK_NB-3][COLOR_NB] = {
+    {  0, 0 },
+    {  0, 0 },
+    {  3, 0 },
+    {  6, 0 },
+    { 11, 0 }
+  };
 
+  // PassedDefended[Rank-1][full/block square] contains a weight according to the rank and defended squares
+  int PassedDefended[RANK_NB-2][2] = {
+    {   0,  0 },
+    {   0,  0 },
+    {  18, 12 },
+    {  36, 24 },
+    {  66, 44 },
+    { 108, 72 }
+  };
+  
+  // PassedUnsafe[Rank-1][full/block square] contains a weight according to the rank and unsafe squares
+  int PassedUnsafe[RANK_NB-2][2] = {
+    {   0,   0 },
+    {   0,   0 },
+    {  60,  27 },
+    { 120,  54 },
+    { 220,  99 },
+    { 360, 162 }
+  };
+  
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
@@ -627,51 +666,50 @@ namespace {
         int r = relative_rank(Us, s);
 
         Score bonus = PassedRank[r];
+        Square blockSq = s + Up;
 
-        if (r > RANK_3)
+        // Adjust bonus based on the king's proximity
+        int v =  king_proximity(Them, blockSq) * PassedKingProximity[r-1][1]
+               - king_proximity(Us,   blockSq) * PassedKingProximity[r-1][0];
+
+        // If blockSq is not the queening square then consider also a second push
+        if (r != RANK_7)
+            v +=  king_proximity(Them, blockSq + Up) * PassedKingProximityAdditional[r-1][1]
+                - king_proximity(Us  , blockSq + Up) * PassedKingProximityAdditional[r-1][0];
+    
+        bonus += make_score(0, v);
+
+        // If the pawn is free to advance, then increase the bonus
+        if (pos.empty(blockSq))
         {
-            int w = (r-2) * (r-2) + 2;
-            Square blockSq = s + Up;
+            // If there is a rook or queen attacking/defending the pawn from behind,
+            // consider all the squaresToQueen. Otherwise consider only the squares
+            // in the pawn's path attacked or occupied by the enemy.
+            defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, s);
 
-            // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (  king_proximity(Them, blockSq) * 5
-                                    - king_proximity(Us,   blockSq) * 2) * w);
+            bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
 
-            // If blockSq is not the queening square then consider also a second push
-            if (r != RANK_7)
-                bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
+            if (!(pos.pieces(Us) & bb))
+                defendedSquares &= attackedBy[Us][ALL_PIECES];
 
-            // If the pawn is free to advance, then increase the bonus
-            if (pos.empty(blockSq))
-            {
-                // If there is a rook or queen attacking/defending the pawn from behind,
-                // consider all the squaresToQueen. Otherwise consider only the squares
-                // in the pawn's path attacked or occupied by the enemy.
-                defendedSquares = unsafeSquares = squaresToQueen = forward_file_bb(Us, s);
+            if (!(pos.pieces(Them) & bb))
+                unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
 
-                bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
+            // If there aren't any enemy attacks, assign a big bonus. Otherwise
+            // assign a smaller bonus if the block square isn't attacked.
+            int k = !unsafeSquares             ? PassedUnsafe[r-1][0] : 
+                    !(unsafeSquares & blockSq) ? PassedUnsafe[r-1][1] : 0;
 
-                if (!(pos.pieces(Us) & bb))
-                    defendedSquares &= attackedBy[Us][ALL_PIECES];
+            // If the path to the queen is fully defended, assign a big bonus.
+            // Otherwise assign a smaller bonus if the block square is defended.
+            if (defendedSquares == squaresToQueen)
+                k += PassedDefended[r-1][0];
 
-                if (!(pos.pieces(Them) & bb))
-                    unsafeSquares &= attackedBy[Them][ALL_PIECES] | pos.pieces(Them);
+            else if (defendedSquares & blockSq)
+                k += PassedDefended[r-1][1];
 
-                // If there aren't any enemy attacks, assign a big bonus. Otherwise
-                // assign a smaller bonus if the block square isn't attacked.
-                int k = !unsafeSquares ? 20 : !(unsafeSquares & blockSq) ? 9 : 0;
-
-                // If the path to the queen is fully defended, assign a big bonus.
-                // Otherwise assign a smaller bonus if the block square is defended.
-                if (defendedSquares == squaresToQueen)
-                    k += 6;
-
-                else if (defendedSquares & blockSq)
-                    k += 4;
-
-                bonus += make_score(k * w, k * w);
-            }
-        } // r > RANK_3
+            bonus += make_score(k, k);
+        }
 
         // Scale down bonus for candidate passers which need more than one
         // pawn push to become passed, or have a pawn in front of them.
@@ -907,3 +945,5 @@ std::string Eval::trace(const Position& pos) {
 
   return ss.str();
 }
+
+TUNE(SetRange(centered_range), PassedKingProximity, PassedKingProximityAdditional, PassedDefended, PassedUnsafe);

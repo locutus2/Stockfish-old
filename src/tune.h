@@ -33,6 +33,11 @@ inline Range default_range(int v) {
   return v > 0 ? Range(0, 2 * v) : Range(2 * v, 0);
 }
 
+inline Range centered_range(int v) {
+  int r = std::max(100, std::abs(v) / 2);
+  return Range(v - r, v + r);
+}
+
 struct SetRange {
   explicit SetRange(RangeFun f) : fun(f) {}
   SetRange(int min, int max) : fun(nullptr), range(min, max) {}
