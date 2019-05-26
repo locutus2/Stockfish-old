@@ -134,41 +134,41 @@ namespace {
 
   // PassedKingProximity[Rank-1][Us/Them] contains a weight according to the rank and the considered king
   constexpr int PassedKingProximity[RANK_NB-2][COLOR_NB] = {
-    {  2, -4 },
-    { -7, -3 },
-    { 11, 18 },
-    { 13, 32 },
-    { 18, 65 },
-    { 38, 99 }
+    {  0,  0 },
+    {  0,  0 },
+    {  6, 15 },
+    { 12, 30 },
+    { 22, 55 },
+    { 36, 90 }
   };
 
   // PassedKingProximityAdditional[Rank-1][Us/Them] contains a weight according to the rank and the considered king
   constexpr int PassedKingProximityAdditional[RANK_NB-3][COLOR_NB] = {
-    { -2, 6 },
-    {  7, 2 },
-    {  6, 5 },
-    {  6, 4 },
-    { 21, 3 }
+    {  0, 0 },
+    {  0, 0 },
+    {  3, 0 },
+    {  6, 0 },
+    { 11, 0 }
   };
 
-  // PassedDefended[Rank-1][full/block square] contains a weight according to the rank and defended squares
-  constexpr int PassedDefended[RANK_NB-2][2] = {
-    {   6, -12 },
-    {   0,   0 },
-    {  21,   9 },
-    {  37,  18 },
-    {  63,  48 },
-    { 121,  77 }
+  // PassedDefended[Rank-1][full/block square/other] contains a weight according to the rank and defended squares
+  constexpr int PassedDefended[RANK_NB-2][3] = {
+    {   0,  0,  0 },
+    {   0,  0,  0 },
+    {  18, 12,  0 },
+    {  36, 24,  0 },
+    {  66, 44,  0 },
+    { 108, 72,  0 }
   };
 
-  // PassedUnsafe[Rank-1][full/block square] contains a weight according to the rank and unsafe squares
-  constexpr int PassedUnsafe[RANK_NB-2][2] = {
-    {  -3,   1 },
-    {  -3,  -5 },
-    {  69,  39 },
-    { 114,  63 },
-    { 223, 103 },
-    { 354, 161 }
+  // PassedUnsafe[Rank-1][full/block square/other] contains a weight according to the rank and unsafe squares
+  constexpr int PassedUnsafe[RANK_NB-2][3] = {
+    {   0,   0,   0 },
+    {   0,   0,   0 },
+    {  60,  27,   0 },
+    { 120,  54,   0 },
+    { 220,  99,   0 },
+    { 360, 162,   0 }
   };
 
   // Assorted bonuses and penalties
@@ -698,7 +698,7 @@ namespace {
             // If there aren't any enemy attacks, assign a big bonus. Otherwise
             // assign a smaller bonus if the block square isn't attacked.
             int k = !unsafeSquares             ? PassedUnsafe[r-1][0] :
-                    !(unsafeSquares & blockSq) ? PassedUnsafe[r-1][1] : 0;
+                    !(unsafeSquares & blockSq) ? PassedUnsafe[r-1][1] : PassedUnsafe[r-1][2];
 
             // If the path to the queen is fully defended, assign a big bonus.
             // Otherwise assign a smaller bonus if the block square is defended.
@@ -707,6 +707,9 @@ namespace {
 
             else if (defendedSquares & blockSq)
                 k += PassedDefended[r-1][1];
+
+            else
+                k += PassedDefended[r-1][2];
 
             bonus += make_score(k, k);
         }
