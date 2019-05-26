@@ -122,16 +122,16 @@ namespace {
   };
 
   // PassedRank[Rank] contains a bonus according to the rank of a passed pawn
-  constexpr Score PassedRank[RANK_NB] = {
+  Score PassedRank[RANK_NB] = {
     S(0, 0), S(5, 18), S(12, 23), S(10, 31), S(57, 62), S(163, 167), S(271, 250)
   };
 
   // PassedFile[File] contains a bonus according to the file of a passed pawn
-  constexpr Score PassedFile[FILE_NB] = {
+  Score PassedFile[FILE_NB] = {
     S( -1,  7), S( 0,  9), S(-9, -8), S(-30,-14),
     S(-30,-14), S(-9, -8), S( 0,  9), S( -1,  7)
   };
-  
+
   // PassedKingProximity[Rank-1][Us/Them] contains a weight according to the rank and the considered king
   int PassedKingProximity[RANK_NB-2][COLOR_NB] = {
     {  0,  0 },
@@ -140,8 +140,8 @@ namespace {
     { 12, 30 },
     { 22, 55 },
     { 36, 90 }
-  }; 
-  
+  };
+
   // PassedKingProximityAdditional[Rank-1][Us/Them] contains a weight according to the rank and the considered king
   int PassedKingProximityAdditional[RANK_NB-3][COLOR_NB] = {
     {  0, 0 },
@@ -151,26 +151,26 @@ namespace {
     { 11, 0 }
   };
 
-  // PassedDefended[Rank-1][full/block square] contains a weight according to the rank and defended squares
-  int PassedDefended[RANK_NB-2][2] = {
-    {   0,  0 },
-    {   0,  0 },
-    {  18, 12 },
-    {  36, 24 },
-    {  66, 44 },
-    { 108, 72 }
+  // PassedDefended[Rank-1][full/block square/other] contains a weight according to the rank and defended squares
+  int PassedDefended[RANK_NB-2][3] = {
+    {   0,  0,  0 },
+    {   0,  0,  0 },
+    {  18, 12,  0 },
+    {  36, 24,  0 },
+    {  66, 44,  0 },
+    { 108, 72,  0 }
   };
-  
-  // PassedUnsafe[Rank-1][full/block square] contains a weight according to the rank and unsafe squares
-  int PassedUnsafe[RANK_NB-2][2] = {
-    {   0,   0 },
-    {   0,   0 },
-    {  60,  27 },
-    { 120,  54 },
-    { 220,  99 },
-    { 360, 162 }
+
+  // PassedUnsafe[Rank-1][full/block square/other] contains a weight according to the rank and unsafe squares
+  int PassedUnsafe[RANK_NB-2][3] = {
+    {   0,   0,   0 },
+    {   0,   0,   0 },
+    {  60,  27,   0 },
+    { 120,  54,   0 },
+    { 220,  99,   0 },
+    { 360, 162,   0 }
   };
-  
+
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
@@ -676,7 +676,7 @@ namespace {
         if (r != RANK_7)
             v +=  king_proximity(Them, blockSq + Up) * PassedKingProximityAdditional[r-1][1]
                 - king_proximity(Us  , blockSq + Up) * PassedKingProximityAdditional[r-1][0];
-    
+
         bonus += make_score(0, v);
 
         // If the pawn is free to advance, then increase the bonus
@@ -698,7 +698,7 @@ namespace {
             // If there aren't any enemy attacks, assign a big bonus. Otherwise
             // assign a smaller bonus if the block square isn't attacked.
             int k = !unsafeSquares             ? PassedUnsafe[r-1][0] : 
-                    !(unsafeSquares & blockSq) ? PassedUnsafe[r-1][1] : 0;
+                    !(unsafeSquares & blockSq) ? PassedUnsafe[r-1][1] : PassedUnsafe[r-1][2];
 
             // If the path to the queen is fully defended, assign a big bonus.
             // Otherwise assign a smaller bonus if the block square is defended.
@@ -707,6 +707,9 @@ namespace {
 
             else if (defendedSquares & blockSq)
                 k += PassedDefended[r-1][1];
+
+            else
+                k += PassedDefended[r-1][2];
 
             bonus += make_score(k, k);
         }
@@ -946,4 +949,4 @@ std::string Eval::trace(const Position& pos) {
   return ss.str();
 }
 
-TUNE(SetRange(centered_range), PassedKingProximity, PassedKingProximityAdditional, PassedDefended, PassedUnsafe);
+TUNE(SetRange(centered_range), PassedKingProximity, PassedKingProximityAdditional, PassedDefended, PassedUnsafe, PassedRank, PassedFile);

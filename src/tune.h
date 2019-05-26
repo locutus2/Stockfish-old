@@ -34,7 +34,7 @@ inline Range default_range(int v) {
 }
 
 inline Range centered_range(int v) {
-  int r = std::max(100, std::abs(v) / 2);
+  int r = std::max(50, std::abs(v) / 2);
   return Range(v - r, v + r);
 }
 
