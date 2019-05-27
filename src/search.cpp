@@ -1361,6 +1361,7 @@ moves_loop: // When in check, search starts from here
       evasionPrunable =    inCheck
                        &&  (depth != DEPTH_ZERO || moveCount > 2)
                        &&  bestValue > VALUE_MATED_IN_MAX_PLY
+                       && !pvHit
                        && !pos.capture(move);
 
       // Don't search moves with negative SEE values
@@ -1413,7 +1414,7 @@ moves_loop: // When in check, search starts from here
     if (inCheck && bestValue == -VALUE_INFINITE)
         return mated_in(ss->ply); // Plies to mate from the root
 
-    tte->save(posKey, value_to_tt(bestValue, ss->ply), PvNode || pvHit,
+    tte->save(posKey, value_to_tt(bestValue, ss->ply), pvHit,
               bestValue >= beta ? BOUND_LOWER :
               PvNode && bestValue > oldAlpha  ? BOUND_EXACT : BOUND_UPPER,
               ttDepth, bestMove, ss->staticEval);
