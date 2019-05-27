@@ -123,52 +123,52 @@ namespace {
 
   // PassedRank[Rank] contains a bonus according to the rank of a passed pawn
   constexpr Score PassedRank[RANK_NB] = {
-    S(0, 0), S(5, 18), S(12, 23), S(10, 31), S(57, 62), S(163, 167), S(271, 250)
+    S(0, 0), S(4, 24), S(14, 26), S(5, 36), S(58, 68), S(161, 179), S(281, 231)
   };
 
   // PassedFile[File] contains a bonus according to the file of a passed pawn
   constexpr Score PassedFile[FILE_NB] = {
-    S( -1,  7), S( 0,  9), S(-9, -8), S(-30,-14),
-    S(-30,-14), S(-9, -8), S( 0,  9), S( -1,  7)
+    S(  2,  8), S( 2,  13), S(-15, -2), S(-26,-12),
+    S(-26,-16), S(-3, -18), S( -4, 21), S( -1,  3)
   };
 
   // PassedKingProximity[Rank-1][Us/Them] contains a weight according to the rank and the considered king
   constexpr int PassedKingProximity[RANK_NB-2][COLOR_NB] = {
-    {  0,  0 },
-    {  0,  0 },
-    {  6, 15 },
-    { 12, 30 },
-    { 22, 55 },
-    { 36, 90 }
+    {  0, -4 },
+    {  9,  1 },
+    {  7, 14 },
+    { 14, 31 },
+    { 23, 51 },
+    { 32, 89 }
   };
 
   // PassedKingProximityAdditional[Rank-1][Us/Them] contains a weight according to the rank and the considered king
   constexpr int PassedKingProximityAdditional[RANK_NB-3][COLOR_NB] = {
-    {  0, 0 },
-    {  0, 0 },
-    {  3, 0 },
-    {  6, 0 },
-    { 11, 0 }
+    { -2,  3 },
+    {  0,  4 },
+    {  6, -1 },
+    {  7,  3 },
+    { 16,  6 }
   };
 
   // PassedDefended[Rank-1][full/block square/other] contains a weight according to the rank and defended squares
   constexpr int PassedDefended[RANK_NB-2][3] = {
-    {   0,  0,  0 },
-    {   0,  0,  0 },
-    {  18, 12,  0 },
-    {  36, 24,  0 },
-    {  66, 44,  0 },
-    { 108, 72,  0 }
+    {   0, -6, -6 },
+    {  -6,  5,  8 },
+    {  12, 10,  1 },
+    {  38, 28, -4 },
+    {  61, 41, -5 },
+    { 110, 70,  3 }
   };
 
   // PassedUnsafe[Rank-1][full/block square/other] contains a weight according to the rank and unsafe squares
   constexpr int PassedUnsafe[RANK_NB-2][3] = {
-    {   0,   0,   0 },
-    {   0,   0,   0 },
-    {  60,  27,   0 },
-    { 120,  54,   0 },
-    { 220,  99,   0 },
-    { 360, 162,   0 }
+    {  -8,   0,   8 },
+    {   0,  -5,   0 },
+    {  69,  30,  12 },
+    { 115,  54,   4 },
+    { 240,  95,  -7 },
+    { 352, 177,   3 }
   };
 
   // Assorted bonuses and penalties
