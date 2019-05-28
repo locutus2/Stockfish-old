@@ -132,6 +132,11 @@ namespace {
     S(-30,-14), S(-9, -8), S( 0,  9), S( -1,  7)
   };
 
+  // RestrictedPiece[piece type] contains a restricion bonus according to restricted piece
+  constexpr Score RestrictedPiece[PIECE_TYPE_NB] = {
+     S(0, 0), S(0, 0), S(6, 6), S(6, 6), S(8, 8), S(10, 10), S(12, 12)
+  };
+
   // Assorted bonuses and penalties
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
@@ -143,7 +148,6 @@ namespace {
   constexpr Score MinorBehindPawn    = S( 18,  3);
   constexpr Score Outpost            = S(  9,  3);
   constexpr Score PawnlessFlank      = S( 17, 95);
-  constexpr Score RestrictedPiece    = S(  7,  7);
   constexpr Score RookOnPawn         = S( 10, 32);
   constexpr Score SliderOnQueen      = S( 59, 18);
   constexpr Score ThreatByKing       = S( 24, 89);
@@ -552,11 +556,14 @@ namespace {
 
     // Bonus for restricting their piece moves
     b =   attackedBy[Them][ALL_PIECES]
-       & ~attackedBy[Them][PAWN]
        & ~stronglyProtected
        &  attackedBy[Us][ALL_PIECES];
 
-    score += RestrictedPiece * popcount(b);
+    score +=  RestrictedPiece[KNIGHT] * popcount(b & attackedBy[Them][KNIGHT])
+            + RestrictedPiece[BISHOP] * popcount(b & attackedBy[Them][BISHOP])
+            + RestrictedPiece[ROOK]   * popcount(b & attackedBy[Them][ROOK])
+            + RestrictedPiece[QUEEN]  * popcount(b & attackedBy[Them][QUEEN])
+            + RestrictedPiece[KING]   * popcount(b & attackedBy[Them][KING]);
 
     // Bonus for enemy unopposed weak pawns
     if (pos.pieces(Us, ROOK, QUEEN))
