@@ -134,7 +134,7 @@ namespace {
 
   // RestrictedPiece[piece type] contains a restricion bonus according to attacking piece
   constexpr Score RestrictedPiece[PIECE_TYPE_NB] = {
-     S(0, 0), S(14, 14), S(10, 10), S(10, 10), S(5, 5), S(3, 3)
+     S(0, 0), S(9, 9), S(7, 7), S(7, 7), S(5, 5), S(3, 3)
   };
 
   // Assorted bonuses and penalties
