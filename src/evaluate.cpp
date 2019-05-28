@@ -144,7 +144,7 @@ namespace {
   constexpr Score Outpost            = S(  9,  3);
   constexpr Score PawnlessFlank      = S( 17, 95);
   constexpr Score RestrictedPiece    = S(  7,  7);
-  constexpr Score RestrictedKing     = S(  3,  3);
+  constexpr Score RestrictedQueen    = S(  3,  3);
   constexpr Score RookOnPawn         = S( 10, 32);
   constexpr Score SliderOnQueen      = S( 59, 18);
   constexpr Score ThreatByKing       = S( 24, 89);
@@ -557,7 +557,7 @@ namespace {
        &  attackedBy[Us][ALL_PIECES];
 
     score +=  RestrictedPiece * popcount(b)
-            + RestrictedKing  * popcount(b & attackedBy[Them][KING]);
+            + RestrictedQueen * popcount(b & attackedBy[Them][QUEEN]);
 
     // Bonus for enemy unopposed weak pawns
     if (pos.pieces(Us, ROOK, QUEEN))
