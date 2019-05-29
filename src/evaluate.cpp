@@ -419,7 +419,7 @@ namespace {
     b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
     // Enemy rooks checks
-    rookChecks = b1 & safe & attackedBy[Them][ROOK_NO_XRAY_THROUGH_QUEEN];
+    rookChecks = b1 & safe & attackedBy[Them][ROOK];
 
     if (rookChecks)
         kingDanger += RookSafeCheck;
@@ -539,7 +539,7 @@ namespace {
                 score += ThreatByRank * (int)relative_rank(Them, s);
         }
 
-        b = weak & attackedBy[Us][ROOK];
+        b = weak & attackedBy[Us][ROOK_NO_XRAY_THROUGH_QUEEN];
         while (b)
         {
             Square s = pop_lsb(&b);
