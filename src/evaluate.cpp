@@ -23,6 +23,7 @@
 #include <cstring>   // For std::memset
 #include <iomanip>
 #include <sstream>
+#include <iostream>
 
 #include "bitboard.h"
 #include "evaluate.h"
@@ -372,9 +373,20 @@ namespace {
         if (Pt == QUEEN)
         {
             // Penalty if any relative pin or discovered attack against the queen
-            Bitboard queenPinners;
-            if (pos.slider_blockers(pos.pieces(Them, ROOK, BISHOP), s, queenPinners))
-                score -= WeakQueen;
+            Bitboard queenPinners, discoveredAttackers;
+            if (pos.slider_blockers(pos.pieces(Them, ROOK, BISHOP), s, queenPinners, discoveredAttackers))
+            {
+               Bitboard weakAttacker =   discoveredAttackers
+                                      &  pos.pieces(Them, ROOK)
+                                      &  file_bb(s)
+                                      & ~attackedBy2[Them]
+                                      & ( ~attackedBy[Them][ALL_PIECES]
+                                         | attackedBy[Them][KING]
+                                         | attackedBy[Them][QUEEN]);
+
+               if (!weakAttacker || !(attackedBy[Us][QUEEN] & file_bb(s) & pos.pieces(Us, ROOK)))
+                   score -= WeakQueen;
+            }
         }
     }
     if (T)
