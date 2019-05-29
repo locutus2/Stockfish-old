@@ -424,7 +424,7 @@ namespace {
     if (rookChecks)
         kingDanger += RookSafeCheck;
     else
-        unsafeChecks |= b1 & attackedBy[Them][ROOK_NO_XRAY_THROUGH_QUEEN];
+        unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
     // Enemy queen safe checks: we count them only if they are from squares from
     // which we can't give a rook check, because rook checks are more valuable.
