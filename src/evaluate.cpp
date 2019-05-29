@@ -277,6 +277,9 @@ namespace {
 
     attackedBy[Us][Pt] = 0;
 
+    if (Pt == ROOK)
+        attackedBy[Us][ROOK_NO_XRAY_THROUGH_QUEEN] = 0;
+
     for (Square s = *pl; s != SQ_NONE; s = *++pl)
     {
         // Find attacked squares, including x-ray attacks for bishops and rooks
@@ -290,6 +293,9 @@ namespace {
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
+
+        if (Pt == ROOK)
+            attackedBy[Us][ROOK_NO_XRAY_THROUGH_QUEEN] |= b & attacks_bb<ROOK>(s, pos.pieces() ^ pos.pieces(Us, ROOK));
 
         if (b & kingRing[Them])
         {
@@ -588,8 +594,8 @@ namespace {
 
         score += KnightOnQueen * popcount(b & safe);
 
-        b =  (attackedBy[Us][BISHOP] & pos.attacks_from<BISHOP>(s))
-           | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
+        b =  (attackedBy[Us][BISHOP]                     & pos.attacks_from<BISHOP>(s))
+           | (attackedBy[Us][ROOK_NO_XRAY_THROUGH_QUEEN] & pos.attacks_from<ROOK  >(s));
 
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
