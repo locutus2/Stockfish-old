@@ -554,7 +554,7 @@ namespace {
     b =   attackedBy[Them][ALL_PIECES]
        & ~stronglyProtected
        &  attackedBy[Us][ALL_PIECES]
-       & ~pos.pieces(Them);
+       & ~pos.pieces(Them, PAWN);
 
     score += RestrictedPiece * popcount(b);
 
