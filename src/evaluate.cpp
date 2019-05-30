@@ -485,7 +485,7 @@ namespace {
                             | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]);
             evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks & ~excludedAttacks;
 
-            kingDanger += kingDanger * popcount(evasionAttacks) / 2;
+            kingDanger += kingDanger * popcount(evasionAttacks) / 8;
         }
     }
 
