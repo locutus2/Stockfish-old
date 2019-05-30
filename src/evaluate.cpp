@@ -455,7 +455,10 @@ namespace {
     // increase king danger for each attack move to the evasion square
     if (kingDanger)
     {
-        b = attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
+        b =      attackedBy[Us][KING]
+           & ~(  pos.pieces(Us)
+               | attackedBy2[Them]
+               | (attackedBy[Them][ALL_PIECES] & ~excludedAttacks));
         if (b && !more_than_one(b))
         {
             Square s = lsb(b);
@@ -482,7 +485,7 @@ namespace {
                             | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]);
             evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks & ~excludedAttacks;
 
-            kingDanger += kingDanger * popcount(evasionAttacks) / 8;
+            kingDanger += kingDanger * popcount(evasionAttacks) / 4;
         }
     }
 
