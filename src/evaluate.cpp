@@ -452,7 +452,7 @@ namespace {
         unsafeChecks |= knightChecks;
 
     // if a safe check exists and the king has only one square to retreat
-    // consider also attacks to the evasion square as unsafe checks
+    // increase king danger for each attack move to the evasion square
     if (kingDanger)
     {
         b = attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
@@ -482,7 +482,7 @@ namespace {
                             | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]);
             evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks & ~excludedAttacks;
 
-            kingDanger += kingDanger * popcount(evasionAttacks) / 4;
+            kingDanger += kingDanger * popcount(evasionAttacks) / 2;
         }
     }
 
