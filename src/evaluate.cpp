@@ -392,7 +392,7 @@ namespace {
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-    Bitboard weak, b, b1, b2, safe, unsafeChecks = 0, safeChecks = 0, evasionAttacks;
+    Bitboard weak, b, b1, b2, safe, unsafeChecks = 0, evasionAttacks, excludedAttacks = 0;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
@@ -416,7 +416,7 @@ namespace {
     rookChecks = b1 & safe & attackedBy[Them][ROOK];
 
     if (rookChecks)
-        kingDanger += RookSafeCheck, safeChecks |= rookChecks;
+        kingDanger += RookSafeCheck, excludedAttacks |= attackedBy[Them][ROOK];
     else
         unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
@@ -429,7 +429,7 @@ namespace {
                  & ~rookChecks;
 
     if (queenChecks)
-        kingDanger += QueenSafeCheck, safeChecks |= queenChecks;
+        kingDanger += QueenSafeCheck, excludedAttacks |= attackedBy[Them][QUEEN];
 
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
@@ -439,7 +439,7 @@ namespace {
                   & ~queenChecks;
 
     if (bishopChecks)
-        kingDanger += BishopSafeCheck, safeChecks |= bishopChecks;
+        kingDanger += BishopSafeCheck, excludedAttacks |= attackedBy[Them][BISHOP];
     else
         unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
@@ -447,18 +447,32 @@ namespace {
     knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
 
     if (knightChecks & safe)
-        kingDanger += KnightSafeCheck, safeChecks |= knightChecks & safe;
+        kingDanger += KnightSafeCheck, excludedAttacks |= attackedBy[Them][KNIGHT];
     else
         unsafeChecks |= knightChecks;
 
     // if a safe check exists and the king has only one square to retreat
     // consider also attacks to the evasion square as unsafe checks
-    if (safeChecks)
+    if (kingDanger)
     {
         b = attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
         if (b && !more_than_one(b))
         {
             Square s = lsb(b);
+            b = attackedBy[Us][KING] & ~pos.pieces(Us) & ~attackedBy2[Them];
+
+            if (b & attackedBy[Them][QUEEN])
+                excludedAttacks |= attackedBy[Them][QUEEN];
+
+            if (b & attackedBy[Them][ROOK])
+                excludedAttacks |= attackedBy[Them][ROOK];
+
+            if (b & attackedBy[Them][BISHOP])
+                excludedAttacks |= attackedBy[Them][BISHOP];
+
+            if (b & attackedBy[Them][KNIGHT])
+                excludedAttacks |= attackedBy[Them][KNIGHT];
+
             b1 = attacks_bb<ROOK  >(s, pos.pieces() ^ pos.pieces(Us, QUEEN, KING));
             b2 = attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, QUEEN, KING));
 
@@ -466,7 +480,7 @@ namespace {
                             | ((b1 | b2) & attackedBy[Them][QUEEN])
                             | (b2 & attackedBy[Them][BISHOP])
                             | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]);
-            evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks & ~safeChecks;
+            evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks & ~excludedAttacks;
 
             kingDanger += kingDanger * popcount(evasionAttacks) / 4;
         }
