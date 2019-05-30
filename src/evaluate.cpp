@@ -392,7 +392,7 @@ namespace {
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-    Bitboard weak, b, b1, b2, safe, unsafeChecks = 0, evasionAttacks;
+    Bitboard weak, b, b1, b2, safe, unsafeChecks = 0, safeChecks = 0, evasionAttacks;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
@@ -416,7 +416,7 @@ namespace {
     rookChecks = b1 & safe & attackedBy[Them][ROOK];
 
     if (rookChecks)
-        kingDanger += RookSafeCheck;
+        kingDanger += RookSafeCheck, safeChecks |= rookChecks;
     else
         unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
@@ -429,7 +429,7 @@ namespace {
                  & ~rookChecks;
 
     if (queenChecks)
-        kingDanger += QueenSafeCheck;
+        kingDanger += QueenSafeCheck, safeChecks |= queenChecks;
 
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
@@ -439,7 +439,7 @@ namespace {
                   & ~queenChecks;
 
     if (bishopChecks)
-        kingDanger += BishopSafeCheck;
+        kingDanger += BishopSafeCheck, safeChecks |= bishopChecks;
     else
         unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
@@ -447,13 +447,13 @@ namespace {
     knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
 
     if (knightChecks & safe)
-        kingDanger += KnightSafeCheck;
+        kingDanger += KnightSafeCheck, safeChecks |= knightChecks & safe;
     else
         unsafeChecks |= knightChecks;
 
     // if a safe check exists and the king has only one square to retreat
     // consider also attacks to the evasion square as unsafe checks
-    if (kingDanger)
+    if (safeChecks)
     {
         b = attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
         if (b && !more_than_one(b))
@@ -466,10 +466,9 @@ namespace {
                             | ((b1 | b2) & attackedBy[Them][QUEEN])
                             | (b2 & attackedBy[Them][BISHOP])
                             | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]);
-            evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks;
+            evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks & ~safeChecks;
 
-            if (evasionAttacks)
-                kingDanger += kingDanger / 4;
+            kingDanger += kingDanger * popcount(evasionAttacks) / 4;
         }
     }
 
