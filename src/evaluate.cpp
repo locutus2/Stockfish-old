@@ -451,6 +451,10 @@ namespace {
     else
         unsafeChecks |= knightChecks;
 
+    // if the king has no retreat squares increase king danger
+    if (!(attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES])))
+        kingDanger += kingDanger / 4;
+
     // Unsafe or occupied checking squares will also be considered, as long as
     // the square is in the attacker's mobility area.
     unsafeChecks &= mobilityArea[Them];
