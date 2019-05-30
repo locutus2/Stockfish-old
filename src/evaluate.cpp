@@ -466,7 +466,7 @@ namespace {
                             | ((b1 | b2) & attackedBy[Them][QUEEN])
                             | (b2 & attackedBy[Them][BISHOP])
                             | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]);
-            kingDanger += 40 * popcount(evasionAttacks & safe & mobilityArea[Them] & ~unsafeChecks);
+            kingDanger += kingDanger * popcount(evasionAttacks & safe & mobilityArea[Them] & ~unsafeChecks) / 4;
         }
     }
 
