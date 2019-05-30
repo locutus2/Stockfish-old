@@ -392,7 +392,7 @@ namespace {
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-    Bitboard weak, b1, b2, safe, unsafeChecks = 0;
+    Bitboard weak, b, b1, b2, safe, unsafeChecks = 0;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
@@ -450,6 +450,24 @@ namespace {
         kingDanger += KnightSafeCheck;
     else
         unsafeChecks |= knightChecks;
+
+    // if a safe check exists and the king has only one square to retreat
+    // consider also attacks to the evasion square as unsafe checks
+    if (kingDanger)
+    {
+        b = attackedBy[Us][KING] & ~(pos.pieces(Us) | attackedBy[Them][ALL_PIECES]);
+        if (b && !more_than_one(b))
+        {
+            Square s = lsb(b);
+            b1 = attacks_bb<ROOK  >(s, pos.pieces() ^ pos.pieces(Us, QUEEN, KING));
+            b2 = attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, QUEEN, KING));
+
+            unsafeChecks |= safe & (  (b1 & attackedBy[Them][ROOK])
+                                    | ((b1 | b2) & attackedBy[Them][QUEEN])
+                                    | (b2 & attackedBy[Them][BISHOP])
+                                    | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]));
+        }
+    }
 
     // Unsafe or occupied checking squares will also be considered, as long as
     // the square is in the attacker's mobility area.
