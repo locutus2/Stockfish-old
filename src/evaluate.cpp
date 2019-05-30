@@ -392,7 +392,7 @@ namespace {
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-    Bitboard weak, b, b1, b2, safe, unsafeChecks = 0;
+    Bitboard weak, b, b1, b2, safe, unsafeChecks = 0, evasionAttacks;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
@@ -462,10 +462,11 @@ namespace {
             b1 = attacks_bb<ROOK  >(s, pos.pieces() ^ pos.pieces(Us, QUEEN, KING));
             b2 = attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, QUEEN, KING));
 
-            unsafeChecks |= safe & (  (b1 & attackedBy[Them][ROOK])
-                                    | ((b1 | b2) & attackedBy[Them][QUEEN])
-                                    | (b2 & attackedBy[Them][BISHOP])
-                                    | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]));
+            evasionAttacks =  (b1 & attackedBy[Them][ROOK])
+                            | ((b1 | b2) & attackedBy[Them][QUEEN])
+                            | (b2 & attackedBy[Them][BISHOP])
+                            | (pos.attacks_from<KNIGHT>(s) & attackedBy[Them][KNIGHT]);
+            kingDanger += 75 * popcount(evasionAttacks & safe & mobilityArea[Them] & ~unsafeChecks);
         }
     }
 
