@@ -469,7 +469,7 @@ namespace {
             evasionAttacks &= safe & mobilityArea[Them] & ~unsafeChecks;
 
             if (evasionAttacks)
-                kingDanger += kingDanger / 8;
+                kingDanger += kingDanger / 4;
         }
     }
 
