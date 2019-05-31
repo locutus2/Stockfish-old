@@ -460,6 +460,7 @@ namespace {
         b1 =   attackedBy[Us][KING]
             & ~pos.pieces(Them)
             & ~attackedBy2[Us]
+            & ~attackedBy2[Them]
             &  attackedBy[Them][QUEEN];
         while(b1)
         {
