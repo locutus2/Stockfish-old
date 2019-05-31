@@ -393,7 +393,6 @@ namespace {
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
     Bitboard weak, b1, b2, safe, unsafeChecks = 0;
-    Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
 
@@ -413,43 +412,19 @@ namespace {
     b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
     // Enemy rooks checks
-    rookChecks = b1 & safe & attackedBy[Them][ROOK];
+    unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
-    if (rookChecks)
-        kingDanger += RookSafeCheck;
-    else
-        unsafeChecks |= b1 & attackedBy[Them][ROOK];
+    // Enemy queen safe checks
+    unsafeChecks |= (b1 | b2)
+                   & attackedBy[Them][QUEEN]
+                   & safe
+                   & ~attackedBy[Us][QUEEN];
 
-    // Enemy queen safe checks: we count them only if they are from squares from
-    // which we can't give a rook check, because rook checks are more valuable.
-    queenChecks =  (b1 | b2)
-                 & attackedBy[Them][QUEEN]
-                 & safe
-                 & ~attackedBy[Us][QUEEN]
-                 & ~rookChecks;
-
-    if (queenChecks)
-        kingDanger += QueenSafeCheck;
-
-    // Enemy bishops checks: we count them only if they are from squares from
-    // which we can't give a queen check, because queen checks are more valuable.
-    bishopChecks =  b2
-                  & attackedBy[Them][BISHOP]
-                  & safe
-                  & ~queenChecks;
-
-    if (bishopChecks)
-        kingDanger += BishopSafeCheck;
-    else
-        unsafeChecks |= b2 & attackedBy[Them][BISHOP];
+    // Enemy bishops checks
+    unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
     // Enemy knights checks
-    knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
-
-    if (knightChecks & safe)
-        kingDanger += KnightSafeCheck;
-    else
-        unsafeChecks |= knightChecks;
+    unsafeChecks |= pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
 
     // Unsafe or occupied checking squares will also be considered, as long as
     // the square is in the attacker's mobility area.
