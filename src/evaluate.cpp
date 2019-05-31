@@ -429,7 +429,7 @@ namespace {
                  & ~rookChecks;
 
     if (queenChecks)
-        kingDanger += QueenSafeCheck - 20 * !(queenChecks & attackedBy[Us][KING]);
+        kingDanger += QueenSafeCheck + 30 * bool(queenChecks & attackedBy[Us][KING]);
 
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
