@@ -460,7 +460,7 @@ namespace {
         b1 =   attackedBy[Us][KING]
             & ~pos.pieces(Them)
             & ~attackedBy2[Us]
-            &  attackedBy[Them][QUEEN];
+            &  attackedBy[Them][ALL_PIECES];
         while(b1)
         {
             Square s = pop_lsb(&b1);
