@@ -415,10 +415,9 @@ namespace {
     // Enemy rooks checks
     rookChecks = b1 & safe & attackedBy[Them][ROOK];
 
+    unsafeChecks |= b1 & attackedBy[Them][ROOK] & ~rookChecks;
     if (rookChecks)
         kingDanger += RookSafeCheck;
-    else
-        unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
     // Enemy queen safe checks: we count them only if they are from squares from
     // which we can't give a rook check, because rook checks are more valuable.
@@ -438,18 +437,16 @@ namespace {
                   & safe
                   & ~queenChecks;
 
+    unsafeChecks |= b2 & attackedBy[Them][BISHOP] & ~bishopChecks;
     if (bishopChecks)
         kingDanger += BishopSafeCheck;
-    else
-        unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
     // Enemy knights checks
     knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
 
+    unsafeChecks |= knightChecks & ~safe;
     if (knightChecks & safe)
         kingDanger += KnightSafeCheck;
-    else
-        unsafeChecks |= knightChecks;
 
     // Unsafe or occupied checking squares will also be considered, as long as
     // the square is in the attacker's mobility area.
