@@ -412,24 +412,23 @@ namespace {
     b1 = attacks_bb<ROOK  >(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
     b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ pos.pieces(Us, QUEEN));
 
-    // Enemy rooks checks
-    rookChecks = b1 & safe & attackedBy[Them][ROOK];
-
-    if (rookChecks)
-        kingDanger += RookSafeCheck;
-    else
-        unsafeChecks |= b1 & attackedBy[Them][ROOK];
-
     // Enemy queen safe checks: we count them only if they are from squares from
     // which we can't give a rook check, because rook checks are more valuable.
     queenChecks =  (b1 | b2)
                  & attackedBy[Them][QUEEN]
                  & safe
-                 & ~attackedBy[Us][QUEEN]
-                 & ~rookChecks;
+                 & ~attackedBy[Us][QUEEN];
 
     if (queenChecks)
         kingDanger += QueenSafeCheck;
+
+    // Enemy rooks checks
+    rookChecks = b1 & safe & attackedBy[Them][ROOK] & ~queenChecks;
+
+    if (rookChecks)
+        kingDanger += RookSafeCheck;
+    else
+        unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
