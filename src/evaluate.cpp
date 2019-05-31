@@ -453,7 +453,9 @@ namespace {
 
     // Unsafe or occupied checking squares will also be considered, as long as
     // the square is in the attacker's mobility area.
-    unsafeChecks &= mobilityArea[Them] | (pos.pieces(Them, PAWN) & attackedBy[Us][PAWN]);
+    unsafeChecks &=   mobilityArea[Them]
+                   | (  pos.pieces(Them, PAWN)
+                      & pawn_attacks_bb<Us>(pos.pieces(Us, PAWN) & ~attackedBy[Us][PAWN]));
 
     // Find the squares that opponent attacks in our king flank, and the squares
     // which are attacked twice in that flank.
