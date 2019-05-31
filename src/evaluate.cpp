@@ -455,6 +455,26 @@ namespace {
     // the square is in the attacker's mobility area.
     unsafeChecks &= mobilityArea[Them];
 
+    if (pos.pieces(Them, QUEEN) & ~attackedBy[Us][ALL_PIECES])
+    {
+        b1 =   attackedBy[Us][KING]
+            & ~pos.pieces(Them)
+            & ~attackedBy2[Us]
+            &  attackedBy[Them][QUEEN];
+        while(b1)
+        {
+            Square s = pop_lsb(&b1);
+            b2 =    attackedBy[Us][KING]
+                & ~(  pos.pieces(Us)
+                    | attackedBy2[Them]
+                    | (attackedBy[Them][ALL_PIECES] & ~attackedBy[Them][QUEEN])
+                    | attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, KING))
+                    | attacks_bb<ROOK  >(s, pos.pieces() ^ pos.pieces(Us, KING)));
+            if (!b2)
+                kingDanger += 50;
+        }
+    }
+
     // Find the squares that opponent attacks in our king flank, and the squares
     // which are attacked twice in that flank.
     b1 = attackedBy[Them][ALL_PIECES] & KingFlank[file_of(ksq)] & Camp;
