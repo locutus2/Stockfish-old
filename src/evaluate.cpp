@@ -307,15 +307,10 @@ namespace {
             // Bonus if piece is on an outpost square or can reach one
             bb = OutpostRanks & ~pe->pawn_attacks_span(Them);
 
-            if (file_of(pos.square<KING>(Them)) > FILE_E)
-                bb &= ~FileABB;
-
-            else if (file_of(pos.square<KING>(Them)) < FILE_D)
-                bb &= ~FileHBB;
-
             if (bb & s)
                 score += Outpost * (Pt == KNIGHT ? 4 : 2)
-                                 * ((attackedBy[Us][PAWN] & s) ? 2 : 1);
+                                 * ((attackedBy[Us][PAWN] & s)                        ? 2 :
+                                    (forward_file_bb(Us, s) & pos.pieces(Them, PAWN)) ? 1 : 0);
 
             else if (bb &= b & ~pos.pieces(Us))
                 score += Outpost * (Pt == KNIGHT ? 2 : 1)
