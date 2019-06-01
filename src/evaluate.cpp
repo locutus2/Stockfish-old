@@ -391,6 +391,7 @@ namespace {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
+    constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
     constexpr Bitboard  Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
@@ -457,6 +458,7 @@ namespace {
     if (pos.pieces(Them ,QUEEN))
         unsafeChecks |=   PawnAttacks[Us][ksq]
                        &  safe
+                       &  shift<Up>(pos.pieces() | attackedBy[Them][ALL_PIECES])
                        &  (  ((pos.pieces(Us) ^ pos.pieces(Us, PAWN)) & attackedBy[Them][PAWN])
                            | (~pos.pieces()   & shift<Down>(pos.pieces(Them, PAWN))));
 
