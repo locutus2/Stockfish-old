@@ -309,12 +309,12 @@ namespace {
             if (bb & s)
                 score += Outpost * (Pt == KNIGHT ? 2 : 1)
                                  * ((attackedBy[Us][PAWN] & s) ? 2 : 1)
-                                 * (~(Rank1BB | Rank2BB | Rank7BB | Rank8BB) & s ? 2 : 1);
+                                 * (~(Rank1BB | Rank2BB | Rank7BB | Rank8BB) & s ? 4 : 1) / 2;
 
             else if (bb &= b & ~pos.pieces(Us))
                 score += Outpost * (Pt == KNIGHT ? 2 : 1)
                                  * ((attackedBy[Us][PAWN] & bb) ? 2 : 1)
-                                 * (~(Rank1BB | Rank2BB | Rank7BB | Rank8BB) & bb ? 2 : 1) / 2;
+                                 * (~(Rank1BB | Rank2BB | Rank7BB | Rank8BB) & bb ? 4 : 1) / 4;
 
             // Knight and Bishop bonus for being right behind a pawn
             if (shift<Down>(pos.pieces(PAWN)) & s)
