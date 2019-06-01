@@ -18,6 +18,7 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <algorithm>
 #include <cassert>
 #include <cstring>   // For std::memset
@@ -453,10 +454,11 @@ namespace {
         unsafeChecks |= knightChecks;
 
     // Enemy safe pawns checks
-    unsafeChecks |=  PawnAttacks[Us][ksq]
-                   & safe
-                   & (  ( pos.pieces(Us) & attackedBy[Them][PAWN])
-                      | (~pos.pieces()   & shift<Down>(pos.pieces(Them, PAWN))));
+    if (pos.pieces(Them ,QUEEN))
+        unsafeChecks |=   PawnAttacks[Us][ksq]
+                       &  safe
+                       &  (  ((pos.pieces(Us) ^ pos.pieces(Us, PAWN)) & attackedBy[Them][PAWN])
+                           | (~pos.pieces()   & shift<Down>(pos.pieces(Them, PAWN))));
 
     // Unsafe or occupied checking squares will also be considered, as long as
     // the square is in the attacker's mobility area.
