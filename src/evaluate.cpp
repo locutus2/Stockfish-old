@@ -452,9 +452,11 @@ namespace {
     else
         unsafeChecks |= knightChecks;
 
-    // Enemy pawns checks
-    unsafeChecks |= PawnAttacks[Us][ksq] & (  ( pos.pieces(Us) & attackedBy[Them][PAWN])
-                                            | (~pos.pieces()   & shift<Down>(pos.pieces(Them, PAWN))));
+    // Enemy safe pawns checks
+    unsafeChecks |=  PawnAttacks[Us][ksq]
+                   & safe
+                   & (  ( pos.pieces(Us) & attackedBy[Them][PAWN])
+                      | (~pos.pieces()   & shift<Down>(pos.pieces(Them, PAWN))));
 
     // Unsafe or occupied checking squares will also be considered, as long as
     // the square is in the attacker's mobility area.
