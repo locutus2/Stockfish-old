@@ -89,7 +89,7 @@ namespace {
 #define S(mg, eg) make_score(mg, eg)
 
 constexpr int spreadSNmg = 0, fixedSNmg = 0;
-constexpr int spreadSNeg = -8, fixedSNeg = 5;
+constexpr int spreadSNeg = 8, fixedSNeg = 5;
 
 #define SN(mg, eg) make_score(mg+spreadSNmg*(mg-fixedSNmg)/(33+62), eg+spreadSNeg*(eg-fixedSNeg)/(33+81))
 
