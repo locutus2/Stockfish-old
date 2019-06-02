@@ -298,7 +298,11 @@ namespace {
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
-        int mob = popcount(b & mobilityArea[Us]);
+        int mob;
+        if (Pt == BISHOP)
+            mob = popcount(b & mobilityArea[Us] & ~(FileABB | FileHBB));
+        else
+            mob = popcount(b & mobilityArea[Us]);
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
