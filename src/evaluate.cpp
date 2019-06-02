@@ -87,7 +87,7 @@ namespace {
   constexpr int KnightSafeCheck = 790;
 
 #define S(mg, eg) make_score(mg, eg)
-#define S2(mg, eg) make_score(-48+(mg+48)*(98+48)/(81+48), -59+(eg+59)*(97+59)/(78+59))
+#define S2(mg, eg) make_score(mg+11, eg+13)
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
@@ -269,6 +269,7 @@ namespace {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
+    constexpr Bitboard BaseRank = (Us == WHITE ? Rank1BB : Rank8BB);
     constexpr Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
                                                    : Rank5BB | Rank4BB | Rank3BB);
     const Square* pl = pos.squares<Pt>(Us);
@@ -301,7 +302,7 @@ namespace {
 
         int mob;
         if (Pt == BISHOP)
-            mob = popcount(b & mobilityArea[Us] & ~(FileABB | FileHBB));
+            mob = popcount(b & mobilityArea[Us] & ~BaseRank);
         else
             mob = popcount(b & mobilityArea[Us]);
 
