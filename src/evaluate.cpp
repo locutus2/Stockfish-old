@@ -87,7 +87,7 @@ namespace {
   constexpr int KnightSafeCheck = 790;
 
 #define S(mg, eg) make_score(mg, eg)
-#define S2(mg, eg) make_score(mg+11, eg+13)
+#define S2(mg, eg) make_score(-48+(mg+48)*(98+48)/(81+48), -59+(eg+59)*(97+59)/(86+59))
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
