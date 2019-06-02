@@ -88,22 +88,32 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-constexpr int spreadSNmg = 0, fixedSNmg = 0;
+constexpr int spreadSNmg = -8, fixedSNmg = 10;
 constexpr int spreadSNeg = 8, fixedSNeg = 5;
 
 #define SN(mg, eg) make_score(mg+spreadSNmg*(mg-fixedSNmg)/(33+62), eg+spreadSNeg*(eg-fixedSNeg)/(33+81))
+
+constexpr int spreadSBmg = 0, fixedSBmg = 0;
+constexpr int spreadSBeg = 0, fixedSBeg = 0;
+
+#define SB(mg, eg) make_score(mg+spreadSBmg*(mg-fixedSBmg)/(98+48), eg+spreadSBeg*(eg-fixedSBeg)/(97+59))
+
+constexpr int spreadSRmg = 0, fixedSRmg = 0;
+constexpr int spreadSReg = 0, fixedSReg = 0;
+
+#define SR(mg, eg) make_score(mg+spreadSRmg*(mg-fixedSRmg)/(58+58), eg+spreadSReg*(eg-fixedSReg)/(171+76))
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
   constexpr Score MobilityBonus[][32] = {
     { SN(-62,-81), SN(-53,-56), SN(-12,-30), SN( -4,-14), SN(  3,  8), SN( 13, 15), // Knights
       SN( 22, 23), SN( 28, 27), SN( 33, 33) },
-    { S(-48,-59), S(-20,-23), S( 16, -3), S( 26, 13), S( 38, 24), S( 51, 42), // Bishops
-      S( 55, 54), S( 63, 57), S( 63, 65), S( 68, 73), S( 81, 78), S( 81, 86),
-      S( 91, 88), S( 98, 97) },
-    { S(-58,-76), S(-27,-18), S(-15, 28), S(-10, 55), S( -5, 69), S( -2, 82), // Rooks
-      S(  9,112), S( 16,118), S( 30,132), S( 29,142), S( 32,155), S( 38,165),
-      S( 46,166), S( 48,169), S( 58,171) },
+    { SB(-48,-59), SB(-20,-23), SB( 16, -3), SB( 26, 13), SB( 38, 24), SB( 51, 42), // Bishops
+      SB( 55, 54), SB( 63, 57), SB( 63, 65), SB( 68, 73), SB( 81, 78), SB( 81, 86),
+      SB( 91, 88), SB( 98, 97) },
+    { SR(-58,-76), SR(-27,-18), SR(-15, 28), SR(-10, 55), SR( -5, 69), SR( -2, 82), // Rooks
+      SR(  9,112), SR( 16,118), SR( 30,132), SR( 29,142), SR( 32,155), SR( 38,165),
+      SR( 46,166), SR( 48,169), SR( 58,171) },
     { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Queens
       S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
       S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
