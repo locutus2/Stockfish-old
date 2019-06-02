@@ -88,11 +88,16 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
+constexpr int spreadSNmg = -8, fixedSNmg = 10;
+constexpr int spreadSNeg = 0, fixedSNeg = 0;
+
+#define SN(mg, eg) make_score(mg+spreadSNmg*(mg-fixedSNmg)/(33+62), eg+spreadSNeg*(eg-fixedSNeg)/(33+81))
+
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
   constexpr Score MobilityBonus[][32] = {
-    { S(-62,-81), S(-53,-56), S(-12,-30), S( -4,-14), S(  3,  8), S( 13, 15), // Knights
-      S( 22, 23), S( 28, 27), S( 33, 33) },
+    { SN(-62,-81), SN(-53,-56), SN(-12,-30), SN( -4,-14), SN(  3,  8), SN( 13, 15), // Knights
+      SN( 22, 23), SN( 28, 27), SN( 33, 33) },
     { S(-48,-59), S(-20,-23), S( 16, -3), S( 26, 13), S( 38, 24), S( 51, 42), // Bishops
       S( 55, 54), S( 63, 57), S( 63, 65), S( 68, 73), S( 81, 78), S( 81, 86),
       S( 91, 88), S( 98, 97) },
