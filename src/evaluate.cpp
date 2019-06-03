@@ -94,7 +94,7 @@ constexpr int spreadSNeg = 0, fixedSNeg = 0;
 #define SN(mg, eg) make_score(mg+spreadSNmg*(mg-fixedSNmg)/(33+62), eg+spreadSNeg*(eg-fixedSNeg)/(33+81))
 
 constexpr int spreadSBmg = 0, fixedSBmg = 0;
-constexpr int spreadSBeg = -8, fixedSBeg = 40;
+constexpr int spreadSBeg = 0, fixedSBeg = 0;
 
 #define SB(mg, eg) make_score(mg+spreadSBmg*(mg-fixedSBmg)/(98+48), eg+spreadSBeg*(eg-fixedSBeg)/(97+59))
 
@@ -102,6 +102,11 @@ constexpr int spreadSRmg = 0, fixedSRmg = 0;
 constexpr int spreadSReg = 0, fixedSReg = 0;
 
 #define SR(mg, eg) make_score(mg+spreadSRmg*(mg-fixedSRmg)/(58+58), eg+spreadSReg*(eg-fixedSReg)/(171+76))
+
+constexpr int spreadSQmg = 0, fixedSQmg = 0;
+constexpr int spreadSQeg = 0, fixedSQeg = 0;
+
+#define SQ(mg, eg) make_score(mg+spreadSQmg*(mg-fixedSQmg)/(116+39), eg+spreadSQeg*(eg-fixedSQeg)/(212+36))
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
@@ -114,11 +119,11 @@ constexpr int spreadSReg = 0, fixedSReg = 0;
     { SR(-58,-76), SR(-27,-18), SR(-15, 28), SR(-10, 55), SR( -5, 69), SR( -2, 82), // Rooks
       SR(  9,112), SR( 16,118), SR( 30,132), SR( 29,142), SR( 32,155), SR( 38,165),
       SR( 46,166), SR( 48,169), SR( 58,171) },
-    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Queens
-      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
-      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
-      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
-      S(106,184), S(109,191), S(113,206), S(116,212) }
+    { SQ(-39,-36), SQ(-21,-15), SQ(  3,  8), SQ(  3, 18), SQ( 14, 34), SQ( 22, 54), // Queens
+      SQ( 28, 61), SQ( 41, 73), SQ( 43, 79), SQ( 48, 92), SQ( 56, 94), SQ( 60,104),
+      SQ( 60,113), SQ( 66,120), SQ( 67,123), SQ( 70,126), SQ( 71,133), SQ( 73,136),
+      SQ( 79,140), SQ( 88,143), SQ( 88,148), SQ( 99,166), SQ(102,170), SQ(102,175),
+      SQ(106,184), SQ(109,191), SQ(113,206), SQ(116,212) }
   };
 
   // RookOnFile[semiopen/open] contains bonuses for each rook when there is
