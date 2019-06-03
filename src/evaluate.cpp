@@ -88,13 +88,13 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-constexpr int spreadSNmg = 0, fixedSNmg = 0;
+constexpr int spreadSNmg = -17, fixedSNmg = 11;
 constexpr int spreadSNeg = 0, fixedSNeg = 0;
 
 #define SN(mg, eg) make_score(mg+spreadSNmg*(mg-fixedSNmg)/(33+62), eg+spreadSNeg*(eg-fixedSNeg)/(33+81))
 
 constexpr int spreadSBmg = 0, fixedSBmg = 0;
-constexpr int spreadSBeg = 17, fixedSBeg = 42;
+constexpr int spreadSBeg = 0, fixedSBeg = 0;
 
 #define SB(mg, eg) make_score(mg+spreadSBmg*(mg-fixedSBmg)/(98+48), eg+spreadSBeg*(eg-fixedSBeg)/(97+59))
 
