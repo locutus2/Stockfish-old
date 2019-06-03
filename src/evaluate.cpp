@@ -93,7 +93,7 @@ constexpr int spreadSNeg = 0, fixedSNeg = 0;
 
 #define SN(mg, eg) make_score(mg+spreadSNmg*(mg-fixedSNmg)/(33+62), eg+spreadSNeg*(eg-fixedSNeg)/(33+81))
 
-constexpr int spreadSBmg = -8, fixedSBmg = 49;
+constexpr int spreadSBmg = 8, fixedSBmg = 44;
 constexpr int spreadSBeg = 0, fixedSBeg = 0;
 
 #define SB(mg, eg) make_score(mg+spreadSBmg*(mg-fixedSBmg)/(98+48), eg+spreadSBeg*(eg-fixedSBeg)/(97+59))
