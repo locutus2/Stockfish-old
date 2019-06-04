@@ -103,7 +103,7 @@ constexpr int spreadSReg = 0, fixedSReg = 0;
 
 #define SR(mg, eg) make_score(mg+spreadSRmg*(mg-fixedSRmg)/(58+58), eg+spreadSReg*(eg-fixedSReg)/(171+76))
 
-constexpr int spreadSQmg = 8, fixedSQmg = 61;
+constexpr int spreadSQmg = -8, fixedSQmg = 53;
 constexpr int spreadSQeg = 0, fixedSQeg = 0;
 
 #define SQ(mg, eg) make_score(mg+spreadSQmg*(mg-fixedSQmg)/(116+39), eg+spreadSQeg*(eg-fixedSQeg)/(212+36))
