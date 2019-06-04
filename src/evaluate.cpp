@@ -88,22 +88,42 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
+constexpr int spreadSNmg = 0, fixedSNmg = 0;
+constexpr int spreadSNeg = 0, fixedSNeg = 0;
+
+#define SN(mg, eg) make_score(mg+spreadSNmg*(mg-fixedSNmg)/(33+62), eg+spreadSNeg*(eg-fixedSNeg)/(33+81))
+
+constexpr int spreadSBmg = 0, fixedSBmg = 0;
+constexpr int spreadSBeg = 0, fixedSBeg = 0;
+
+#define SB(mg, eg) make_score(mg+spreadSBmg*(mg-fixedSBmg)/(98+48), eg+spreadSBeg*(eg-fixedSBeg)/(97+59))
+
+constexpr int spreadSRmg = 0, fixedSRmg = 0;
+constexpr int spreadSReg = -8, fixedSReg = -76;
+
+#define SR(mg, eg) make_score(mg+spreadSRmg*(mg-fixedSRmg)/(58+58), eg+spreadSReg*(eg-fixedSReg)/(171+76))
+
+constexpr int spreadSQmg = 0, fixedSQmg = 0;
+constexpr int spreadSQeg = 0, fixedSQeg = 0;
+
+#define SQ(mg, eg) make_score(mg+spreadSQmg*(mg-fixedSQmg)/(116+39), eg+spreadSQeg*(eg-fixedSQeg)/(212+36))
+
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
   constexpr Score MobilityBonus[][32] = {
-    { S(-62,-81), S(-53,-56), S(-12,-30), S( -4,-14), S(  3,  8), S( 13, 15), // Knights
-      S( 22, 23), S( 28, 27), S( 33, 33) },
-    { S(-48,-59), S(-20,-23), S( 16, -3), S( 26, 13), S( 38, 24), S( 51, 42), // Bishops
-      S( 55, 54), S( 63, 57), S( 63, 65), S( 68, 73), S( 81, 78), S( 81, 86),
-      S( 91, 88), S( 98, 97) },
-    { S(-58,-76), S(-27,-18), S(-15, 28), S(-10, 55), S( -5, 69), S( -2, 82), // Rooks
-      S(  9,112), S( 16,118), S( 30,132), S( 29,142), S( 32,155), S( 38,165),
-      S( 46,166), S( 48,169), S( 58,171) },
-    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Queens
-      S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
-      S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
-      S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
-      S(106,184), S(109,191), S(113,206), S(116,212) }
+    { SN(-62,-81), SN(-53,-56), SN(-12,-30), SN( -4,-14), SN(  3,  8), SN( 13, 15), // Knights
+      SN( 22, 23), SN( 28, 27), SN( 33, 33) },
+    { SB(-48,-59), SB(-20,-23), SB( 16, -3), SB( 26, 13), SB( 38, 24), SB( 51, 42), // Bishops
+      SB( 55, 54), SB( 63, 57), SB( 63, 65), SB( 68, 73), SB( 81, 78), SB( 81, 86),
+      SB( 91, 88), SB( 98, 97) },
+    { SR(-58,-76), SR(-27,-18), SR(-15, 28), SR(-10, 55), SR( -5, 69), SR( -2, 82), // Rooks
+      SR(  9,112), SR( 16,118), SR( 30,132), SR( 29,142), SR( 32,155), SR( 38,165),
+      SR( 46,166), SR( 48,169), SR( 58,171) },
+    { SQ(-39,-36), SQ(-21,-15), SQ(  3,  8), SQ(  3, 18), SQ( 14, 34), SQ( 22, 54), // Queens
+      SQ( 28, 61), SQ( 41, 73), SQ( 43, 79), SQ( 48, 92), SQ( 56, 94), SQ( 60,104),
+      SQ( 60,113), SQ( 66,120), SQ( 67,123), SQ( 70,126), SQ( 71,133), SQ( 73,136),
+      SQ( 79,140), SQ( 88,143), SQ( 88,148), SQ( 99,166), SQ(102,170), SQ(102,175),
+      SQ(106,184), SQ(109,191), SQ(113,206), SQ(116,212) }
   };
 
   // RookOnFile[semiopen/open] contains bonuses for each rook when there is
