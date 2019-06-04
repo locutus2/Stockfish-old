@@ -1030,8 +1030,8 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Decrease reduction if opponents king safety < -200
-          if(oppKingSafety < -200)
+          // Decrease reduction if bad opponents king safety
+          if(oppKingSafety < -250)
               r -= ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
