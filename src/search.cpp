@@ -1029,8 +1029,8 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Decrease reduction of a pawn move if opponents king safety < -150
-          if(type_of(movedPiece) == PAWN && kingSafety(~us) < -150)
+          // Decrease reduction of a check move if opponents king safety < -150
+          if(givesCheck && kingSafety(~us) < -150)
               r -= ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
