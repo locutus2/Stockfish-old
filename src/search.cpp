@@ -1029,6 +1029,12 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if opponent's move count is high (~10 Elo)
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
+
+
+          // Decrease reduction if opponents king safety is decreased by a pawn move
+          if(type_of(movedPiece) == PAWN && kingSafety(~us) < oppKingSafety)
+              r -= ONE_PLY;
+
           // Decrease reduction if move has been singularly extended
           r -= singularExtensionLMRmultiplier * ONE_PLY;
 
@@ -1065,10 +1071,6 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
           }
-
-          // Decrease reduction if opponents king safety decreases by the move
-          else if(kingSafety(~us) < oppKingSafety)
-              r -= ONE_PLY;
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
