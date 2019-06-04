@@ -857,7 +857,7 @@ moves_loop: // When in check, search starts from here
                           return c == WHITE ? mg_value(pe->king_safety<WHITE>(pos))
                                             : mg_value(pe->king_safety<BLACK>(pos));
                       };
-    Value oppKingSafety = kingSafety(~us);
+    Value ourKingSafety = kingSafety(us);
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
@@ -1030,8 +1030,8 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Decrease reduction if bad opponents king safety
-          if(oppKingSafety < -250)
+          // Decrease reduction if bad own king safety
+          if(ourKingSafety < -200)
               r -= ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
