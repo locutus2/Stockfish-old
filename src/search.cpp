@@ -852,6 +852,13 @@ moves_loop: // When in check, search starts from here
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
     int singularExtensionLMRmultiplier = 0;
 
+    Pawns::Entry* pe = Pawns::probe(pos);
+    auto kingSafety = [&](Color c) {
+                          return c == WHITE ? mg_value(pe->king_safety<WHITE>(pos))
+                                            : mg_value(pe->king_safety<BLACK>(pos));
+                      };
+    Value oppKingSafety = kingSafety(~us);
+
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1058,6 +1065,10 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 20000 * ONE_PLY;
           }
+
+          // Decrease reduction if opponents king safety decreases by the move
+          else if(kingSafety(~us) < oppKingSafety)
+              r -= ONE_PLY;
 
           Depth d = std::max(newDepth - std::max(r, DEPTH_ZERO), ONE_PLY);
 
