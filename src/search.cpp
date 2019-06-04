@@ -1031,7 +1031,7 @@ moves_loop: // When in check, search starts from here
               r -= ONE_PLY;
 
           // Decrease reduction if in check and bad own king safety
-          if(inCheck && ourKingSafety < -200)
+          if(inCheck && ourKingSafety < -150)
               r -= ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
