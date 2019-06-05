@@ -274,6 +274,7 @@ namespace {
 
     Bitboard b, bb;
     Score score = SCORE_ZERO;
+    Bitboard notPawnBlocked = ~(pos.pieces(Us, PAWN) & shift<Down>(pos.pieces(Them, PAWN)) & ~attackedBy[Them][PAWN]);
 
     attackedBy[Us][Pt] = 0;
 
@@ -283,6 +284,7 @@ namespace {
         b = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN))
           : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
                          : pos.attacks_from<Pt>(s);
+        b &= notPawnBlocked;
 
         if (pos.blockers_for_king(Us) & s)
             b &= LineBB[pos.square<KING>(Us)][s];
