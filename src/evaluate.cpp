@@ -274,7 +274,6 @@ namespace {
 
     Bitboard b, bb;
     Score score = SCORE_ZERO;
-    Bitboard notPawnBlocked = ~(pos.pieces(Us, PAWN) & shift<Down>(pos.pieces(Them, PAWN)) & ~attackedBy[Them][PAWN]);
 
     attackedBy[Us][Pt] = 0;
 
@@ -292,11 +291,12 @@ namespace {
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
 
-        if (b & kingRing[Them] & notPawnBlocked)
+        if (b & kingRing[Them])
         {
+            Bitboard notPawnBlocked = ~(pos.pieces(Us, PAWN) & shift<Down>(pos.pieces(Them, PAWN)) & ~attackedBy[Them][PAWN]);
             kingAttackersCount[Us]++;
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
-            kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
+            kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING] & notPawnBlocked);
         }
 
         int mob = popcount(b & mobilityArea[Us]);
