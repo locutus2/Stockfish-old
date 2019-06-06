@@ -62,9 +62,10 @@ struct Entry {
   int weakUnopposed[COLOR_NB];
   int castlingRights[COLOR_NB];
   int pawnsOnSquares[COLOR_NB][COLOR_NB]; // [color][light/dark squares]
+  int used = 0;
 };
 
-typedef HashTable<Entry, 32768> Table;
+typedef HashTable<Entry, 16384> Table;
 
 Entry* probe(const Position& pos);
 

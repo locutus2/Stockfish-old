@@ -159,8 +159,17 @@ Entry* probe(const Position& pos) {
   Entry* e = pos.this_thread()->pawnsTable[key];
 
   if (e->key == key)
-      return e;
+      return ++e->used, e;
 
+  Entry* e2 = pos.this_thread()->pawnsTable[key^1];
+
+  if (e2->key == key)
+      return ++e2->used, e2;
+
+  if (e->used > e2->used)
+      e = e2;
+
+  e->used = 1;
   e->key = key;
   e->scores[WHITE] = evaluate<WHITE>(pos, e);
   e->scores[BLACK] = evaluate<BLACK>(pos, e);
