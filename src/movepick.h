@@ -29,6 +29,14 @@
 #include "position.h"
 #include "types.h"
 
+constexpr int FROM_TO_SIZE = 1793;
+
+int from_to(Move m);
+
+namespace Movepick {
+    void init();
+}
+
 /// StatsEntry stores the stat table value. It is usually a number but could
 /// be a move or even a nested history. We use a class instead of naked value
 /// to directly call history update operator<<() on the entry so to use stats
@@ -86,7 +94,7 @@ enum StatsParams { NOT_USED = 0 };
 /// unsuccessful during the current search, and is used for reduction and move
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
-typedef Stats<int16_t, 10692, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
+typedef Stats<int16_t, 10692, COLOR_NB, FROM_TO_SIZE> ButterflyHistory;
 
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
 /// move, see www.chessprogramming.org/Countermove_Heuristic
@@ -101,7 +109,7 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// ContinuationHistory is the combined history of a given pair of moves, usually
 /// the current one given a previous one. The nested history table is based on
 /// PieceToHistory instead of ButterflyBoards.
-typedef Stats<PieceToHistory, NOT_USED, int(SQUARE_NB) * int(SQUARE_NB)> ContinuationHistory;
+typedef Stats<PieceToHistory, NOT_USED, FROM_TO_SIZE> ContinuationHistory;
 
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the

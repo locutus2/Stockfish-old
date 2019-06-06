@@ -22,6 +22,31 @@
 
 #include "movepick.h"
 
+int fromToIndex[SQUARE_NB][SQUARE_NB];
+
+int from_to(Move m) {
+  return fromToIndex[from_sq(m)][to_sq(m)];
+}
+
+namespace Movepick {
+    void init() {
+
+      // Calculate the mapping from a move (from square/to square) to the index in history array
+      int index = 1;
+      Bitboard b;
+
+      for(Square s = SQ_A1; s <= SQ_H8; ++s)
+      {
+          b = PseudoAttacks[KNIGHT][s] | PseudoAttacks[BISHOP][s] | PseudoAttacks[ROOK][s];
+
+          while (b)
+              fromToIndex[s][pop_lsb(&b)] = index++;
+      }
+
+      assert(index == FROM_TO_SIZE);
+    }
+}
+
 namespace {
 
   enum Stages {
