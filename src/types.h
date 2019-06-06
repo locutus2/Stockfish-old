@@ -433,6 +433,10 @@ constexpr int from_to(Move m) {
  return m & 0xFFF;
 }
 
+constexpr int piece_index(Piece pt) {
+ return pt - 2 * (pt >= B_PAWN);
+}
+
 constexpr MoveType type_of(Move m) {
   return MoveType(m & (3 << 14));
 }
