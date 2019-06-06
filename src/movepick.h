@@ -29,7 +29,7 @@
 #include "position.h"
 #include "types.h"
 
-constexpr int FROM_TO_SIZE = 1793;
+constexpr int16_t FROM_TO_SIZE = 1793;
 
 int from_to(Move m);
 

@@ -22,7 +22,7 @@
 
 #include "movepick.h"
 
-int fromToIndex[SQUARE_NB][SQUARE_NB];
+int16_t fromToIndex[SQUARE_NB][SQUARE_NB];
 
 int from_to(Move m) {
   return fromToIndex[from_sq(m)][to_sq(m)];
