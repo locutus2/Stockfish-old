@@ -88,22 +88,20 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-  // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
-  // indexed by piece type and number of attacked squares in the mobility area.
-  constexpr Score MobilityBonus[][32] = {
-    { S(-62,-81), S(-53,-56), S(-12,-30), S( -4,-14), S(  3,  8), S( 13, 15), // Knights
-      S( 22, 23), S( 28, 27), S( 33, 33) },
-    { S(-48,-59), S(-20,-23), S( 16, -3), S( 26, 13), S( 38, 24), S( 51, 42), // Bishops
-      S( 55, 54), S( 63, 57), S( 63, 65), S( 68, 73), S( 81, 78), S( 81, 86),
-      S( 91, 88), S( 98, 97) },
-    { S(-58,-76), S(-27,-18), S(-15, 28), S(-10, 55), S( -5, 69), S( -2, 82), // Rooks
-      S(  9,112), S( 16,118), S( 30,132), S( 29,142), S( 32,155), S( 38,165),
-      S( 46,166), S( 48,169), S( 58,171) },
-    { S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54), // Queens
+  // MobilityFactor[PieceType-2] contains mobility scaling factor indexed by piece type.
+  constexpr int MobilityFactor[] = { 125, 114, 63, 128 };
+
+  // MobilityOffset[PieceType-2] contains mobility offset indexed by piece type.
+  constexpr Score MobilityOffset[] = { S(-9, -35), S(26, -6), S(4, 87), S(0, 0) };
+
+  // MobilityBonus[attacked] contains bonuses for middle and end game,
+  // indexed by number of attacked squares in the mobility area.
+  constexpr Score MobilityBonus[32] = {
+      S(-39,-36), S(-21,-15), S(  3,  8), S(  3, 18), S( 14, 34), S( 22, 54),
       S( 28, 61), S( 41, 73), S( 43, 79), S( 48, 92), S( 56, 94), S( 60,104),
       S( 60,113), S( 66,120), S( 67,123), S( 70,126), S( 71,133), S( 73,136),
       S( 79,140), S( 88,143), S( 88,148), S( 99,166), S(102,170), S(102,175),
-      S(106,184), S(109,191), S(113,206), S(116,212) }
+      S(106,184), S(109,191), S(113,206), S(116,212)
   };
 
   // RookOnFile[semiopen/open] contains bonuses for each rook when there is
@@ -300,7 +298,7 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
-        mobility[Us] += MobilityBonus[Pt - 2][mob];
+        mobility[Us] += MobilityBonus[mob] * MobilityFactor[Pt - 2] / 128 + MobilityOffset[Pt - 2];
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
