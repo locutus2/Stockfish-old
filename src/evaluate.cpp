@@ -234,12 +234,14 @@ namespace {
     Bitboard b = pos.pieces(Us, PAWN) & (shift<Down>(pos.pieces()) | LowRanks);
 
     // Squares occupied by those pawns, by our king or queen or controlled by
-    // enemy pawns are excluded from the mobility area.
-    mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pe->pawn_attacks(Them));
+    // enemy pawns (if not pinned) are excluded from the mobility area.
+    mobilityArea[Us] = ~(  b
+                         | pos.pieces(Us, KING, QUEEN)
+                         | pawn_attacks_bb<Them>(pos.pieces(Them, PAWN) & ~pos.blockers_for_king(Them)));
 
     // Initialize attackedBy[] for king and pawns
     attackedBy[Us][KING] = pos.attacks_from<KING>(ksq);
-    attackedBy[Us][PAWN] = pawn_attacks_bb<Us>(pos.pieces(Us, PAWN) & ~pos.blockers_for_king(Us));
+    attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
     attackedBy2[Us] = dblAttackByPawn | (attackedBy[Us][KING] & attackedBy[Us][PAWN]);
 
