@@ -300,7 +300,7 @@ namespace {
 
         int mob  = (  15 * popcount(b & mobilityArea[Us])
                     +      popcount(b & mobilityArea[Us] & pos.pieces(Them))
-                    +  2) / 16;
+                    +  14) / 16;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
