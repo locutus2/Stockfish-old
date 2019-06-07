@@ -290,7 +290,7 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
-     (ss-i)->continuationHistory = &this->continuationHistory[0]; // Use as sentinel
+     (ss-i)->continuationHistory = &this->continuationHistory[0][0]; // Use as sentinel
   ss->pv = pv;
 
   bestValue = delta = alpha = -VALUE_INFINITE;
@@ -752,7 +752,7 @@ namespace {
         Depth R = ((823 + 67 * depth / ONE_PLY) / 256 + std::min(int(eval - beta) / 200, 3)) * ONE_PLY;
 
         ss->currentMove = MOVE_NULL;
-        ss->continuationHistory = &thisThread->continuationHistory[0];
+        ss->continuationHistory = &thisThread->continuationHistory[0][0];
 
         pos.do_null_move(st);
 
@@ -803,7 +803,7 @@ namespace {
                 probCutCount++;
 
                 ss->currentMove = move;
-                ss->continuationHistory = &thisThread->continuationHistory[from_to(move)];
+                ss->continuationHistory = &thisThread->continuationHistory[us][from_to(move)];
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -1000,7 +1000,7 @@ moves_loop: // When in check, search starts from here
 
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
-      ss->continuationHistory = &thisThread->continuationHistory[from_to(move)];
+      ss->continuationHistory = &thisThread->continuationHistory[us][from_to(move)];
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1243,6 +1243,7 @@ moves_loop: // When in check, search starts from here
     (ss+1)->ply = ss->ply + 1;
     bestMove = MOVE_NONE;
     inCheck = pos.checkers();
+    Color us = pos.side_to_move();
     moveCount = 0;
 
     // Check for an immediate draw or maximum ply reached
@@ -1379,7 +1380,7 @@ moves_loop: // When in check, search starts from here
       }
 
       ss->currentMove = move;
-      ss->continuationHistory = &thisThread->continuationHistory[from_to(move)];
+      ss->continuationHistory = &thisThread->continuationHistory[us][from_to(move)];
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
