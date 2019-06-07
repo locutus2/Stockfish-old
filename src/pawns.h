@@ -59,12 +59,11 @@ struct Entry {
   Bitboard pawnAttacksSpan[COLOR_NB];
   Square kingSquares[COLOR_NB];
   Score kingSafety[COLOR_NB];
-  int weakUnopposed[COLOR_NB];
-  int castlingRights[COLOR_NB];
-  int pawnsOnSquares[COLOR_NB][COLOR_NB]; // [color][light/dark squares]
+  int8_t weakUnopposed[COLOR_NB];
+  int8_t castlingRights[COLOR_NB];
 };
 
-typedef HashTable<Entry, 65536> Table;
+typedef HashTable<Entry, 32768> Table;
 
 Entry* probe(const Position& pos);
 
