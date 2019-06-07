@@ -237,7 +237,9 @@ namespace {
     // enemy pawns (if not pinned) are excluded from the mobility area.
     mobilityArea[Us] = ~(  b
                          | pos.pieces(Us, KING, QUEEN)
-                         | pawn_attacks_bb<Them>(pos.pieces(Them, PAWN) & ~pos.blockers_for_king(Them)));
+                         | pawn_attacks_bb<Them>(pos.pieces(Them, PAWN) & ~pos.blockers_for_king(Them))
+                         | (  pawn_attacks_bb<Them>(pos.pieces(Them, PAWN) & pos.blockers_for_king(Them))
+                            & PseudoAttacks[BISHOP][pos.square<KING>(Them)]));
 
     // Initialize attackedBy[] for king and pawns
     attackedBy[Us][KING] = pos.attacks_from<KING>(ksq);
