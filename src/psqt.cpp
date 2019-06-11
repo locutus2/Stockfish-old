@@ -30,6 +30,8 @@ Value PieceValue[PHASE_NB][PIECE_NB] = {
 namespace PSQT {
 
 #define S(mg, eg) make_score(mg, eg)
+#define SX(x) (x)
+#define SY(x) (x)
 
 // Bonus[PieceType][Square / 2] contains Piece-Square scores. For each piece
 // type on a given square a (middlegame, endgame) score pair is assigned. Table
@@ -40,13 +42,13 @@ constexpr Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
   { },
   { // Knight
    { S(-169,-105), S(-96,-74), S(-80,-46), S(-79,-18) },
-   { S( -79, -70), S(-39,-56), S(-24,-15), S( -9,  6) },
-   { S( -64, -38), S(-20,-33), S(  4, -5), S( 19, 27) },
-   { S( -28, -36), S(  5,  0), S( 41, 13), S( 47, 34) },
-   { S( -29, -41), S( 13,-20), S( 42,  4), S( 52, 35) },
-   { S( -11, -51), S( 28,-38), S( 63,-17), S( 55, 19) },
-   { S( -67, -64), S(-21,-45), S(  6,-37), S( 37, 16) },
-   { S(-200, -98), S(-80,-89), S(-53,-53), S(-32,-16) }
+   { S( -79+SX(4), -70+SY(1)), S(-39+SX(6),-56+SY(2)), S(-24+SX(7),-15+SY(2)), S( -9+SX(3),  6+SY(1)) },
+   { S( -64+SX(5), -38+SY(2)), S(-20+SX(7),-33+SY(2)), S(  4+SX(5), -5+SY(2)), S( 19+SX(9), 27+SY(3)) },
+   { S( -28+SX(15), -36+SY(5)), S(  5+SX(21),  0+SY(7)), S( 41+SX(19), 13+SY(6)), S( 47+SX(17), 34+SY(6)) },
+   { S( -29+SX(23), -41+SY(8)), S( 13+SX(15),-20+SY(5)), S( 42+SX(21),  4+SY(7)), S( 52+SX(20), 35+SY(7)) },
+   { S( -11+SX(34), -51+SY(11)), S( 28+SX(28),-38+SY(9)), S( 63+SX(30),-17+SY(10)), S( 55+SX(29), 19+SY(10)) },
+   { S( -67+SX(14), -64+SY(5)), S(-21+SX(14),-45+SY(5)), S(  6+SX(14),-37+SY(5)), S( 37+SX(14), 16+SY(5)) },
+   { S(-200+SX(16), -98+SY(5)), S(-80+SX(17),-89+SY(6)), S(-53+SX(16),-53+SY(5)), S(-32+SX(16),-16+SY(5)) }
   },
   { // Bishop
    { S(-44,-63), S( -4,-30), S(-11,-35), S(-28, -8) },
