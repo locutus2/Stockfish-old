@@ -428,8 +428,6 @@ void Thread::search() {
       if (!Threads.stop)
           completedDepth = rootDepth;
 
-      sync_cout << "Nodes searched for bestMove = " << rootMoves[0].nodesSearched << sync_endl;
-
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
@@ -533,7 +531,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, ttPv, inCheck, givesCheck, improving;
+    bool ttHit, ttPv, inCheck, givesCheck, improving, skipLMR = false;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, singularLMR;
@@ -880,6 +878,15 @@ moves_loop: // When in check, search starts from here
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
+      if (rootNode && moveCount > 1)
+      {
+		  RootMove& rm = *std::find(thisThread->rootMoves.begin(), thisThread->rootMoves.end(), move);
+          skipLMR = rm.nodesSearched > thisThread->rootMoves[0].nodesSearched / 32;
+          //if (skipLMR)
+          //  sync_cout << "Move = " << UCI::move(move, pos.is_chess960())
+          //            << " Nodes = " << rm.nodesSearched
+          //            << " Nodes 0 = " << thisThread->rootMoves[0].nodesSearched << sync_endl;
+      }
 
       // Step 13. Extensions (~70 Elo)
 
@@ -1008,7 +1015,8 @@ moves_loop: // When in check, search starts from here
       // Step 16. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
-          &&  moveCount > 1 + 3 * rootNode
+          &&  moveCount > 1
+          &&  !skipLMR
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha))
