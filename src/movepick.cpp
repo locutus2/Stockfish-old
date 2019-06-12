@@ -35,7 +35,7 @@ namespace {
   // a given limit. The order of moves smaller than the limit is left unspecified.
   void partial_insertion_sort(ExtMove* begin, ExtMove* end, int limit) {
 
-    int step = (end - begin) / 3;
+    int step = (end - begin) / 4;
     if (step > 1)
       for (ExtMove *sortedEnd = begin, *p = begin + step; p < end; ++p)
           if (p->value >= limit)
