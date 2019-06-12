@@ -21,6 +21,8 @@
 #include <cassert>
 
 #include <algorithm> // For std::count
+#include <cstring>   // For std::memset
+#include "evaluate.h"
 #include "movegen.h"
 #include "search.h"
 #include "thread.h"
@@ -66,6 +68,8 @@ void Thread::clear() {
           h->fill(0);
 
   continuationHistory[NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
+
+  clearRootFeatures();
 }
 
 /// Thread::start_searching() wakes up the thread that will start the search
@@ -115,6 +119,16 @@ void Thread::idle_loop() {
 
       search();
   }
+}
+
+void Thread::clearRootFeatures() {
+
+  std::memset(dynamicPSQT, 0, sizeof(dynamicPSQT));
+}
+
+void Thread::generateRootFeatures() {
+
+  Eval::generateDynamicPSQT(rootPos);
 }
 
 /// ThreadPool::set() creates/destroys threads to match the requested number.

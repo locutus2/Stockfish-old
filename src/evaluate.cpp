@@ -164,6 +164,7 @@ namespace {
     explicit Evaluation(const Position& p) : pos(p) {}
     Evaluation& operator=(const Evaluation&) = delete;
     Value value();
+    void generateDynamicPSQT();
 
   private:
     template<Color Us> void initialize();
@@ -298,6 +299,8 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
+
+        score += pos.this_thread()->dynamicPSQT[make_piece(Us, Pt)][s];
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
@@ -772,6 +775,70 @@ namespace {
   }
 
 
+  // Evaluation::generateDynamicPSQT() generates the dynamic piece square tables for the position.
+
+  template<Tracing T>
+  void Evaluation<T>::generateDynamicPSQT() {
+
+    Thread* thisThread = pos.this_thread();
+
+    thisThread->clearRootFeatures();
+
+    pe = Pawns::probe(pos);
+
+    initialize<WHITE>();
+    initialize<BLACK>();
+
+    for (Color Us = WHITE; Us <= BLACK; ++Us)
+    {
+        Color Them = ~Us;
+        Square oppKsq = pos.square<KING>(Them);
+        Bitboard blockedPawns =   pos.pieces(Us, PAWN)
+                               & ~attackedBy[Them][PAWN]
+                               &  (Us == WHITE ? shift<SOUTH>(pos.pieces(Them, PAWN))
+                                               : shift<NORTH>(pos.pieces(Them, PAWN)));
+        Bitboard safe = ~(blockedPawns | pe->pawn_attacks(Them));
+
+        for (PieceType Pt = KNIGHT; Pt <= QUEEN; ++Pt)
+        {
+            Piece piece = make_piece(Us, Pt);
+ 
+            Score base     = make_score(Pt == KNIGHT ? -6 : Pt == BISHOP ? -2 : Pt == ROOK ? -7 : -7, 0);
+            Score baseKing = make_score(Pt == KNIGHT ?  4 : Pt == BISHOP ?  7 : Pt == ROOK ?  4 :  3, 0);
+            Score stepKing = make_score(Pt == KNIGHT ?  1 : Pt == BISHOP ?  1 : Pt == ROOK ?  1 :  1, 0);
+
+            for (Square s = SQ_A1; s <= SQ_H8; ++s)
+                thisThread->dynamicPSQT[piece][s] += base;
+
+            Bitboard b = pos.pieces(Them, KING);
+            Bitboard bb = b;
+            Bitboard b1;
+            Score bonus = baseKing - base;
+
+            thisThread->dynamicPSQT[piece][oppKsq] += bonus;
+
+            while (b)
+            {
+                b1 = 0;
+                while (b)
+                {
+                    Square s = pop_lsb(&b);
+                    b1 |= pos.attacks_from(Pt, s);
+                }
+                bb |= b = b1 &= ~bb & safe;
+
+                bonus -= stepKing;
+                while (b1)
+                {
+                    Square s = pop_lsb(&b1);
+                    thisThread->dynamicPSQT[piece][s] += bonus;
+                }
+            }
+        }
+    }
+  }
+
+
   // Evaluation::value() is the main function of the class. It computes the various
   // parts of the evaluation and returns the value of the position from the point
   // of view of the side to move.
@@ -852,6 +919,12 @@ namespace {
 
 Value Eval::evaluate(const Position& pos) {
   return Evaluation<NO_TRACE>(pos).value();
+}
+
+/// generateDynamicPSQT() fills the dynamic piece square tables according to the given position.
+
+void Eval::generateDynamicPSQT(const Position& pos) {
+  Evaluation<NO_TRACE>(pos).generateDynamicPSQT();
 }
 
 

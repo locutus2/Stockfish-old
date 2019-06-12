@@ -56,6 +56,8 @@ public:
   void idle_loop();
   void start_searching();
   void wait_for_search_finished();
+  void clearRootFeatures();
+  void generateRootFeatures();
 
   Pawns::Table pawnsTable;
   Material::Table materialTable;
@@ -64,6 +66,7 @@ public:
   Color nmpColor;
   std::atomic<uint64_t> nodes, tbHits, bestMoveChanges;
 
+  Score dynamicPSQT[PIECE_NB][SQUARE_NB];
   Position rootPos;
   Search::RootMoves rootMoves;
   Depth rootDepth, completedDepth;
