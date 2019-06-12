@@ -878,14 +878,15 @@ moves_loop: // When in check, search starts from here
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
-      if (rootNode && moveCount > 1)
+      if (rootNode && moveCount > 1 && depth > 4 * ONE_PLY)
       {
 		  RootMove& rm = *std::find(thisThread->rootMoves.begin(), thisThread->rootMoves.end(), move);
-          skipLMR = rm.nodesSearched > thisThread->rootMoves[0].nodesSearched / 32;
-          //if (skipLMR)
-          //  sync_cout << "Move = " << UCI::move(move, pos.is_chess960())
-          //            << " Nodes = " << rm.nodesSearched
-          //            << " Nodes 0 = " << thisThread->rootMoves[0].nodesSearched << sync_endl;
+          skipLMR = rm.nodesSearched > (4 + thisThread->rootMoves[0].nodesSearched / 16);
+          /*if (skipLMR)
+            sync_cout << "Move = " << UCI::move(move, pos.is_chess960())
+                      << " currmovenumber " << moveCount + thisThread->pvIdx
+                      << " Nodes = " << rm.nodesSearched
+                      << " Nodes 0 = " << thisThread->rootMoves[0].nodesSearched << sync_endl;*/
       }
 
       // Step 13. Extensions (~70 Elo)
