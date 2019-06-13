@@ -791,7 +791,9 @@ namespace {
 
     for (Color Us = WHITE; Us <= BLACK; ++Us)
     {
-        if (!pe->passed_pawns(Us))
+        Color Them = ~Us;
+
+        if (!pe->passed_pawns(Them))
             continue;
 
         Bitboard safe = mobilityArea[Us];
@@ -804,11 +806,11 @@ namespace {
             Score basePassed = make_score(Pt == KNIGHT ?  3 : Pt == BISHOP ?  3 : Pt == ROOK ?  4 :  6, 0);
             Score stepPassed = make_score(Pt == KNIGHT ?  1 : Pt == BISHOP ?  1 : Pt == ROOK ?  1 :  1, 0);
 
-            Bitboard pp = pe->passed_pawns(Us);
+            Bitboard pp = pe->passed_pawns(Them);
 
             while (pp)
             {
-                Bitboard b = forward_file_bb(Us, pop_lsb(&pp));
+                Bitboard b = forward_file_bb(Them, pop_lsb(&pp));
 
                 for (Square s = SQ_A1; s <= SQ_H8; ++s)
                   thisThread->dynamicPSQT[piece][s] += base;
