@@ -804,31 +804,33 @@ namespace {
             Score basePassed = make_score(Pt == KNIGHT ?  3 : Pt == BISHOP ?  3 : Pt == ROOK ?  4 :  6, 0);
             Score stepPassed = make_score(Pt == KNIGHT ?  1 : Pt == BISHOP ?  1 : Pt == ROOK ?  1 :  1, 0);
 
-            for (Square s = SQ_A1; s <= SQ_H8; ++s)
-                thisThread->dynamicPSQT[piece][s] += base;
+            Bitboard pp = pe->passed_pawns(Us);
 
-            Bitboard b1 = pe->passed_pawns(Us);
-            Bitboard b = 0;
-
-            while (b1)
-                b |= forward_file_bb(Us, pop_lsb(&b1));
-
-            Bitboard bb = b;
-
-            Score bonus = basePassed - base;
-
-            while (b)
+            while (pp)
             {
-                b1 = 0;
+                Bitboard b = forward_file_bb(Us, pop_lsb(&pp));
+
+                for (Square s = SQ_A1; s <= SQ_H8; ++s)
+                  thisThread->dynamicPSQT[piece][s] += base;
+
+                Bitboard bb = b;
+
+                Score bonus = basePassed - base;
+
                 while (b)
                 {
-                    Square s = pop_lsb(&b);
-                    b1 |= pos.attacks_from(Pt, s);
-                    thisThread->dynamicPSQT[piece][s] += bonus;
+                    Bitboard b1 = 0;
+                    while (b)
+                    {
+                        Square s = pop_lsb(&b);
+                        b1 |= pos.attacks_from(Pt, s);
+                        thisThread->dynamicPSQT[piece][s] += bonus;
+                    }
+                    bb |= b = b1 &= ~bb & safe;
+                    bonus -= stepPassed;
                 }
-                bb |= b = b1 &= ~bb & safe;
-                bonus -= stepPassed;
             }
+
         }
     }
   }
