@@ -799,8 +799,8 @@ namespace {
         {
             Piece piece = make_piece(Us, Pt);
 
-            Score base     = make_score(Pt == KNIGHT ? -6 : Pt == BISHOP ? -2 : Pt == ROOK ? -7 : -7, 0);
-            Score baseKing = make_score(Pt == KNIGHT ?  4 : Pt == BISHOP ?  7 : Pt == ROOK ?  4 :  3, 0);
+            Score base     = make_score(Pt == KNIGHT ? -6 : Pt == BISHOP ? -2 : Pt == ROOK ? -7 : -4, 0);
+            Score baseKing = make_score(Pt == KNIGHT ?  4 : Pt == BISHOP ?  7 : Pt == ROOK ?  4 :  6, 0);
             Score stepKing = make_score(Pt == KNIGHT ?  1 : Pt == BISHOP ?  1 : Pt == ROOK ?  1 :  1, 0);
 
             for (Square s = SQ_A1; s <= SQ_H8; ++s)
