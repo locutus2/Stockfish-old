@@ -798,14 +798,14 @@ namespace {
         {
             Piece piece = make_piece(Us, Pt);
 
-            Score base     = make_score(Pt == KNIGHT ? -14 : Pt == BISHOP ? -12 : Pt == ROOK ? -14 : -8, 0);
-            Score baseKing = make_score(Pt == KNIGHT ?   6 : Pt == BISHOP ?   6 : Pt == ROOK ?   8 : 12, 0);
-            Score stepKing = make_score(Pt == KNIGHT ?   2 : Pt == BISHOP ?   2 : Pt == ROOK ?   2 :  2, 0);
+            Score base     = make_score(Pt == KNIGHT ? -12 : Pt == BISHOP ? -4 : Pt == ROOK ? -14 : -8, 0);
+            Score baseKing = make_score(Pt == KNIGHT ?   8 : Pt == BISHOP ? 14 : Pt == ROOK ?   8 : 12, 0);
+            Score stepKing = make_score(Pt == KNIGHT ?   2 : Pt == BISHOP ?  2 : Pt == ROOK ?   2 :  2, 0);
 
             for (Square s = SQ_A1; s <= SQ_H8; ++s)
                 thisThread->dynamicPSQT[piece][s] += base;
 
-            Bitboard b = pos.pieces(Them, KING) | attackedBy[Them][KING];
+            Bitboard b = pos.pieces(Them, KING);
             Bitboard bb = b;
             Bitboard b1;
             Score bonus = baseKing - base;
