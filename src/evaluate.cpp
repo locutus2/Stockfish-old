@@ -792,26 +792,23 @@ namespace {
     for (Color Us = WHITE; Us <= BLACK; ++Us)
     {
         Color Them = ~Us;
-        Square oppKsq = pos.square<KING>(Them);
         Bitboard safe = mobilityArea[Us];
 
         for (PieceType Pt = KNIGHT; Pt <= QUEEN; ++Pt)
         {
             Piece piece = make_piece(Us, Pt);
 
-            Score base     = make_score(Pt == KNIGHT ? -6 : Pt == BISHOP ? -2 : Pt == ROOK ? -7 : -4, 0);
-            Score baseKing = make_score(Pt == KNIGHT ?  4 : Pt == BISHOP ?  7 : Pt == ROOK ?  4 :  6, 0);
+            Score base     = make_score(Pt == KNIGHT ? -7 : Pt == BISHOP ? -6 : Pt == ROOK ? -7 : -4, 0);
+            Score baseKing = make_score(Pt == KNIGHT ?  3 : Pt == BISHOP ?  3 : Pt == ROOK ?  4 :  6, 0);
             Score stepKing = make_score(Pt == KNIGHT ?  1 : Pt == BISHOP ?  1 : Pt == ROOK ?  1 :  1, 0);
 
             for (Square s = SQ_A1; s <= SQ_H8; ++s)
                 thisThread->dynamicPSQT[piece][s] += base;
 
-            Bitboard b = pos.pieces(Them, KING);
+            Bitboard b = pos.pieces(Them, KING) | attackedBy[Them][KING];
             Bitboard bb = b;
             Bitboard b1;
             Score bonus = baseKing - base;
-
-            thisThread->dynamicPSQT[piece][oppKsq] += bonus;
 
             while (b)
             {
@@ -820,15 +817,10 @@ namespace {
                 {
                     Square s = pop_lsb(&b);
                     b1 |= pos.attacks_from(Pt, s);
-                }
-                bb |= b = b1 &= ~bb & safe;
-
-                bonus -= stepKing;
-                while (b1)
-                {
-                    Square s = pop_lsb(&b1);
                     thisThread->dynamicPSQT[piece][s] += bonus;
                 }
+                bb |= b = b1 &= ~bb & safe;
+                bonus -= stepKing;
             }
         }
     }
