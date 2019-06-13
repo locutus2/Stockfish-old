@@ -791,24 +791,31 @@ namespace {
 
     for (Color Us = WHITE; Us <= BLACK; ++Us)
     {
-        Color Them = ~Us;
+        if (!pe->passed_pawns(Us))
+            continue;
+
         Bitboard safe = mobilityArea[Us];
 
         for (PieceType Pt = KNIGHT; Pt <= QUEEN; ++Pt)
         {
             Piece piece = make_piece(Us, Pt);
 
-            Score base     = make_score(Pt == KNIGHT ? -14 : Pt == BISHOP ? -12 : Pt == ROOK ? -14 : -8, 0);
-            Score baseKing = make_score(Pt == KNIGHT ?   6 : Pt == BISHOP ?   6 : Pt == ROOK ?   8 : 12, 0);
-            Score stepKing = make_score(Pt == KNIGHT ?   2 : Pt == BISHOP ?   2 : Pt == ROOK ?   2 :  2, 0);
+            Score base       = make_score(Pt == KNIGHT ? -7 : Pt == BISHOP ? -6 : Pt == ROOK ? -7 : -4, 0);
+            Score basePassed = make_score(Pt == KNIGHT ?  3 : Pt == BISHOP ?  3 : Pt == ROOK ?  4 :  6, 0);
+            Score stepPassed = make_score(Pt == KNIGHT ?  1 : Pt == BISHOP ?  1 : Pt == ROOK ?  1 :  1, 0);
 
             for (Square s = SQ_A1; s <= SQ_H8; ++s)
                 thisThread->dynamicPSQT[piece][s] += base;
 
-            Bitboard b = pos.pieces(Them, KING) | attackedBy[Them][KING];
+            Bitboard b1 = pe->passed_pawns(Us);
+            Bitboard b = 0;
+
+            while (b1)
+                b |= forward_file_bb(Us, pop_lsb(&b1));
+
             Bitboard bb = b;
-            Bitboard b1;
-            Score bonus = baseKing - base;
+
+            Score bonus = basePassed - base;
 
             while (b)
             {
@@ -820,7 +827,7 @@ namespace {
                     thisThread->dynamicPSQT[piece][s] += bonus;
                 }
                 bb |= b = b1 &= ~bb & safe;
-                bonus -= stepKing;
+                bonus -= stepPassed;
             }
         }
     }
