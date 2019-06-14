@@ -170,7 +170,7 @@ namespace {
     template<Color Us, PieceType Pt> Score pieces();
     template<Color Us> Score king() const;
     template<Color Us> Score threats() const;
-    template<Color Us> Score passed() const;
+    template<Color Us> Score passed();
     template<Color Us> Score space() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
@@ -180,6 +180,7 @@ namespace {
     Pawns::Entry* pe;
     Bitboard mobilityArea[COLOR_NB];
     Score mobility[COLOR_NB] = { SCORE_ZERO, SCORE_ZERO };
+    Score passedScore[COLOR_NB] = { SCORE_ZERO, SCORE_ZERO };
 
     // attackedBy[color][piece type] is a bitboard representing all squares
     // attacked by a given color and piece type. Special "piece types" which
@@ -468,6 +469,7 @@ namespace {
                  +       mg_value(mobility[Them] - mobility[Us])
                  +   5 * kingFlankAttacks * kingFlankAttacks / 16
                  +  64 * popcount(pe->passed_pawns(Them))
+                 +       eg_value(passedScore[Them]) / 2
                  -   7;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
@@ -596,7 +598,7 @@ namespace {
   // pawns of the given color.
 
   template<Tracing T> template<Color Us>
-  Score Evaluation<T>::passed() const {
+  Score Evaluation<T>::passed() {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
@@ -669,6 +671,8 @@ namespace {
 
         score += bonus + PassedFile[file_of(s)];
     }
+
+    passedScore[Us] = score;
 
     if (T)
         Trace::add(PASSED, Us, score);
@@ -817,10 +821,11 @@ namespace {
 
     score += mobility[WHITE] - mobility[BLACK];
 
-    score +=  king<   WHITE>() - king<   BLACK>()
-            + threats<WHITE>() - threats<BLACK>()
+    score +=  threats<WHITE>() - threats<BLACK>()
             + passed< WHITE>() - passed< BLACK>()
             + space<  WHITE>() - space<  BLACK>();
+
+    score +=  king<   WHITE>() - king<   BLACK>();
 
     score += initiative(eg_value(score));
 
