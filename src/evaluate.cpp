@@ -666,7 +666,7 @@ namespace {
             || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
             bonus = bonus / 2;
 
-        bonus = bonus * (730 - eg_value(mobility[Them])) / 512;
+        bonus += bonus / 16 * (218 - eg_value(mobility[Them])) / 256;
 
         score += bonus + PassedFile[file_of(s)];
     }
