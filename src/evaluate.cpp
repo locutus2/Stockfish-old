@@ -657,6 +657,8 @@ namespace {
                     k += 5;
 
                 bonus += make_score(k * w, k * w);
+
+                bonus += bonus / 16 * (218 - eg_value(mobility[Them])) / 256;
             }
         } // r > RANK_3
 
@@ -665,8 +667,6 @@ namespace {
         if (   !pos.pawn_passed(Us, s + Up)
             || (pos.pieces(PAWN) & forward_file_bb(Us, s)))
             bonus = bonus / 2;
-
-        bonus += bonus / 16 * (218 - eg_value(mobility[Them])) / 512;
 
         score += bonus + PassedFile[file_of(s)];
     }
