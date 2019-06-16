@@ -455,7 +455,6 @@ namespace {
     b1 = attackedBy[Them][ALL_PIECES] & KingFlank[file_of(ksq)] & Camp;
     b2 = b1 & attackedBy2[Them];
 
-    int passedPawnDanger = max_distance(ksq, pe->passed_pawns(Them));
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
@@ -468,7 +467,7 @@ namespace {
                  -   6 * mg_value(score) / 8
                  +       mg_value(mobility[Them] - mobility[Us])
                  +   5 * kingFlankAttacks * kingFlankAttacks / 16
-                 +   2 * passedPawnDanger * passedPawnDanger
+                 +  16 * max_distance<File>(ksq, pe->passed_pawns(Them))
                  -   7;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
