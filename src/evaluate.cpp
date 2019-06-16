@@ -455,7 +455,7 @@ namespace {
     b1 = attackedBy[Them][ALL_PIECES] & KingFlank[file_of(ksq)] & Camp;
     b2 = b1 & attackedBy2[Them];
 
-    int passedPawnDanger = max_distance(ksq, pe->passed_pawns(Them));
+    int passedPawnDanger = max_distance<File>(ksq, pe->passed_pawns(Them));
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
