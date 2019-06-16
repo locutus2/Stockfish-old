@@ -249,6 +249,18 @@ template<> inline int distance<File>(Square x, Square y) { return std::abs(file_
 template<> inline int distance<Rank>(Square x, Square y) { return std::abs(rank_of(x) - rank_of(y)); }
 template<> inline int distance<Square>(Square x, Square y) { return SquareDistance[x][y]; }
 
+Square pop_lsb(Bitboard* b);
+
+/// max_distance() functions return the distance between x and set of squares of y, defined as the
+/// number of steps for a king in x to reach the farest square in y.
+
+template<typename T1 = Square> inline int max_distance(Square x, Bitboard y) {
+    int dist = 0;
+    while(y)
+        dist = std::max(distance<T1>(x, pop_lsb(&y)), dist);
+    return dist;
+}
+
 template<class T> constexpr const T& clamp(const T& v, const T& lo, const T&  hi) {
   return v < lo ? lo : v > hi ? hi : v;
 }
