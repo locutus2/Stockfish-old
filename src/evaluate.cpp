@@ -657,9 +657,9 @@ namespace {
                     k += 5;
 
                 bonus += make_score(k * w, k * w);
-
-                bonus += bonus / 16 * (218 - eg_value(mobility[Them])) / 256;
             }
+            else
+                bonus += bonus / 16 * (218 - eg_value(mobility[Them])) / 256;
         } // r > RANK_3
 
         // Scale down bonus for candidate passers which need more than one
