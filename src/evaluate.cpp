@@ -467,7 +467,7 @@ namespace {
                  -   6 * mg_value(score) / 8
                  +       mg_value(mobility[Them] - mobility[Us])
                  +   5 * kingFlankAttacks * kingFlankAttacks / 16
-                 +   8 * max_distance(ksq, pe->passed_pawns(Them))
+                 +  16 * max_distance(ksq, pe->passed_pawns(Them))
                  -   7;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
