@@ -1023,9 +1023,9 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Decrease reduction if moves destroys own pain chain.
+          // Increase reduction if moves destroys own pawn chain.
           if (ownPawnChains & from_sq(move))
-              r -= ONE_PLY;
+              r += ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
           r -= singularLMR * ONE_PLY;
