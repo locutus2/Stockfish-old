@@ -384,11 +384,10 @@ namespace {
   Score Evaluation<T>::king() const {
 
     constexpr Color    Them = (Us == WHITE ? BLACK : WHITE);
-    constexpr Direction Up  = (Us == WHITE ? NORTH : SOUTH);
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-    Bitboard weak, b1, b2, safe, unsafeChecks = 0, pawnChains;
+    Bitboard weak, b1, b2, safe, unsafeChecks = 0;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
@@ -469,46 +468,6 @@ namespace {
                  +       mg_value(mobility[Them] - mobility[Us])
                  +   5 * kingFlankAttacks * kingFlankAttacks / 16
                  -   7;
-
-    // More king danger if a opponent pawn chain points to out king.
-    if (file_of(ksq) > FILE_E)
-    {
-        if (Us == WHITE)
-            pawnChains  = pe->left_pawn_chains(Them);
-        else
-            pawnChains  = pe->right_pawn_chains(Them);
-
-        b1 = PseudoAttacks[BISHOP][ksq];
-        if (relative_rank(Us, ksq) < RANK_8)
-            b1 |= PseudoAttacks[BISHOP][ksq + Up];
-
-        if (relative_rank(Us, ksq) < RANK_7)
-            b1 |= PseudoAttacks[BISHOP][ksq + Up + Up];
-
-        pawnChains &= b1 & FileEBB;
-
-        if(pawnChains)
-            kingDanger += 25;
-    }
-    else if (file_of(ksq) < FILE_D)
-    {
-        if (Us == WHITE)
-            pawnChains  = pe->right_pawn_chains(Them);
-        else
-            pawnChains  = pe->left_pawn_chains(Them);
-
-        b1 = PseudoAttacks[BISHOP][ksq];
-        if (relative_rank(Us, ksq) < RANK_8)
-            b1 |= PseudoAttacks[BISHOP][ksq + Up];
-
-        if (relative_rank(Us, ksq) < RANK_7)
-            b1 |= PseudoAttacks[BISHOP][ksq + Up + Up];
-
-        pawnChains &= b1 & FileDBB;
-
-        if(pawnChains)
-            kingDanger += 25;
-    }
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)

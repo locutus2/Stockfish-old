@@ -847,6 +847,9 @@ moves_loop: // When in check, search starts from here
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
+    Pawns::Entry* pe = Pawns::probe(pos);
+    Bitboard ownPawnChains = pe->left_pawn_chains(us) | pe->right_pawn_chains(us);
+
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1018,6 +1021,10 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if opponent's move count is high (~10 Elo)
           if ((ss-1)->moveCount > 15)
+              r -= ONE_PLY;
+
+          // Decrease reduction if moves destroys own pain chain.
+          if (ownPawnChains & from_sq(move))
               r -= ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
