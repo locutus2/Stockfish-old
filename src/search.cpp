@@ -1020,10 +1020,9 @@ moves_loop: // When in check, search starts from here
           if ((ss-1)->moveCount > 15)
               r -= ONE_PLY;
 
-          // Decrease reduction if a pawn before moving is not defended by apawn but after moving
+          // Decrease reduction if a pawn after moving defends another pawn
           if (    type_of(movedPiece) == PAWN
-              && (PawnAttacks[~us][to_sq(move)] & pos.pieces(us, PAWN))
-              && !(PawnAttacks[~us][from_sq(move)] & pos.pieces(us, PAWN)))
+              && (PawnAttacks[us][to_sq(move)] & pos.pieces(us, PAWN)))
               r -= ONE_PLY;
 
           // Decrease reduction if move has been singularly extended
