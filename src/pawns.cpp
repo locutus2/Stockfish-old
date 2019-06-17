@@ -67,6 +67,8 @@ namespace {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
+    constexpr Direction LeftUp  = (Us == WHITE ? NORTH_WEST : SOUTH_EAST);
+    constexpr Direction RightUp = (Us == WHITE ? NORTH_EAST : SOUTH_WEST);
 
     Bitboard b, neighbours, stoppers, doubled, support, phalanx;
     Bitboard lever, leverPush;
@@ -77,10 +79,31 @@ namespace {
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
+    Bitboard ourSafePawns = ourPawns & ~pawn_attacks_bb<Them>(theirPawns);
 
     e->passedPawns[Us] = e->pawnAttacksSpan[Us] = 0;
     e->kingSquares[Us]   = SQ_NONE;
     e->pawnAttacks[Us]   = pawn_attacks_bb<Us>(ourPawns);
+
+    // Detect pawn chains pointing to left. All pawns with at least to pawns behind themin the chain are considered.
+    b = shift<LeftUp>(shift<LeftUp>(ourSafePawns) & ourSafePawns) & ourSafePawns;
+    if (b)
+    {
+        b |= shift<LeftUp>(b) & ourSafePawns;
+        b |= shift<LeftUp>(b) & ourSafePawns;
+        b |= shift<LeftUp>(b) & ourSafePawns;
+    }
+    e->pawnChains[Us][0] = b;
+
+    // Detect pawn chains pointing to right. All pawns with at least to pawns behind themin the chain are considered.
+    b = shift<RightUp>(shift<RightUp>(ourSafePawns) & ourSafePawns) & ourSafePawns;
+    if (b)
+    {
+        b |= shift<RightUp>(b) & ourSafePawns;
+        b |= shift<RightUp>(b) & ourSafePawns;
+        b |= shift<RightUp>(b) & ourSafePawns;
+    }
+    e->pawnChains[Us][1] = b;
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
