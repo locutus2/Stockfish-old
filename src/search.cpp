@@ -535,6 +535,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, singularLMR;
+    Bitboard captureThreats;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -847,6 +848,10 @@ moves_loop: // When in check, search starts from here
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
+    captureThreats =   pos.pieces(us, QUEEN)
+                    & (us == WHITE ? pawn_attacks_bb<BLACK>(pos.pieces(~us, PAWN))
+                                   : pawn_attacks_bb<WHITE>(pos.pieces(~us, PAWN)));
+
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1027,6 +1032,10 @@ moves_loop: // When in check, search starts from here
           {
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
+                  r += ONE_PLY;
+
+              // Increase reduction if move doesn't move a threatend piece if capture threats exists
+              if (captureThreats && !(captureThreats & from_sq(move)))
                   r += ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
