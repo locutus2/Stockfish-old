@@ -1035,7 +1035,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Increase reduction if move doesn't move a threatend piece if capture threats exists
-              if (captureThreats && !(captureThreats & from_sq(move)))
+              if (captureThreats && !(captureThreats & from_sq(move)) && !givesCheck)
                   r += ONE_PLY;
 
               // Increase reduction for cut nodes (~5 Elo)
