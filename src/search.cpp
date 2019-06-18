@@ -848,7 +848,7 @@ moves_loop: // When in check, search starts from here
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
-    captureThreats =   pos.pieces(us, QUEEN)
+    captureThreats =   pos.pieces(us, ROOK, QUEEN)
                     & (us == WHITE ? pawn_attacks_bb<BLACK>(pos.pieces(~us, PAWN))
                                    : pawn_attacks_bb<WHITE>(pos.pieces(~us, PAWN)));
 
