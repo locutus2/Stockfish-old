@@ -219,7 +219,7 @@ Score Entry::do_king_safety(const Position& pos) {
   kingSquares[Us] = ksq;
   castlingRights[Us] = pos.castling_rights(Us);
 
-  Bitboard pawns = pos.pieces(Us, PAWN);
+  Bitboard pawns = pos.pieces(Us, PAWN) & ~pawn_attacks(Us);
   int sumPawnDist = 0;
 
   while (pawns)
@@ -235,7 +235,7 @@ Score Entry::do_king_safety(const Position& pos) {
   if (pos.can_castle(Us | QUEEN_SIDE))
       evaluate_shelter<Us>(pos, relative_square(Us, SQ_C1), shelter);
 
-  return shelter - make_score(VALUE_ZERO, 2 * sumPawnDist);
+  return shelter - make_score(VALUE_ZERO, 3 * sumPawnDist);
 }
 
 // Explicit template instantiation
