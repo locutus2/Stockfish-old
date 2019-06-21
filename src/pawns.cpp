@@ -220,13 +220,10 @@ Score Entry::do_king_safety(const Position& pos) {
   castlingRights[Us] = pos.castling_rights(Us);
 
   Bitboard pawns = pos.pieces(Us, PAWN);
-  int minPawnDist = pawns ? 8 : 0;
+  int sumPawnDist = 0;
 
-  if (pawns & PseudoAttacks[KING][ksq])
-      minPawnDist = 1;
-
-  else while (pawns)
-      minPawnDist = std::min(minPawnDist, distance(ksq, pop_lsb(&pawns)));
+  while (pawns)
+      sumPawnDist += distance(ksq, pop_lsb(&pawns));
 
   Score shelter = make_score(-VALUE_INFINITE, VALUE_ZERO);
   evaluate_shelter<Us>(pos, ksq, shelter);
@@ -238,7 +235,7 @@ Score Entry::do_king_safety(const Position& pos) {
   if (pos.can_castle(Us | QUEEN_SIDE))
       evaluate_shelter<Us>(pos, relative_square(Us, SQ_C1), shelter);
 
-  return shelter - make_score(VALUE_ZERO, 16 * minPawnDist);
+  return shelter - make_score(VALUE_ZERO, 2 * sumPawnDist);
 }
 
 // Explicit template instantiation
