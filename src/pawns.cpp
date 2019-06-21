@@ -215,11 +215,12 @@ void Entry::evaluate_shelter(const Position& pos, Square ksq, Score& shelter) {
 template<Color Us>
 Score Entry::do_king_safety(const Position& pos) {
 
+  Color Them = ~Us;
   Square ksq = pos.square<KING>(Us);
   kingSquares[Us] = ksq;
   castlingRights[Us] = pos.castling_rights(Us);
 
-  Bitboard pawns = pos.pieces(Us, PAWN) & ~pawn_attacks(Us);
+  Bitboard pawns = pos.pieces(Us, PAWN) & (pawn_attacks(Them) | ~pawn_attacks(Us));
   int minPawnDist = pawns ? 8 : 0;
 
   if (pawns & PseudoAttacks[KING][ksq])
