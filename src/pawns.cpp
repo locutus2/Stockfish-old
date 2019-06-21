@@ -215,6 +215,8 @@ void Entry::evaluate_shelter(const Position& pos, Square ksq, Score& shelter) {
 template<Color Us>
 Score Entry::do_king_safety(const Position& pos) {
 
+  Color Them = ~Us;
+
   Square ksq = pos.square<KING>(Us);
   kingSquares[Us] = ksq;
   castlingRights[Us] = pos.castling_rights(Us);
@@ -228,6 +230,15 @@ Score Entry::do_king_safety(const Position& pos) {
   else while (pawns)
       minPawnDist = std::min(minPawnDist, distance(ksq, pop_lsb(&pawns)));
 
+  pawns = pos.pieces(Them, PAWN);
+  int minOppPawnDist = pawns ? 8 : 0;
+
+  if (pawns & PseudoAttacks[KING][ksq])
+      minOppPawnDist = 1;
+
+  else while (pawns)
+      minOppPawnDist = std::min(minOppPawnDist, distance(ksq, pop_lsb(&pawns)));
+
   Score shelter = make_score(-VALUE_INFINITE, VALUE_ZERO);
   evaluate_shelter<Us>(pos, ksq, shelter);
 
@@ -238,7 +249,7 @@ Score Entry::do_king_safety(const Position& pos) {
   if (pos.can_castle(Us | QUEEN_SIDE))
       evaluate_shelter<Us>(pos, relative_square(Us, SQ_C1), shelter);
 
-  return shelter - make_score(VALUE_ZERO, 16 * minPawnDist);
+  return shelter - make_score(VALUE_ZERO, 16 * (minPawnDist + minOppPawnDist));
 }
 
 // Explicit template instantiation
