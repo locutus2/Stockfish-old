@@ -238,7 +238,7 @@ Score Entry::do_king_safety(const Position& pos) {
   if (pos.can_castle(Us | QUEEN_SIDE))
       evaluate_shelter<Us>(pos, relative_square(Us, SQ_C1), shelter);
 
-  return shelter - make_score(VALUE_ZERO, minPawnDist * (8 + 2 * minPawnDist));
+  return shelter - make_score(VALUE_ZERO, minPawnDist * (7 + 3 * minPawnDist));
 }
 
 // Explicit template instantiation
