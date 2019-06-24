@@ -69,7 +69,7 @@ namespace {
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
 
     Bitboard b, neighbours, stoppers, doubled, support, phalanx;
-    Bitboard lever, leverPush;
+    Bitboard lever, leverPush, unopposedPawns = 0, isolatedPawns = 0, backwardPawns = 0;
     Square s;
     bool opposed, backward;
     Score score = SCORE_ZERO;
@@ -131,13 +131,33 @@ namespace {
             score += make_score(v, v * (r - 2) / 4);
         }
         else if (!neighbours)
-            score -= Isolated + WeakUnopposed * int(!opposed);
+            score -= Isolated + WeakUnopposed * int(!opposed), isolatedPawns |= s;
 
         else if (backward)
-            score -= Backward + WeakUnopposed * int(!opposed);
+            score -= Backward + WeakUnopposed * int(!opposed), backwardPawns |= s;
 
         if (doubled && !support)
             score -= Doubled;
+
+        if (!opposed)
+            unopposedPawns |= s;
+    }
+
+    Bitboard pawns = ourPawns | theirPawns;
+    Bitboard pawnsGroup = 0;
+    for(File f = FILE_A; f <= FILE_H; ++f)
+    {
+        pawnsGroup |= file_bb(f);
+        if (!(pawns & file_bb(f)) || f == FILE_H)
+        {
+            if (  !(e->passedPawns[Us] & pawnsGroup)
+                && (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns))
+                &&  popcount(b) > popcount(theirPawns & pawnsGroup)
+                && (b &= unopposedPawns))
+                e->passedPawns[Us] |= frontmost_sq(Us, b);
+
+            pawnsGroup = 0;
+        }
     }
 
     return score;
