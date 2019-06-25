@@ -153,8 +153,7 @@ namespace {
         {
             if (  !(e->passedPawns[Us] & pawnsGroup)
                 && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
-                &&  popcount(b) <= 4
-                &&  popcount(b) > popcount(theirPawns & pawnsGroup))
+                &&  popcount(b) > 1 + popcount(theirPawns & pawnsGroup))
                 score += CandidatePasser;
 
             pawnsGroup = 0;
