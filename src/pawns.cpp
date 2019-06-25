@@ -36,7 +36,7 @@ namespace {
   constexpr Score Doubled  = S(11, 56);
   constexpr Score Isolated = S( 5, 15);
   constexpr Score WeakUnopposed = S( 13, 27);
-  constexpr Score CandidatePasser = S(10, 10);
+  constexpr Score CandidatePasser = S(15, 15);
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -153,8 +153,8 @@ namespace {
         {
             if (  !(e->passedPawns[Us] & pawnsGroup)
                 && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
-                &&  popcount(b) > popcount(theirPawns & pawnsGroup))
-                score += CandidatePasser * popcount(b & unopposedPawns);
+                &&  popcount(b) > 1 + popcount(theirPawns & pawnsGroup))
+                score += CandidatePasser;
 
             pawnsGroup = 0;
         }
