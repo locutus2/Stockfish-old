@@ -146,7 +146,6 @@ namespace {
 
     Bitboard pawns = ourPawns | theirPawns;
     Bitboard pawnsGroup = 0;
-    int advantage;
     for(File f = FILE_A; f <= FILE_H; ++f)
     {
         pawnsGroup |= file_bb(f);
@@ -154,8 +153,8 @@ namespace {
         {
             if (  !(e->passedPawns[Us] & pawnsGroup)
                 && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
-                && (advantage = popcount(b) - popcount(theirPawns & pawnsGroup)) > 0)
-                score += CandidatePasser * advantage;
+                &&  popcount(b) > popcount(theirPawns & pawnsGroup))
+                score += CandidatePasser * popcount(b & unopposedPawns);
 
             pawnsGroup = 0;
         }
