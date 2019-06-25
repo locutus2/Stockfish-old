@@ -68,6 +68,7 @@ namespace {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
+    constexpr Bitboard  LowRanks = (Us == WHITE ? Rank2BB : Rank7BB);
 
     Bitboard b, neighbours, stoppers, doubled, support, phalanx;
     Bitboard lever, leverPush, unopposedPawns = 0, isolatedPawns = 0, backwardPawns = 0;
@@ -152,7 +153,7 @@ namespace {
         if (!(pawns & file_bb(f)) || f == FILE_H)
         {
             if (  !(e->passedPawns[Us] & pawnsGroup)
-                && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
+                && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(LowRanks | backwardPawns | isolatedPawns)))
                 &&  popcount(b) > popcount(theirPawns & pawnsGroup))
                 score += CandidatePasser;
 
