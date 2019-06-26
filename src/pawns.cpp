@@ -155,7 +155,7 @@ namespace {
                 &&  popcount(b) > 1 + popcount(theirPawns & pawnsGroup))
                 score += CandidatePasser;
 
-            pawnsGroup = 0;
+            pawnsGroup = file_bb(f);
         }
     }
 
