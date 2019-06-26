@@ -152,6 +152,7 @@ namespace {
   constexpr Score ThreatBySafePawn   = S(173, 94);
   constexpr Score TrappedRook        = S( 47,  4);
   constexpr Score WeakQueen          = S( 49, 15);
+  constexpr Score WeakSpaceThreat    = S(  2,  0);
 
 #undef S
 
@@ -711,6 +712,18 @@ namespace {
     int weight = pos.count<ALL_PIECES>(Us) - 1;
     Score score = make_score(bonus * weight * weight / 16, 0);
     score -= make_score(4, 0) * popcount(attackedBy[Them][ALL_PIECES] & behind & safe);
+
+    Bitboard b = behind & safe & ~attackedBy[Them][ALL_PIECES];
+    safe = ~(attackedBy[Us][ALL_PIECES] | pos.pieces(Them));
+
+    while (b)
+    {
+        Square s = pop_lsb(&b);
+        if (safe & (  (pos.attacks_from<KNIGHT>(s) &  attackedBy[Them][KNIGHT])
+                    | (pos.attacks_from<BISHOP>(s) & (attackedBy[Them][BISHOP] | attackedBy[Them][QUEEN]))
+                    | (pos.attacks_from<ROOK  >(s) & (attackedBy[Them][ROOK  ] | attackedBy[Them][QUEEN]))))
+            score -= WeakSpaceThreat;
+    }
 
     if (T)
         Trace::add(SPACE, Us, score);
