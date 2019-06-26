@@ -144,18 +144,21 @@ namespace {
             unopposedPawns |= s;
     }
 
-    Bitboard pawnsGroup = 0;
-    for(File f = FILE_A; f <= FILE_H; ++f)
+    if (!e->passedPawns[Us])
     {
-        pawnsGroup |= file_bb(f);
-        if (!(ourPawns & file_bb(f)) || f == FILE_H)
+        Bitboard pawns = ourPawns | theirPawns;
+        Bitboard pawnsGroup = 0;
+        for(File f = FILE_A; f <= FILE_H; ++f)
         {
-            if (  !(e->passedPawns[Us] & pawnsGroup)
-                && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
-                &&  popcount(b) > 1 + popcount(theirPawns & pawnsGroup))
-                score += CandidatePasser;
+            pawnsGroup |= file_bb(f);
+            if (!(pawns & file_bb(f)) || f == FILE_H)
+            {
+                if (  (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
+                    && popcount(b) > 1 + popcount(theirPawns & pawnsGroup))
+                    score += CandidatePasser;
 
-            pawnsGroup = file_bb(f);
+                pawnsGroup = 0;
+            }
         }
     }
 
