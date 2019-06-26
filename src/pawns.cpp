@@ -36,7 +36,7 @@ namespace {
   constexpr Score Doubled  = S(11, 56);
   constexpr Score Isolated = S( 5, 15);
   constexpr Score WeakUnopposed = S( 13, 27);
-  constexpr Score CandidatePasser = S(20, 20);
+  constexpr Score CandidatePasser = S(10, 10);
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -70,7 +70,7 @@ namespace {
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
 
     Bitboard b, neighbours, stoppers, doubled, support, phalanx;
-    Bitboard lever, leverPush, unopposedPawns = 0, isolatedPawns = 0, backwardPawns = 0;
+    Bitboard lever, leverPush, unopposedPawns = 0, isolatedPawns = 0, backwardPawns = 0, doubledPawns = 0;
     Square s;
     bool opposed, backward;
     Score score = SCORE_ZERO;
@@ -101,6 +101,8 @@ namespace {
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
+
+        doubledPawns |= ourPawns & forward_file_bb(Us, s);
 
         // A pawn is backward when it is behind all pawns of the same color
         // on the adjacent files and cannot be safely advanced.
@@ -152,7 +154,8 @@ namespace {
         if (!(pawns & file_bb(f)) || f == FILE_H)
         {
             if (  !(e->passedPawns[Us] & pawnsGroup)
-                && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
+                && (    unopposedPawns & (b = ourPawns & pawnsGroup
+                    & ~(backwardPawns | isolatedPawns | doubledPawns)))
                 &&  popcount(b) > 1 + popcount(theirPawns & pawnsGroup))
                 score += CandidatePasser;
 
