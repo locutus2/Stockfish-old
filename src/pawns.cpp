@@ -36,7 +36,7 @@ namespace {
   constexpr Score Doubled  = S(11, 56);
   constexpr Score Isolated = S( 5, 15);
   constexpr Score WeakUnopposed = S( 13, 27);
-  constexpr Score CandidatePasser = S(20, 20);
+  constexpr Score CandidatePasser = S(10, 10);
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -144,12 +144,11 @@ namespace {
             unopposedPawns |= s;
     }
 
-    Bitboard pawns = ourPawns | theirPawns;
     Bitboard pawnsGroup = 0;
     for(File f = FILE_A; f <= FILE_H; ++f)
     {
         pawnsGroup |= file_bb(f);
-        if (!(pawns & file_bb(f)) || f == FILE_H)
+        if (!(ourPawns & file_bb(f)) || f == FILE_H)
         {
             if (  !(e->passedPawns[Us] & pawnsGroup)
                 && (unopposedPawns & (b = ourPawns & pawnsGroup & ~(backwardPawns | isolatedPawns)))
