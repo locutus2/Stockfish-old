@@ -122,6 +122,14 @@ namespace {
                     e->passedPawns[Us] |= s;
         }
 
+        // Detect candidate passers which has only one stopper on an adjacent file
+        // and a supporter on the same file.
+        else if (    !opposed
+                 &&  !more_than_one(stoppers)
+                 &&  (b = (ourPawns & pawn_attack_span(Them, s + Up) & file_bb(lsb(stoppers))))
+                 &&  !more_than_one(theirPawns & passed_pawn_span(Us, frontmost_sq(Us, b))))
+            e->passedPawns[Us] |= s;
+
         // Score this pawn
         if (support | phalanx)
         {
