@@ -70,7 +70,7 @@ namespace {
     constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
 
     Bitboard b, neighbours, stoppers, doubled, support, phalanx;
-    Bitboard lever, leverPush, unopposedPawns = 0, isolatedPawns = 0, backwardPawns = 0, doubledPawns = 0;
+    Bitboard lever, leverPush, unopposedPawns = 0, backwardPawns = 0;
     Square s;
     bool opposed, backward;
     Score score = SCORE_ZERO;
@@ -102,8 +102,6 @@ namespace {
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
 
-        doubledPawns |= ourPawns & forward_file_bb(Us, s);
-
         // A pawn is backward when it is behind all pawns of the same color
         // on the adjacent files and cannot be safely advanced.
         backward =  !(ourPawns & pawn_attack_span(Them, s + Up))
@@ -134,7 +132,7 @@ namespace {
             score += make_score(v, v * (r - 2) / 4);
         }
         else if (!neighbours)
-            score -= Isolated + WeakUnopposed * int(!opposed), isolatedPawns |= s;
+            score -= Isolated + WeakUnopposed * int(!opposed);
 
         else if (backward)
             score -= Backward + WeakUnopposed * int(!opposed), backwardPawns |= s;
@@ -154,8 +152,7 @@ namespace {
         if (!(pawns & file_bb(f)) || f == FILE_H)
         {
             if (  !(e->passedPawns[Us] & pawnsGroup)
-                && (    unopposedPawns & (b = ourPawns & pawnsGroup
-                    & ~(backwardPawns | isolatedPawns | doubledPawns)))
+                && (unopposedPawns & (b = ourPawns & pawnsGroup & ~backwardPawns))
                 &&  popcount(b) > 1 + popcount(theirPawns & pawnsGroup))
                 score += CandidatePasser;
 
