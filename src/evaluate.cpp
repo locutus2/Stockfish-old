@@ -693,6 +693,7 @@ namespace {
 
     constexpr Color Them     = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
+    constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
     constexpr Bitboard SpaceMask =
       Us == WHITE ? CenterFiles & (Rank2BB | Rank3BB | Rank4BB)
                   : CenterFiles & (Rank7BB | Rank6BB | Rank5BB);
@@ -703,7 +704,8 @@ namespace {
                    & ~attackedBy[Them][PAWN];
 
     // Find all squares which are at most three squares behind some friendly pawn
-    Bitboard behind = pos.pieces(Us, PAWN);
+    Bitboard safePushable = shift<Down>(~(pos.pieces() | attackedBy[Them][ALL_PIECES]));
+    Bitboard behind = pos.pieces(Us, PAWN) | shift<Up>(pos.pieces(Us, PAWN) & safePushable);
     behind |= shift<Down>(behind);
     behind |= shift<Down+Down>(behind);
 
