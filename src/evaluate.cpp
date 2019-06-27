@@ -716,7 +716,7 @@ namespace {
     score -= AttacksOnSpaceArea * popcount(attackedBy[Them][ALL_PIECES] & behind & safe);
 
     if (pos.non_pawn_material() < SpaceThresholdHigh)
-        score = score * int(pos.non_pawn_material()) / SpaceThresholdHigh;
+        score = score * (int(pos.non_pawn_material()) - SpaceThresholdLow) / (SpaceThresholdHigh - SpaceThresholdLow);
 
     if (T)
         Trace::add(SPACE, Us, score);
