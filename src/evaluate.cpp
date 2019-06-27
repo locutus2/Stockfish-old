@@ -689,9 +689,6 @@ namespace {
   template<Tracing T> template<Color Us>
   Score Evaluation<T>::space() const {
 
-    if (pos.non_pawn_material() < SpaceThreshold)
-        return SCORE_ZERO;
-
     constexpr Color Them     = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
     constexpr Bitboard SpaceMask =
@@ -713,6 +710,9 @@ namespace {
     Score score = make_score(bonus * weight * weight / 16, 0);
 
     score -= AttacksOnSpaceArea * popcount(attackedBy[Them][ALL_PIECES] & behind & safe);
+
+    if (pos.non_pawn_material() < SpaceThreshold)
+        score = score * int(pos.non_pawn_material()) / SpaceThreshold;
 
     if (T)
         Trace::add(SPACE, Us, score);
