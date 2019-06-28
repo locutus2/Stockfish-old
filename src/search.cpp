@@ -806,7 +806,7 @@ namespace {
                 ss->currentMove = move;
                 ss->moveKey = pos.move_key(move);
                 ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)];
-                ss->twoMoveHistory = &thisThread->twoMoveHistory[two_move_keys((ss-1)->moveKey, ss->moveKey)];
+                ss->twoMoveHistory = &thisThread->twoMoveHistory[two_move_keys((ss-3)->moveKey, (ss-1)->moveKey)];
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -1014,7 +1014,7 @@ moves_loop: // When in check, search starts from here
       ss->currentMove = move;
       ss->moveKey = pos.move_key(move);
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
-      ss->twoMoveHistory = &thisThread->twoMoveHistory[two_move_keys((ss-1)->moveKey, ss->moveKey)];
+      ss->twoMoveHistory = &thisThread->twoMoveHistory[two_move_keys((ss-3)->moveKey, (ss-1)->moveKey)];
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1484,7 +1484,7 @@ moves_loop: // When in check, search starts from here
         if (is_ok((ss-i)->currentMove))
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
 
-    if (is_ok((ss-1)->currentMove) && is_ok((ss-2)->currentMove))
+    if (is_ok((ss-2)->currentMove) && is_ok((ss-4)->currentMove))
         (*(ss-1)->twoMoveHistory)[pc][to] << bonus;
   }
 
