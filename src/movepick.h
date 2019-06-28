@@ -29,7 +29,9 @@
 #include "position.h"
 #include "types.h"
 
-template <int Size = 1024>
+constexpr int TWO_MOVES_NB = 2048;
+
+template <int Size = TWO_MOVES_NB>
 inline int two_move_keys(Key mk1, Key mk2) {
   return (mk1 ^ mk2) & (Size - 1);
 }
@@ -108,7 +110,7 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
-typedef Stats<PieceToHistory, NOT_USED, 1024> TwoMoveHistory;
+typedef Stats<PieceToHistory, NOT_USED, TWO_MOVES_NB> TwoMoveHistory;
 
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
