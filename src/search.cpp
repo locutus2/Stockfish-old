@@ -67,6 +67,9 @@ namespace {
     return Value((175 - 50 * improving) * d / ONE_PLY);
   }
 
+  constexpr Bitboard AdvancedSpace[COLOR_NB] = { Rank5BB | Rank6BB | Rank7BB | Rank8BB,
+                                                 Rank4BB | Rank3BB | Rank2BB | Rank1BB};
+
   // Reductions lookup table, initialized at startup
   int Reductions[MAX_MOVES]; // [depth or moveNumber]
 
@@ -990,10 +993,10 @@ moves_loop: // When in check, search starts from here
           else if ((!givesCheck || !extension)
                   && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY))) // (~20 Elo)
           {
-              if(type_of(movedPiece) >= ROOK || !(pos.pieces(~us, PAWN) & to_sq(move)))
+              if(!(pos.pieces(~us, PAWN) & to_sq(move)))
                   continue;
 
-              Bitboard b = passed_pawn_span(~us, to_sq(move)) & pos.pieces(us, PAWN);
+              Bitboard b = passed_pawn_span(~us, to_sq(move)) & pos.pieces(us, PAWN) & AdvancedSpace[us];
               if(!b || more_than_one(passed_pawn_span(us, frontmost_sq(us, b)) & pos.pieces(~us, PAWN)))
                   continue;
           }
