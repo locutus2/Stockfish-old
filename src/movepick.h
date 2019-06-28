@@ -29,6 +29,11 @@
 #include "position.h"
 #include "types.h"
 
+template <int Size = 1024>
+inline int two_move_keys(Key mk1, Key mk2) {
+  return (mk1 ^ mk2) & (Size - 1);
+}
+
 /// StatsEntry stores the stat table value. It is usually a number but could
 /// be a move or even a nested history. We use a class instead of naked value
 /// to directly call history update operator<<() on the entry so to use stats
@@ -102,6 +107,8 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// the current one given a previous one. The nested history table is based on
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
+
+typedef Stats<PieceToHistory, NOT_USED, 1024> TwoMoveHistory;
 
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the

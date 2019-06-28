@@ -147,6 +147,7 @@ public:
   Key key_after(Move m) const;
   Key material_key() const;
   Key pawn_key() const;
+  Key move_key(Move m) const;
 
   // Other properties of the position
   Color side_to_move() const;

@@ -1040,6 +1040,20 @@ Key Position::key_after(Move m) const {
   return k ^ Zobrist::psq[pc][to] ^ Zobrist::psq[pc][from];
 }
 
+Key Position::move_key(Move m) const {
+
+  Square from = from_sq(m);
+  Square to = to_sq(m);
+  Piece pc = piece_on(from);
+  Piece captured = piece_on(to);
+  Key k = Zobrist::psq[pc][to] ^ Zobrist::psq[pc][from];
+
+  if (captured)
+      k ^= Zobrist::psq[captured][to];
+
+  return k;
+}
+
 
 /// Position::see_ge (Static Exchange Evaluation Greater or Equal) tests if the
 /// SEE value of move is greater or equal to the given threshold. We'll use an
