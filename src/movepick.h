@@ -29,7 +29,7 @@
 #include "position.h"
 #include "types.h"
 
-constexpr int TWO_MOVES_NB = 2048;
+constexpr int TWO_MOVES_NB = 1024;
 
 template <int Size = TWO_MOVES_NB>
 inline int two_move_keys(Key mk1, Key mk2) {
