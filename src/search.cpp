@@ -989,7 +989,14 @@ moves_loop: // When in check, search starts from here
           }
           else if ((!givesCheck || !extension)
                   && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY))) // (~20 Elo)
+          {
+              if(!(pos.pieces(~us, PAWN) & to_sq(move)))
                   continue;
+
+              Bitboard b = passed_pawn_span(~us, to_sq(move)) & pos.pieces(us, PAWN);
+              if(!b || more_than_one(passed_pawn_span(us, frontmost_sq(us, b)) & pos.pieces(~us, PAWN)))
+                  continue;
+          }
       }
 
       // Speculative prefetch as early as possible
