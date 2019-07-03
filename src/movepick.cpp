@@ -255,7 +255,7 @@ top:
       /* fallthrough */
 
   case PROBCUT_CHECK:
-      return select<Next>([](){ return true; });
+      return select<Next>([&](){ return pos.see_ge(*cur, threshold);  });
 
   case QCAPTURE:
       if (select<Best>([&](){ return   depth > DEPTH_QS_RECAPTURES
