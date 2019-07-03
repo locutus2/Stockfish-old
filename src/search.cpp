@@ -71,7 +71,7 @@ namespace {
   int Reductions[MAX_MOVES]; // [depth or moveNumber]
 
   Depth reduction(bool i, Depth d, int mn) {
-    int r = Reductions[d / ONE_PLY] * Reductions[mn];
+    int r = Reductions[d / ONE_PLY] * Reductions[std::min(MAX_MOVES - 1, mn * 9 / 8)];
     return ((r + 512) / 1024 + (!i && r > 1024)) * ONE_PLY;
   }
 
