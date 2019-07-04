@@ -21,6 +21,7 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "quietOrderNet.h"
 
 namespace {
 
@@ -57,9 +58,10 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers,
+                       bool useNet)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
-             refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d) {
+             refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), useQuietOrderNet(useNet) {
 
   assert(d > DEPTH_ZERO);
 
@@ -103,19 +105,12 @@ MovePicker::MovePicker(const Position& p, Move ttm, Value th, const CapturePiece
 template<GenType Type>
 void MovePicker::score() {
 
-  static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
+  static_assert(Type == CAPTURES || Type == EVASIONS, "Wrong type");
 
   for (auto& m : *this)
       if (Type == CAPTURES)
           m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))] / 8;
-
-      else if (Type == QUIETS)
-          m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   + (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)] / 2;
 
       else // Type == EVASIONS
       {
@@ -127,6 +122,33 @@ void MovePicker::score() {
                        + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                        - (1 << 28);
       }
+}
+
+template<>
+void MovePicker::score<QUIETS>() {
+
+  if (useQuietOrderNet)
+  {
+    bool input[Net::INPUT_SIZE];
+    Net::calculateQuietOrderNetInput(pos, input);
+
+    for (auto& m : *this)
+          m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
+                   + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                   + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                   + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                   + (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)] / 2
+                   +  Net::calculateQuietOrderValue(input, pos.moved_piece(m), to_sq(m));
+  }
+  else
+  {
+    for (auto& m : *this)
+            m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
+                     + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                     + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                     + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                     + (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)] / 2;
+  }
 }
 
 /// MovePicker::select() returns the next move satisfying a predicate function.
