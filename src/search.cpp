@@ -889,7 +889,7 @@ moves_loop: // When in check, search starts from here
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      rootNode && depth >= 11 * ONE_PLY);
+                                      rootNode && depth >= 13 * ONE_PLY);
 
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
