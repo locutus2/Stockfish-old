@@ -129,7 +129,7 @@ void MovePicker::score<QUIETS>() {
 
   if (useQuietOrderNet)
   {
-    bool input[Net::INPUT_SIZE];
+    float input[Net::INPUT_SIZE];
     Net::calculateQuietOrderNetInput(pos, input);
 
     for (auto& m : *this)

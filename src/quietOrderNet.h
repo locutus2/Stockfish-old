@@ -7,8 +7,8 @@ namespace Net {
 
 constexpr int INPUT_SIZE = 800;
 
-int calculateQuietOrderValue(bool input[], Piece p, Square s);
-void calculateQuietOrderNetInput(const Position& pos, bool input[]);
+int calculateQuietOrderValue(float input[], Piece p, Square s);
+void calculateQuietOrderNetInput(const Position& pos, float input[]);
 
 }
 
