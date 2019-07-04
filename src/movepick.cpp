@@ -133,22 +133,17 @@ void MovePicker::score<QUIETS>() {
     Net::calculateQuietOrderNetInput(pos, input);
 
     for (auto& m : *this)
-          m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   + (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)] / 2
-                   +  Net::calculateQuietOrderValue(input, pos.moved_piece(m), to_sq(m));
+        m.value = Net::calculateQuietOrderValue(input, pos.moved_piece(m), to_sq(m));
   }
   else
   {
     for (auto& m : *this)
-            m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
-                     + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                     + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                     + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                     + (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)] / 2;
-  }
+        m.value =  (*mainHistory)[pos.side_to_move()][from_to(m)]
+                 + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                 + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                 + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                 + (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)] / 2;
+}
 }
 
 /// MovePicker::select() returns the next move satisfying a predicate function.
