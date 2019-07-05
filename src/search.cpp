@@ -1069,8 +1069,12 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Decrease reduction if move is now possible only because prevoius move
+          if (is_ok((ss-1)->currentMove) && (between_bb(from_sq(move), to_sq(move)) & from_sq((ss-1)->currentMove)))
+              r -= ONE_PLY;
+
           // Reduction if other threads are searching this position.
-	  if (th.marked())
+          if (th.marked())
               r += ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
