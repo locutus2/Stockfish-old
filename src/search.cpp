@@ -1072,6 +1072,11 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Increase reduction of a move at non-PV node
+          // if not an extension and at least one move was extended.
+          if (!PvNode && !extension && extensionFound)
+              r += ONE_PLY;
+
           // Reduction if other threads are searching this position.
           if (th.marked())
               r += ONE_PLY;
@@ -1089,10 +1094,6 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction of a move if not an extension and at least one move was extended.
-              if (!extension && extensionFound)
-                  r += ONE_PLY;
-
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r += ONE_PLY;
