@@ -999,6 +999,8 @@ moves_loop: // When in check, search starts from here
                && pos.pawn_passed(us, to_sq(move)))
           extension = ONE_PLY;
 
+      extensionFound = extensionFound || extension;
+
       // Calculate new depth for this move
       newDepth = depth - ONE_PLY + extension;
 
@@ -1053,8 +1055,6 @@ moves_loop: // When in check, search starts from here
           continue;
       }
 
-      extensionFound = extensionFound || extension;
-
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
@@ -1071,10 +1071,6 @@ moves_loop: // When in check, search starts from here
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha))
       {
           Depth r = reduction(improving, depth, moveCount);
-
-          // Increase reduction of a move if not an extension and at least one move was extended.
-          if (!extension && extensionFound)
-              r += ONE_PLY;
 
           // Reduction if other threads are searching this position.
           if (th.marked())
@@ -1093,6 +1089,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Increase reduction of a move if not an extension and at least one move was extended.
+              if (!extension && extensionFound)
+                  r += ONE_PLY;
+
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r += ONE_PLY;
