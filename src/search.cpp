@@ -893,7 +893,6 @@ moves_loop: // When in check, search starts from here
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
-    bool castleSearched = false;
 
     // Mark this node as being searched.
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1087,8 +1086,8 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction for king moves if already a castle move was searched
-              if (type_of(movedPiece) == KING && castleSearched)
+              // Increase reduction for king moves if tt move is a castle
+              if (type_of(movedPiece) == KING && type_of(ttMove) == CASTLING)
                   r += ONE_PLY;
 
               // Increase reduction if ttMove is a capture (~0 Elo)
@@ -1219,9 +1218,6 @@ moves_loop: // When in check, search starts from here
           else if (!captureOrPromotion && quietCount < 64)
               quietsSearched[quietCount++] = move;
       }
-
-      if (type_of(move) == CASTLING)
-         castleSearched = true;
     }
 
     // The following condition would detect a stop only after move loop has been
