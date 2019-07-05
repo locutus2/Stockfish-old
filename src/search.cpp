@@ -893,6 +893,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+    bool extensionFound = false;
 
     // Mark this node as being searched.
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -998,8 +999,10 @@ moves_loop: // When in check, search starts from here
                && pos.pawn_passed(us, to_sq(move)))
           extension = ONE_PLY;
 
+      extensionFound = extensionFound || extension;
+
       // Calculate new depth for this move
-      newDepth = depth - ONE_PLY + extension;
+      newDepth = depth - ONE_PLY;
 
       // Step 14. Pruning at shallow depth (~170 Elo)
       if (  !rootNode
@@ -1069,8 +1072,12 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Increase reduction of a move is not an extension and at least one other move was extended.
+          if (!extension && extensionFound)
+              r += ONE_PLY;
+
           // Reduction if other threads are searching this position.
-	  if (th.marked())
+          if (th.marked())
               r += ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
