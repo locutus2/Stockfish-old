@@ -894,6 +894,20 @@ moves_loop: // When in check, search starts from here
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
+    Bitboard goodSquares = 0;
+
+    if (ttMove)
+        goodSquares |= to_sq(ttMove);
+
+    if (ss->killers[0])
+        goodSquares |= to_sq(ss->killers[0]);
+
+    if (ss->killers[1])
+        goodSquares |= to_sq(ss->killers[1]);
+
+    if (countermove)
+        goodSquares |= to_sq(countermove);
+
     // Mark this node as being searched.
     ThreadHolding th(thisThread, posKey, ss->ply);
 
@@ -1069,8 +1083,11 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          if (goodSquares & to_sq(move))
+              r -= ONE_PLY;
+
           // Reduction if other threads are searching this position.
-	  if (th.marked())
+          if (th.marked())
               r += ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
