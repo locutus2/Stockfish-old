@@ -1002,7 +1002,7 @@ moves_loop: // When in check, search starts from here
       extensionFound = extensionFound || extension;
 
       // Calculate new depth for this move
-      newDepth = depth - ONE_PLY;
+      newDepth = depth - ONE_PLY + extension;
 
       // Step 14. Pruning at shallow depth (~170 Elo)
       if (  !rootNode
