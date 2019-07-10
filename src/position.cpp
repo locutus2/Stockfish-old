@@ -713,6 +713,20 @@ bool Position::gives_check(Move m) const {
   }
 }
 
+/// Position::discovered_check() tests whether a pseudo-legal move gives a discovered check
+
+bool Position::discovered_check(Move m) const {
+
+  assert(is_ok(m));
+  assert(color_of(moved_piece(m)) == sideToMove);
+
+  Square from = from_sq(m);
+  Square to = to_sq(m);
+
+  // Is there a discovered check?
+  return   (st->blockersForKing[~sideToMove] & from)
+        && !aligned(from, to, square<KING>(~sideToMove));
+}
 
 /// Position::do_move() makes a move, and saves all information necessary
 /// to a StateInfo object. The move is assumed to be legal. Pseudo-legal

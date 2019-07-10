@@ -174,7 +174,7 @@ top:
 
   case GOOD_CAPTURE:
       if (select<Best>([&](){
-                       return  (type_of(pos.moved_piece(*cur)) == PAWN && pos.capture(*cur))
+                       return   pos.discovered_check(*cur)
                              || pos.see_ge(*cur, Value(-55 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
