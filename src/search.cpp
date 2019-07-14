@@ -831,7 +831,12 @@ namespace {
             thisThread->nmpMinPly = 0;
 
             if (v >= beta)
+            {
+                if (!pos.captured_piece())
+                    update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth));
+
                 return nullValue;
+            }
         }
     }
 
