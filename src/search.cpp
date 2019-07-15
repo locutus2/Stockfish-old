@@ -1023,7 +1023,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material(~us) > BishopValueMg))
           {
               // Move count based pruning
-              if (moveCountPruning && !(pinned & from_sq(move)))
+              if (moveCountPruning)
                   continue;
 
               // Reduced depth of the next LMR search
@@ -1033,7 +1033,8 @@ moves_loop: // When in check, search starts from here
               // Countermoves based pruning (~20 Elo)
               if (   lmrDepth < 3 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
+                  && !(pinned & from_sq(move)))
                   continue;
 
               // Futility pruning: parent node (~2 Elo)
