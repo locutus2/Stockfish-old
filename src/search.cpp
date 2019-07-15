@@ -1095,6 +1095,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Increase reduction if pinned piece does a quiet move.
+              if (pinned & from_sq(move))
+                  r += ONE_PLY;
+
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r += ONE_PLY;
@@ -1126,10 +1130,6 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 16384 * ONE_PLY;
           }
-
-          // Less reduction if pinned piece does a non-quite move.
-          else if (pinned & from_sq(move))
-              r -= ONE_PLY;
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
 
