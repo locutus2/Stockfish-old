@@ -773,8 +773,7 @@ namespace {
     // Step 7. Razoring (~2 Elo)
     if (   !rootNode // The required rootNode PV handling is not available in qsearch
         &&  depth < 2 * ONE_PLY
-        &&  eval <= alpha - RazorMargin
-        && !(pos.blockers_for_king(us) & (pos.pieces(us) ^ pos.pieces(us, PAWN))))
+        &&  eval <= alpha - RazorMargin)
         return qsearch<NT>(pos, ss, alpha, beta);
 
     improving =   ss->staticEval >= (ss-2)->staticEval
@@ -784,6 +783,7 @@ namespace {
     if (   !PvNode
         &&  depth < 7 * ONE_PLY
         &&  eval - futility_margin(depth, improving) >= beta
+        && !(pos.blockers_for_king(us) & (pos.pieces(us) ^ pos.pieces(us, PAWN)))
         &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
         return eval;
 
