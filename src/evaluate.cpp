@@ -29,7 +29,6 @@
 #include "material.h"
 #include "pawns.h"
 #include "thread.h"
-#include "misc.h"
 
 namespace Trace {
 
@@ -135,7 +134,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score AttacksOnSpaceArea = S(  4,  0);
-  constexpr Score BadPiece           = S(  5, 10);
+  constexpr Score BadPiece           = S(  3, 6);
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score FlankAttacks       = S(  8,  0);
@@ -307,7 +306,7 @@ namespace {
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         if (mob == 0)
-            ++badPieces[Us];
+            badPieces[Us] += 2;
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
