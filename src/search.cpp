@@ -794,7 +794,7 @@ namespace {
         &&  ss->staticEval >= beta - 36 * depth / ONE_PLY + 225
         && !excludedMove
         &&  pos.non_pawn_material(us)
-        && !pos.blockers_for_king(us)
+        && !(pos.blockers_for_king(us) & pos.pieces(us, KNIGHT))
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
