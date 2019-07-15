@@ -774,7 +774,7 @@ namespace {
                || (ss-2)->staticEval == VALUE_NONE;
 
     if (pos.blockers_for_king(us) & (pos.pieces(us) ^ pos.pieces(us, PAWN)))
-        goto moves_loop;
+        goto iid;
 
     // Step 7. Razoring (~2 Elo)
     if (   !rootNode // The required rootNode PV handling is not available in qsearch
@@ -875,6 +875,8 @@ namespace {
                     return value;
             }
     }
+
+iid: // When not in check and own pinned non-pawn exists, search starts from here
 
     // Step 11. Internal iterative deepening (~2 Elo)
     if (depth >= 8 * ONE_PLY && !ttMove)
