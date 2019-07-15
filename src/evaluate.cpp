@@ -29,6 +29,7 @@
 #include "material.h"
 #include "pawns.h"
 #include "thread.h"
+#include "misc.h"
 
 namespace Trace {
 
@@ -134,6 +135,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score AttacksOnSpaceArea = S(  4,  0);
+  constexpr Score BadPiece           = S(  5, 10);
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score FlankAttacks       = S(  8,  0);
@@ -181,6 +183,7 @@ namespace {
     Pawns::Entry* pe;
     Bitboard mobilityArea[COLOR_NB];
     Score mobility[COLOR_NB] = { SCORE_ZERO, SCORE_ZERO };
+    int badPieces[COLOR_NB] = { 0, 0 };
 
     // attackedBy[color][piece type] is a bitboard representing all squares
     // attacked by a given color and piece type. Special "piece types" which
@@ -283,7 +286,10 @@ namespace {
                          : pos.attacks_from<Pt>(s);
 
         if (pos.blockers_for_king(Us) & s)
+        {
             b &= LineBB[pos.square<KING>(Us)][s];
+            ++badPieces[Us];
+        }
 
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
@@ -299,6 +305,9 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
+
+        if (mob == 0)
+            ++badPieces[Us];
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
@@ -585,6 +594,8 @@ namespace {
 
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
+
+    score += BadPiece * badPieces[Them] * (badPieces[Them] - 1);
 
     if (T)
         Trace::add(THREAT, Us, score);
