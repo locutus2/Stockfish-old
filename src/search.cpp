@@ -1023,7 +1023,7 @@ moves_loop: // When in check, search starts from here
               && (!pos.advanced_pawn_push(move) || pos.non_pawn_material(~us) > BishopValueMg))
           {
               // Move count based pruning
-              if (moveCountPruning)
+              if (moveCountPruning && !(pinned & from_sq(move)))
                   continue;
 
               // Reduced depth of the next LMR search
@@ -1047,7 +1047,6 @@ moves_loop: // When in check, search starts from here
                   continue;
           }
           else if (  (!givesCheck || !extension)
-                   && !(pinned & from_sq(move))
                    && !pos.see_ge(move, -PawnValueEg * (depth / ONE_PLY))) // (~20 Elo)
                   continue;
       }
