@@ -833,7 +833,7 @@ namespace {
             if (v >= beta)
             {
                 if (!pos.captured_piece())
-                    update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+                    update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth) / 2);
 
                 return nullValue;
             }
