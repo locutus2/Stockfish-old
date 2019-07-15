@@ -1078,10 +1078,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Less reduction if pinned piece moves.
-          if (pinned & from_sq(move))
-              r -= ONE_PLY;
-
           // Reduction if other threads are searching this position.
           if (th.marked())
               r += ONE_PLY;
@@ -1130,6 +1126,10 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 16384 * ONE_PLY;
           }
+
+          // Less reduction if pinned piece does a non-quite move.
+          else if (pinned & from_sq(move))
+              r -= ONE_PLY;
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
 
