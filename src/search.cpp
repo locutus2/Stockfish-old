@@ -589,6 +589,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, singularLMR;
+    Bitboard pinned;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -900,6 +901,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+    pinned = pos.blockers_for_king(us);
 
     // Mark this node as being searched.
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1075,6 +1077,10 @@ moves_loop: // When in check, search starts from here
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Less reduction if pinned piece moves.
+          if (pinned & from_sq(move))
+              r -= ONE_PLY;
 
           // Reduction if other threads are searching this position.
           if (th.marked())
