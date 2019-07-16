@@ -773,7 +773,8 @@ namespace {
     // Step 7. Razoring (~2 Elo)
     if (   !rootNode // The required rootNode PV handling is not available in qsearch
         &&  depth < 2 * ONE_PLY
-        &&  eval <= alpha - RazorMargin)
+        &&  eval <= alpha - RazorMargin
+        && (ss->staticEval > 0 || !(pos.blockers_for_king(us) & (pos.pieces(us) ^ pos.pieces(us, PAWN)))))
         return qsearch<NT>(pos, ss, alpha, beta);
 
     improving =   ss->staticEval >= (ss-2)->staticEval
@@ -840,7 +841,6 @@ namespace {
     // much above beta, we can (almost) safely prune the previous move.
     if (   !PvNode
         &&  depth >= 5 * ONE_PLY
-        && !(pos.blockers_for_king(us) & (pos.pieces(us) ^ pos.pieces(us, PAWN)))
         &&  abs(beta) < VALUE_MATE_IN_MAX_PLY)
     {
         Value raisedBeta = std::min(beta + 216 - 48 * improving, VALUE_INFINITE);
