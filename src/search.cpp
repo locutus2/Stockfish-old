@@ -1127,9 +1127,9 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 16384 * ONE_PLY;
           }
 
-          // Decrease reduction if pinned piece does a non-quiet move.
-          else if (pinned & from_sq(move))
-              r -= 2 * ONE_PLY;
+          // Decrease reduction if static eval < 0 and pinned piece does a non-quiet move.
+          else if (ss->staticEval < 0 && (pinned & from_sq(move)))
+              r -= ONE_PLY;
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
 
