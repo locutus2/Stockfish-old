@@ -134,7 +134,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score AttacksOnSpaceArea = S(  4,  0);
-  constexpr Score BadPiece           = S( 10, 20);
+  constexpr Score BadPiece           = S(  5, 10);
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score FlankAttacks       = S(  8,  0);
@@ -594,8 +594,6 @@ namespace {
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
 
-    score += BadPiece * badPieces[Them] * (badPieces[Them] - 1);
-
     if (T)
         Trace::add(THREAT, Us, score);
 
@@ -825,6 +823,9 @@ namespace {
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+
+    mobility[WHITE] -= BadPiece * badPieces[WHITE] * (badPieces[WHITE] - 1);
+    mobility[BLACK] -= BadPiece * badPieces[BLACK] * (badPieces[BLACK] - 1);
 
     score += mobility[WHITE] - mobility[BLACK];
 
