@@ -134,7 +134,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score AttacksOnSpaceArea = S(  4,  0);
-  constexpr Score BadPiece           = S(  3, 6);
+  constexpr Score BadPiece           = S( 10, 20);
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score FlankAttacks       = S(  8,  0);
@@ -306,7 +306,7 @@ namespace {
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         if (mob == 0)
-            badPieces[Us] += 2;
+            ++badPieces[Us];
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
