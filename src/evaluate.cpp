@@ -134,7 +134,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score AttacksOnSpaceArea = S(  4,  0);
-  constexpr Score BadPiece           = S( 32, 64);
+  constexpr Score BadPiece           = S( 64, 64);
   constexpr Score BishopPawns        = S(  3,  7);
   constexpr Score CorneredBishop     = S( 50, 50);
   constexpr Score FlankAttacks       = S(  8,  0);
@@ -595,8 +595,8 @@ namespace {
     }
 
     int allPieces = popcount(pos.pieces(Them) ^ pos.pieces(Them, KING, PAWN));
-    if(allPieces)
-        score += BadPiece * badPieces[Them] * (badPieces[Them] - 1) / (allPieces * allPieces);
+    if(allPieces && badPieces[Them])
+        score += BadPiece * badPieces[Them] / allPieces;
 
     if (T)
         Trace::add(THREAT, Us, score);
