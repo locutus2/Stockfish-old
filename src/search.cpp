@@ -943,67 +943,70 @@ moves_loop: // When in check, search starts from here
 
       // Step 13. Extensions (~70 Elo)
 
-      // Singular extension search (~60 Elo). If all moves but one fail low on a
-      // search of (alpha-s, beta-s), and just one fails high on (alpha, beta),
-      // then that move is singular and should be extended. To verify this we do
-      // a reduced search on all the other moves but the ttMove and if the
-      // result is lower than ttValue minus a margin then we will extend the ttMove.
-      if (    depth >= 8 * ONE_PLY
-          &&  move == ttMove
-          && !rootNode
-          && !excludedMove // Avoid recursive singular search
-       /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
-          &&  abs(ttValue) < VALUE_KNOWN_WIN
-          && (tte->bound() & BOUND_LOWER)
-          &&  tte->depth() >= depth - 3 * ONE_PLY
-          &&  pos.legal(move))
+      if (!th.marked())
       {
-          Value singularBeta = ttValue - 2 * depth / ONE_PLY;
-          Depth halfDepth = depth / (2 * ONE_PLY) * ONE_PLY; // ONE_PLY invariant
-          ss->excludedMove = move;
-          value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, halfDepth, cutNode);
-          ss->excludedMove = MOVE_NONE;
-
-          if (value < singularBeta)
+          // Singular extension search (~60 Elo). If all moves but one fail low on a
+          // search of (alpha-s, beta-s), and just one fails high on (alpha, beta),
+          // then that move is singular and should be extended. To verify this we do
+          // a reduced search on all the other moves but the ttMove and if the
+          // result is lower than ttValue minus a margin then we will extend the ttMove.
+          if (    depth >= 8 * ONE_PLY
+              &&  move == ttMove
+              && !rootNode
+              && !excludedMove // Avoid recursive singular search
+           /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
+              &&  abs(ttValue) < VALUE_KNOWN_WIN
+              && (tte->bound() & BOUND_LOWER)
+              &&  tte->depth() >= depth - 3 * ONE_PLY
+              &&  pos.legal(move))
           {
-              extension = ONE_PLY;
-              singularLMR++;
+              Value singularBeta = ttValue - 2 * depth / ONE_PLY;
+              Depth halfDepth = depth / (2 * ONE_PLY) * ONE_PLY; // ONE_PLY invariant
+              ss->excludedMove = move;
+              value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, halfDepth, cutNode);
+              ss->excludedMove = MOVE_NONE;
 
-              if (value < singularBeta - std::min(3 * depth / ONE_PLY, 39))
+              if (value < singularBeta)
+              {
+                  extension = ONE_PLY;
                   singularLMR++;
+
+                  if (value < singularBeta - std::min(3 * depth / ONE_PLY, 39))
+                      singularLMR++;
+              }
+
+              // Multi-cut pruning
+              // Our ttMove is assumed to fail high, and now we failed high also on a reduced
+              // search without the ttMove. So we assume this expected Cut-node is not singular,
+              // that multiple moves fail high, and we can prune the whole subtree by returning
+              // a soft bound.
+              else if (   eval >= beta
+                       && singularBeta >= beta)
+                  return singularBeta;
           }
 
-          // Multi-cut pruning
-          // Our ttMove is assumed to fail high, and now we failed high also on a reduced
-          // search without the ttMove. So we assume this expected Cut-node is not singular,
-          // that multiple moves fail high, and we can prune the whole subtree by returning
-          // a soft bound.
-          else if (   eval >= beta
-                   && singularBeta >= beta)
-              return singularBeta;
+          // Check extension (~2 Elo)
+          else if (    givesCheck
+                   && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
+              extension = ONE_PLY;
+
+          // Castling extension
+          else if (type_of(move) == CASTLING)
+              extension = ONE_PLY;
+
+          // Shuffle extension
+          else if (   PvNode
+                   && pos.rule50_count() > 18
+                   && depth < 3 * ONE_PLY
+                   && ++thisThread->shuffleExts < thisThread->nodes.load(std::memory_order_relaxed) / 4)  // To avoid too many extensions
+              extension = ONE_PLY;
+
+          // Passed pawn extension
+          else if (   move == ss->killers[0]
+                   && pos.advanced_pawn_push(move)
+                   && pos.pawn_passed(us, to_sq(move)))
+              extension = ONE_PLY;
       }
-
-      // Check extension (~2 Elo)
-      else if (    givesCheck
-               && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
-          extension = ONE_PLY;
-
-      // Castling extension
-      else if (type_of(move) == CASTLING)
-          extension = ONE_PLY;
-
-      // Shuffle extension
-      else if (   PvNode
-               && pos.rule50_count() > 18
-               && depth < 3 * ONE_PLY
-               && ++thisThread->shuffleExts < thisThread->nodes.load(std::memory_order_relaxed) / 4)  // To avoid too many extensions
-          extension = ONE_PLY;
-
-      // Passed pawn extension
-      else if (   move == ss->killers[0]
-               && pos.advanced_pawn_push(move)
-               && pos.pawn_passed(us, to_sq(move)))
-          extension = ONE_PLY;
 
       // Calculate new depth for this move
       newDepth = depth - ONE_PLY + extension;
