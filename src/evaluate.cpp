@@ -297,14 +297,15 @@ namespace {
         }
 
         int mob = popcount(b & mobilityArea[Us]);
+        Bitboard safe = ~(pos.pieces(Us, PAWN) | attackedBy[Them][PAWN]);
 
-        if (mob == 1)
+        if (mob && popcount(b & safe) == 1)
         {
-            Square sq = frontmost_sq(Us, b & mobilityArea[Us]);
+            Square sq = frontmost_sq(Us, b & safe);
             bb = Pt == BISHOP ? attacks_bb<BISHOP>(sq, pos.pieces() ^ pos.pieces(QUEEN))
                : Pt ==   ROOK ? attacks_bb<  ROOK>(sq, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
                               : pos.attacks_from<Pt>(sq);
-            if(!more_than_one(bb & mobilityArea[Us]))
+            if(!more_than_one(bb & safe))
                 mob = 0;
         }
 
