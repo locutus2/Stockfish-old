@@ -298,12 +298,10 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
-        if (mob == 1)
+        if (Pt == BISHOP && mob == 1)
         {
             Square sq = frontmost_sq(Us, b & mobilityArea[Us]);
-            bb = Pt == BISHOP ? attacks_bb<BISHOP>(sq, pos.pieces() ^ pos.pieces(QUEEN))
-               : Pt ==   ROOK ? attacks_bb<  ROOK>(sq, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
-                              : pos.attacks_from<Pt>(sq);
+            bb = attacks_bb<BISHOP>(sq, pos.pieces() ^ pos.pieces(QUEEN));
             if(!more_than_one(bb & mobilityArea[Us]))
                 mob = 0;
         }
