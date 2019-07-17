@@ -298,6 +298,16 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
+        if (mob == 1)
+        {
+            Square sq = frontmost_sq(Us, b & mobilityArea[Us]);
+            bb = Pt == BISHOP ? attacks_bb<BISHOP>(sq, pos.pieces() ^ pos.pieces(QUEEN))
+               : Pt ==   ROOK ? attacks_bb<  ROOK>(sq, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
+                              : pos.attacks_from<Pt>(sq);
+            if(!more_than_one(bb & mobilityArea[Us]))
+                mob = 0;
+        }
+
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         if (Pt == BISHOP || Pt == KNIGHT)
