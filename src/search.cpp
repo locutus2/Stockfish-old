@@ -1041,7 +1041,7 @@ moves_loop: // When in check, search starts from here
                   continue;
 
               // Prune moves with negative SEE and not too good main history (~10 Elo)
-              if (   thisThread->mainHistory[us][from_to(move)] < 900 * lmrDepth
+              if (   thisThread->mainHistory[us][from_to(move)] < 900 * (11 - lmrDepth)
                   && !pos.see_ge(move, Value(-(31 - std::min(lmrDepth, 18)) * lmrDepth * lmrDepth)))
                   continue;
           }
