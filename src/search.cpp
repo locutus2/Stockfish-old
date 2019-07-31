@@ -83,7 +83,7 @@ namespace {
   int stat_bonus(Depth depth, Thread* thread) {
     int d = depth / ONE_PLY;
     int rd = thread->rootDepth / ONE_PLY;
-    return d > 17 ? 0 : d * d * (18 * rd + 54) / rd + 151 * d - 191;
+    return d > 17 ? 0 : d * d * (17 * rd + 54) / rd + 151 * d - 191;
   }
 
   // Add a small random component to draw evaluations to avoid 3fold-blindness
