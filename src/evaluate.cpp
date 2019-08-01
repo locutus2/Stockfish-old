@@ -585,20 +585,16 @@ namespace {
     weak = attackedBy[Us][ALL_PIECES] & ~attackedBy[Them][ALL_PIECES];
     b = 0;
 
-    if (    pos.count<QUEEN>(Them) == 1
-        && (pos.pieces(Them, QUEEN) & weak))
+    if (!(pos.pieces(Them, QUEEN) & ~weak))
         b |= attackedBy[Them][QUEEN] ;
 
-    if (    pos.count<ROOK>(Them) == 1
-        && (pos.pieces(Them, ROOK) &weak))
+    if (!(pos.pieces(Them, ROOK) & ~weak))
         b |= attackedBy[Them][ROOK] ;
 
-    if (    pos.count<BISHOP>(Them) == 1
-        && (pos.pieces(Them, BISHOP) & weak))
+    if (!(pos.pieces(Them, BISHOP) & ~weak))
         b |= attackedBy[Them][BISHOP] ;
 
-    if (    pos.count<KNIGHT>(Them) == 1
-        && (pos.pieces(Them, KNIGHT) & weak))
+    if (!(pos.pieces(Them, KNIGHT) & ~weak))
         b |= attackedBy[Them][KNIGHT] ;
 
     b &= pos.pieces(Them) & attackedBy[Us][ALL_PIECES] & ~attackedBy2[Them];
