@@ -581,8 +581,8 @@ namespace {
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
 
-    // Bonus for opponent attacked pieces which has only one defender which is also weak
-    weak = attackedBy[Us][ALL_PIECES] & ~attackedBy[Them][ALL_PIECES];
+    // Bonus for opponent attacked pieces which has only one knight defender which is also weak
+    weak = attackedBy[Us][ALL_PIECES];
 
     if (!(pos.pieces(Them, KNIGHT) & ~weak))
     {
