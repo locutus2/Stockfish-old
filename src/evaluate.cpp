@@ -583,23 +583,16 @@ namespace {
 
     // Bonus for opponent attacked pieces which has only one defender which is also weak
     weak = attackedBy[Us][ALL_PIECES] & ~attackedBy[Them][ALL_PIECES];
-    b = 0;
-
-    if (!(pos.pieces(Them, QUEEN) & ~weak))
-        b |= attackedBy[Them][QUEEN] ;
-
-    if (!(pos.pieces(Them, ROOK) & ~weak))
-        b |= attackedBy[Them][ROOK] ;
-
-    if (!(pos.pieces(Them, BISHOP) & ~weak))
-        b |= attackedBy[Them][BISHOP] ;
 
     if (!(pos.pieces(Them, KNIGHT) & ~weak))
-        b |= attackedBy[Them][KNIGHT] ;
-
-    b &= pos.pieces(Them) & attackedBy[Us][ALL_PIECES] & ~attackedBy2[Them];
-
-    score += WeakDefender * popcount(b);
+    {
+        b =  attackedBy[Them][KNIGHT]
+           & (pos.pieces(Them) ^ pos.pieces(Them, QUEEN))
+           & ~attackedBy2[Them]
+           & ~attackedBy[Us][PAWN]
+           & (attackedBy[Us][PAWN] | attackedBy[Us][KNIGHT] | attackedBy[Us][BISHOP]);
+        score += WeakDefender * popcount(b);
+    }
 
     if (T)
         Trace::add(THREAT, Us, score);
