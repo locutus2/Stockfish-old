@@ -582,7 +582,7 @@ namespace {
     }
 
     // Bonus for opponent attacked pieces which has only one knight defender which is also weak
-    weak = attackedBy[Us][ALL_PIECES];
+    weak = attackedBy[Us][PAWN];
 
     if (!(pos.pieces(Them, KNIGHT) & ~weak))
     {
