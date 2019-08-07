@@ -813,7 +813,13 @@ namespace {
 
         pos.do_null_move(st);
 
-        Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
+        Value nullValue = VALUE_INFINITE;
+
+        if (depth > R)
+            nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-2*R, !cutNode);
+
+        if (nullValue >= beta)
+            nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
 
         pos.undo_null_move();
 
