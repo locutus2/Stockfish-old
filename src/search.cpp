@@ -900,7 +900,7 @@ moves_loop: // When in check, search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
                                           nullptr, (ss-4)->continuationHistory,
                                           nullptr, (ss-6)->continuationHistory };
-    const PieceToHistory* sectorHist[] = { (ss-1)->sectorHistory };
+    const PieceToHistory* sectorHist[] = { nullptr, (ss-2)->sectorHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
@@ -1564,7 +1564,7 @@ moves_loop: // When in check, search starts from here
         if (is_ok((ss-i)->currentMove))
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
 
-    for (int i : {1})
+    for (int i : {2})
         if (is_ok((ss-i)->currentMove))
             (*(ss-i)->sectorHistory)[pc][to] << bonus;
   }
