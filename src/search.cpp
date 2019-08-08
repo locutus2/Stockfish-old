@@ -335,7 +335,10 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
+  {
      (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
+     (ss-i)->sectorHistory = &this->sectorHistory[NO_PIECE][0]; // Use as sentinel
+  }
   ss->pv = pv;
 
   bestValue = delta = alpha = -VALUE_INFINITE;
@@ -810,6 +813,7 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[NO_PIECE][0];
+        ss->sectorHistory = &thisThread->sectorHistory[NO_PIECE][0];
 
         pos.do_null_move(st);
 
@@ -861,6 +865,7 @@ namespace {
 
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)];
+                ss->sectorHistory = &thisThread->sectorHistory[pos.moved_piece(move)][from_to_sector(move)];
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -1063,6 +1068,7 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
+      ss->sectorHistory = &thisThread->sectorHistory[movedPiece][from_to_sector(move)];
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1555,8 +1561,11 @@ moves_loop: // When in check, search starts from here
     for (int i : {1, 2, 4, 6})
         if (is_ok((ss-i)->currentMove))
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
-  }
 
+    for (int i : {1})
+        if (is_ok((ss-i)->currentMove))
+            (*(ss-i)->sectorHistory)[pc][to] << bonus;
+  }
 
   // update_capture_stats() updates move sorting heuristics when a new capture best move is found
 
