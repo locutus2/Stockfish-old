@@ -66,10 +66,6 @@ void Thread::clear() {
           h->fill(0);
 
   continuationHistory[NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
-
-  for (auto& sectors : sectorHistory)
-      for (auto& h : sectors)
-          h->fill(0);
 }
 
 /// Thread::start_searching() wakes up the thread that will start the search
