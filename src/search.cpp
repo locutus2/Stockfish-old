@@ -1467,7 +1467,7 @@ moves_loop: // When in check, search starts from here
       }
 
       ss->currentMove = move;
-      ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)];
+      ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][from_to_sector(move)];
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
