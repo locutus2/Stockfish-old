@@ -816,7 +816,7 @@ namespace {
         Value nullValue = VALUE_INFINITE;
 
         if (depth > R)
-            nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-2*R, !cutNode);
+            nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, (depth-R) / (2 * ONE_PLY) * ONE_PLY, !cutNode);
 
         if (nullValue >= beta)
             nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
