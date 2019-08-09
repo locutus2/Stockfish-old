@@ -428,8 +428,20 @@ constexpr Square to_sq(Move m) {
   return Square(m & 0x3F);
 }
 
+constexpr int sector(Square s) {
+  return ((rank_of(s) & 0x4) >> 1) | (file_of(s) >> 2);
+}
+
 constexpr int from_to(Move m) {
- return m & 0xFFF;
+  return m & 0xFFF;
+}
+
+constexpr int from_to_sector(Square from, Square to) {
+  return 4 * sector(from) + sector(to);
+}
+
+constexpr int from_to_sector(Move m) {
+  return from_to_sector(from_sq(m), to_sq(m));
 }
 
 constexpr MoveType type_of(Move m) {

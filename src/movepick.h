@@ -103,6 +103,9 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
+typedef Stats<int16_t, 29952, PIECE_NB, 4 * 4> PieceSectorHistory;
+typedef Stats<PieceSectorHistory, NOT_USED, PIECE_NB, SQUARE_NB> SectorHistory;
+
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a
@@ -125,6 +128,7 @@ public:
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*,
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
+                                           const PieceSectorHistory**,
                                            Move,
                                            Move*);
   Move next_move(bool skipQuiets = false);
@@ -139,6 +143,7 @@ private:
   const ButterflyHistory* mainHistory;
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** continuationHistory;
+  const PieceSectorHistory** sectorHistory;
   Move ttMove;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
   int stage;
