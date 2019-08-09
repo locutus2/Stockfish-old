@@ -147,6 +147,7 @@ namespace {
   constexpr Score ThreatBySafePawn   = S(173, 94);
   constexpr Score TrappedRook        = S( 47,  4);
   constexpr Score WeakQueen          = S( 49, 15);
+  constexpr Score WeakPinnedPiece    = S( 20, 20);
 
 #undef S
 
@@ -539,6 +540,14 @@ namespace {
            | (nonPawnEnemies & attackedBy2[Us]);
         score += Hanging * popcount(weak & b);
     }
+
+    // Bonus for opponent weak pinned piece which is only defended by a restricted king
+    b = weak & nonPawnEnemies & pos.blockers_for_king(Them) & attackedBy[Them][KING];
+    while (b)
+        if (!(  attackedBy[Them][KING]
+              & pos.attacks_from<KING>(pop_lsb(&b))
+              & ~(pos.pieces(Them, PAWN) | attackedBy[Us][ALL_PIECES])))
+            score += WeakPinnedPiece;
 
     // Bonus for restricting their piece moves
     b =   attackedBy[Them][ALL_PIECES]
