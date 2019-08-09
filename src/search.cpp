@@ -1119,7 +1119,7 @@ moves_loop: // When in check, search starts from here
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
-                             + (*(ss-1)->sectorHistory)[movedPiece][to_sq(move)] / 4
+                             + (*(ss-1)->sectorHistory)[movedPiece][to_sq(move)] / 8
                              - 4729;
 
               // Reset statScore to zero if negative and most stats shows >= 0
