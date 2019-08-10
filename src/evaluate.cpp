@@ -542,7 +542,7 @@ namespace {
     }
 
     // Bonus for opponent weak pinned piece which is only defended by a restricted king
-    b = weak & nonPawnEnemies & pos.blockers_for_king(Them) & attackedBy[Them][KING];
+    b = nonPawnEnemies & pos.blockers_for_king(Them) & attackedBy[Them][KING] & ~attackedBy2[Them];
     while (b)
         if (!(  attackedBy[Them][KING]
               & pos.attacks_from<KING>(pop_lsb(&b))
