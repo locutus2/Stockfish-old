@@ -138,6 +138,7 @@ namespace {
   constexpr Score Outpost            = S( 18,  6);
   constexpr Score PassedFile         = S( 11,  8);
   constexpr Score PawnlessFlank      = S( 17, 95);
+  constexpr Score PinnedPiece        = S(  0, 20);
   constexpr Score RestrictedPiece    = S(  7,  7);
   constexpr Score RookOnPawn         = S( 10, 32);
   constexpr Score SliderOnQueen      = S( 59, 18);
@@ -277,7 +278,10 @@ namespace {
                          : pos.attacks_from<Pt>(s);
 
         if (pos.blockers_for_king(Us) & s)
+        {
             b &= LineBB[pos.square<KING>(Us)][s];
+            score -= PinnedPiece;
+        }
 
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
