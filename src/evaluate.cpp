@@ -466,12 +466,16 @@ namespace {
 
     if (   file_of(ksq) > FILE_F
         && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_E4))
-        && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_E3)))
+        && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_E3))
+        && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_D5))
+        && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_F2)))
         kingDanger += 100;
 
     else if (   file_of(ksq) < FILE_C
              && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_D4))
-             && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_D3)))
+             && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_D3))
+             && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_E5))
+             && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_C2)))
         kingDanger += 100;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
