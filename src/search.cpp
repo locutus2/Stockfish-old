@@ -636,6 +636,7 @@ namespace {
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
+    ss->evalTrend = (ss-2)->evalTrend;
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
@@ -777,14 +778,18 @@ namespace {
         tte->save(posKey, VALUE_NONE, ttPv, BOUND_NONE, DEPTH_NONE, MOVE_NONE, eval);
     }
 
+    if ((ss-2)->staticEval != VALUE_NONE)
+        ss->evalTrend += (ss->staticEval - (ss-2)->staticEval - ss->evalTrend) / 4;
+
     // Step 7. Razoring (~2 Elo)
     if (   !rootNode // The required rootNode PV handling is not available in qsearch
         &&  depth < 2 * ONE_PLY
         &&  eval <= alpha - RazorMargin)
         return qsearch<NT>(pos, ss, alpha, beta);
 
-    improving =   ss->staticEval >= (ss-2)->staticEval
-               || (ss-2)->staticEval == VALUE_NONE;
+    improving =   ss->evalTrend > 0
+               && (   ss->staticEval >= (ss-2)->staticEval
+                   || (ss-2)->staticEval == VALUE_NONE);
 
     // Step 8. Futility pruning: child node (~30 Elo)
     if (   !PvNode
