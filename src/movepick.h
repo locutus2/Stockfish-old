@@ -38,10 +38,9 @@ class StatsEntry {
 
   T entry;
   T value;
-  T momentum;
 
 public:
-  void operator=(const T& v) { value = entry = v; momentum = T(0); }
+  void operator=(const T& v) { value = entry = v; }
   T* operator&() { return &value; }
   T* operator->() { return &value; }
   operator const T&() const { return value; }
@@ -52,11 +51,10 @@ public:
 
     entry += bonus - entry * abs(bonus) / D;
 
-    value += momentum;
-    momentum += (entry - value) / 32;
     value += (entry - value) * 7 / 8;
 
     assert(abs(entry) <= D);
+    assert(abs(value) <= D);
   }
 };
 
