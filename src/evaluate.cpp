@@ -281,9 +281,7 @@ namespace {
         {
             b &= LineBB[pos.square<KING>(Us)][s];
 
-            if (    Pt == KNIGHT
-                || (Pt == BISHOP && !(b & pos.pieces(Them, BISHOP, QUEEN)))
-                || (Pt == ROOK   && !(b & pos.pieces(Them, ROOK,   QUEEN))))
+            if (!b)
                 score -= PinnedPiece;
         }
 
