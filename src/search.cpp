@@ -789,7 +789,7 @@ namespace {
 
     improving =   ss->staticEval >= (ss-2)->staticEval
                || (ss-2)->staticEval == VALUE_NONE
-               || ss->evalTrend > 0;
+               || ss->evalTrend > 100;
 
     // Step 8. Futility pruning: child node (~30 Elo)
     if (   !PvNode
