@@ -280,7 +280,11 @@ namespace {
         if (pos.blockers_for_king(Us) & s)
         {
             b &= LineBB[pos.square<KING>(Us)][s];
-            score -= PinnedPiece;
+
+            if (    Pt == KNIGHT
+                || (Pt == BISHOP && !(b & pos.pieces(Them, BISHOP, QUEEN)))
+                || (Pt == ROOK   && !(b & pos.pieces(Them, ROOK,   QUEEN))))
+                score -= PinnedPiece;
         }
 
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
