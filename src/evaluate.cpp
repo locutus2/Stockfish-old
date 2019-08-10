@@ -464,6 +464,16 @@ namespace {
                  +   5 * kingFlankAttacks * kingFlankAttacks / 16
                  -   7;
 
+    if (   file_of(ksq) > FILE_E
+        && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_E4))
+        && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_E3)))
+        kingDanger += 100;
+
+    else if (   file_of(ksq) < FILE_D
+             && (pos.pieces(Them, PAWN) & relative_square(Us, SQ_D4))
+             && (pos.pieces(Us,   PAWN) & relative_square(Us, SQ_D3)))
+        kingDanger += 100;
+
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
         score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
