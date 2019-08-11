@@ -30,6 +30,24 @@
 #include "pawns.h"
 #include "thread.h"
 
+int A0 = 0;
+int A1 = 0;
+int A2 = 0;
+int A3 = 0;
+int A4 = 0;
+int C = 0;
+
+void initTune()
+{
+    C = - A0 * 0.289396
+        - A1 * 0.0662231
+        - A2 * 0.0173283
+        - A3 * 0.0852955
+        - A4 * 0.0417424;
+}
+
+TUNE(SetRange(-180, 180), A0, A1, A2, A3, A4);
+
 namespace Trace {
 
   enum Tracing { NO_TRACE, TRACE };
@@ -457,12 +475,18 @@ namespace {
                  + 185 * popcount(kingRing[Us] & weak)
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -  35 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + 150 * popcount(pos.blockers_for_king(Us) | unsafeChecks)
+                 + (A0+148) * popcount(unsafeChecks)
+                 +  A1 * popcount(unsafeChecks & pos.pieces(Us))
+                 +  A2 * popcount(unsafeChecks & pos.pieces(Them))
+                 +  A3 * popcount(unsafeChecks & attackedBy2[Us])
+                 +  A4 * popcount(unsafeChecks & attackedBy2[Them])
+                 +  98 * popcount(pos.blockers_for_king(Us))
                  - 873 * !pos.count<QUEEN>(Them)
                  -   6 * mg_value(score) / 8
                  +       mg_value(mobility[Them] - mobility[Us])
                  +   5 * kingFlankAttacks * kingFlankAttacks / 16
-                 -   7;
+                 -   7
+                 +   C;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
