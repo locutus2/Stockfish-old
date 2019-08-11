@@ -457,7 +457,12 @@ namespace {
                  + 185 * popcount(kingRing[Us] & weak)
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -  35 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + 150 * popcount(pos.blockers_for_king(Us) | unsafeChecks)
+                 + 148 * popcount(unsafeChecks)
+                 -       popcount(unsafeChecks & pos.pieces(Us))
+                 -   4 * popcount(unsafeChecks & pos.pieces(Them))
+                 +   6 * popcount(unsafeChecks & attackedBy2[Us])
+                 -   3 * popcount(unsafeChecks & attackedBy2[Them])
+                 +  98 * popcount(pos.blockers_for_king(Us))
                  - 873 * !pos.count<QUEEN>(Them)
                  -   6 * mg_value(score) / 8
                  +       mg_value(mobility[Them] - mobility[Us])
