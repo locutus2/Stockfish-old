@@ -46,7 +46,7 @@ void initTune()
         - A4 * 0.0417424;
 }
 
-TUNE(SetRange(-180, 180), A0, A1, A2, A3, A4);
+TUNE(SetRange(-160, 160), A0, A1, A2, A3, A4, initTune);
 
 namespace Trace {
 
