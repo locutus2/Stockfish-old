@@ -466,9 +466,9 @@ namespace {
                  + (A5+148) * popcount(unsafeChecks)
                  + (A6+98) * popcount(pos.blockers_for_king(Us))
                  + (A7-873) * !pos.count<QUEEN>(Them)
-                 + (A8-3*128) * mg_value(score) / (4*128)
+                 + (A8-96) * mg_value(score) / 128
                  + (A9+128) * mg_value(mobility[Them] - mobility[Us]) / 128
-                 + (A10+5*128) * kingFlankAttacks * kingFlankAttacks / (16*128)
+                 + (A10+40) * kingFlankAttacks * kingFlankAttacks / 128
                  + (A11-7);
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
