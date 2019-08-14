@@ -30,6 +30,16 @@
 #include "pawns.h"
 #include "thread.h"
 
+int RandomWalk = 0;
+int A0 = 0, A1 = 0, A2 = 0, A3 = 0, A4 = 0, A5 = 0, A6 = 0, A7 = 0, A8 = 0, A9 = 0, A10= 0, A11 = 0;
+
+inline Range centered(int v)
+{
+   return Range(v - 50, v + 50);
+}
+
+TUNE(SetRange(centered), RandomWalk, A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11);
+
 namespace Trace {
 
   enum Tracing { NO_TRACE, TRACE };
@@ -448,18 +458,18 @@ namespace {
 
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
-    kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
-                 +  69 * kingAttacksCount[Them]
-                 + 185 * popcount(kingRing[Us] & weak)
-                 - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
-                 -  35 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + 148 * popcount(unsafeChecks)
-                 +  98 * popcount(pos.blockers_for_king(Us))
-                 - 873 * !pos.count<QUEEN>(Them)
-                 -   6 * mg_value(score) / 8
-                 +       mg_value(mobility[Them] - mobility[Us])
-                 +   5 * kingFlankAttacks * kingFlankAttacks / 16
-                 -   7;
+    kingDanger +=  (A0+128) * kingAttackersCount[Them] * kingAttackersWeight[Them] / 128
+                 + (A1+69) * kingAttacksCount[Them]
+                 + (A2+185) * popcount(kingRing[Us] & weak)
+                 + (A3-100) * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
+                 + (A4-35) * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
+                 + (A5+148) * popcount(unsafeChecks)
+                 + (A6+98) * popcount(pos.blockers_for_king(Us))
+                 + (A7-873) * !pos.count<QUEEN>(Them)
+                 + (A8-3*128) * mg_value(score) / (4*128)
+                 + (A9+128) * mg_value(mobility[Them] - mobility[Us]) / 128
+                 + (A10+5*128) * kingFlankAttacks * kingFlankAttacks / (16*128)
+                 + (A11-7);
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
