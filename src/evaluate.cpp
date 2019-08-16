@@ -30,15 +30,36 @@
 #include "pawns.h"
 #include "thread.h"
 
+constexpr int Scale = 256;
+constexpr int CBase = 36;
+constexpr int W_QC = Scale * 13.9224338808;
+constexpr int W_RC = Scale * 4.0613537041;
+constexpr int W_BC = Scale * 35.8812138778;
+constexpr int W_KC = Scale * 19.0040862339;
+constexpr int W_A0 = Scale * 0.0157908998;
+constexpr int W_A1 = Scale * 0.8336870544;
+constexpr int W_A2 = Scale * 0.9246685449;
+constexpr int W_A3 = Scale * 14.1680505977;
+constexpr int W_A4 = Scale * 11.032041398;
+constexpr int W_A5 = Scale * 6.3165709686;
+constexpr int W_A6 = Scale * 24.8090171602;
+constexpr int W_A7 = Scale * 3.5549223019;
+constexpr int W_A8 = Scale * -0.0040272593;
+constexpr int W_A9 = Scale * 0.150055823;
+constexpr int W_A10 = Scale * 0.0207935129;
+constexpr int W_A11 = Scale * 2.3827463849;
+
+
 int RandomWalk = 0;
+int QC = 0, RC = 0, BC = 0, KC = 0;
 int A0 = 0, A1 = 0, A2 = 0, A3 = 0, A4 = 0, A5 = 0, A6 = 0, A7 = 0, A8 = 0, A9 = 0, A10= 0, A11 = 0;
 
 inline Range centered(int v)
 {
-   return Range(v - 50, v + 50);
+   return Range(v - 10*CBase, v + 10*CBase);
 }
 
-TUNE(SetRange(centered), RandomWalk, A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11);
+TUNE(SetRange(centered), RandomWalk, QC, RC, BC, KC, A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11);
 
 namespace Trace {
 
@@ -416,7 +437,7 @@ namespace {
     rookChecks = b1 & safe & attackedBy[Them][ROOK];
 
     if (rookChecks)
-        kingDanger += RookSafeCheck;
+        kingDanger += Scale * CBase * RookSafeCheck + W_RC * RC;
     else
         unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
@@ -429,7 +450,7 @@ namespace {
                  & ~rookChecks;
 
     if (queenChecks)
-        kingDanger += QueenSafeCheck;
+        kingDanger += Scale * CBase * QueenSafeCheck + W_QC * QC;
 
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
@@ -439,7 +460,7 @@ namespace {
                   & ~queenChecks;
 
     if (bishopChecks)
-        kingDanger += BishopSafeCheck;
+        kingDanger += Scale * CBase * BishopSafeCheck + W_BC * BC;
     else
         unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
@@ -447,7 +468,7 @@ namespace {
     knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
 
     if (knightChecks & safe)
-        kingDanger += KnightSafeCheck;
+        kingDanger += Scale * CBase * KnightSafeCheck + W_KC * KC;
     else
         unsafeChecks |= knightChecks;
 
@@ -458,18 +479,20 @@ namespace {
 
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
-    kingDanger +=  (A0+128) * kingAttackersCount[Them] * kingAttackersWeight[Them] / 128
-                 + (A1+69) * kingAttacksCount[Them]
-                 + (A2+185) * popcount(kingRing[Us] & weak)
-                 + (A3-100) * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
-                 + (A4-35) * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + (A5+148) * popcount(unsafeChecks)
-                 + (A6+98) * popcount(pos.blockers_for_king(Us))
-                 + (A7-873) * !pos.count<QUEEN>(Them)
-                 + (A8-96) * mg_value(score) / 128
-                 + (A9+128) * mg_value(mobility[Them] - mobility[Us]) / 128
-                 + (A10+40) * kingFlankAttacks * kingFlankAttacks / 128
-                 + (A11-7);
+    kingDanger +=  (W_A0 * A0 + Scale * CBase) * kingAttackersCount[Them] * kingAttackersWeight[Them]
+                 + (W_A1 * A1 + Scale * CBase * 69) * kingAttacksCount[Them]
+                 + (W_A2 * A2 + Scale * CBase * 185) * popcount(kingRing[Us] & weak)
+                 + (W_A3 * A3 - Scale * CBase * 100) * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
+                 + (W_A4 * A4 - Scale * CBase * 35) * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
+                 + (W_A5 * A5 + Scale * CBase * 148) * popcount(unsafeChecks)
+                 + (W_A6 * A6 + Scale * CBase * 98) * popcount(pos.blockers_for_king(Us))
+                 + (W_A7 * A7 - Scale * CBase * 873) * !pos.count<QUEEN>(Them)
+                 + (W_A8 * A8 - Scale * CBase * 3 / 4) * mg_value(score)
+                 + (W_A9 * A9 + Scale * CBase) * mg_value(mobility[Them] - mobility[Us])
+                 + (W_A10 * A10 + Scale * CBase * 5 / 16) * kingFlankAttacks * kingFlankAttacks
+                 + (W_A11 * A11 - Scale * CBase * 7);
+                 
+    kingDanger /= Scale * CBase;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
