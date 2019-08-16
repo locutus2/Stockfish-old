@@ -82,6 +82,7 @@ namespace {
 
   // Penalties for enemy's safe checks
   constexpr int QueenSafeCheck  = 780;
+  constexpr int UnblockableQueenCheck = 24;
   constexpr int RookSafeCheck   = 1080;
   constexpr int BishopSafeCheck = 635;
   constexpr int KnightSafeCheck = 790;
@@ -419,7 +420,17 @@ namespace {
                  & ~rookChecks;
 
     if (queenChecks)
+    {
+        Bitboard freeCheckPath =  ~attackedBy2[Us]
+                            | ~(  attackedBy[Us][KNIGHT]
+                                | attackedBy[Us][BISHOP]
+                                | attackedBy[Us][ROOK]
+                                | attackedBy[Us][QUEEN]);
+
         kingDanger += QueenSafeCheck;
+        if (!(between_bb(frontmost_sq(Them, queenChecks), ksq) & ~freeCheckPath))
+            kingDanger += UnblockableQueenCheck;
+    }
 
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
