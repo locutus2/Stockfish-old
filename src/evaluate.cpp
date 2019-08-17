@@ -81,10 +81,10 @@ namespace {
   constexpr int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 77, 55, 44, 10 };
 
   // Penalties for enemy's safe checks
-  constexpr int QueenSafeCheck  = 780;
-  constexpr int RookSafeCheck   = 1080;
-  constexpr int BishopSafeCheck = 635;
-  constexpr int KnightSafeCheck = 790;
+  constexpr int QueenSafeCheck  = 777;
+  constexpr int RookSafeCheck   = 1078;
+  constexpr int BishopSafeCheck = 625;
+  constexpr int KnightSafeCheck = 805;
 
 #define S(mg, eg) make_score(mg, eg)
 
@@ -448,18 +448,18 @@ namespace {
 
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
-    kingDanger +=   61 * kingAttacksCount[Them]
-                 + 179 * popcount(kingRing[Us] & weak)
-                 - 103 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
-                 -  49 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + 140 * popcount(unsafeChecks)
-                 +  99 * popcount(pos.blockers_for_king(Us))
-                 - 869 * !pos.count<QUEEN>(Them)
-                 -   8
-                 + (  117 * kingAttackersCount[Them] * kingAttackersWeight[Them]
-                    -  99 * mg_value(score)
-                    + 137 * mg_value(mobility[Them] - mobility[Us])
-                    +  40 * kingFlankAttacks * kingFlankAttacks) / 128;
+    kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
+                 +  70 * kingAttacksCount[Them]
+                 + 186 * popcount(kingRing[Us] & weak)
+                 -  99 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
+                 -  42 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
+                 + 143 * popcount(unsafeChecks)
+                 +  94 * popcount(pos.blockers_for_king(Us))
+                 - 874 * !pos.count<QUEEN>(Them)
+                 -   3 * mg_value(score) / 4
+                 +       mg_value(mobility[Them] - mobility[Us])
+                 +   5 * kingFlankAttacks * kingFlankAttacks / 16
+                 -   7;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
