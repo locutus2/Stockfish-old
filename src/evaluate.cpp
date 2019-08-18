@@ -30,24 +30,25 @@
 #include "pawns.h"
 #include "thread.h"
 
+constexpr double Lambda = 2;
 constexpr int Scale = 256;
-constexpr int CBase = 36;
-constexpr int W_QC = Scale * 13.9224338808;
-constexpr int W_RC = Scale * 4.0613537041;
-constexpr int W_BC = Scale * 35.8812138778;
-constexpr int W_KC = Scale * 19.0040862339;
-constexpr int W_A0 = Scale * 0.0157908998;
-constexpr int W_A1 = Scale * 0.8336870544;
-constexpr int W_A2 = Scale * 0.9246685449;
-constexpr int W_A3 = Scale * 14.1680505977;
-constexpr int W_A4 = Scale * 11.032041398;
-constexpr int W_A5 = Scale * 6.3165709686;
-constexpr int W_A6 = Scale * 24.8090171602;
-constexpr int W_A7 = Scale * 3.5549223019;
-constexpr int W_A8 = Scale * -0.0040272593;
-constexpr int W_A9 = Scale * 0.150055823;
-constexpr int W_A10 = Scale * 0.0207935129;
-constexpr int W_A11 = Scale * 2.3827463849;
+constexpr int CBase = Lambda * 36;
+constexpr int W_QC = Lambda * Scale * 13.9224338808;
+constexpr int W_RC = Lambda * Scale * 4.0613537041;
+constexpr int W_BC = Lambda * Scale * 35.8812138778;
+constexpr int W_KC = Lambda * Scale * 19.0040862339;
+constexpr int W_A0 = Lambda * Scale * 0.0157908998;
+constexpr int W_A1 = Lambda * Scale * 0.8336870544;
+constexpr int W_A2 = Lambda * Scale * 0.9246685449;
+constexpr int W_A3 = Lambda * Scale * 14.1680505977;
+constexpr int W_A4 = Lambda * Scale * 11.032041398;
+constexpr int W_A5 = Lambda * Scale * 6.3165709686;
+constexpr int W_A6 = Lambda * Scale * 24.8090171602;
+constexpr int W_A7 = Lambda * Scale * 3.5549223019;
+constexpr int W_A8 = Lambda * Scale * -0.0040272593;
+constexpr int W_A9 = Lambda * Scale * 0.150055823;
+constexpr int W_A10 = Lambda * Scale * 0.0207935129;
+constexpr int W_A11 = Lambda * Scale * 2.3827463849;
 
 
 int RandomWalk = 0;
