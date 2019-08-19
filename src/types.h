@@ -2,7 +2,7 @@
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
   Copyright (C) 2008-2015 Marco Costalba, Joona Kiiski, Tord Romstad
-  Copyright (C) 2015-2018 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
+  Copyright (C) 2015-2019 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ typedef uint64_t Key;
 typedef uint64_t Bitboard;
 
 constexpr int MAX_MOVES = 256;
-constexpr int MAX_PLY   = 128;
+constexpr int MAX_PLY   = 246;
 
 /// A move needs 16 bits to be stored
 ///
@@ -141,14 +141,12 @@ enum CastlingRight {
   WHITE_OOO = WHITE_OO << 1,
   BLACK_OO  = WHITE_OO << 2,
   BLACK_OOO = WHITE_OO << 3,
-  ANY_CASTLING = WHITE_OO | WHITE_OOO | BLACK_OO | BLACK_OOO,
-  CASTLING_RIGHT_NB = 16
-};
 
-template<Color C, CastlingSide S> struct MakeCastling {
-  static constexpr CastlingRight
-  right = C == WHITE ? S == QUEEN_SIDE ? WHITE_OOO : WHITE_OO
-                     : S == QUEEN_SIDE ? BLACK_OOO : BLACK_OO;
+  WHITE_CASTLING = WHITE_OO | WHITE_OOO,
+  BLACK_CASTLING = BLACK_OO | BLACK_OOO,
+  ANY_CASTLING   = WHITE_CASTLING | BLACK_CASTLING,
+
+  CASTLING_RIGHT_NB = 16
 };
 
 enum Phase {
@@ -182,11 +180,11 @@ enum Value : int {
   VALUE_MATE_IN_MAX_PLY  =  VALUE_MATE - 2 * MAX_PLY,
   VALUE_MATED_IN_MAX_PLY = -VALUE_MATE + 2 * MAX_PLY,
 
-  PawnValueMg   = 142,   PawnValueEg   = 207,
-  KnightValueMg = 784,   KnightValueEg = 868,
-  BishopValueMg = 828,   BishopValueEg = 916,
-  RookValueMg   = 1286,  RookValueEg   = 1378,
-  QueenValueMg  = 2528,  QueenValueEg  = 2698,
+  PawnValueMg   = 128,   PawnValueEg   = 213,
+  KnightValueMg = 782,   KnightValueEg = 865,
+  BishopValueMg = 830,   BishopValueEg = 918,
+  RookValueMg   = 1289,  RookValueEg   = 1378,
+  QueenValueMg  = 2529,  QueenValueEg  = 2687,
 
   MidgameLimit  = 15258, EndgameLimit  = 3915
 };
@@ -215,8 +213,9 @@ enum Depth : int {
   DEPTH_QS_NO_CHECKS  = -1 * ONE_PLY,
   DEPTH_QS_RECAPTURES = -5 * ONE_PLY,
 
-  DEPTH_NONE = -6 * ONE_PLY,
-  DEPTH_MAX  = MAX_PLY * ONE_PLY
+  DEPTH_NONE   = -6 * ONE_PLY,
+  DEPTH_OFFSET = DEPTH_NONE,
+  DEPTH_MAX    = MAX_PLY * ONE_PLY
 };
 
 static_assert(!(ONE_PLY & (ONE_PLY - 1)), "ONE_PLY is not a power of 2");
@@ -292,7 +291,6 @@ inline T& operator--(T& d) { return d = T(int(d) - 1); }
 
 #define ENABLE_FULL_OPERATORS_ON(T)                                \
 ENABLE_BASE_OPERATORS_ON(T)                                        \
-ENABLE_INCR_OPERATORS_ON(T)                                        \
 constexpr T operator*(int i, T d) { return T(i * int(d)); }        \
 constexpr T operator*(T d, int i) { return T(int(d) * i); }        \
 constexpr T operator/(T d, int i) { return T(int(d) / i); }        \
@@ -306,7 +304,6 @@ ENABLE_FULL_OPERATORS_ON(Direction)
 
 ENABLE_INCR_OPERATORS_ON(PieceType)
 ENABLE_INCR_OPERATORS_ON(Piece)
-ENABLE_INCR_OPERATORS_ON(Color)
 ENABLE_INCR_OPERATORS_ON(Square)
 ENABLE_INCR_OPERATORS_ON(File)
 ENABLE_INCR_OPERATORS_ON(Rank)
@@ -417,11 +414,6 @@ constexpr Rank relative_rank(Color c, Rank r) {
 
 constexpr Rank relative_rank(Color c, Square s) {
   return relative_rank(c, rank_of(s));
-}
-
-inline bool opposite_colors(Square s1, Square s2) {
-  int s = int(s1) ^ int(s2);
-  return ((s >> 3) ^ s) & 1;
 }
 
 constexpr Direction pawn_push(Color c) {

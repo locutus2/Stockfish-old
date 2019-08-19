@@ -2,7 +2,7 @@
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
   Copyright (C) 2008-2015 Marco Costalba, Joona Kiiski, Tord Romstad
-  Copyright (C) 2015-2018 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
+  Copyright (C) 2015-2019 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ const string engine_info(bool to_uci) {
 
 
 /// Debug functions used mainly to collect run-time statistics
-static int64_t hits[2], means[2];
+static std::atomic<int64_t> hits[2], means[2];
 
 void dbg_hit_on(bool b) { ++hits[0]; if (b) ++hits[1]; }
 void dbg_hit_on(bool c, bool b) { if (c) dbg_hit_on(b); }
@@ -261,12 +261,6 @@ void prefetch(void* addr) {
 
 #endif
 
-void prefetch2(void* addr) {
-
-  prefetch(addr);
-  prefetch((uint8_t*)addr + 64);
-}
-
 namespace WinProcGroup {
 
 #ifndef _WIN32
@@ -308,7 +302,7 @@ int best_group(size_t idx) {
       return -1;
   }
 
-  while (ptr->Size > 0 && byteOffset + ptr->Size <= returnLength)
+  while (byteOffset < returnLength)
   {
       if (ptr->Relationship == RelationNumaNode)
           nodes++;
@@ -319,6 +313,7 @@ int best_group(size_t idx) {
           threads += (ptr->Processor.Flags == LTP_PC_SMT) ? 2 : 1;
       }
 
+      assert(ptr->Size);
       byteOffset += ptr->Size;
       ptr = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*)(((char*)ptr) + ptr->Size);
   }
