@@ -30,6 +30,20 @@
 #include "pawns.h"
 #include "thread.h"
 
+constexpr double Lambda = 2;
+constexpr int Scale = 256;
+constexpr int CBase = Lambda * 36;
+
+constexpr int W_K0 = Lambda * Scale * 1.4528970767710815365839483930958;
+constexpr int W_K1 = Lambda * Scale * 0.8117344329629118537579245574018;
+constexpr int W_K2 = Lambda * Scale * 0.49539775485737498637656174142219;
+constexpr int W_K3 = Lambda * Scale * 0.48024281076512284611099371842404;
+
+int RandomWalk = 15;
+int K0 = 15, K1 = 11, K2 = 9, K3 = 5;
+
+TUNE(SetRange(0, 20*CBase), RandomWalk, K0, K1, K2, K3);
+
 namespace Trace {
 
   enum Tracing { NO_TRACE, TRACE };
@@ -599,9 +613,10 @@ namespace {
     Score score = SCORE_ZERO;
 
     b = pe->passed_pawns(Us);
-
+    int val = 0;
     while (b)
     {
+        int v = 0;
         Square s = pop_lsb(&b);
 
         assert(!(pos.pieces(Them, PAWN) & forward_file_bb(Us, s + Up)));
@@ -638,16 +653,16 @@ namespace {
                 // If there are no enemy attacks on passed pawn span, assign a big bonus.
                 // Otherwise assign a smaller bonus if the path to queen is not attacked
                 // and even smaller bonus if it is attacked but block square is not.
-                int k = !unsafeSquares                    ? 35 :
-                        !(unsafeSquares & squaresToQueen) ? 20 :
-                        !(unsafeSquares & blockSq)        ?  9 :
+                int k = !unsafeSquares                    ?  W_K0 * (K0-15) + 15 * Scale * CBase + W_K1 * (K1-11) +  11 * Scale * CBase + W_K2 * (K2-9) + 9 * Scale * CBase:
+                        !(unsafeSquares & squaresToQueen) ?  W_K1 * (K1-11) +  11 * Scale * CBase + W_K2 * (K2-9) + 9 * Scale * CBase:
+                        !(unsafeSquares & blockSq)        ?  W_K2 * (K2-9) + 9 * Scale * CBase:
                                                              0 ;
 
                 // Assign a larger bonus if the block square is defended
                 if ((pos.pieces(Us) & bb) || (attackedBy[Us][ALL_PIECES] & blockSq))
-                    k += 5;
+                    k += W_K3 * (K3 - 5) + 5 * Scale + CBase;
 
-                bonus += make_score(k * w, k * w);
+                bonus += make_score(k * w / (Scale * CBase), k * w / (Scale * CBase));
             }
         } // r > RANK_3
 
@@ -658,6 +673,7 @@ namespace {
             bonus = bonus / 2;
 
         score += bonus - PassedFile * std::min(f, ~f);
+        val += v;
     }
 
     if (T)
