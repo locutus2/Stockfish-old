@@ -595,7 +595,7 @@ namespace {
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, ttPv, inCheck, givesCheck, improving, doLMR;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
-    Piece movedPiece;
+    Piece movedPiece, lastCapturedPiece;
     int moveCount, captureCount, quietCount, singularLMR;
 
     // Step 1. Initialize node
@@ -907,6 +907,7 @@ moves_loop: // When in check, search starts from here
 
     value = bestValue; // Workaround a bogus 'uninitialized' warning under gcc
     moveCountPruning = false;
+    lastCapturedPiece = pos.captured_piece();
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
     // Mark this node as being searched
@@ -1075,7 +1076,7 @@ moves_loop: // When in check, search starts from here
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
-              || cutNode))
+              || (cutNode && lastCapturedPiece == NO_PIECE)))
       {
           Depth r = reduction(improving, depth, moveCount);
 
