@@ -81,10 +81,10 @@ namespace {
   constexpr int KingAttackWeights[PIECE_TYPE_NB] = { 0, 0, 77, 55, 44, 10 };
 
   // Penalties for enemy's safe checks
-  constexpr int QueenSafeCheck  = 774;
-  constexpr int RookSafeCheck   = 1076;
-  constexpr int BishopSafeCheck = 615;
-  constexpr int KnightSafeCheck = 820;
+  constexpr int QueenSafeCheck  = 811;
+  constexpr int RookSafeCheck   = 1080;
+  constexpr int BishopSafeCheck = 603;
+  constexpr int KnightSafeCheck = 775;
 
 #define S(mg, eg) make_score(mg, eg)
 
@@ -449,12 +449,12 @@ namespace {
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
-                 +  71 * kingAttacksCount[Them]
-                 + 187 * popcount(kingRing[Us] & weak)
-                 -  98 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
-                 -  49 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + 138 * popcount(unsafeChecks)
-                 +  90 * popcount(pos.blockers_for_king(Us))
+                 +  70 * kingAttacksCount[Them]
+                 + 185 * popcount(kingRing[Us] & weak)
+                 - 142 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
+                 -  40 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
+                 + 164 * popcount(unsafeChecks)
+                 +  81 * popcount(pos.blockers_for_king(Us))
                  - 875 * !pos.count<QUEEN>(Them)
                  -   3 * mg_value(score) / 4
                  +       mg_value(mobility[Them] - mobility[Us])
