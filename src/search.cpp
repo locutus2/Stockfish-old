@@ -1075,13 +1075,16 @@ moves_loop: // When in check, search starts from here
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1 + 3 * rootNode
-          && (!rootNode || thisThread->bestMoveCount(move) == 0)
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Decrease reduction at root if move was already sometime a best move.
+          if (rootNode && thisThread->bestMoveCount(move) > 0)
+              r -= ONE_PLY;
 
           // Reduction if other threads are searching this position.
           if (th.marked())
