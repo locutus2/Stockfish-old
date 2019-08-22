@@ -1073,9 +1073,10 @@ moves_loop: // When in check, search starts from here
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1 + 3 * rootNode
           && (  !captureOrPromotion
-              || moveCountPruning
-              || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
-              || thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] <= 0))
+              || (   thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] <= 0
+                  && (   moveCountPruning
+                      || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
+                      || cutNode))))
       {
           Depth r = reduction(improving, depth, moveCount);
 
