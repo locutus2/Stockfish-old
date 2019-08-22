@@ -1083,8 +1083,8 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Decrease reduction at root if move was already sometime a best move.
-          if (rootNode && thisThread->bestMoveCount(move) > 0)
-              r -= ONE_PLY;
+          if (rootNode)
+              r -= thisThread->bestMoveCount(move) * ONE_PLY;
 
           // Reduction if other threads are searching this position.
           if (th.marked())
