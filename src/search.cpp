@@ -638,6 +638,7 @@ namespace {
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
     (ss+1)->ply = ss->ply + 1;
+    (ss+1)->delayedReduction = DEPTH_ZERO;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
@@ -1068,6 +1069,8 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      (ss+1)->delayedReduction = DEPTH_ZERO;
+
       // Step 16. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3 * ONE_PLY
@@ -1077,7 +1080,7 @@ moves_loop: // When in check, search starts from here
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode))
       {
-          Depth r = reduction(improving, depth, moveCount);
+          Depth r = reduction(improving, depth, moveCount) + ss->delayedReduction;
 
           // Reduction if other threads are searching this position.
           if (th.marked())
@@ -1102,7 +1105,7 @@ moves_loop: // When in check, search starts from here
 
               // Increase reduction for cut nodes (~5 Elo)
               if (cutNode)
-                  r += 2 * ONE_PLY;
+                  r += ONE_PLY, (ss+1)->delayedReduction += ONE_PLY;
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
