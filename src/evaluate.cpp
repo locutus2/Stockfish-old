@@ -86,6 +86,8 @@ namespace {
   constexpr int BishopSafeCheck = 635;
   constexpr int KnightSafeCheck = 790;
 
+  constexpr int QueenSafeKingAttack = 200;
+
 #define S(mg, eg) make_score(mg, eg)
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
@@ -382,7 +384,7 @@ namespace {
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-    Bitboard weak, b1, b2, safe, unsafeChecks = 0;
+    Bitboard weak, b, b1, b2, safe, safeQueenMoves, unsafeChecks = 0;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
@@ -412,14 +414,26 @@ namespace {
 
     // Enemy queen safe checks: we count them only if they are from squares from
     // which we can't give a rook check, because rook checks are more valuable.
+    safeQueenMoves =  attackedBy[Them][QUEEN]
+                    & safe
+                    & ~attackedBy[Us][QUEEN];
+
     queenChecks =  (b1 | b2)
-                 & attackedBy[Them][QUEEN]
-                 & safe
-                 & ~attackedBy[Us][QUEEN]
+                 & safeQueenMoves
                  & ~rookChecks;
 
     if (queenChecks)
         kingDanger += QueenSafeCheck;
+    else if (safeQueenMoves)
+    {
+        b = attackedBy[Us][KING] & weak & ~attackedBy[Them][QUEEN];
+        while (b)
+            if (pos.attacks_from<QUEEN>(pop_lsb(&b)) & safeQueenMoves)
+            {
+                    kingDanger += QueenSafeKingAttack;
+                    break;
+            }
+    }
 
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
