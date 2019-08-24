@@ -961,7 +961,7 @@ moves_loop: // When in check, search starts from here
           &&  pos.legal(move))
       {
           Value singularBeta = ttValue - 2 * depth / ONE_PLY;
-          Depth halfDepth = (depth / (2 * ONE_PLY) + cutNode) * ONE_PLY; // ONE_PLY invariant
+          Depth halfDepth = depth / (2 * ONE_PLY) * ONE_PLY; // ONE_PLY invariant
           ss->excludedMove = move;
           value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, halfDepth, cutNode);
           ss->excludedMove = MOVE_NONE;
@@ -1078,6 +1078,10 @@ moves_loop: // When in check, search starts from here
               || cutNode))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Decrease reduction in singular search if at cut node
+          if (ss->excludedMove && cutNode)
+              r -= ONE_PLY;
 
           // Reduction if other threads are searching this position.
           if (th.marked())
