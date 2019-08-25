@@ -644,7 +644,6 @@ namespace {
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
-    Piece prevCapturedPiece = pos.captured_piece();
 
     // Initialize statScore to zero for the grandchildren of the current position.
     // So statScore is shared between all grandchildren and only the first grandchild
@@ -1078,16 +1077,13 @@ moves_loop: // When in check, search starts from here
       if (    depth >= 3 * ONE_PLY
           &&  moveCount > 1 + 2 * rootNode
           && (!rootNode || thisThread->bestMoveCount(move) == 0)
+          && !excludedMove
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode))
       {
           Depth r = reduction(improving, depth, moveCount);
-
-          // Increase reduction in singular search if not at cut node and previous move was a capture
-          if (excludedMove && !cutNode && prevCapturedPiece)
-              r += ONE_PLY;
 
           // Reduction if other threads are searching this position.
           if (th.marked())
