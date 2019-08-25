@@ -390,7 +390,10 @@ void Thread::search() {
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
       for (RootMove& rm : rootMoves)
+      {
           rm.previousScore = rm.score;
+          rm.bestMoveCount /= 2;
+      }
 
       size_t pvFirst = 0;
       pvLast = 0;
@@ -473,7 +476,7 @@ void Thread::search() {
               }
               else
               {
-                  ++rootMoves[pvIdx].bestMoveCount;
+                  rootMoves[pvIdx].bestMoveCount += 256;
                   break;
               }
 
