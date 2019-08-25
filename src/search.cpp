@@ -1085,8 +1085,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction in singular search if at cut node and previous move was not a capture
-          if (excludedMove && cutNode && !prevCapturedPiece)
+          // Decrease reduction in singular search if at cut node and previous move was a capture
+          if (excludedMove && cutNode && prevCapturedPiece)
               r -= ONE_PLY;
 
           // Reduction if other threads are searching this position.
