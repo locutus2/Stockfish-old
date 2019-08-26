@@ -1080,7 +1080,7 @@ moves_loop: // When in check, search starts from here
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode)
-          && (!PvNode || ss->ply % 2 != 0 || thisThread->best_move_count(move) == 0))
+          && (!PvNode || ss->ply > 2 || ss->ply % 2 != 0 || thisThread->best_move_count(move) == 0))
       {
           Depth r = reduction(improving, depth, moveCount);
 
