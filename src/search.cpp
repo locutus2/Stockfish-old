@@ -1141,8 +1141,8 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 16384 * ONE_PLY;
           }
 
-          // Defer one ply of reduction to delayed reduction if at root
-          if (rootNode && r >= ONE_PLY)
+          // Defer one ply of reduction to delayed reduction at the root
+          if (rootNode && r >= 2 * ONE_PLY)
               r -= ONE_PLY, rDelayed += ONE_PLY;
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
