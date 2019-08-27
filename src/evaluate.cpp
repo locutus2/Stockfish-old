@@ -721,7 +721,7 @@ namespace {
 
     Score goalSum = threatsScore[Us] + passedScore[Us] - kingScore[Them];
     Value goalEffectMg = mg_value(goalSum) * abs(mg_value(goalSum)) / 4096;
-    Value goalEffectEg = eg_value(goalSum) * abs(eg_value(goalSum)) / 1024;
+    Value goalEffectEg = eg_value(goalSum) * abs(eg_value(goalSum)) / 4096;
 
     Score score = make_score(goalEffectMg, goalEffectEg);
 
