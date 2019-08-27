@@ -1083,7 +1083,7 @@ moves_loop: // When in check, search starts from here
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode)
-          && (ss->ply != 1 || thisThread->opponentBestMoveCount[move] == 0))
+          && (!PvNode || ss->ply != 1 || thisThread->opponentBestMoveCount[move] == 0))
       {
           Depth r = reduction(improving, depth, moveCount);
 
@@ -1286,7 +1286,7 @@ moves_loop: // When in check, search starts from here
             && !pos.captured_piece())
                 update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
 
-        if (ss->ply == 1 && bestValue < beta)
+        if (PvNode && ss->ply == 1 && bestValue < beta)
             ++thisThread->opponentBestMoveCount[bestMove];
 
     }
