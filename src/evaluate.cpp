@@ -167,6 +167,7 @@ namespace {
     template<Color Us> Score threats() const;
     template<Color Us> Score passed() const;
     template<Color Us> Score space() const;
+    template<Color Us> Score multiple_goals() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Value eg) const;
 
@@ -205,6 +206,10 @@ namespace {
     // a white knight on g5 and black's king is on g8, this white knight adds 2
     // to kingAttacksCount[WHITE].
     int kingAttacksCount[COLOR_NB];
+
+    Score kingScore[COLOR_NB];
+    Score threatsScore[COLOR_NB];
+    Score passedScore[COLOR_NB];
   };
 
 
@@ -706,6 +711,23 @@ namespace {
     return score;
   }
 
+  // Evaluation::multiple_goals() computes a quadratic score if multiple goals
+  // like king safety, threats or passed pawns exists.
+
+  template<Tracing T> template<Color Us>
+  Score Evaluation<T>::multiple_goals() const {
+
+    constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
+
+    Score goalSum = threatsScore[Us] + passedScore[Us] - kingScore[Them];
+    Value goalEffectMg = mg_value(goalSum) * abs(mg_value(goalSum)) / 4096;
+    Value goalEffectEg = eg_value(goalSum) * abs(eg_value(goalSum)) / 1024;
+
+    Score score = make_score(goalEffectMg, goalEffectEg);
+
+    return score;
+  }
+
 
   // Evaluation::initiative() computes the initiative correction value
   // for the position. It is a second order bonus/malus based on the
@@ -807,10 +829,19 @@ namespace {
 
     score += mobility[WHITE] - mobility[BLACK];
 
-    score +=  king<   WHITE>() - king<   BLACK>()
-            + threats<WHITE>() - threats<BLACK>()
-            + passed< WHITE>() - passed< BLACK>()
-            + space<  WHITE>() - space<  BLACK>();
+    kingScore[   WHITE] = king<   WHITE>();
+    threatsScore[WHITE] = threats<WHITE>();
+    passedScore[ WHITE] = passed< WHITE>();
+    kingScore[   BLACK] = king<   BLACK>();
+    threatsScore[BLACK] = threats<BLACK>();
+    passedScore[ BLACK] = passed< BLACK>();
+
+    score +=  kingScore[   WHITE] - kingScore[   BLACK]
+            + threatsScore[WHITE] - threatsScore[BLACK]
+            + passedScore[ WHITE] - passedScore[ BLACK]
+            + space<WHITE>()      - space<BLACK>();
+
+    score += multiple_goals<WHITE>() - multiple_goals<BLACK>();
 
     score += initiative(eg_value(score));
 
