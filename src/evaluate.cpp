@@ -821,7 +821,7 @@ namespace {
 
     v /= PHASE_MIDGAME;
 
-    v += v * abs(v) / 16384;
+    v += v * abs(v) / 32768;
 
     // In case of tracing add all remaining individual evaluation terms
     if (T)
