@@ -720,7 +720,7 @@ namespace {
     constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
 
     Score goalSum = threatsScore[Us] + passedScore[Us] - kingScore[Them];
-    Value goalEffectMg = mg_value(goalSum) * abs(mg_value(goalSum)) / 4096;
+    Value goalEffectMg = mg_value(goalSum) * abs(mg_value(goalSum)) / 16384;
     Value goalEffectEg = eg_value(goalSum) * abs(eg_value(goalSum)) / 4096;
 
     Score score = make_score(goalEffectMg, goalEffectEg);
