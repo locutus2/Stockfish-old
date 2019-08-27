@@ -334,6 +334,8 @@ void Thread::search() {
   double timeReduction = 1, totBestMoveChanges = 0;
   Color us = rootPos.side_to_move();
 
+  opponentBestMoveCount.clear();
+
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
      (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
@@ -1080,7 +1082,8 @@ moves_loop: // When in check, search starts from here
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
-              || cutNode))
+              || cutNode)
+          && (ss->ply != 1 || thisThread->opponentBestMoveCount[move] == 0))
       {
           Depth r = reduction(improving, depth, moveCount);
 
@@ -1282,6 +1285,9 @@ moves_loop: // When in check, search starts from here
         if (   ((ss-1)->moveCount == 1 || ((ss-1)->currentMove == (ss-1)->killers[0]))
             && !pos.captured_piece())
                 update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + ONE_PLY));
+
+        if (ss->ply == 1 && bestValue < beta)
+            ++thisThread->opponentBestMoveCount[bestMove];
 
     }
     // Bonus for prior countermove that caused the fail low

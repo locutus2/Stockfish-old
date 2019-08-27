@@ -25,6 +25,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include "material.h"
@@ -67,6 +68,7 @@ public:
 
   Position rootPos;
   Search::RootMoves rootMoves;
+  std::unordered_map<Move, int> opponentBestMoveCount;
   Depth rootDepth, completedDepth;
   CounterMoveHistory counterMoves;
   ButterflyHistory mainHistory;

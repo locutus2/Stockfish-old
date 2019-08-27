@@ -52,7 +52,7 @@ Thread::~Thread() {
   stdThread.join();
 }
 
-/// Thread::bestMoveCount(Move move) return best move counter for the given root move
+/// Thread::best_move_count(Move move) return best move counter for the given root move
 
 int Thread::best_move_count(Move move) {
 
