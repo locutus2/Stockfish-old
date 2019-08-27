@@ -719,9 +719,15 @@ namespace {
 
     constexpr Color Them = (Us == WHITE ? BLACK : WHITE);
 
-    Score goalSum = threatsScore[Us] + passedScore[Us] - kingScore[Them];
-    Value goalEffectMg = mg_value(goalSum) * abs(mg_value(goalSum)) / 4096;
-    Value goalEffectEg = eg_value(goalSum) * abs(eg_value(goalSum)) / 1024;
+    Value goalEffectMg =  std::max(mg_value(threatsScore[Us]) - 127, VALUE_ZERO)
+                        + std::max(mg_value(passedScore[Us]) - 35, VALUE_ZERO)
+                        + std::max(-mg_value(kingScore[Them]) - 222, VALUE_ZERO);
+    Value goalEffectEg =  std::max(eg_value(threatsScore[Us]) - 115, VALUE_ZERO)
+                        + std::max(eg_value(passedScore[Us]) - 49, VALUE_ZERO)
+                        + std::max(-eg_value(kingScore[Them]) - 61, VALUE_ZERO);
+
+    goalEffectMg = goalEffectMg * abs(goalEffectMg) / 2048;
+    goalEffectEg = goalEffectEg * abs(goalEffectEg) / 256;
 
     Score score = make_score(goalEffectMg, goalEffectEg);
 
