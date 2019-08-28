@@ -1142,8 +1142,8 @@ moves_loop: // When in check, search starts from here
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
           bool lmrCutNode =  !givesCheck
+                           || !cutNode
                            || captureOrPromotion
-                           || moveCountPruning
                            || ss->staticEval <= alpha;
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, lmrCutNode);
