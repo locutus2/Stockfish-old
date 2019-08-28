@@ -728,7 +728,7 @@ namespace {
                     + 49 * !pos.non_pawn_material()
                     -103 ;
 
-    complexity += 18 + complexity * abs(complexity) / 128;
+    complexity += 9 + complexity * abs(complexity) / 256;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
