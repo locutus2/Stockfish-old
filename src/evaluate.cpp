@@ -714,6 +714,8 @@ namespace {
   template<Tracing T>
   Score Evaluation<T>::initiative(Value eg) const {
 
+    Color weakSide = eg < 0 ? WHITE : BLACK;
+
     int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
 
@@ -725,9 +727,9 @@ namespace {
                     + 11 * pos.count<PAWN>()
                     +  9 * outflanking
                     + 18 * pawnsOnBothFlanks
-                    + 59 * !pos.non_pawn_material()
-                    - 10 * !pos.pieces(QUEEN)
-                    - 97 ;
+                    + 49 * !pos.non_pawn_material()
+                    - 20 * bool(pos.pieces(weakSide, QUEEN))
+                    -103 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
