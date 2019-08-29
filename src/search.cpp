@@ -1142,7 +1142,7 @@ moves_loop: // When in check, search starts from here
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, captureOrPromotion);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, !captureOrPromotion);
 
           doFullDepthSearch = (value > alpha && d != newDepth), doLMR = true;
       }
