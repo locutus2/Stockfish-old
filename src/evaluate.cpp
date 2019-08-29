@@ -725,7 +725,8 @@ namespace {
                     + 11 * pos.count<PAWN>()
                     +  9 * outflanking
                     + 18 * pawnsOnBothFlanks
-                    + 49 * !pos.non_pawn_material()
+                    + 89 * !pos.non_pawn_material()
+                    - 40 * !pos.pieces(QUEEN)
                     -103 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
