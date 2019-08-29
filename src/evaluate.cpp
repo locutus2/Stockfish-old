@@ -729,7 +729,7 @@ namespace {
                     + 18 * pawnsOnBothFlanks
                     + 49 * !pos.non_pawn_material()
                     - 20 * bool(pos.pieces(weakSide, QUEEN))
-                    -103 ;
+                    - 95 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
     // the sign of the endgame value, and that we carefully cap the bonus so
