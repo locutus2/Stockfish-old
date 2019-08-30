@@ -1080,7 +1080,8 @@ moves_loop: // When in check, search starts from here
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
-              || cutNode))
+              || cutNode)
+          && moveCount != 32 + int(posKey & 31))
       {
           Depth r = reduction(improving, depth, moveCount);
 
