@@ -146,6 +146,7 @@ namespace {
   constexpr Score ThreatByRank       = S( 13,  0);
   constexpr Score ThreatBySafePawn   = S(173, 94);
   constexpr Score TrappedRook        = S( 47,  4);
+  constexpr Score WeakPawn           = S(  0, 10);
   constexpr Score WeakQueen          = S( 49, 15);
 
 #undef S
@@ -574,6 +575,20 @@ namespace {
            | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
 
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
+    }
+
+    // Evaluate the safety of pawns regarding only kings
+    if (!pe->passed_pawns(Them))
+    {
+        Square ksq = pos.square<KING>(Us);
+        Square oppKsq = pos.square<KING>(Them);
+        b = pos.pieces(Them, PAWN) & ~attackedBy[Them][PAWN] & ~attackedBy[Us][PAWN];
+        while (b)
+        {
+            Square s = pop_lsb(&b);
+            if (distance(oppKsq, s) - distance(ksq, s) > 1)
+                score += WeakPawn;
+        }
     }
 
     if (T)
