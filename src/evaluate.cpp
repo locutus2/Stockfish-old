@@ -146,7 +146,7 @@ namespace {
   constexpr Score ThreatByRank       = S( 13,  0);
   constexpr Score ThreatBySafePawn   = S(173, 94);
   constexpr Score TrappedRook        = S( 47,  4);
-  constexpr Score WeakPawn           = S(  0, 15);
+  constexpr Score WeakPawn           = S(  0, 10);
   constexpr Score WeakQueen          = S( 49, 15);
 
 #undef S
@@ -578,7 +578,7 @@ namespace {
     }
 
     // Evaluate the safety of pawns regarding only kings
-    if (!pe->passed_pawns(Them))
+    if (!pos.pieces(Them, QUEEN) && !pe->passed_pawns(Them))
     {
         Square ksq = pos.square<KING>(Us);
         Square oppKsq = pos.square<KING>(Them);
