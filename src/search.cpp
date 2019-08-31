@@ -192,7 +192,7 @@ namespace {
 void Search::init() {
 
   for (int i = 1; i < MAX_MOVES; ++i)
-      Reductions[i] = int(23.4 * std::log(1.1 * i - 0.1));
+      Reductions[i] = int(23.4 * std::log(0.9 * i + 0.1));
 }
 
 
