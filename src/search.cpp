@@ -1137,7 +1137,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore + 2709) * ONE_PLY / 16384;
+              r -= (ss->statScore + 4232) * ONE_PLY / 16384;
           }
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
