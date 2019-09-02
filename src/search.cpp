@@ -72,7 +72,7 @@ namespace {
 
   Depth reduction(bool i, Depth d, int mn) {
     int r = Reductions[d / ONE_PLY] * Reductions[mn];
-    return (r + 520) * ONE_PLY / 1024 + ONE_PLY * (!i && r > 999);
+    return ((r + 520) / 1024 + (!i && r > 999)) * ONE_PLY;
   }
 
   constexpr int futility_move_count(bool improving, int depth) {
@@ -1137,7 +1137,7 @@ moves_loop: // When in check, search starts from here
                   r += ONE_PLY;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= ss->statScore / 16384 * ONE_PLY;
+              r -= (ss->statScore + 2709) * ONE_PLY / 16384;
           }
 
           Depth d = clamp(newDepth - r, ONE_PLY, newDepth);
