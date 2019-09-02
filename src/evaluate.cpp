@@ -658,14 +658,13 @@ namespace {
             bonus = bonus / 2;
 
         else if (   pos.non_pawn_material(Us) == RookValueMg
-                 && pos.pawn_passed(Us, s)
                  && distance<File>(s, pos.square<KING>(Us)) > 1
                  && !(adjacent_files_bb(s) & pos.pieces(Us, PAWN))
                  && (forward_file_bb(Us, s) & pos.pieces(Us, ROOK))
                  && (pos.attacks_from<ROOK>(s) & forward_file_bb(Them, s) & pos.pieces(Them, ROOK))
                  && (    relative_rank(Us, pos.square<KING>(Them)) >= RANK_7
-                     || (forward_file_bb(Us, pos.square<KING>(Them)) & pos.pieces(Them))
-                     || (attackedBy[Us][ALL_PIECES] & make_score(f, relative_rank(Us, RANK_8)))))
+                     || (forward_file_bb(Us, pos.square<KING>(Them)) & pos.pieces(Them) & ~attackedBy[Us][ROOK])
+                     || (attackedBy[Them][ALL_PIECES] & make_square(file_of(pos.square<KING>(Them)), relative_rank(Us, RANK_8)))))
             bonus = bonus / 2;
 
         score += bonus - PassedFile * std::min(f, ~f);
