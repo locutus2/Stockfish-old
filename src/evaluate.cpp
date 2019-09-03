@@ -649,7 +649,7 @@ namespace {
 
                 // If not free to advance decrease k factor
                 if (!pos.empty(blockSq))
-                    k /= 8;
+                    k = k / 5 - 1;
 
                 bonus += make_score(k * w, k * w);
             }
