@@ -147,6 +147,7 @@ namespace {
   constexpr Score ThreatBySafePawn   = S(173, 94);
   constexpr Score TrappedRook        = S( 47,  4);
   constexpr Score WeakQueen          = S( 49, 15);
+  constexpr Score OnlyPawnDefender   = S( 20, 20);
 
 #undef S
 
@@ -575,6 +576,16 @@ namespace {
 
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
+
+    // Bonus for threats on blocked pawns which has only one non-pawn defender
+    b =  pos.pieces(Them, PAWN)
+       & shift<Up>(pos.pieces(Us, PAWN))
+       & attackedBy[Them][ALL_PIECES]
+       & attackedBy[Us][ALL_PIECES]
+       & ~attackedBy2[Them]
+       & ~attackedBy[Us][PAWN]
+       & ~attackedBy[Them][PAWN];
+    score += OnlyPawnDefender * popcount(b);
 
     if (T)
         Trace::add(THREAT, Us, score);
