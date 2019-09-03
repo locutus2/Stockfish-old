@@ -646,7 +646,7 @@ namespace {
 
             // If the pawn is not free to advance, then decrease the bonus
             if (!pos.empty(blockSq))
-                k /= 4;
+                k /= 8;
 
             bonus += make_score(k * w, k * w);
         } // r > RANK_3
