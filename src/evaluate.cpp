@@ -147,7 +147,7 @@ namespace {
   constexpr Score ThreatBySafePawn   = S(173, 94);
   constexpr Score TrappedRook        = S( 47,  4);
   constexpr Score WeakQueen          = S( 49, 15);
-  constexpr Score OnlyPawnDefender   = S( 20,  0);
+  constexpr Score OnlyPawnDefender   = S( 30,  0);
 
 #undef S
 
@@ -582,8 +582,9 @@ namespace {
        & shift<Up>(pos.pieces(Us, PAWN))
        & attackedBy[Them][ALL_PIECES]
        & attackedBy[Us][ALL_PIECES]
+       & ~attackedBy2[Them]
        & ~attackedBy[Us][PAWN]
-       & ~stronglyProtected;
+       & ~attackedBy[Them][PAWN];
     score += OnlyPawnDefender * popcount(b);
 
     if (T)
