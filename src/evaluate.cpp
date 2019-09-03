@@ -644,8 +644,12 @@ namespace {
                                                              0 ;
 
                 // Assign a larger bonus if the block square is defended
-                if (pos.empty(blockSq) && ((pos.pieces(Us) & bb) || (attackedBy[Us][ALL_PIECES] & blockSq)))
+                if ((pos.pieces(Us) & bb) || (attackedBy[Us][ALL_PIECES] & blockSq))
                     k += 5;
+
+                // If not free to advance decrease k factor
+                if (!pos.empty(blockSq))
+                    k /= 8;
 
                 bonus += make_score(k * w, k * w);
             }
