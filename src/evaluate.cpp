@@ -624,31 +624,31 @@ namespace {
             if (r != RANK_7)
                 bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w);
 
-            // If the pawn is free to advance, then increase the bonus
-            if (pos.empty(blockSq))
-            {
-                squaresToQueen = forward_file_bb(Us, s);
-                unsafeSquares = passed_pawn_span(Us, s);
+            squaresToQueen = forward_file_bb(Us, s);
+            unsafeSquares = passed_pawn_span(Us, s);
 
-                bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
+            bb = forward_file_bb(Them, s) & pos.pieces(ROOK, QUEEN);
 
-                if (!(pos.pieces(Them) & bb))
-                    unsafeSquares &= attackedBy[Them][ALL_PIECES];
+            if (!(pos.pieces(Them) & bb))
+                unsafeSquares &= attackedBy[Them][ALL_PIECES];
 
-                // If there are no enemy attacks on passed pawn span, assign a big bonus.
-                // Otherwise assign a smaller bonus if the path to queen is not attacked
-                // and even smaller bonus if it is attacked but block square is not.
-                int k = !unsafeSquares                    ? 35 :
-                        !(unsafeSquares & squaresToQueen) ? 20 :
-                        !(unsafeSquares & blockSq)        ?  9 :
-                                                             0 ;
+            // If there are no enemy attacks on passed pawn span, assign a big bonus.
+            // Otherwise assign a smaller bonus if the path to queen is not attacked
+            // and even smaller bonus if it is attacked but block square is not.
+            int k = !unsafeSquares                    ? 35 :
+                    !(unsafeSquares & squaresToQueen) ? 20 :
+                    !(unsafeSquares & blockSq)        ?  9 :
+                                                         0 ;
 
-                // Assign a larger bonus if the block square is defended
-                if ((pos.pieces(Us) & bb) || (attackedBy[Us][ALL_PIECES] & blockSq))
-                    k += 5;
+            // Assign a larger bonus if the block square is defended
+            if ((pos.pieces(Us) & bb) || (attackedBy[Us][ALL_PIECES] & blockSq))
+                k += 5;
 
-                bonus += make_score(k * w, k * w);
-            }
+            // If the pawn is not free to advance, then decrease the bonus
+            if (!pos.empty(blockSq))
+                k /= 2;
+
+            bonus += make_score(k * w, k * w);
         } // r > RANK_3
 
         // Scale down bonus for candidate passers which need more than one
