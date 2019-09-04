@@ -805,12 +805,12 @@ namespace {
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
-    score += (mobility[WHITE] - mobility[BLACK]) * 7 / 8;
+    score += mobility[WHITE] - mobility[BLACK];
 
-    score +=  king<   WHITE>() - king<   BLACK>()
-            + threats<WHITE>() - threats<BLACK>()
-            + passed< WHITE>() - passed< BLACK>()
-            + space<  WHITE>() - space<  BLACK>();
+    score +=  (king<   WHITE>() - king<   BLACK>()) * 9 / 8
+            +  threats<WHITE>() - threats<BLACK>()
+            +  passed< WHITE>() - passed< BLACK>()
+            +  space<  WHITE>() - space<  BLACK>();
 
     score += initiative(eg_value(score));
 
