@@ -581,7 +581,7 @@ namespace {
     b =  pos.pieces(Them, PAWN)
        & shift<Up>(pos.pieces(Us, PAWN))
        & attackedBy[Them][ALL_PIECES]
-       & ~attackedBy[Them][QUEEN]
+       & ~attackedBy[Them][KING]
        & attackedBy[Us][ALL_PIECES]
        & ~attackedBy2[Them]
        & ~attackedBy[Us][PAWN]
