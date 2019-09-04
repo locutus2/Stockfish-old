@@ -807,8 +807,8 @@ namespace {
 
     score += mobility[WHITE] - mobility[BLACK];
 
-    score +=  (king<   WHITE>() - king<   BLACK>()) * 7 / 8
-            +  threats<WHITE>() - threats<BLACK>()
+    score +=   king<   WHITE>() - king<   BLACK>()
+            + (threats<WHITE>() - threats<BLACK>()) * 9 / 8
             +  passed< WHITE>() - passed< BLACK>()
             +  space<  WHITE>() - space<  BLACK>();
 
