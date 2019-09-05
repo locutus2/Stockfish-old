@@ -579,10 +579,8 @@ namespace {
 
     // Bonus for threats on blocked pawns which has only one non-pawn defender
     b =  pos.pieces(Them, PAWN)
-       & shift<Up>(pos.pieces(Us, PAWN))
+       & shift<Up>(pos.pieces(Us) & ~attackedBy[Them][PAWN])
        & attackedBy[Them][ALL_PIECES]
-       & ~attackedBy[Them][KING]
-       & attackedBy[Us][ALL_PIECES]
        & ~attackedBy2[Them]
        & ~attackedBy[Us][PAWN]
        & ~attackedBy[Them][PAWN];
