@@ -800,8 +800,8 @@ namespace {
     initialize<BLACK>();
 
     // Pieces should be evaluated first (populate attack tables)
-    score +=  (pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()) * 7 / 8
-            + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
+    score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
+            + (pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()) * 9 / 8
             + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
             + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
