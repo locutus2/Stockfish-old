@@ -787,7 +787,7 @@ namespace {
 
     // Probe the pawn hash table
     pe = Pawns::probe(pos);
-    score += (pe->pawn_score(WHITE) - pe->pawn_score(BLACK)) * 9 / 8;
+    score += (pe->pawn_score(WHITE) - pe->pawn_score(BLACK)) * 7 / 8;
 
     // Early exit if score is high
     Value v = (mg_value(score) + eg_value(score)) / 2;
