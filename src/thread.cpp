@@ -62,6 +62,17 @@ int Thread::best_move_count(Move move) {
   return rm != rootMoves.begin() + pvLast ? rm->bestMoveCount : 0;
 }
 
+/// Thread::update_best_move_count(Move move) updates the best move counter for the given root move
+
+void Thread::update_best_move_count(Move move) {
+
+  auto rm = std::find(rootMoves.begin() + pvIdx,
+                      rootMoves.begin() + pvLast, move);
+
+  if (rm != rootMoves.begin() + pvLast)
+      ++rm->bestMoveCount;
+}
+
 /// Thread::clear() reset histories, usually before a new game
 
 void Thread::clear() {

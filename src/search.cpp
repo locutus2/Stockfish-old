@@ -1225,6 +1225,9 @@ moves_loop: // When in check, search starts from here
 
           if (value > alpha)
           {
+              if (rootNode && bestMove)
+                  thisThread->update_best_move_count(bestMove);
+
               bestMove = move;
 
               if (PvNode && !rootNode) // Update pv even in fail-high case
