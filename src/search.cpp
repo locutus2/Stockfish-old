@@ -342,6 +342,8 @@ void Thread::search() {
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
 
+  secondBestMoveCounter.clear();
+
   size_t multiPV = Options["MultiPV"];
 
   // Pick integer skill levels, but non-deterministically round up or down
@@ -593,7 +595,7 @@ namespace {
     StateInfo st;
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove;
+    Move ttMove, move, excludedMove, bestMove, secondBestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, ttPv, inCheck, givesCheck, improving, doLMR;
@@ -641,7 +643,7 @@ namespace {
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
     (ss+1)->ply = ss->ply + 1;
-    (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    (ss+1)->excludedMove = bestMove = secondBestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -1084,6 +1086,10 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Less reduction at root if move was second best move during this search
+          if (rootNode && thisThread->second_best_move_count(move) > 0)
+              r -= ONE_PLY;
+
           // Reduction if other threads are searching this position.
           if (th.marked())
               r += ONE_PLY;
@@ -1225,6 +1231,9 @@ moves_loop: // When in check, search starts from here
 
           if (value > alpha)
           {
+              if (rootNode)
+                  secondBestMove = bestMove;
+
               bestMove = move;
 
               if (PvNode && !rootNode) // Update pv even in fail-high case
@@ -1290,7 +1299,12 @@ moves_loop: // When in check, search starts from here
         update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
 
     if (PvNode)
+    {
         bestValue = std::min(bestValue, maxValue);
+
+        if (rootNode && secondBestMove)
+            ++thisThread->secondBestMoveCounter[secondBestMove];
+    }
 
     if (!excludedMove)
         tte->save(posKey, value_to_tt(bestValue, ss->ply), ttPv,

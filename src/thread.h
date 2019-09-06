@@ -25,6 +25,7 @@
 #include <condition_variable>
 #include <mutex>
 #include <thread>
+#include <unordered_map>
 #include <vector>
 
 #include "material.h"
@@ -57,6 +58,7 @@ public:
   void start_searching();
   void wait_for_search_finished();
   int best_move_count(Move move);
+  int second_best_move_count(Move move);
 
   Pawns::Table pawnsTable;
   Material::Table materialTable;
@@ -72,6 +74,7 @@ public:
   ButterflyHistory mainHistory;
   CapturePieceToHistory captureHistory;
   ContinuationHistory continuationHistory;
+  std::unordered_map<Move, int> secondBestMoveCounter;
   Score contempt;
 };
 

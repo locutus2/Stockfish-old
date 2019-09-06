@@ -62,6 +62,12 @@ int Thread::best_move_count(Move move) {
   return rm != rootMoves.begin() + pvLast ? rm->bestMoveCount : 0;
 }
 
+int Thread::second_best_move_count(Move move) {
+    auto it = secondBestMoveCounter.find(move);
+
+    return it != secondBestMoveCounter.end() ? it->second : 0;
+}
+
 /// Thread::clear() reset histories, usually before a new game
 
 void Thread::clear() {
