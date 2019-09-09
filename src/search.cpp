@@ -1605,11 +1605,10 @@ moves_loop: // When in check, search starts from here
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
+    int pvBonus = PvNode ? bonus : bonus / 2;
     thisThread->mainHistory[us][from_to(move)] << bonus;
+    thisThread->pvHistory[us][from_to(move)] << pvBonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
-
-    if (PvNode)
-        thisThread->pvHistory[us][from_to(move)] << bonus;
 
     if (is_ok((ss-1)->currentMove))
     {
@@ -1621,10 +1620,8 @@ moves_loop: // When in check, search starts from here
     for (int i = 0; i < quietCount; ++i)
     {
         thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
+        thisThread->pvHistory[us][from_to(quiets[i])] << -pvBonus;
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
-
-        if (PvNode)
-            thisThread->pvHistory[us][from_to(quiets[i])] << -bonus;
     }
   }
 
