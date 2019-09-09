@@ -135,7 +135,7 @@ void MovePicker::score() {
 void MovePicker::scoreQuietsRoot() {
 
   for (auto& m : *this)
-      m.value =  (*rootHistory)[pos.side_to_move()][from_to(m)] * 2
+      m.value =  (*rootHistory)[pos.side_to_move()][from_to(m)] * 4
                + (*mainHistory)[pos.side_to_move()][from_to(m)]
                + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
