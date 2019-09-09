@@ -903,7 +903,7 @@ moves_loop: // When in check, search starts from here
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
+    MovePicker mp(pos, ttMove, depth, rootNode ? &thisThread->rootHistory : &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
@@ -1592,6 +1592,8 @@ moves_loop: // When in check, search starts from here
   void update_quiet_stats(const Position& pos, Stack* ss, Move move,
                           Move* quiets, int quietCount, int bonus) {
 
+    const bool rootNode = ss->ply == 0;
+
     if (ss->killers[0] != move)
     {
         ss->killers[1] = ss->killers[0];
@@ -1602,6 +1604,9 @@ moves_loop: // When in check, search starts from here
     Thread* thisThread = pos.this_thread();
     thisThread->mainHistory[us][from_to(move)] << bonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
+
+    if (rootNode)
+        thisThread->rootHistory[us][from_to(move)] << bonus;
 
     if (is_ok((ss-1)->currentMove))
     {
@@ -1614,6 +1619,9 @@ moves_loop: // When in check, search starts from here
     {
         thisThread->mainHistory[us][from_to(quiets[i])] << -bonus;
         update_continuation_histories(ss, pos.moved_piece(quiets[i]), to_sq(quiets[i]), -bonus);
+
+        if (rootNode)
+            thisThread->rootHistory[us][from_to(quiets[i])] << -bonus;
     }
   }
 
