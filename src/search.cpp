@@ -1088,8 +1088,8 @@ moves_loop: // When in check, search starts from here
           if (th.marked())
               r += ONE_PLY;
 
-          // Decrease reduction at root for higher move counts.
-          if (rootNode && moveCount > 50)
+          // Decrease reduction at root for higher move counts if no best move found so fare.
+          if (rootNode && !bestMove && moveCount > 30)
               r -= ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
@@ -1222,6 +1222,8 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
+
+
 
       if (value > bestValue)
       {
