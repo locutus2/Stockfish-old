@@ -899,13 +899,14 @@ namespace {
 
 moves_loop: // When in check, search starts from here
 
+    const ButterflyHistory* history = PvNode ? &thisThread->pvHistory : &thisThread->mainHistory;
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
                                           nullptr, (ss-4)->continuationHistory,
                                           nullptr, (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
-    MovePicker mp(pos, ttMove, depth, PvNode ? &thisThread->pvHistory : &thisThread->mainHistory,
+    MovePicker mp(pos, ttMove, depth, history,
                                       &thisThread->captureHistory,
                                       contHist,
                                       countermove,
@@ -1118,7 +1119,7 @@ moves_loop: // When in check, search starts from here
                        && !pos.see_ge(make_move(to_sq(move), from_sq(move))))
                   r -= 2 * ONE_PLY;
 
-              ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+              ss->statScore =  (*history)[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
@@ -1128,7 +1129,7 @@ moves_loop: // When in check, search starts from here
               if (    ss->statScore < 0
                   && (*contHist[0])[movedPiece][to_sq(move)] >= 0
                   && (*contHist[1])[movedPiece][to_sq(move)] >= 0
-                  && thisThread->mainHistory[us][from_to(move)] >= 0)
+                  && (*history)[us][from_to(move)] >= 0)
                   ss->statScore = 0;
 
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
