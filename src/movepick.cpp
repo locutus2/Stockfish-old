@@ -56,9 +56,9 @@ namespace {
 /// ordering is at the current node.
 
 /// MovePicker constructor for the main search
-MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
+MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const ButterflyHistory* rh,
                        const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers)
-           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
+           : pos(p), mainHistory(mh), rootHistory(rh), captureHistory(cph), continuationHistory(ch),
              refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d) {
 
   assert(d > DEPTH_ZERO);
@@ -127,6 +127,20 @@ void MovePicker::score() {
                        + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                        - (1 << 28);
       }
+}
+
+/// MovePicker::scoreQuietsRoot() assigns a numerical value to each quiet move in a list at root.
+/// The quiets moves are ordered using the histories.
+
+void MovePicker::scoreQuietsRoot() {
+
+  for (auto& m : *this)
+      m.value =  (*rootHistory)[pos.side_to_move()][from_to(m)]
+               + (*mainHistory)[pos.side_to_move()][from_to(m)]
+               + (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+               + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+               + (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+               + (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)] / 2;
 }
 
 /// MovePicker::select() returns the next move satisfying a predicate function.
@@ -205,7 +219,10 @@ top:
           cur = endBadCaptures;
           endMoves = generate<QUIETS>(pos, cur);
 
-          score<QUIETS>();
+          if (rootHistory)
+               scoreQuietsRoot();
+          else
+               score<QUIETS>();
           partial_insertion_sort(cur, endMoves, -4000 * depth / ONE_PLY);
       }
 
