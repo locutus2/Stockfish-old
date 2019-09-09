@@ -1602,7 +1602,7 @@ moves_loop: // When in check, search starts from here
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
-    int rootBonus = rootNode ? bonus : bonus / 2;
+    int rootBonus = rootNode ? bonus : bonus / 4;
     thisThread->mainHistory[us][from_to(move)] << bonus;
     thisThread->rootHistory[us][from_to(move)] << rootBonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
