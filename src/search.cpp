@@ -1088,9 +1088,9 @@ moves_loop: // When in check, search starts from here
           if (th.marked())
               r += ONE_PLY;
 
-          // Decrease reduction at root with higher move count.
-          if (rootNode)
-              r -= moveCount / 32 * ONE_PLY;
+          // Decrease reduction at root for higher move counts.
+          if (rootNode && moveCount > 50)
+              r -= ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
           if (ttPv)
