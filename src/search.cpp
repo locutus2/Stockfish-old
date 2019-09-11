@@ -1605,7 +1605,7 @@ moves_loop: // When in check, search starts from here
 
     if (type_of(pos.moved_piece(move)) != PAWN)
     {
-        int reverseBonus = type_of(pos.moved_piece(move)) == KING ? -bonus/2 : -bonus;
+        int reverseBonus = type_of(pos.moved_piece(move)) == KING ? -bonus * 3 / 4 : -bonus;
         thisThread->mainHistory[us][from_to(reverse_move(move))] << reverseBonus;
     }
 
