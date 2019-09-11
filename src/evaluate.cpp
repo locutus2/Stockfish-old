@@ -285,9 +285,10 @@ namespace {
 
         if (b & kingRing[Them])
         {
+            Bitboard dblAttackByPawn = pawn_double_attacks_bb<Us>(pos.pieces(Us, PAWN));
             kingAttackersCount[Us]++;
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
-            kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING] & ~attackedBy[Them][PAWN]);
+            kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING] & ~dblAttackByPawn);
         }
 
         int mob = popcount(b & mobilityArea[Us]);
