@@ -1607,7 +1607,8 @@ moves_loop: // When in check, search starts from here
     {
         thisThread->mainHistory[us][from_to(reverse_move(move))] << -bonus;
 
-        if (is_ok((ss-2)->currentMove))
+        if (   is_ok((ss-2)->currentMove)
+            && (*(ss-2)->continuationHistory)[pos.moved_piece(move)][from_sq(move)] < 0)
             (*(ss-2)->continuationHistory)[pos.moved_piece(move)][from_sq(move)] << -bonus;
     }
 
