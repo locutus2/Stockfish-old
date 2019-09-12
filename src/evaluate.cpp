@@ -729,6 +729,8 @@ namespace {
                            &&  outflanking < 0
                            && !pawnsOnBothFlanks;
 
+    int contempt = ((eg > 0) - (eg < 0)) * eg_value(pos.this_thread()->contempt);
+
     // Compute the initiative bonus for the attacking side
     int complexity =   9 * pe->passed_count()
                     + 11 * pos.count<PAWN>()
@@ -736,6 +738,7 @@ namespace {
                     + 18 * pawnsOnBothFlanks
                     + 49 * !pos.non_pawn_material()
                     - 36 * almostUnwinnable
+                    -      contempt
                     -103 ;
 
     // Now apply the bonus: note that we find the attacking side by extracting
