@@ -208,7 +208,7 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
           bonus -= make_score(UnblockedStorm[d][theirRank], 0);
   }
 
-  bonus -= BlockedStorm * (blockedStorm * blockedStorm * blockedStorm);
+  bonus -= BlockedStorm * (2 * blockedStorm * blockedStorm - 1);
 
   return bonus;
 }
