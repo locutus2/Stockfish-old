@@ -722,9 +722,9 @@ namespace {
     int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
 
-    bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & (QueenSide ^ FileDBB))
-                            && (pos.pieces(PAWN) & (KingSide  ^ FileEBB))
-                            && (pos.pieces(PAWN) & (FileABB   | FileHBB));
+    bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
+                            && (pos.pieces(PAWN) & KingSide)
+                            && (pos.pieces(PAWN) & ~CenterFiles);
 
     bool almostUnwinnable =   !pe->passed_count()
                            &&  outflanking < 0
