@@ -724,7 +724,7 @@ namespace {
 
     bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
                             && (pos.pieces(PAWN) & KingSide)
-                            && (pos.count<PAWN>() > 2 || (pos.pieces(PAWN) & ~CenterFiles));
+                            && (pos.count<PAWN>() > 4 || (pos.pieces(PAWN) & ~CenterFiles));
 
     bool almostUnwinnable =   !pe->passed_count()
                            &&  outflanking < 0
