@@ -30,6 +30,29 @@
 #include "pawns.h"
 #include "thread.h"
 
+  constexpr int Scale = 1;
+  constexpr int NW = 9;
+  constexpr int NWP = 13;
+  constexpr int NE = 4;
+
+  int Weight1[NW+1][NWP] = {   
+                           {0},  
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+                           };
+  int Weight2[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  int Weight3[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  int Weight4[NE+1] = {0, 0, 0, 0, 0};
+
+TUNE(SetRange(-300,300), Weight1, Weight2, Weight3, Weight4);
+
 namespace Trace {
 
   enum Tracing { NO_TRACE, TRACE };
@@ -88,26 +111,6 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int Scale = 1;
-  constexpr int NW = 9;
-  constexpr int NWP = 13;
-  constexpr int NE = 4;
-
-  int Weight1[NW+1][NWP] = {   
-                           {0},  
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-                           };
-  int Weight2[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  int Weight3[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  int Weight4[NE+1] = {0, 0, 0, 0, 0};
   
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
