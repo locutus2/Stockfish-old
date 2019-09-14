@@ -475,7 +475,7 @@ namespace {
         score -= PawnlessFlank;
 
     // Penalty if king flank is under attack, potentially moving toward the king
-    score -= (FlankAttacks + make_score(std::max(kingDanger, 0) / 512, 0)) * kingFlankAttacks;
+    score -= (FlankAttacks + make_score(std::max(kingDanger, 0) / 256, 0)) * kingFlankAttacks;
 
     if (T)
         Trace::add(KING, Us, score);
