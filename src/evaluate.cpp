@@ -723,7 +723,7 @@ namespace {
                      - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
 
     int pawnsOnBothFlanks =  ((pos.pieces(PAWN) & QueenSide) && (pos.pieces(PAWN) & KingSide))
-                           * (1 + bool(pos.pieces(PAWN) & ~CenterFiles));
+                           * (2 + bool(pos.pieces(PAWN) & ~CenterFiles));
 
     bool almostUnwinnable =   !pe->passed_count()
                            &&  outflanking < 0
@@ -733,7 +733,7 @@ namespace {
     int complexity =   9 * pe->passed_count()
                     + 11 * pos.count<PAWN>()
                     +  9 * outflanking
-                    +  9 * pawnsOnBothFlanks
+                    +  6 * pawnsOnBothFlanks
                     + 49 * !pos.non_pawn_material()
                     - 36 * almostUnwinnable
                     -103 ;
