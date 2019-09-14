@@ -35,8 +35,8 @@
   constexpr int NWP = 13;
   constexpr int NE = 4;
 
-  int Weight1[NW+1][NWP] = {   
-                           {0},  
+  int Weight0 = 0;
+  int Weight1[NW][NWP] = {    
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -51,7 +51,7 @@
   int Weight3[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   int Weight4[NE+1] = {0, 0, 0, 0, 0};
 
-TUNE(SetRange(-300,300), Weight1, Weight2, Weight3, Weight4);
+TUNE(SetRange(-300,300), Weight0, Weight1, Weight2, Weight3, Weight4);
 
 namespace Trace {
 
@@ -794,10 +794,10 @@ namespace {
       for (File f = FILE_B; f < FILE_H; ++f)
           for (Rank r = RANK_2; r < RANK_8; ++r)
           {
-              int sum = Weight1[0][0];
+              int sum = Weight0;
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
-                      sum += Weight1[3*f2+r2+5][pieceMap[pos.piece_on(make_square(File(f + f2), Rank(r + r2)))]];
+                      sum += Weight1[3*f2+r2+4][pieceMap[pos.piece_on(make_square(File(f + f2), Rank(r + r2)))]];
               Value1[f-1][r-1] = func(sum / Scale);
           }
 
