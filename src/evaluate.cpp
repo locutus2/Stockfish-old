@@ -30,7 +30,7 @@
 #include "pawns.h"
 #include "thread.h"
 
-  constexpr int Scale = 16;
+  constexpr int Scale = 128;
   constexpr int NW = 9;
   constexpr int NWP = 13;
   constexpr int NE = 4;
@@ -798,7 +798,7 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += Weight1[3*f2+r2+4][pieceMap[pos.piece_on(make_square(File(f + f2), Rank(r + r2)))]];
-              Value1[f-1][r-1] = func(sum / Scale);
+              Value1[f-1][r-1] = func(sum);
           }
 
       for (int f = 1; f < 5; ++f)
