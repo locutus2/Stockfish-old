@@ -88,6 +88,28 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
+  constexpr int Scale = 128;
+  constexpr int RANGE = 256;
+  constexpr int NW = 9;
+  constexpr int NWP = 13;
+  constexpr int NE = 4;
+
+  constexpr int Weight0 = 0;
+  constexpr int Weight1[NW][NWP] = {
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                           {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+                           };
+  constexpr int Weight2[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  constexpr int Weight3[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  constexpr int Weight4[NE+1] = {0, 0, 0, 0, 0};
+
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
   constexpr Score MobilityBonus[][32] = {
@@ -170,7 +192,12 @@ namespace {
     template<Color Us> Score space() const;
     ScaleFactor scale_factor(Value eg) const;
     Score initiative(Score score) const;
+    Value complex_eval();
 
+    int Value1[6][6];
+    int Value2[4][4];
+    int Value3[2][2];
+    
     const Position& pos;
     Material::Entry* me;
     Pawns::Entry* pe;
@@ -753,6 +780,54 @@ namespace {
     return make_score(u, v);
   }
 
+  template<Tracing T>
+  Value Evaluation<T>::complex_eval() {
+      
+      static constexpr int pieceMap[PIECE_NB] = {0, 1, 2, 3, 4, 5, 6, 0, 0, 7, 8, 9, 10, 11, 12, 0};
+
+      int v = 0;
+      
+      auto func = [&](int x) -> int { return std::max(x, 0); };
+
+      for (File f = FILE_B; f < FILE_H; ++f)
+          for (Rank r = RANK_2; r < RANK_8; ++r)
+          {
+              int sum = Weight0;
+              for (int f2 = -1; f2 <= 1; ++f2)
+                  for (int r2 = -1; r2 <= 1; ++r2)
+                      sum += Weight1[3*f2+r2+4][pieceMap[pos.piece_on(make_square(File(f + f2), Rank(r + r2)))]];
+              Value1[f-1][r-1] = clamp(func(sum), -RANGE, RANGE);
+          }
+
+      for (int f = 1; f < 5; ++f)
+          for (int r = 1; r < 5; ++r)
+          {
+              int sum = Weight2[0];
+              for (int f2 = -1; f2 <= 1; ++f2)
+                  for (int r2 = -1; r2 <= 1; ++r2)
+                      sum += Weight2[3*f2+r2+5] * Value1[f+f2][r+r2];
+              Value2[f-1][r-1] = clamp(func(sum / Scale), -RANGE, RANGE);
+          }
+          
+      for (int f = 1; f < 3; ++f)
+          for (int r = 1; r < 3; ++r)
+          {
+              int sum = Weight3[0];
+              for (int f2 = -1; f2 <= 1; ++f2)
+                  for (int r2 = -1; r2 <= 1; ++r2)
+                      sum += Weight3[3*f2+r2+5] * Value2[f+f2][r+r2];
+              Value3[f-1][r-1] = clamp(func(sum / Scale), -RANGE, RANGE);
+          }
+
+      v =  Weight4[0]
+         + Weight4[1] * Value3[0][0]
+         + Weight4[2] * Value3[0][1]
+         + Weight4[3] * Value3[1][0]
+         + Weight4[4] * Value3[1][1];
+
+      return Value(clamp(v / Scale, -RANGE, RANGE));
+  }
+
 
   // Evaluation::scale_factor() computes the scale factor for the winning side
 
@@ -834,6 +909,8 @@ namespace {
        + eg_value(score) * int(PHASE_MIDGAME - me->game_phase()) * sf / SCALE_FACTOR_NORMAL;
 
     v /= PHASE_MIDGAME;
+    
+    v += complex_eval();
 
     // In case of tracing add all remaining individual evaluation terms
     if (T)
