@@ -731,7 +731,7 @@ namespace {
     bool almostUnwinnable =   !pe->passed_count()
                            &&  outflanking < 0
                            && !pawnsOnBothFlanks
-                           &&  pos.non_pawn_material(WHITE) == pos.non_pawn_material(BLACK);
+                           &&  abs(pos.non_pawn_material(WHITE) - pos.non_pawn_material(BLACK)) <= BishopValueMg - KnightValueMg;
 
     // Compute the initiative bonus for the attacking side
     int complexity =   9 * pe->passed_count()
