@@ -30,14 +30,14 @@
 #include "pawns.h"
 #include "thread.h"
 
-  constexpr int Scale = 1;
+  constexpr int Scale = 128;
   constexpr int RANGE = 256;
   constexpr int NW = 9;
   constexpr int NWP = 13;
   constexpr int NE = 4;
 
-  int Weight0 = 0;
-  int Weight1[NW][NWP] = {    
+  int W0 = 0;
+  int W1[NW][NWP] = {
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -48,11 +48,11 @@
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
                            };
-  int Weight2[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  int Weight3[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  int Weight4[NE+1] = {0, 0, 0, 0, 0};
+  int W2[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  int W3[NW+1] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  int W4[NE+1] = {0, 0, 0, 0, 0};
 
-TUNE(SetRange(-300,300), Weight0, Weight1, Weight2, Weight3, Weight4);
+TUNE(SetRange(-300,300), W0, W1, W2, W3, W4);
 
 namespace Trace {
 
@@ -795,40 +795,40 @@ namespace {
       for (File f = FILE_B; f < FILE_H; ++f)
           for (Rank r = RANK_2; r < RANK_8; ++r)
           {
-              int sum = Weight0;
+              int sum = W0;
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
-                      sum += Weight1[3*f2+r2+4][pieceMap[pos.piece_on(make_square(File(f + f2), Rank(r + r2)))]];
-              Value1[f-1][r-1] = clamp(func(sum), -RANGE, RANGE);
+                      sum += W1[3*f2+r2+4][pieceMap[pos.piece_on(make_square(File(f + f2), Rank(r + r2)))]];
+              Value1[f-1][r-1] = func(sum);
           }
 
       for (int f = 1; f < 5; ++f)
           for (int r = 1; r < 5; ++r)
           {
-              int sum = Weight2[0];
+              int sum = W2[0];
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
-                      sum += Weight2[3*f2+r2+5] * Value1[f+f2][r+r2];
-              Value2[f-1][r-1] = clamp(func(sum / Scale), -RANGE, RANGE);
+                      sum += W2[3*f2+r2+5] * Value1[f+f2][r+r2];
+              Value2[f-1][r-1] = func(sum / Scale);
           }
           
       for (int f = 1; f < 3; ++f)
           for (int r = 1; r < 3; ++r)
           {
-              int sum = Weight3[0];
+              int sum = W3[0];
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
-                      sum += Weight3[3*f2+r2+5] * Value2[f+f2][r+r2];
-              Value3[f-1][r-1] = clamp(func(sum / Scale), -RANGE, RANGE);
+                      sum += W3[3*f2+r2+5] * Value2[f+f2][r+r2];
+              Value3[f-1][r-1] = func(sum / Scale);
           }
 
-      v =  Weight4[0]
-         + Weight4[1] * Value3[0][0]
-         + Weight4[2] * Value3[0][1]
-         + Weight4[3] * Value3[1][0]
-         + Weight4[4] * Value3[1][1];
+      v =  W4[0]
+         + W4[1] * Value3[0][0]
+         + W4[2] * Value3[0][1]
+         + W4[3] * Value3[1][0]
+         + W4[4] * Value3[1][1];
 
-      return Value(clamp(v / Scale, -RANGE, RANGE));
+      return Value(clamp(v / (Scale * Scale), -RANGE, RANGE));
   }
 
 
