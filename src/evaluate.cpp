@@ -828,7 +828,7 @@ namespace {
          + W4[3] * Value3[1][0]
          + W4[4] * Value3[1][1];
 
-      return Value(clamp(v / (Scale * Scale), -RANGE, RANGE));
+      return Value(clamp(v , -RANGE, RANGE));
   }
 
 
