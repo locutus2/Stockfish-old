@@ -88,7 +88,7 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int Scale = 1;
+  constexpr int Scale = 128;
   constexpr int RANGE = 256;
   constexpr int NW = 9;
   constexpr int NWP = 13;
@@ -794,7 +794,7 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += Weight1[3*f2+r2+4][pieceMap[pos.piece_on(make_square(File(f + f2), Rank(r + r2)))]];
-              Value1[f-1][r-1] = clamp(func(sum), -RANGE, RANGE);
+              Value1[f-1][r-1] = func(sum);
           }
 
       for (int f = 1; f < 5; ++f)
@@ -804,7 +804,7 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += Weight2[3*f2+r2+5] * Value1[f+f2][r+r2];
-              Value2[f-1][r-1] = clamp(func(sum / Scale), -RANGE, RANGE);
+              Value2[f-1][r-1] = func(sum / Scale);
           }
           
       for (int f = 1; f < 3; ++f)
@@ -814,7 +814,7 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += Weight3[3*f2+r2+5] * Value2[f+f2][r+r2];
-              Value3[f-1][r-1] = clamp(func(sum / Scale), -RANGE, RANGE);
+              Value3[f-1][r-1] = func(sum / Scale);
           }
 
       v =  Weight4[0]
@@ -823,7 +823,7 @@ namespace {
          + Weight4[3] * Value3[1][0]
          + Weight4[4] * Value3[1][1];
 
-      return Value(clamp(v / Scale, -RANGE, RANGE));
+      return Value(clamp(v / (Scale * Scale), -RANGE, RANGE));
   }
 
 
