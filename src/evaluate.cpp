@@ -809,7 +809,7 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += W2[3*f2+r2+5] * Value1[f+f2][r+r2];
-              Value2[f-1][r-1] = func(sum / Scale);
+              Value2[f-1][r-1] = func(sum);
           }
           
       for (int f = 1; f < 3; ++f)
@@ -819,7 +819,7 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += W3[3*f2+r2+5] * Value2[f+f2][r+r2];
-              Value3[f-1][r-1] = func(sum / Scale);
+              Value3[f-1][r-1] = func(sum);
           }
 
       v =  W4[0]
@@ -828,7 +828,7 @@ namespace {
          + W4[3] * Value3[1][0]
          + W4[4] * Value3[1][1];
 
-      return Value(clamp(v , -RANGE, RANGE));
+      return Value(clamp(v / Scale , -RANGE, RANGE));
   }
 
 
