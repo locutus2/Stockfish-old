@@ -195,7 +195,7 @@ namespace {
     int Value1[6][6];
     int Value2[4][4];
     int Value3[2][2];
-    
+
     const Position& pos;
     Material::Entry* me;
     Pawns::Entry* pe;
@@ -780,11 +780,11 @@ namespace {
 
   template<Tracing T>
   Value Evaluation<T>::complex_eval() {
-      
+
       static constexpr int pieceMap[PIECE_NB] = {0, 1, 2, 3, 4, 5, 6, 0, 0, 7, 8, 9, 10, 11, 12, 0};
 
       int v = 0;
-      
+
       auto func = [&](int x) -> int { return std::max(x, 0); };
 
       for (File f = FILE_B; f < FILE_H; ++f)
@@ -804,9 +804,9 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += Weight2[3*f2+r2+5] * Value1[f+f2][r+r2];
-              Value2[f-1][r-1] = func(sum / Scale);
+              Value2[f-1][r-1] = func(sum);
           }
-          
+
       for (int f = 1; f < 3; ++f)
           for (int r = 1; r < 3; ++r)
           {
@@ -814,7 +814,7 @@ namespace {
               for (int f2 = -1; f2 <= 1; ++f2)
                   for (int r2 = -1; r2 <= 1; ++r2)
                       sum += Weight3[3*f2+r2+5] * Value2[f+f2][r+r2];
-              Value3[f-1][r-1] = func(sum / Scale);
+              Value3[f-1][r-1] = func(sum);
           }
 
       v =  Weight4[0]
@@ -823,7 +823,7 @@ namespace {
          + Weight4[3] * Value3[1][0]
          + Weight4[4] * Value3[1][1];
 
-      return Value(clamp(v / (Scale * Scale), -RANGE, RANGE));
+      return Value(clamp(v / Scale, -RANGE, RANGE));
   }
 
 
