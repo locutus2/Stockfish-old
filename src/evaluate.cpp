@@ -30,7 +30,7 @@
 #include "pawns.h"
 #include "thread.h"
 
-  constexpr int Scale = 128;
+  constexpr int Scale = 1;
   constexpr int RANGE = 256;
   constexpr int NW = 9;
   constexpr int NWP = 13;
