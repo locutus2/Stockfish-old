@@ -790,7 +790,7 @@ namespace {
 
       int v = 0;
       
-      auto func = [&](int x) -> int { return std::max(x, 0); };
+      auto func = [&](int x) -> int { return std::max(x, x / 4); };
 
       for (File f = FILE_B; f < FILE_H; ++f)
           for (Rank r = RANK_2; r < RANK_8; ++r)
