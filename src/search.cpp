@@ -455,6 +455,8 @@ void Thread::search() {
                   && Time.elapsed() > 3000)
                   sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
 
+              delta += delta / 4 + 5;
+
               // In case of failing low/high increase aspiration window and
               // re-search, otherwise exit the loop.
               if (bestValue <= alpha)
@@ -476,8 +478,6 @@ void Thread::search() {
                   ++rootMoves[pvIdx].bestMoveCount;
                   break;
               }
-
-              delta += delta / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
