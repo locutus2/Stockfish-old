@@ -89,7 +89,7 @@ constexpr Score Bonus[][RANK_NB][int(FILE_NB) / 2] = {
    { S( 64,  5), S( 87, 60), S( 49, 75), S(  0, 75) }
   }
 };
-constexpr int A = 2, B = 2;
+constexpr int A = 4, B = 4;
 constexpr Score PBonus[RANK_NB][FILE_NB] =
   { // Pawn (asymmetric distribution)
    { },
