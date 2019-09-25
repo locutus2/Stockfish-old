@@ -147,6 +147,15 @@ inline Bitboard file_bb(Square s) {
   return file_bb(file_of(s));
 }
 
+/// make_bitboard() returns a bitboard from a list of squares relative to given color
+
+template<Color Us>
+constexpr Bitboard make_bitboard() { return 0; }
+
+template<Color Us, typename ...Squares>
+constexpr Bitboard make_bitboard(Square s, Squares... squares) {
+  return square_bb(relative_square(Us, s)) | make_bitboard<Us>(squares...);
+}
 
 /// shift() moves a bitboard one step along direction D
 
