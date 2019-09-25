@@ -43,7 +43,7 @@ namespace {
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
   // King safety penalties
-  constexpr Score BlockedCenter = S(75, 0);
+  constexpr Score BlockedCenter = S(50, 0);
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
@@ -213,12 +213,12 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
   int count = 0;
 
   if (file_of(ksq) > FILE_E)
-      count = popcount(  (pos.pieces(Us,   PAWN) & (square_bb(relative_square(Us, SQ_D4)) | relative_square(Us, SQ_E3) | relative_square(Us, SQ_F2)))
-                       | (pos.pieces(Them, PAWN) & (square_bb(relative_square(Us, SQ_D5)) | relative_square(Us, SQ_E4))));
+      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_D4, SQ_E3))
+                       | (pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_D5, SQ_E4, SQ_G4)));
 
   else if (file_of(ksq) < FILE_D)
-      count = popcount(  (pos.pieces(Us,   PAWN) & (square_bb(relative_square(Us, SQ_E4)) | relative_square(Us, SQ_D3) | relative_square(Us, SQ_C2)))
-                       | (pos.pieces(Them, PAWN) & (square_bb(relative_square(Us, SQ_E5)) | relative_square(Us, SQ_D4))));
+      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_E4, SQ_D3))
+                       | (pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_E5, SQ_D4, SQ_B4)));
 
   if (count >= 5)
       bonus -= BlockedCenter;
