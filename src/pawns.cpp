@@ -213,11 +213,11 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
   int count = 0;
 
   if (file_of(ksq) > FILE_E)
-      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_D4, SQ_E3))
+      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_F2, SQ_E3))
                        | (pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_E4, SQ_G4)));
 
   else if (file_of(ksq) < FILE_D)
-      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_E4, SQ_D3))
+      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_C2, SQ_D3))
                        | (pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_D4, SQ_B4)));
 
   if (count >= 4)
