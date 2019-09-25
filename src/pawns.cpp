@@ -43,7 +43,7 @@ namespace {
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
   // King safety penalties
-  constexpr Score BlockedCenter = S(75, 0);
+  constexpr Score BlockedCenter = S(50, 50);
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
