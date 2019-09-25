@@ -42,6 +42,9 @@ namespace {
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
+  // King safety penalties
+  constexpr Score BlockedCenter = S(50, 0);
+
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
   constexpr Value ShelterStrength[int(FILE_NB) / 2][RANK_NB] = {
@@ -206,6 +209,19 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
       else
           bonus -= make_score(UnblockedStorm[d][theirRank], 0);
   }
+
+  int count = 0;
+
+  if (file_of(ksq) > FILE_E)
+      count = popcount(  (pos.pieces(Us,   PAWN) & (square_bb(relative_square(Us, SQ_D4)) | relative_square(Us, SQ_E3)))
+                       | (pos.pieces(Them, PAWN) & (square_bb(relative_square(Us, SQ_D5)) | relative_square(Us, SQ_E4))));
+
+  else if (file_of(ksq) < FILE_D)
+      count = popcount(  (pos.pieces(Us,   PAWN) & (square_bb(relative_square(Us, SQ_E4)) | relative_square(Us, SQ_D3)))
+                       | (pos.pieces(Them, PAWN) & (square_bb(relative_square(Us, SQ_E5)) | relative_square(Us, SQ_D4))));
+
+  if (count >= 4)
+      bonus -= BlockedCenter;
 
   return bonus;
 }
