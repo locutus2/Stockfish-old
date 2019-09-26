@@ -210,17 +210,17 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
           bonus -= make_score(UnblockedStorm[d][theirRank], 0);
   }
 
-  int count = 0;
+  int countUs = 0, countThem = 0;
 
   if (file_of(ksq) > FILE_E)
-      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_D4, SQ_E3, SQ_F2))
-                       | (pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_D5, SQ_E4)));
+      countUs   = popcount(pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_D4, SQ_E3, SQ_F2)),
+      countThem = popcount(pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_D5, SQ_E4));
 
   else if (file_of(ksq) < FILE_D)
-      count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_E4, SQ_D3, SQ_C2))
-                       | (pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_E5, SQ_D4)));
+      countUs   = popcount(pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_E4, SQ_D3, SQ_C2)),
+      countThem = popcount(pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_E5, SQ_D4));
 
-  bonus -= BlockedCenter * count * (count - 1) / 20;
+  bonus -= BlockedCenter * countThem * countUs / 6;
 
   return bonus;
 }
