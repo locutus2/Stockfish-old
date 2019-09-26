@@ -220,7 +220,7 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
       count = popcount(  (pos.pieces(Us,   PAWN) & make_bitboard<Us>(SQ_E4, SQ_D3, SQ_C2))
                        | (pos.pieces(Them, PAWN) & make_bitboard<Us>(SQ_E5, SQ_D4)));
 
-  bonus -= BlockedCenter * count * count;
+  bonus -= BlockedCenter * count * count * count / 5;
 
   return bonus;
 }
