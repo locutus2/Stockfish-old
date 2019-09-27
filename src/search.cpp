@@ -336,7 +336,10 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
-     (ss-i)->twoMovesHistory = (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
+  {
+     (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
+     (ss-i)->twoMovesHistory = &this->continuationHistory[two_pieces()][two_squares()]; // Use as sentinel;
+  }
   ss->pv = pv;
 
   bestValue = delta = alpha = -VALUE_INFINITE;
@@ -819,7 +822,7 @@ namespace {
         ss->currentMove = MOVE_NULL;
         ss->movedPiece = NO_PIECE;
         ss->continuationHistory = &thisThread->continuationHistory[NO_PIECE][0];
-        ss->twoMovesHistory = &thisThread->continuationHistory[(ss-1)->movedPiece][prevSq];
+        ss->twoMovesHistory = &thisThread->continuationHistory[two_pieces((ss-1)->movedPiece)][two_squares(prevSq)];
 
         pos.do_null_move(st);
 
@@ -1578,7 +1581,7 @@ moves_loop: // When in check, search starts from here
         if (is_ok((ss-i)->currentMove))
         {
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
-            (*(ss-i)->twoMovesHistory)[pc][to] << bonus / 8;
+            (*(ss-i)->twoMovesHistory)[pc][to] << bonus;
         }
   }
 

@@ -29,11 +29,12 @@
 #include "position.h"
 #include "types.h"
 
-constexpr int two_pieces(Piece a, Piece b) {
-    return int(a) ^ int(b);
+inline int two_pieces(Piece a = NO_PIECE, Piece b = NO_PIECE) {
+    static const int index[3] = { W_KING+1, W_KING+2, B_KING+1 };
+    return index[(int(a) ^ int(b)) % 3];
 }
 
-constexpr int two_squares(Square a, Square b) {
+constexpr int two_squares(Square a = SQ_A1, Square b = SQ_A1) {
     return int(a) ^ int(b);
 }
 
