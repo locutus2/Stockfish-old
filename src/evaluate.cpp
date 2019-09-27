@@ -293,7 +293,7 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         if (Pt == ROOK)
-            mob = (mob + 1) / 2 + popcount(b & mobilityArea[Us] & file_bb(s));
+            mob = (mob + popcount(b & mobilityArea[Us] & file_bb(s)) + 1) * 2 / 3;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
