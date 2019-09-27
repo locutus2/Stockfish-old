@@ -108,7 +108,7 @@ namespace {
 
   // RookOnFile[semiopen/open] contains bonuses for each rook when there is
   // no (friendly) pawn on the rook file.
-  constexpr Score RookOnFile[] = { S(17, 0), S(43, 21) };
+  constexpr Score RookOnFile[] = { S(21, 4), S(47, 25) };
 
   // ThreatByMinor/ByRook[attacked PieceType] contains bonuses according to
   // which piece type attacks which one. Attacks on lesser pieces which are
@@ -293,7 +293,7 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         if (Pt == ROOK)
-            mob = (mob + popcount(b & mobilityArea[Us] & file_bb(s)) + 1) * 2 / 3;
+            mob = (4 * mob + popcount(b & mobilityArea[Us] & file_bb(s)) + 2) * 2 / 9;
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
