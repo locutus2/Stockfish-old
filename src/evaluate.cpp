@@ -292,6 +292,9 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
+        if (Pt == ROOK)
+            mob = (mob + 1) / 2 + popcount(b & mobilityArea[Us] & file_bb(s));
+
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         if (Pt == BISHOP || Pt == KNIGHT)
