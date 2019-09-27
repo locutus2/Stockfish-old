@@ -29,6 +29,14 @@
 #include "position.h"
 #include "types.h"
 
+constexpr int two_pieces(Piece a, Piece b) {
+    return int(a) ^ int(b);
+}
+
+constexpr int two_squares(Square a, Square b) {
+    return int(a) ^ int(b);
+}
+
 /// StatsEntry stores the stat table value. It is usually a number but could
 /// be a move or even a nested history. We use a class instead of naked value
 /// to directly call history update operator<<() on the entry so to use stats

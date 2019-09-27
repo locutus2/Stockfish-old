@@ -336,7 +336,7 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
-     (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
+     (ss-i)->twoMovesHistory = (ss-i)->continuationHistory = &this->continuationHistory[NO_PIECE][0]; // Use as sentinel
   ss->pv = pv;
 
   bestValue = delta = alpha = -VALUE_INFINITE;
@@ -817,7 +817,9 @@ namespace {
         Depth R = ((835 + 70 * depth / ONE_PLY) / 256 + std::min(int(eval - beta) / 185, 3)) * ONE_PLY;
 
         ss->currentMove = MOVE_NULL;
+        ss->movedPiece = NO_PIECE;
         ss->continuationHistory = &thisThread->continuationHistory[NO_PIECE][0];
+        ss->twoMovesHistory = &thisThread->continuationHistory[(ss-1)->movedPiece][prevSq];
 
         pos.do_null_move(st);
 
@@ -868,7 +870,9 @@ namespace {
                 probCutCount++;
 
                 ss->currentMove = move;
+                ss->movedPiece = pos.moved_piece(move);
                 ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)];
+                ss->twoMovesHistory = &thisThread->continuationHistory[two_pieces((ss-1)->movedPiece, pos.moved_piece(move))][two_squares(prevSq, to_sq(move))];
 
                 assert(depth >= 5 * ONE_PLY);
 
@@ -1070,7 +1074,9 @@ moves_loop: // When in check, search starts from here
 
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
+      ss->movedPiece = movedPiece;
       ss->continuationHistory = &thisThread->continuationHistory[movedPiece][to_sq(move)];
+      ss->twoMovesHistory = &thisThread->continuationHistory[two_pieces((ss-1)->movedPiece, movedPiece)][two_squares(prevSq, to_sq(move))];
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1477,7 +1483,9 @@ moves_loop: // When in check, search starts from here
       }
 
       ss->currentMove = move;
+      ss->movedPiece = pos.moved_piece(move);
       ss->continuationHistory = &thisThread->continuationHistory[pos.moved_piece(move)][to_sq(move)];
+      ss->twoMovesHistory = &thisThread->continuationHistory[two_pieces((ss-1)->movedPiece, pos.moved_piece(move))][two_squares(to_sq((ss-1)->currentMove), to_sq(move))];
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
