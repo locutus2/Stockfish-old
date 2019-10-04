@@ -30,8 +30,7 @@
 /// move       16 bit
 /// value      16 bit
 /// eval value 16 bit
-/// generation  5 bit
-/// pv node     1 bit
+/// generation  6 bit
 /// bound type  2 bit
 /// depth       8 bit
 
@@ -41,9 +40,8 @@ struct TTEntry {
   Value value() const { return (Value)value16; }
   Value eval()  const { return (Value)eval16; }
   Depth depth() const { return (Depth)(depth8 * int(ONE_PLY)) + DEPTH_OFFSET; }
-  bool is_pv() const { return (bool)(genBound8 & 0x4); }
   Bound bound() const { return (Bound)(genBound8 & 0x3); }
-  void save(Key k, Value v, bool pv, Bound b, Depth d, Move m, Value ev);
+  void save(Key k, Value v, Bound b, Depth d, Move m, Value ev);
 
 private:
   friend class TranspositionTable;
@@ -78,10 +76,10 @@ class TranspositionTable {
 
 public:
  ~TranspositionTable() { free(mem); }
-  void new_search() { generation8 += 8; } // Lower 3 bits are used by PV flag and Bound
+  void new_search() { generation8 += 4; } // Lower 2 bits are used by Bound
   TTEntry* probe(const Key key, bool& found) const;
   int hashfull() const;
-  void resize(size_t mbSize);
+  void resize(size_t kbSize);
   void clear();
 
   // The 32 lowest order bits of the key are used to get the index of the cluster
@@ -98,6 +96,6 @@ private:
   uint8_t generation8; // Size must be not bigger than TTEntry::genBound8
 };
 
-extern TranspositionTable TT;
+extern TranspositionTable TT[2];
 
 #endif // #ifndef TT_H_INCLUDED

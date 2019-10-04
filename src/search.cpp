@@ -202,7 +202,8 @@ void Search::clear() {
   Threads.main()->wait_for_search_finished();
 
   Time.availableNodes = 0;
-  TT.clear();
+  TT[0].clear();
+  TT[1].clear();
   Threads.clear();
   Tablebases::init(Options["SyzygyPath"]); // Free mapped files
 }
@@ -222,7 +223,8 @@ void MainThread::search() {
 
   Color us = rootPos.side_to_move();
   Time.init(Limits, us, rootPos.game_ply());
-  TT.new_search();
+  TT[0].new_search();
+  TT[1].new_search();
 
   if (rootMoves.empty())
   {
@@ -595,7 +597,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, ttPv, inCheck, givesCheck, improving, doLMR;
+    bool ttHit, inCheck, givesCheck, improving, doLMR;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, singularLMR;
@@ -659,11 +661,10 @@ namespace {
     // position key in case of an excluded move.
     excludedMove = ss->excludedMove;
     posKey = pos.key() ^ Key(excludedMove << 16); // Isn't a very good hash
-    tte = TT.probe(posKey, ttHit);
+    tte = TT[PvNode].probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
-    ttPv = PvNode || (ttHit && tte->is_pv());
 
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
@@ -729,7 +730,7 @@ namespace {
                 if (    b == BOUND_EXACT
                     || (b == BOUND_LOWER ? value >= beta : value <= alpha))
                 {
-                    tte->save(posKey, value_to_tt(value, ss->ply), ttPv, b,
+                    tte->save(posKey, value_to_tt(value, ss->ply), b,
                               std::min(DEPTH_MAX - ONE_PLY, depth + 6 * ONE_PLY),
                               MOVE_NONE, VALUE_NONE);
 
@@ -780,7 +781,7 @@ namespace {
         else
             ss->staticEval = eval = -(ss-1)->staticEval + 2 * Eval::Tempo;
 
-        tte->save(posKey, VALUE_NONE, ttPv, BOUND_NONE, DEPTH_NONE, MOVE_NONE, eval);
+        tte->save(posKey, VALUE_NONE, BOUND_NONE, DEPTH_NONE, MOVE_NONE, eval);
     }
 
     // Step 7. Razoring (~2 Elo)
@@ -892,7 +893,7 @@ namespace {
     {
         search<NT>(pos, ss, alpha, beta, depth - 7 * ONE_PLY, cutNode);
 
-        tte = TT.probe(posKey, ttHit);
+        tte = TT[PvNode].probe(posKey, ttHit);
         ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
         ttMove = ttHit ? tte->move() : MOVE_NONE;
     }
@@ -1058,7 +1059,7 @@ moves_loop: // When in check, search starts from here
       }
 
       // Speculative prefetch as early as possible
-      prefetch(TT.first_entry(pos.key_after(move)));
+      prefetch(TT[PvNode].first_entry(pos.key_after(move)));
 
       // Check for legality just before making the move
       if (!rootNode && !pos.legal(move))
@@ -1091,7 +1092,7 @@ moves_loop: // When in check, search starts from here
               r += ONE_PLY;
 
           // Decrease reduction if position is or has been on the PV
-          if (ttPv)
+          if (PvNode)
               r -= 2 * ONE_PLY;
 
           // Decrease reduction if opponent's move count is high (~10 Elo)
@@ -1295,7 +1296,7 @@ moves_loop: // When in check, search starts from here
         bestValue = std::min(bestValue, maxValue);
 
     if (!excludedMove)
-        tte->save(posKey, value_to_tt(bestValue, ss->ply), ttPv,
+        tte->save(posKey, value_to_tt(bestValue, ss->ply),
                   bestValue >= beta ? BOUND_LOWER :
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
                   depth, bestMove, ss->staticEval);
@@ -1325,7 +1326,7 @@ moves_loop: // When in check, search starts from here
     Move ttMove, move, bestMove;
     Depth ttDepth;
     Value bestValue, value, ttValue, futilityValue, futilityBase, oldAlpha;
-    bool ttHit, pvHit, inCheck, givesCheck, evasionPrunable;
+    bool ttHit, inCheck, givesCheck, evasionPrunable;
     int moveCount;
 
     if (PvNode)
@@ -1355,10 +1356,9 @@ moves_loop: // When in check, search starts from here
                                                   : DEPTH_QS_NO_CHECKS;
     // Transposition table lookup
     posKey = pos.key();
-    tte = TT.probe(posKey, ttHit);
+    tte = TT[PvNode].probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply) : VALUE_NONE;
     ttMove = ttHit ? tte->move() : MOVE_NONE;
-    pvHit = ttHit && tte->is_pv();
 
     if (  !PvNode
         && ttHit
@@ -1396,7 +1396,7 @@ moves_loop: // When in check, search starts from here
         if (bestValue >= beta)
         {
             if (!ttHit)
-                tte->save(posKey, value_to_tt(bestValue, ss->ply), pvHit, BOUND_LOWER,
+                tte->save(posKey, value_to_tt(bestValue, ss->ply), BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval);
 
             return bestValue;
@@ -1466,7 +1466,7 @@ moves_loop: // When in check, search starts from here
           continue;
 
       // Speculative prefetch as early as possible
-      prefetch(TT.first_entry(pos.key_after(move)));
+      prefetch(TT[PvNode].first_entry(pos.key_after(move)));
 
       // Check for legality just before making the move
       if (!pos.legal(move))
@@ -1510,7 +1510,7 @@ moves_loop: // When in check, search starts from here
     if (inCheck && bestValue == -VALUE_INFINITE)
         return mated_in(ss->ply); // Plies to mate from the root
 
-    tte->save(posKey, value_to_tt(bestValue, ss->ply), pvHit,
+    tte->save(posKey, value_to_tt(bestValue, ss->ply),
               bestValue >= beta ? BOUND_LOWER :
               PvNode && bestValue > oldAlpha  ? BOUND_EXACT : BOUND_UPPER,
               ttDepth, bestMove, ss->staticEval);
@@ -1732,7 +1732,7 @@ string UCI::pv(const Position& pos, Depth depth, Value alpha, Value beta) {
          << " nps "      << nodesSearched * 1000 / elapsed;
 
       if (elapsed > 1000) // Earlier makes little sense
-          ss << " hashfull " << TT.hashfull();
+          ss << " hashfull " << TT[0].hashfull();
 
       ss << " tbhits "   << tbHits
          << " time "     << elapsed
@@ -1762,7 +1762,10 @@ bool RootMove::extract_ponder_from_tt(Position& pos) {
         return false;
 
     pos.do_move(pv[0], st);
-    TTEntry* tte = TT.probe(pos.key(), ttHit);
+    TTEntry* tte = TT[1].probe(pos.key(), ttHit);
+
+    if (!ttHit)
+        tte = TT[0].probe(pos.key(), ttHit);
 
     if (ttHit)
     {
