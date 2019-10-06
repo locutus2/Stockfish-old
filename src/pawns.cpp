@@ -133,7 +133,7 @@ namespace {
 
         // Passed pawns will be properly scored later in evaluation when we have
         // full attack info.
-        if (passed)
+        if (passed && (neighbours || !(ourPawns & forward_file_bb(Us, s))))
             e->passedPawns[Us] |= s;
 
         // Score this pawn
