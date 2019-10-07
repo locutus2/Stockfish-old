@@ -812,7 +812,7 @@ namespace {
 
     score += mobility[WHITE] - mobility[BLACK];
 
-    score +=  (king<   WHITE>() - king<   BLACK>()) * (blockedCenter ? 17 : 16) / 16
+    score +=  (king<   WHITE>() - king<   BLACK>()) * (blockedCenter ? 33 : 32) / 32
             + threats<WHITE>() - threats<BLACK>()
             + passed< WHITE>() - passed< BLACK>()
             + space<  WHITE>() - space<  BLACK>();
