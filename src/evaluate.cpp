@@ -88,7 +88,7 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-  constexpr Score MN = S(5,5);
+  constexpr Score MN = S(-5,-5);
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
