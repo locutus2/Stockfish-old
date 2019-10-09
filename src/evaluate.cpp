@@ -728,7 +728,7 @@ namespace {
 
     int complexity_mg =  complexity_eg
                        + mg_value(kingSafety[WHITE] + kingSafety[BLACK]) / 16
-                       + 50;
+                       + 80;
 
     // Now apply the bonus: note that we find the attacking side by extracting the
     // sign of the midgame or endgame values, and that we carefully cap the bonus
