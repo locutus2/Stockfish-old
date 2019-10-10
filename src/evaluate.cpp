@@ -297,18 +297,6 @@ namespace {
         {
             // Bonus if piece is on an outpost square or can reach one
             bb = OutpostRanks & attackedBy[Us][PAWN] & ~pe->pawn_attacks_span(Them);
-            if (bb & s)
-                score += Outpost * (Pt == KNIGHT ? 2 : 1);
-
-            else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
-                score += Outpost;
-
-            // Knight and Bishop bonus for being right behind a pawn
-            if (shift<Down>(pos.pieces(PAWN)) & s)
-                score += MinorBehindPawn;
-
-            // Penalty if the piece is far from the king
-            score -= KingProtector * distance(s, pos.square<KING>(Us));
 
             if (Pt == BISHOP)
             {
@@ -322,7 +310,23 @@ namespace {
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
                     score += LongDiagonalBishop;
+
+                // Remove outpost square if a own blocked pawn in the next rank blocks the moves
+                bb &= ~pawn_attacks_bb<Them>(blocked);
             }
+
+            if (bb & s)
+                score += Outpost * (Pt == KNIGHT ? 2 : 1);
+
+            else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
+                score += Outpost;
+
+            // Knight and Bishop bonus for being right behind a pawn
+            if (shift<Down>(pos.pieces(PAWN)) & s)
+                score += MinorBehindPawn;
+
+            // Penalty if the piece is far from the king
+            score -= KingProtector * distance(s, pos.square<KING>(Us));
 
             // An important Chess960 pattern: A cornered bishop blocked by a friendly
             // pawn diagonally in front of it is a very serious problem, especially
