@@ -729,8 +729,8 @@ namespace {
     Color strongSide = mg > VALUE_ZERO ? WHITE : BLACK;
 
     int complexity_mg =  complexity_eg
-                       + mg_value(kingSafety[strongSide] - kingSafety[~strongSide]) / 8
-                       + 25;
+                       + mg_value(kingSafety[strongSide] - kingSafety[~strongSide]) / 16
+                       + 38;
 
     // Now apply the bonus: note that we find the attacking side by extracting the
     // sign of the midgame or endgame values, and that we carefully cap the bonus
