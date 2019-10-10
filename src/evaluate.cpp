@@ -813,6 +813,9 @@ namespace {
 
     score += initiative(score);
 
+    if (mg_value(score) * int(eg_value(score)) < 0)
+        score = make_score(0, eg_value(score));
+
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = scale_factor(eg_value(score));
     v =  mg_value(score) * int(me->game_phase())
