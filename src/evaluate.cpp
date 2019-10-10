@@ -312,7 +312,7 @@ namespace {
                     score += LongDiagonalBishop;
 
                 // Remove outpost square if a own blocked pawn in the next rank on the center files blocks the moves
-                bb &= ~pawn_attacks_bb<Them>(blocked & (FileDBB | FileEBB));
+                bb &= ~pawn_attacks_bb<Them>(blocked & CenterFiles);
             }
 
             if (bb & s)
