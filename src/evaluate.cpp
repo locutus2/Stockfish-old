@@ -134,6 +134,7 @@ namespace {
   constexpr Score KingProtector      = S(  7,  8);
   constexpr Score KnightOnQueen      = S( 16, 12);
   constexpr Score LongDiagonalBishop = S( 45,  0);
+  constexpr Score LongDiagonalNextBishop = S( 20,  0);
   constexpr Score MinorBehindPawn    = S( 18,  3);
   constexpr Score Outpost            = S( 32, 10);
   constexpr Score PassedFile         = S( 11,  8);
@@ -320,8 +321,14 @@ namespace {
                                      * (1 + popcount(blocked & CenterFiles));
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
-                if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
+                bb = attacks_bb<BISHOP>(s, pos.pieces(PAWN));
+                if (more_than_one(bb & Center))
                     score += LongDiagonalBishop;
+
+                // Bonus for bishop on a diagnal next to a long diagonal which can "see" two extended center squares
+                else if(   more_than_one(bb & (square_bb(SQ_E4) | SQ_F4 | SQ_E5 | SQ_F5))
+                        || more_than_one(bb & (square_bb(SQ_D4) | SQ_C4 | SQ_D5 | SQ_C5)))
+                    score += LongDiagonalNextBishop;
             }
 
             // An important Chess960 pattern: A cornered bishop blocked by a friendly
