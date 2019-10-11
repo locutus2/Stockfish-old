@@ -154,7 +154,7 @@ namespace {
   constexpr Score ComplexityPawnsOnBothFlanks = S(18, 18);
   constexpr Score ComplexityNoPieces          = S(49, 49);
   constexpr Score ComplexityUnwinnable        = S(36, 36);
-  constexpr Score ComplexityConstant          = S(59, 103);
+  constexpr Score ComplexityConstant          = S(47, 103);
 
 #undef S
 
