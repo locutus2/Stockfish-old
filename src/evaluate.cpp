@@ -259,6 +259,7 @@ namespace {
 
     constexpr Color     Them = (Us == WHITE ? BLACK : WHITE);
     constexpr Direction Down = (Us == WHITE ? SOUTH : NORTH);
+    constexpr Direction Up   = (Us == WHITE ? NORTH : SOUTH);
     constexpr Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
                                                    : Rank5BB | Rank4BB | Rank3BB);
     const Square* pl = pos.squares<Pt>(Us);
@@ -320,7 +321,7 @@ namespace {
                                      * (1 + popcount(blocked & CenterFiles));
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
-                if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
+                if ((shift<Up>(pos.pieces(Us, PAWN)) & s) && more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
                     score += LongDiagonalBishop;
             }
 
