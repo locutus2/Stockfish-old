@@ -42,6 +42,16 @@ namespace {
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
+  constexpr Score BishopPawns[SQUARE_NB] = {
+     S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0),
+     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
+     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
+     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
+     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
+     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
+     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7)
+  };
+
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
   constexpr Value ShelterStrength[int(FILE_NB) / 2][RANK_NB] = {
@@ -86,6 +96,7 @@ namespace {
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
     e->pawnAttacks[Us] = e->pawnAttacksSpan[Us] = pawn_attacks_bb<Us>(ourPawns);
+    e->pawnsOnSameColorSquaresScore[Us][WHITE] = e->pawnsOnSameColorSquaresScore[Us][BLACK] = SCORE_ZERO;
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
@@ -93,6 +104,8 @@ namespace {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
         Rank r = relative_rank(Us, s);
+
+        e->pawnsOnSameColorSquaresScore[Us][DarkSquares & s ? BLACK : WHITE] += BishopPawns[s];
 
         // Flag the pawn
         opposed    = theirPawns & forward_file_bb(Us, s);
