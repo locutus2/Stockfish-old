@@ -42,15 +42,18 @@ namespace {
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
-  constexpr Score BishopPawns[SQUARE_NB] = {
-     S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0), S(0, 0),
-     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
-     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
-     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
-     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
-     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7),
-     S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7), S(3, 7)
+  Score BishopPawns[int(FILE_NB) / 2][RANK_NB-2] = {
+     { S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56) },
+     { S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56) },
+     { S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56) },
+     { S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56), S(24, 56) }
   };
+
+  Range centerRange(int v) {
+      return Range(v - 160, v + 160);
+  }
+
+  TUNE(SetRange(centerRange), BishopPawns);
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
@@ -105,7 +108,7 @@ namespace {
 
         Rank r = relative_rank(Us, s);
 
-        e->pawnsOnSameColorSquaresScore[Us][DarkSquares & s ? BLACK : WHITE] += BishopPawns[s];
+        e->pawnsOnSameColorSquaresScore[Us][DarkSquares & s ? BLACK : WHITE] += BishopPawns[map_to_queenside(file_of(s))][r-1];
 
         // Flag the pawn
         opposed    = theirPawns & forward_file_bb(Us, s);
