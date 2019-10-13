@@ -325,9 +325,9 @@ namespace {
                 if (more_than_one(bb & Center))
                     score += LongDiagonalBishop;
 
-                // Bonus for bishop on a diagnal next to a long diagonal which can "see" two extended center squares
-                else if(   more_than_one(bb & (square_bb(SQ_E4) | SQ_F4 | SQ_E5 | SQ_F5))
-                        || more_than_one(bb & (square_bb(SQ_D4) | SQ_C4 | SQ_D5 | SQ_C5)))
+                // Bonus for bishop on a diagnal next to a long diagonal which can "see" the advanced center squares
+                else if(more_than_one(bb & (square_bb(relative_square(Us, SQ_D5)) | relative_square(Us, SQ_E5)
+                                                    | relative_square(Us, SQ_D6)  | relative_square(Us, SQ_E6))))
                     score += LongDiagonalNextBishop;
             }
 
