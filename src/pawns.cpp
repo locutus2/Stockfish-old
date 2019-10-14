@@ -42,10 +42,10 @@ namespace {
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
-  constexpr int A = 0, B = 2, C = 0, D = -6;
+  constexpr int A = 0, B = 1, C = 0, D = 0;
   constexpr Score BishopPawnsBase = S(24 + C, 56 + D);
   constexpr Score BishopPawnsFile = S( A,  B);
-  constexpr Score BishopPawnsRank = S( 0,  0);
+  //constexpr Score BishopPawnsRank = S( 0,  0);
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
@@ -101,8 +101,8 @@ namespace {
         Rank r = relative_rank(Us, s);
 
         e->pawnsOnSameColorSquaresScore[Us][DarkSquares & s ? BLACK : WHITE] +=  BishopPawnsBase
-                                                                               + BishopPawnsFile * map_to_queenside(file_of(s))
-                                                                               + BishopPawnsRank * r;
+                                                                               + BishopPawnsFile * map_to_queenside(file_of(s));
+                                                                               //+ BishopPawnsRank * r;
 
         // Flag the pawn
         opposed    = theirPawns & forward_file_bb(Us, s);
