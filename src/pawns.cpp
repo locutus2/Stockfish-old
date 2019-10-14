@@ -42,13 +42,10 @@ namespace {
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
-  // Penalty for pawn on the same color as a bishop
-  constexpr Score BishopPawns[int(FILE_NB) / 2][RANK_NB-2] = {
-     { S(19, 53), S( 7, 41), S( 9, 39), S(24, 70), S(30, 70), S( 6, 43) },
-     { S(20, 59), S(34, 59), S(10, 82), S( 6, 45), S(17, 64), S(35, 54) },
-     { S(27, 47), S(19, 72), S(30, 70), S(17, 68), S(13, 61), S( 0, 66) },
-     { S(12, 45), S(35, 45), S(20, 66), S(24, 57), S(11, 33), S(14, 59) }
-  };
+  constexpr int A = 1, B = 0, C = -3, D = 0;
+  constexpr Score BishopPawnsBase = S(24 + C, 56 + D);
+  constexpr Score BishopPawnsFile = S( A,  B);
+  constexpr Score BishopPawnsRank = S( 0,  0);
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
@@ -103,7 +100,9 @@ namespace {
 
         Rank r = relative_rank(Us, s);
 
-        e->pawnsOnSameColorSquaresScore[Us][DarkSquares & s ? BLACK : WHITE] += BishopPawns[map_to_queenside(file_of(s))][r-1];
+        e->pawnsOnSameColorSquaresScore[Us][DarkSquares & s ? BLACK : WHITE] +=  BishopPawnsBase
+                                                                               + BishopPawnsFile * map_to_queenside(file_of(s))
+                                                                               + BishopPawnsRank * r;
 
         // Flag the pawn
         opposed    = theirPawns & forward_file_bb(Us, s);
