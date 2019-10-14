@@ -42,7 +42,7 @@ namespace {
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
-  constexpr int A = 1, B = 0, C = -3, D = 0;
+  constexpr int A = 0, B = 1, C = 0, D = -3;
   constexpr Score BishopPawnsBase = S(24 + C, 56 + D);
   constexpr Score BishopPawnsFile = S( A,  B);
   constexpr Score BishopPawnsRank = S( 0,  0);
