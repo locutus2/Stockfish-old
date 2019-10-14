@@ -42,10 +42,10 @@ namespace {
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
-  constexpr int A = 0, B = 1, C = 0, D = -3;
+  constexpr int A = 0, B = 0, C = 4, D = 0, E = -1, F = 0;
   constexpr Score BishopPawnsBase = S(24 + C, 56 + D);
   constexpr Score BishopPawnsFile = S( A,  B);
-  constexpr Score BishopPawnsRank = S( 0,  0);
+  constexpr Score BishopPawnsRank = S( E,  F);
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
