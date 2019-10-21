@@ -420,6 +420,9 @@ namespace {
     if (queenChecks)
         kingDanger += QueenSafeCheck;
 
+    // For minors consider also squares which twice defened and only attacked by a rook as safe
+    safe |= ~pos.pieces(Them) & attackedBy2[Them] & ~attackedBy2[Us] & attackedBy[Us][ROOK];
+
     // Enemy bishops checks: we count them only if they are from squares from
     // which we can't give a queen check, because queen checks are more valuable.
     bishopChecks =  b2
