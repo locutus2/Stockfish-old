@@ -84,7 +84,7 @@ namespace {
   constexpr int QueenSafeCheck  = 780;
   constexpr int RookSafeCheck   = 1080;
   constexpr int BishopSafeCheck = 635;
-  constexpr int KnightSafeCheck = 790;
+  constexpr int KnightSafeCheck = 721;
 
 #define S(mg, eg) make_score(mg, eg)
 
@@ -429,14 +429,15 @@ namespace {
 
     if (bishopChecks)
         kingDanger += BishopSafeCheck;
-    unsafeChecks |= b2 & attackedBy[Them][BISHOP] & ~bishopChecks;
+    else
+        unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
     // Enemy knights checks
-    knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
+    knightChecks  = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
+    unsafeChecks |= knightChecks & ~safe;
 
     if (knightChecks & safe)
         kingDanger += KnightSafeCheck;
-    unsafeChecks |= knightChecks & ~safe;
 
     // Find the squares that opponent attacks in our king flank, and the squares
     // which are attacked twice in that flank.
