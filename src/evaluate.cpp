@@ -451,7 +451,7 @@ namespace {
                  + 185 * popcount(kingRing[Us] & weak)
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -  35 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + 148 * popcount(unsafeChecks)
+                 + 106 * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
                  - 873 * !pos.count<QUEEN>(Them)
                  -   6 * mg_value(score) / 8
