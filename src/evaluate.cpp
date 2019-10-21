@@ -406,7 +406,8 @@ namespace {
 
     if (rookChecks)
         kingDanger += RookSafeCheck;
-    unsafeChecks |= b1 & attackedBy[Them][ROOK] & ~rookChecks;
+    else
+        unsafeChecks |= b1 & attackedBy[Them][ROOK];
 
     // Enemy queen safe checks: we count them only if they are from squares from
     // which we can't give a rook check, because rook checks are more valuable.
@@ -436,8 +437,7 @@ namespace {
 
     if (knightChecks & safe)
         kingDanger += KnightSafeCheck;
-    else
-        unsafeChecks |= knightChecks;
+    unsafeChecks |= knightChecks & ~safe;
 
     // Find the squares that opponent attacks in our king flank, and the squares
     // which are attacked twice in that flank.
@@ -451,7 +451,7 @@ namespace {
                  + 185 * popcount(kingRing[Us] & weak)
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -  35 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 + 106 * popcount(unsafeChecks)
+                 + 143 * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
                  - 873 * !pos.count<QUEEN>(Them)
                  -   6 * mg_value(score) / 8
