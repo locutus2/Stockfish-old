@@ -429,15 +429,15 @@ namespace {
 
     if (bishopChecks)
         kingDanger += BishopSafeCheck;
-    unsafeChecks |= b2 & attackedBy[Them][BISHOP] & ~bishopChecks;
+    else
+        unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
     // Enemy knights checks
     knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
 
     if (knightChecks & safe)
         kingDanger += KnightSafeCheck;
-    else
-        unsafeChecks |= knightChecks;
+    unsafeChecks |= knightChecks & ~safe;
 
     // Find the squares that opponent attacks in our king flank, and the squares
     // which are attacked twice in that flank.
