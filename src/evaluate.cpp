@@ -149,7 +149,7 @@ namespace {
 
   // Complexity bonuses and penalties
   constexpr Score ComplexityPasser            = S( 9,   9);
-  constexpr Score ComplexityPawnCount         = S( 0,  11);
+  constexpr Score ComplexityPawnCount         = S(22,  11);
   constexpr Score ComplexityOutflanking       = S( 9,   9);
   constexpr Score ComplexityPawnsOnBothFlanks = S(18,  18);
   constexpr Score ComplexityNoPieces          = S(49,  49);
