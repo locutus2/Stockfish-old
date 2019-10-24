@@ -151,9 +151,9 @@ namespace {
   constexpr Score ComplexityPasser            = S(9, 9);
   constexpr Score ComplexityPawnCount         = S(11, 11);
   constexpr Score ComplexityOutflanking       = S(9, 9);
-  constexpr Score ComplexityPawnsOnBothFlanks = S(18, 18);
+  constexpr Score ComplexityPawnsOnBothFlanks = S(0, 18);
   constexpr Score ComplexityNoPieces          = S(49, 49);
-  constexpr Score ComplexityUnwinnable        = S(72, 36);
+  constexpr Score ComplexityUnwinnable        = S(36, 36);
   constexpr Score ComplexityConstant          = S(53, 103);
 
 #undef S
