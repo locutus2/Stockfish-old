@@ -128,7 +128,7 @@ namespace {
 
   // BishopPawns[Rank] contains a pawn penalty according to the rank of a bishop
   constexpr Score BishopPawns[RANK_NB] = {
-    S(2, 7), S(2, 10), S(2, 7), S(1, 7), S(2, 4), S(10, 5), S(2, 6), S(6, 11)
+    S(2, 8), S(2, 11), S(1, 9), S(1, 6), S(1, 3), S(2, 6), S(2, 4), S(0, 7)
   };
 
   // Assorted bonuses and penalties
