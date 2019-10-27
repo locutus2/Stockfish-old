@@ -317,7 +317,7 @@ namespace {
                 int blockedCenter = 1 + popcount(blocked & CenterFiles);
                 int weight = pos.pawns_on_same_color_squares(Us, s) * blockedCenter * (32 - blockedCenter);
 
-                score -= make_score( 3 * weight / 32, 7 * weight / 32);
+                score -= make_score(weight / 9, weight / 4);
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
