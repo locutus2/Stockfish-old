@@ -314,10 +314,13 @@ namespace {
             {
                 // Penalty according to number of pawns on the same color square as the
                 // bishop, bigger when the center files are blocked with pawns.
-                Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces());
+                int bishopPawns = pos.pawns_on_same_color_squares(Us, s);
 
-                score -= BishopPawns * pos.pawns_on_same_color_squares(Us, s)
-                                     * (1 + popcount(blocked & CenterFiles));
+                if (bishopPawns > 1)
+                {
+                    Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces());
+                    score -= BishopPawns * bishopPawns * (1 + popcount(blocked & CenterFiles));
+                }
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
