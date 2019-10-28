@@ -316,7 +316,7 @@ namespace {
                 // bishop, bigger when the center files are blocked with pawns.
                 int bishopPawns = pos.pawns_on_same_color_squares(Us, s);
 
-                if (bishopPawns > 1)
+                if (bishopPawns > 2)
                 {
                     Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces());
                     score -= BishopPawns * bishopPawns * (1 + popcount(blocked & CenterFiles));
