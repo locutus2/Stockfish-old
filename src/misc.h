@@ -33,9 +33,13 @@ const std::string engine_info(bool to_uci = false);
 void prefetch(void* addr);
 void start_logger(const std::string& fname);
 
-void dbg_hit_on(bool b);
-void dbg_hit_on(bool c, bool b);
-void dbg_mean_of(int v);
+void dbg_hit_on(bool b, int n = 0);
+void dbg_hit_on(bool c, bool b, int n = 0);
+void dbg_mean_of(int v, int n = 0);
+void dbg_std_of(int v, int n = 0);
+void dbg_cov_of(int v, int w, int n = 0);
+void dbg_corr_of(int v, int w, int n = 0);
+void dbg_cramer_of(bool v, bool w, int n = 0);
 void dbg_print();
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
