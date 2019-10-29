@@ -1079,6 +1079,35 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false;
+      bool C = givesCheck;
+      bool failHigh = false;
+
+ /*
+            =>CC=true
+            [0] Total 57617527 CramersV(x,y) = 0.564676 error% =6.20159
+            C=givesCheck
+[10] Total 57617527 CramersV(x,y) = -0.0238196 error% =77.4325
+[11] Total 57617527 CramersV(x,y) = 0.0238196 error% =22.5675
+
+            C=captureOrPromotion
+[10] Total 57617527 CramersV(x,y) = 0.0703629 error% =75.9522
+[11] Total 57617527 CramersV(x,y) = -0.0703629 error% =24.0478
+
+            C=inCheck
+            [10] Total 57617527 CramersV(x,y) = -0.056631 error% =87.8216
+[11] Total 57617527 CramersV(x,y) = 0.056631 error% =12.1784
+
+            ---------------------
+            =>
+            CC=failHigh
+            [0] Total 1937430 CramersV(x,y) = nan error% =38.8592
+            C=givesCheck
+[10] Total 1937430 CramersV(x,y) = 0.10799 error% =38.9933
+[11] Total 1937430 CramersV(x,y) = -0.10799 error% =61.0067
+
+            */
+
       // Step 16. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1152,7 +1181,9 @@ moves_loop: // When in check, search starts from here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          doFullDepthSearch = (value > alpha && d != newDepth), didLMR = true;
+          failHigh = value > alpha;
+          CC = failHigh;
+          doFullDepthSearch = ((CC || value > alpha) && d != newDepth), didLMR = true;
       }
       else
           doFullDepthSearch = !PvNode || moveCount > 1, didLMR = false;
@@ -1162,6 +1193,12 @@ moves_loop: // When in check, search starts from here
       {
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode);
 
+          if(CC)
+          {
+            dbg_cramer_of(failHigh, value > alpha, 0);
+            dbg_cramer_of(C, value > alpha, 11);
+            dbg_cramer_of(!C, value > alpha, 10);
+          }
           if (didLMR && !captureOrPromotion)
           {
               int bonus = value > alpha ?  stat_bonus(newDepth)
