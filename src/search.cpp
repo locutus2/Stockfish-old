@@ -313,6 +313,13 @@ void MainThread::search() {
   std::cout << sync_endl;
 }
 
+ constexpr int N2DO = 0;
+ constexpr int NB = 2;//12;
+ constexpr int NN = NB + int(N2DO)*(NB-1)*(NB-2)/2;
+      std::vector<double> NI;
+      double NW[NN];// = {0.329058, 0.284532};
+      double MSE = 0;
+      int NITER = 0;
 
 /// Thread::search() is the main iterative deepening loop. It calls search()
 /// repeatedly with increasing depth until the allocated thinking time has been
@@ -554,10 +561,20 @@ void Thread::search() {
   if (skill.enabled())
       std::swap(rootMoves[0], *std::find(rootMoves.begin(), rootMoves.end(),
                 skill.best ? skill.best : skill.pick_best(multiPV)));
+
+
+   std::cerr << "weights[iter=" << NITER << ",mse=" << (MSE/NITER) << "]:";
+   for(int i = 0; i < NN; ++i)
+   {
+      std::cerr << " " << NW[i];
+   }
+   std::cerr << std::endl;
 }
 
 
 namespace {
+
+ 
 
   // search<>() is the main search function for both PV and non-PV nodes
 
@@ -1080,8 +1097,11 @@ moves_loop: // When in check, search starts from here
       pos.do_move(move, st, givesCheck);
 
       bool CC = false;
-      bool C = givesCheck;
+      //bool C = givesCheck;
       bool failHigh = false;
+      
+      //NI = {true, givesCheck, inCheck, cutNode, PvNode, captureOrPromotion, bool(extension)};
+
 
  /*
             =>CC=true
@@ -1165,7 +1185,106 @@ moves_loop: // When in check, search starts from here
                   && (*contHist[1])[movedPiece][to_sq(move)] >= 0
                   && thisThread->mainHistory[us][from_to(move)] >= 0)
                   ss->statScore = 0;
+   
+   /*
+              double cc = 0.133837 * double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     + 0.129996 * double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     + 0.123216 * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     + 0.0402932 * double((*contHist[3])[movedPiece][to_sq(move)])/30000*/
+                     ;//+ 0.361447;
+                     /*
+              NI = {1, double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[5])[movedPiece][to_sq(move)])/30000 };
+                      */
+              //cc};
+              /*double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[3])[movedPiece][to_sq(move)])/30000
+                     ,double(thisThread->mainHistory[us][from_to(move)])/10000};
+                     */
+                     /*, givesCheck, inCheck, cutNode, PvNode, captureOrPromotion, bool(extension),
+                    thisThread->mainHistory[us][from_to(move)] > 0,
+                    (*contHist[0])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[1])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[3])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[5])[movedPiece][to_sq(move)] > 0};*/
 
+/*
+false => weights[iter=1835689,mse=0.943292]: 0.347117 0
+givesCheck => weights[iter=1835689,mse=0.933684]: 0.36129 -0.184824
+inCheck => weights[iter=1835689,mse=0.930242]: 0.329058 0.284532
+cutNode => weights[iter=1835689,mse=0.93711]: 0.399212 -0.0884134
+PvNode => weights[iter=1835689,mse=0.942776]: 0.348577 -0.253702
+captureOrPromotion => weights[iter=1835689,mse=0.943292]: 0.347117 0
+bool(extension) => weights[iter=1835689,mse=0.93335]: 0.359835 -0.21383
+thisThread->mainHistory[us][from_to(move)] > 0 => weights[iter=1835689,mse=0.942197]: 0.337475 0.0297046
+thisThread->mainHistory[us][from_to(move)]/10000 => weights[iter=1835689,mse=0.942867]: 0.349508 0.00569564
+(*contHist[0])[movedPiece][to_sq(move)] > 0 => weights[iter=1835689,mse=0.940442]: 0.314064 0.0574149
+(*contHist[0])[movedPiece][to_sq(move)]/30000 => weights[iter=1835689,mse=0.942228]: 0.343642 0.0907889
+(*contHist[1])[movedPiece][to_sq(move)] > 0 => weights[iter=1835689,mse=0.941016]: 0.331284 0.03268
+(*contHist[1])[movedPiece][to_sq(move)]/30000 => weights[iter=1835689,mse=0.940652]: 0.349689 0.121507
+(*contHist[3])[movedPiece][to_sq(move)] > 0 => weights[iter=1835689,mse=0.941737]: 0.334346 0.039758
+(*contHist[3])[movedPiece][to_sq(move)]/30000 => weights[iter=1835689,mse=0.941051]: 0.35967 0.12456
+(*contHist[5])[movedPiece][to_sq(move)] > 0 => weights[iter=1835689,mse=0.941982]: 0.336667 0.0439462
+(*contHist[5])[movedPiece][to_sq(move)]/30000 => weights[iter=1835689,mse=0.939471]: 0.364722 0.194686
+ss->statScore > 0 => weights[iter=1835689,mse=0.940886]: 0.320409 0.107359
+ss->statScore/60000 => weights[iter=1835689,mse=0.93946]: 0.373909 0.156714
+
+double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000 => weights[iter=1835689,mse=0.93781]: 0.364383 0.170493 0.0889894
+
+double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[3])[movedPiece][to_sq(move)])/30000 => weights[iter=1835689,mse=0.935839]: 0.361447 0.133837 0.129996 0.123216 0.0402932
+
+double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[3])[movedPiece][to_sq(move)])/30000
+                     ,double(thisThread->mainHistory[us][from_to(move)])/10000 => weights[iter=1835689,mse=0.935839]: 0.361447 0.133837 0.129996 0.123216 0.0402932
+
+cc => weights[iter=1835689,mse=0.940299]: 0.356208 0.652247
+
+double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[1])[movedPiece][to_sq(move)])/30000 => weights[iter=1835689,mse=0.937679]: 0.365107 0.168234 0.0785263 -0.107092
+
+double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000 => weights[iter=1835689,mse=0.935261]: 0.35326 0.153434 0.14846 0.119695 -0.115923 -0.149264 -0.326722
+
+double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[5])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[1])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                      * double((*contHist[5])[movedPiece][to_sq(move)])/30000 => weights[iter=1835689,mse=0.93526]: 0.353258 0.153837 0.148394 0.119528 -0.116138 -0.149207 -0.326288 0.0171649
+*/
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
               if (ss->statScore >= -99 && (ss-1)->statScore < -116)
                   r--;
@@ -1182,8 +1301,8 @@ moves_loop: // When in check, search starts from here
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
           failHigh = value > alpha;
-          CC = failHigh;
-          doFullDepthSearch = ((CC || value > alpha) && d != newDepth), didLMR = true;
+          CC = !captureOrPromotion && failHigh;
+          doFullDepthSearch = ((value > alpha) && d != newDepth), didLMR = true;
       }
       else
           doFullDepthSearch = !PvNode || moveCount > 1, didLMR = false;
@@ -1195,10 +1314,49 @@ moves_loop: // When in check, search starts from here
 
           if(CC)
           {
+          /*
             dbg_cramer_of(failHigh, value > alpha, 0);
             dbg_cramer_of(C, value > alpha, 11);
             dbg_cramer_of(!C, value > alpha, 10);
+            */
+            
+            NI = {1, double(rand()%8!=0 ? int(value <= alpha) : int(value > alpha))};
+
+            if(N2DO)
+            {
+              int index = NB;
+              for(int i = 1; i < NB-1; ++i)
+                  for(int j = i+1; j < NB; ++j)
+                      NI[index++] = NI[i] * NI[j];
+            }
+                    
+
+            double predict = 0;
+            for(int i = 0; i < NN; ++i)
+                predict += NI[i] * NW[i];
+
+            double output = value > alpha ? 1 : -1;
+            double error = predict - output;
+            MSE += std::pow(error, 2);
+
+            // output = sum(Input[i]*weight[i])
+            // d output/dw[i] = Input[i]
+            /*
+            weights[iter=1936235,mse=0.876716]: 0.516487 -0.0259656 0.107032 -0.292329 0.603042 0.0066394 0.470918
+
+Position: 1000/1000
+weights[iter=1937430,mse=0.876666]: 0.574229 -0.033703 0.0569408 -0.30651 0.603042 0.132123 0.485501
+
+            */
+
+            constexpr double ALPHA = 0.0001;
+            for(int i = 0; i < NN; ++i)
+                NW[i] -= ALPHA * NI[i] * error;
+
+            ++NITER;
+            //std::cerr << "iter=" << NITER << ",error=" << error << ",mse=" << (MSE/NITER) << std::endl;
           }
+       
           if (didLMR && !captureOrPromotion)
           {
               int bonus = value > alpha ?  stat_bonus(newDepth)
