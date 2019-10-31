@@ -31,6 +31,7 @@ class Position;
 
 extern double ALPHA;
 extern double MSE;
+extern double ACC;
 extern int NITER;
 
 void initLearnBatch();

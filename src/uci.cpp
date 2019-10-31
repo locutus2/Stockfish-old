@@ -194,6 +194,7 @@ namespace {
     ALPHA = USE_LR_DROP ? 0.01 : 0.001;
     bool noLRdrop = true;
     double oldLoss = 0, newLoss = 0;
+    double oldAcc = 0, newAcc = 0;
 
     constexpr double EPS = 1e-15;
 
@@ -213,7 +214,7 @@ namespace {
 
             if (token == "go")
             {
-                //cerr << "\nPosition: " << cnt++ << '/' << num << endl;
+                cerr << "\nPosition: " << cnt++ << '/' << num << endl;
                 go(pos, is, states);
                 Threads.main()->wait_for_search_finished();
                 nodes += Threads.nodes_searched();
@@ -222,6 +223,7 @@ namespace {
             else if (token == "position")   position(pos, is, states);
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
+        return;
 
         out << "--------------------------------------------" << std::endl;
         out << "Iter=" << iter << " ";
@@ -239,6 +241,7 @@ namespace {
             noLRdrop = false;
 
         oldLoss = newLoss;
+        oldAcc = newAcc;
         out << std::flush;
     }
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
