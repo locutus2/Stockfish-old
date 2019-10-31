@@ -29,6 +29,13 @@
 
 class Position;
 
+extern double ALPHA;
+extern double MSE;
+extern int NITER;
+
+void initLearnBatch();
+void printLearnBatch(std::ostream& out);
+
 namespace Search {
 
 /// Threshold used for countermoves based pruning

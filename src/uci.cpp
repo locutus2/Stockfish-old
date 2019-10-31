@@ -177,6 +177,80 @@ namespace {
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
 
+ void learn(Position& pos, istream& args, StateListPtr& states) {
+
+    string token;
+    uint64_t num, nodes = 0, cnt = 1;
+
+    vector<string> list = setup_bench(pos, args);
+    num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0; });
+
+    TimePoint elapsed = now();
+
+    std::ostream& out = std::cerr;
+
+    constexpr bool USE_LR_DROP = false;
+    int iter = 0;
+    ALPHA = USE_LR_DROP ? 0.01 : 0.001;
+    bool noLRdrop = true;
+    double oldLoss = 0, newLoss = 0;
+
+    constexpr double EPS = 1e-15;
+
+    out << "=> initial ALPHA=" << ALPHA << std::endl;
+
+    while(ALPHA > EPS)
+    {
+        ++iter;
+        cnt = 1;
+
+        initLearnBatch();
+
+        for (const auto& cmd : list)
+        {
+            istringstream is(cmd);
+            is >> skipws >> token;
+
+            if (token == "go")
+            {
+                //cerr << "\nPosition: " << cnt++ << '/' << num << endl;
+                go(pos, is, states);
+                Threads.main()->wait_for_search_finished();
+                nodes += Threads.nodes_searched();
+            }
+            else if (token == "setoption")  setoption(is);
+            else if (token == "position")   position(pos, is, states);
+            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+        }
+
+        out << "--------------------------------------------" << std::endl;
+        out << "Iter=" << iter << " ";
+        printLearnBatch(out);
+        
+        newLoss = MSE/NITER;
+
+        if(USE_LR_DROP && !noLRdrop && (oldLoss-newLoss)/oldLoss < EPS)
+        {
+            noLRdrop = true;
+            ALPHA /= 10;
+            out << "=> LR drop: ALPHA=" << ALPHA << std::endl;
+        }
+        else
+            noLRdrop = false;
+
+        oldLoss = newLoss;
+        out << std::flush;
+    }
+    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
+
+    dbg_print(); // Just before exiting
+
+    cerr << "\n==========================="
+         << "\nTotal time (ms) : " << elapsed
+         << "\nNodes searched  : " << nodes
+         << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+  }
+
 } // namespace
 
 
@@ -232,6 +306,7 @@ void UCI::loop(int argc, char* argv[]) {
       // Do not use these commands during a search!
       else if (token == "flip")  pos.flip();
       else if (token == "bench") bench(pos, is, states);
+      else if (token == "learn") learn(pos, is, states);
       else if (token == "d")     sync_cout << pos << sync_endl;
       else if (token == "eval")  sync_cout << Eval::trace(pos) << sync_endl;
       else
