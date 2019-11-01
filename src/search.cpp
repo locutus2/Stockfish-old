@@ -45,7 +45,7 @@ constexpr double MAX_RANDOM_WEIGHT = 0.1;
  constexpr bool NLEARN = true;
 constexpr int N2DO = 0;
 constexpr double Creg = 0;
- constexpr int NB = 769-1;//1+2*64;//961;//2;//5;//12;
+ constexpr int NB = 6;//769;//1+2*64;//961;//2;//5;//12;
  constexpr int NN = NB + int(N2DO)*(NB-1)*(NB-2)/2;
       std::vector<double> NI;
       // Start ALPHA=0.0001
@@ -1273,11 +1273,18 @@ moves_loop: // When in check, search starts from here
                      ;//+ 0.361447;
 
 /*
-NI = {1, double((*contHist[5])[movedPiece][to_sq(move)])/30000
+NI = {1, double(thisThread->mainHistory[us][from_to(move)])/10000,
+          double((*contHist[0])[movedPiece][to_sq(move)])/30000
                      , double((*contHist[1])[movedPiece][to_sq(move)])/30000
-                     , double((*contHist[0])[movedPiece][to_sq(move)])/30000
+                     , double((*contHist[3])[movedPiece][to_sq(move)])/30000
                      , double((*contHist[5])[movedPiece][to_sq(move)])/30000};
                      */
+NI = {1, double(thisThread->mainHistory[us][from_to(move)]),
+          double((*contHist[0])[movedPiece][to_sq(move)])
+                     , double((*contHist[1])[movedPiece][to_sq(move)])
+                     , double((*contHist[3])[movedPiece][to_sq(move)])
+                     , double((*contHist[5])[movedPiece][to_sq(move)])};
+
                      /*
               NI = {1, double((*contHist[5])[movedPiece][to_sq(move)])/30000
                      , double((*contHist[1])[movedPiece][to_sq(move)])/30000
@@ -1428,13 +1435,6 @@ for(Square s = SQ_A1; s <= SQ_H8; ++s)
         NI.push_back(double(pp == p));
 }
 */
-NI = std::vector<double>(NN, 0);
-constexpr static int pieceToIndex[PIECE_NB] = {-1, 0, 1, 2, 3,  4,  5, -1,
-                                               -1, 6, 7, 8, 9, 10, 11, -1};
-                                               
-int index = 64 * pieceToIndex[movedPiece] + int(to_sq(move));
-NI[index] = 1;
-
 /*
 NI = std::vector<double>(NN, 0);
 NI[0] = 1;
@@ -1482,7 +1482,7 @@ NI[index] = 1;
 
             static std::fstream file("lmr_fh_data.csv", std::ios::out | std::ios::trunc);
             file << int(value > alpha);
-            for(int i = 0; i < NN; ++i)
+            for(int i = 1; i < NN; ++i)
                 file << ',' << NI[i];
             file << std::endl;
 
