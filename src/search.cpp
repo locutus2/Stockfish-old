@@ -1148,7 +1148,7 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 16384;
           }
 
-          Depth d = clamp(newDepth - r, 1 + (move == countermove && !captureOrPromotion), newDepth);
+          Depth d = clamp(newDepth - r, 1 + (move == ss->killers[0] || move == ss->killers[1]), newDepth);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
