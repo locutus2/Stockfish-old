@@ -1403,6 +1403,8 @@ moves_loop: // When in check, search starts from here
         futilityBase = bestValue + 153;
     }
 
+    Square prevSq = to_sq((ss-1)->currentMove);
+    Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
                                           nullptr                   , (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
@@ -1414,7 +1416,7 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
-                                      to_sq((ss-1)->currentMove));
+                                      prevSq);
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move()) != MOVE_NONE)
@@ -1430,7 +1432,8 @@ moves_loop: // When in check, search starts from here
       if (   !inCheck
           && !givesCheck
           &&  futilityBase > -VALUE_KNOWN_WIN
-          && !pos.advanced_pawn_push(move))
+          && !pos.advanced_pawn_push(move)
+          &&  move != countermove)
       {
           assert(type_of(move) != ENPASSANT); // Due to !pos.advanced_pawn_push
 
