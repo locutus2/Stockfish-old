@@ -28,7 +28,7 @@ namespace {
     MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
     EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
-    QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
+    QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QREFUTATION, QCHECK_INIT, QCHECK
   };
 
   // partial_insertion_sort() sorts moves in descending order up to and including
@@ -70,8 +70,8 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 
 /// MovePicker constructor for quiescence search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Square rs)
-           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), recaptureSquare(rs), depth(d) {
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Square rs)
+           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), refutations{{cm, 0}}, recaptureSquare(rs), depth(d) {
 
   assert(d <= 0);
 
@@ -252,6 +252,18 @@ top:
       if (depth != DEPTH_QS_CHECKS)
           return MOVE_NONE;
 
+      // Prepare the pointers to loop over the refutations array
+      cur = std::begin(refutations);
+      endMoves = cur + 1;
+
+      ++stage;
+      /* fallthrough */
+
+  case QREFUTATION:
+      if (select<Next>([&](){ return    *cur != MOVE_NONE
+                                    && !pos.capture(*cur)
+                                    &&  pos.pseudo_legal(*cur); }))
+          return *(cur - 1);
       ++stage;
       /* fallthrough */
 
@@ -263,7 +275,7 @@ top:
       /* fallthrough */
 
   case QCHECK:
-      return select<Next>([](){ return true; });
+      return select<Next>([&](){ return *cur != refutations[0].move; });
   }
 
   assert(false);

@@ -1416,6 +1416,7 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
+                                      countermove,
                                       prevSq);
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
@@ -1432,8 +1433,7 @@ moves_loop: // When in check, search starts from here
       if (   !inCheck
           && !givesCheck
           &&  futilityBase > -VALUE_KNOWN_WIN
-          && !pos.advanced_pawn_push(move)
-          &&  move != countermove)
+          && !pos.advanced_pawn_push(move))
       {
           assert(type_of(move) != ENPASSANT); // Due to !pos.advanced_pawn_push
 
