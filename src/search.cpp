@@ -1143,7 +1143,7 @@ moves_loop: // When in check, search starts from here
 
           // Less reduction if recapture
           else if (priorCapture && prevSq == to_sq(move))
-              r--;
+              r++;
 
           Depth d = clamp(newDepth - r, 1, newDepth);
 
