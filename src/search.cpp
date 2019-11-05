@@ -1005,8 +1005,12 @@ moves_loop: // When in check, search starts from here
                && pos.pawn_passed(us, to_sq(move)))
           extension = 1;
 
+      // Recapture extension
+      else if (priorCapture && prevSq == to_sq(move))
+          extension = 1;
+
       // Castling extension
-      if (type_of(move) == CASTLING)
+      else if (type_of(move) == CASTLING)
           extension = 1;
 
       // Calculate new depth for this move
