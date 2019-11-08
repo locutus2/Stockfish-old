@@ -489,13 +489,15 @@ namespace {
                  -   6 * evalFactor[11] / 8
                  -   7;
 
+    int quadratic_kd = 0;
     for(int i = 0; i < 11; ++i)
     {
         int sum = 0;
         for(int j = i+1; j < 12; ++j)
-            kingDanger += QKD[i][j] * evalFactor[j];
-        kingDanger += sum * evalFactor[i];
+            sum += QKD[i][j] * evalFactor[j];
+        quadratic_kd += sum * evalFactor[i];
     }
+    kingDanger += quadratic_kd / 8;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
