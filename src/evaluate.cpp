@@ -497,7 +497,7 @@ namespace {
             sum += QKD[i][j] * evalFactor[j];
         quadratic_kd += sum * evalFactor[i];
     }
-    kingDanger += quadratic_kd / 8;
+    kingDanger += quadratic_kd / 8192;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
