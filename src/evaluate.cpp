@@ -30,6 +30,27 @@
 #include "pawns.h"
 #include "thread.h"
 
+Range centered(int v)
+{
+    return v == 0 ? Range(0,0) : Range(-100,100);
+}
+
+int QKD[11][12] = {
+    {0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
+    {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+};
+
+TUNE(SetRange(centered), QKD);
+
 namespace Trace {
 
   enum Tracing { NO_TRACE, TRACE };
@@ -441,18 +462,36 @@ namespace {
 
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
-    kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
-                 + 185 * popcount(kingRing[Us] & weak)
-                 + 148 * popcount(unsafeChecks)
-                 +  98 * popcount(pos.blockers_for_king(Us))
-                 +  69 * kingAttacksCount[Them]
-                 +   3 * kingFlankAttacks * kingFlankAttacks / 8
-                 +       mg_value(mobility[Them] - mobility[Us])
-                 - 873 * !pos.count<QUEEN>(Them)
-                 - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
-                 -  35 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 -   6 * mg_value(score) / 8
+    int evalFactor[12] = { kingDanger,
+                         kingAttackersCount[Them] * kingAttackersWeight[Them],
+                         popcount(kingRing[Us] & weak),
+                         popcount(unsafeChecks),
+                         popcount(pos.blockers_for_king(Us)),
+                         kingAttacksCount[Them],
+                         kingFlankAttacks * kingFlankAttacks,
+                         mg_value(mobility[Them] - mobility[Us]),
+                         !pos.count<QUEEN>(Them),
+                         bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING]),
+                         bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING]),
+                         mg_value(score)
+                         };
+
+    kingDanger +=        evalFactor[1]
+                 + 185 * evalFactor[2]
+                 + 148 * evalFactor[3]
+                 +  98 * evalFactor[4]
+                 +  69 * evalFactor[5]
+                 +   3 * evalFactor[6] / 8
+                 +       evalFactor[7]
+                 - 873 * evalFactor[8]
+                 - 100 * evalFactor[9]
+                 -  35 * evalFactor[10]
+                 -   6 * evalFactor[11] / 8
                  -   7;
+
+    for(int i = 0; i < 11; ++i)
+        for(int j = i+1; j < 12; ++j)
+            kingDanger += QKD[i][j];
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
