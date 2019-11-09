@@ -233,6 +233,7 @@ namespace {
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
     attackedBy2[Us] = dblAttackByPawn | (attackedBy[Us][KING] & attackedBy[Us][PAWN]);
+    attackedBy[Us][QUEEN_XRAY] = 0;
 
     // Init our king safety tables
     Square s = make_square(clamp(file_of(ksq), FILE_B, FILE_G),
@@ -269,18 +270,19 @@ namespace {
           : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
                          : pos.attacks_from<Pt>(s);
 
+        if (Pt == QUEEN)
+        {
+            bb =  attacks_bb<BISHOP>(s, pos.pieces() ^ (pos.pieces(Us, BISHOP) & ~pos.blockers_for_king(Us)))
+                | attacks_bb<ROOK  >(s, pos.pieces() ^ (pos.pieces(Us, ROOK)   & ~pos.blockers_for_king(Us)));
+            attackedBy[Us][QUEEN_XRAY] |= ~b & bb;
+        }
+
         if (pos.blockers_for_king(Us) & s)
             b &= LineBB[pos.square<KING>(Us)][s];
 
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
-
-        if (Pt == QUEEN && (b & pos.pieces(Us, BISHOP)))
-        {
-            bb = ~b & attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, BISHOP));
-            attackedBy2[Us] |= attackedBy[Us][BISHOP] & bb;
-        }
 
         if (b & kingRing[Them])
         {
@@ -443,7 +445,7 @@ namespace {
     // Find the squares that opponent attacks in our king flank, and the squares
     // which are attacked twice in that flank.
     b1 = attackedBy[Them][ALL_PIECES] & KingFlank[file_of(ksq)] & Camp;
-    b2 = b1 & attackedBy2[Them];
+    b2 = b1 & (attackedBy2[Them] | attackedBy[Them][QUEEN_XRAY]);
 
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
@@ -800,9 +802,8 @@ namespace {
     // Pieces should be evaluated first (populate attack tables)
     score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
-            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >();
-
-    score += pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
+            + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
     score += mobility[WHITE] - mobility[BLACK];
 
