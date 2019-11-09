@@ -276,6 +276,12 @@ namespace {
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
 
+        if (Pt == QUEEN && (b & pos.pieces(Us, BISHOP)))
+        {
+            bb = ~b & attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(Us, BISHOP));
+            attackedBy2[Us] |= attackedBy[Us][BISHOP] & bb;
+        }
+
         if (b & kingRing[Them])
         {
             kingAttackersCount[Us]++;
@@ -794,8 +800,9 @@ namespace {
     // Pieces should be evaluated first (populate attack tables)
     score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
-            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
-            + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >();
+
+    score += pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
     score += mobility[WHITE] - mobility[BLACK];
 
