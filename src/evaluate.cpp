@@ -521,7 +521,7 @@ namespace {
             score += ThreatByKing;
 
         b =  ~attackedBy[Them][ALL_PIECES]
-           | (nonPawnEnemies & (attackedBy2[Us] | attackedBy[Us][QUEEN_XRAY]));
+           | (nonPawnEnemies & attackedBy2[Us]);
         score += Hanging * popcount(weak & b);
     }
 
@@ -564,7 +564,7 @@ namespace {
         b =  (attackedBy[Us][BISHOP] & pos.attacks_from<BISHOP>(s))
            | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
 
-        score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
+        score += SliderOnQueen * popcount(b & safe & (attackedBy2[Us] | attackedBy[Us][QUEEN_XRAY]));
     }
 
     if (T)
