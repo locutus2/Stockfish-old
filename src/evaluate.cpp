@@ -86,6 +86,21 @@ namespace {
   constexpr int BishopSafeCheck = 635;
   constexpr int KnightSafeCheck = 790;
 
+  // Weights for interaction of the different king danger factors
+  constexpr int KingdangerInteraction[11][12] = {
+    {0, 1, 12,  5,  5,   1,  1,  3,   6,  5, -11,   2},
+    {0, 0, -6,  3, -5, -10, -5,  6,   5,  3,   1,   1},
+    {0, 0,  0, -4,  4,  -1, -2, -3,   3,  4,  -3,  -9},
+    {0, 0,  0,  0,  1,  -5,  8,  5,  -5, -3,   1,  -5},
+    {0, 0,  0,  0,  0,   6,  5, -6,  -5,  7,  -1,   8},
+    {0, 0,  0,  0,  0,   0,  4, 11,   1,  3,  -6,   7},
+    {0, 0,  0,  0,  0,   0,  0,  1, -11, 16,  -5, -10},
+    {0, 0,  0,  0,  0,   0,  0,  0,   2,  0,   2,  14},
+    {0, 0,  0,  0,  0,   0,  0,  0,   0,  3,  -7,   3},
+    {0, 0,  0,  0,  0,   0,  0,  0,   0,  0,   6,  -3},
+    {0, 0,  0,  0,  0,   0,  0,  0,   0,  0,   0,   2}
+  };
+
 #define S(mg, eg) make_score(mg, eg)
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
@@ -441,18 +456,43 @@ namespace {
 
     int kingFlankAttacks = popcount(b1) + popcount(b2);
 
-    kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
-                 + 185 * popcount(kingRing[Us] & weak)
-                 + 148 * popcount(unsafeChecks)
-                 +  98 * popcount(pos.blockers_for_king(Us))
-                 +  69 * kingAttacksCount[Them]
-                 +   3 * kingFlankAttacks * kingFlankAttacks / 8
-                 +       mg_value(mobility[Them] - mobility[Us])
-                 - 873 * !pos.count<QUEEN>(Them)
-                 - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
-                 -  35 * bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING])
-                 -   6 * mg_value(score) / 8
+    int evalFactor[12] = {
+                           kingDanger,
+                           kingAttackersCount[Them] * kingAttackersWeight[Them],
+                           popcount(kingRing[Us] & weak),
+                           popcount(unsafeChecks),
+                           popcount(pos.blockers_for_king(Us)),
+                           kingAttacksCount[Them],
+                           kingFlankAttacks * kingFlankAttacks,
+                           mg_value(mobility[Them] - mobility[Us]),
+                           !pos.count<QUEEN>(Them),
+                           bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING]),
+                           bool(attackedBy[Us][BISHOP] & attackedBy[Us][KING]),
+                           mg_value(score)
+                         };
+
+    kingDanger +=        evalFactor[1]
+                 + 185 * evalFactor[2]
+                 + 148 * evalFactor[3]
+                 +  98 * evalFactor[4]
+                 +  69 * evalFactor[5]
+                 +   3 * evalFactor[6] / 8
+                 +       evalFactor[7]
+                 - 873 * evalFactor[8]
+                 - 100 * evalFactor[9]
+                 -  35 * evalFactor[10]
+                 -   6 * evalFactor[11] / 8
                  -   7;
+
+    int interaction = 0;
+    for(int i = 0; i < 11; ++i)
+    {
+        int sum = 0;
+        for(int j = i+1; j < 12; ++j)
+            sum += KingdangerInteraction[i][j] * evalFactor[j];
+        interaction += sum * evalFactor[i];
+    }
+    kingDanger += interaction / 8192;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
