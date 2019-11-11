@@ -414,7 +414,7 @@ namespace {
     // Enemy queen safe checks: we count them only if they are from squares from
     // which we can't give a rook check, because rook checks are more valuable.
     queenChecks =  (b1 | b2)
-                 & attackedBy[Them][QUEEN]
+                 & (attackedBy[Them][QUEEN]| attackedBy[Them][QUEEN_XRAY])
                  & safe
                  & ~attackedBy[Us][QUEEN]
                  & ~rookChecks;
@@ -564,7 +564,7 @@ namespace {
         b =  (attackedBy[Us][BISHOP] & pos.attacks_from<BISHOP>(s))
            | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
 
-        score += SliderOnQueen * popcount(b & safe & (attackedBy2[Us] | attackedBy[Us][QUEEN_XRAY]));
+        score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
 
     if (T)
