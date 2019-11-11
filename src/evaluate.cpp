@@ -233,7 +233,6 @@ namespace {
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
     attackedBy2[Us] = dblAttackByPawn | (attackedBy[Us][KING] & attackedBy[Us][PAWN]);
-    attackedBy[Us][QUEEN_XRAY] = 0;
 
     // Init our king safety tables
     Square s = make_square(clamp(file_of(ksq), FILE_B, FILE_G),
@@ -271,11 +270,8 @@ namespace {
                          : pos.attacks_from<Pt>(s);
 
         if (Pt == QUEEN)
-        {
             bb =  attacks_bb<BISHOP>(s, pos.pieces() ^ (pos.pieces(Us, BISHOP) & ~pos.blockers_for_king(Us)))
                 | attacks_bb<ROOK  >(s, pos.pieces() ^ (pos.pieces(Us, ROOK)   & ~pos.blockers_for_king(Us)));
-            attackedBy[Us][QUEEN_XRAY] |= ~b & bb;
-        }
 
         if (pos.blockers_for_king(Us) & s)
             b &= LineBB[pos.square<KING>(Us)][s];
@@ -284,7 +280,7 @@ namespace {
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
 
-        if (b & kingRing[Them])
+        if ((Pt == QUEEN ? bb : b) & kingRing[Them])
         {
             kingAttackersCount[Us]++;
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
@@ -414,7 +410,7 @@ namespace {
     // Enemy queen safe checks: we count them only if they are from squares from
     // which we can't give a rook check, because rook checks are more valuable.
     queenChecks =  (b1 | b2)
-                 & (attackedBy[Them][QUEEN]| attackedBy[Them][QUEEN_XRAY])
+                 & attackedBy[Them][QUEEN]
                  & safe
                  & ~attackedBy[Us][QUEEN]
                  & ~rookChecks;
