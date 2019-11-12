@@ -957,12 +957,27 @@ moves_loop: // When in check, search starts from here
 
       // Step 13. Extensions (~70 Elo)
 
+      // Check extension (~2 Elo)
+      if (    givesCheck
+          && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
+          extension = 1;
+
+      // Passed pawn extension
+      else if (   move == ss->killers[0]
+               && pos.advanced_pawn_push(move)
+               && pos.pawn_passed(us, to_sq(move)))
+          extension = 1;
+
+      // Castling extension
+      else if (type_of(move) == CASTLING)
+          extension = 1;
+
       // Singular extension search (~60 Elo). If all moves but one fail low on a
       // search of (alpha-s, beta-s), and just one fails high on (alpha, beta),
       // then that move is singular and should be extended. To verify this we do
       // a reduced search on all the other moves but the ttMove and if the
       // result is lower than ttValue minus a margin then we will extend the ttMove.
-      if (    depth >= 6
+      else if (    depth >= 6
           &&  move == ttMove
           && !rootNode
           && !excludedMove // Avoid recursive singular search
@@ -993,21 +1008,6 @@ moves_loop: // When in check, search starts from here
                    && singularBeta >= beta)
               return singularBeta;
       }
-
-      // Check extension (~2 Elo)
-      else if (    givesCheck
-               && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
-          extension = 1;
-
-      // Passed pawn extension
-      else if (   move == ss->killers[0]
-               && pos.advanced_pawn_push(move)
-               && pos.pawn_passed(us, to_sq(move)))
-          extension = 1;
-
-      // Castling extension
-      if (type_of(move) == CASTLING)
-          extension = 1;
 
       // Calculate new depth for this move
       newDepth = depth - 1 + extension;
