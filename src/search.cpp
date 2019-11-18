@@ -1050,10 +1050,6 @@ moves_loop: // When in check, search starts from here
                && pos.pawn_passed(us, to_sq(move)))
           extension = 1;
 
-      // Castling extension
-      if (type_of(move) == CASTLING)
-          extension = 1;
-
       // Add extension to new depth
       newDepth += extension;
 
@@ -1111,6 +1107,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Decrease reduction for castle move
+              if (type_of(move) == CASTLING)
+                  r--;
+
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r++;
