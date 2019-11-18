@@ -583,12 +583,8 @@ namespace {
             return alpha;
     }
 
-    // Check if delayed extension should be added to depth
-    if (delayedExtension > 0)
-    {
-        depth += delayedExtension;
-        delayedExtension = 0;
-    }
+    // Add delayed extension
+    depth += delayedExtension;
 
     // Dive into quiescence search when the depth reaches zero
     if (depth <= 0)
@@ -835,7 +831,7 @@ namespace {
 
         pos.do_null_move(st);
 
-        Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode, delayedExtension);
+        Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
 
         pos.undo_null_move();
 
@@ -855,7 +851,7 @@ namespace {
             thisThread->nmpMinPly = ss->ply + 3 * (depth-R) / 4;
             thisThread->nmpColor = us;
 
-            Value v = search<NonPV>(pos, ss, beta-1, beta, depth-R, false, delayedExtension);
+            Value v = search<NonPV>(pos, ss, beta-1, beta, depth-R, false);
 
             thisThread->nmpMinPly = 0;
 
@@ -898,7 +894,7 @@ namespace {
 
                 // If the qsearch held, perform the regular search
                 if (value >= raisedBeta)
-                    value = -search<NonPV>(pos, ss+1, -raisedBeta, -raisedBeta+1, depth - 4, !cutNode, delayedExtension);
+                    value = -search<NonPV>(pos, ss+1, -raisedBeta, -raisedBeta+1, depth - 4, !cutNode);
 
                 pos.undo_move(move);
 
@@ -910,7 +906,7 @@ namespace {
     // Step 11. Internal iterative deepening (~2 Elo)
     if (depth >= 7 && !ttMove)
     {
-        search<NT>(pos, ss, alpha, beta, depth - 7, cutNode, delayedExtension);
+        search<NT>(pos, ss, alpha, beta, depth - 7, cutNode);
 
         tte = TT.probe(posKey, ttHit);
         ttValue = ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
@@ -964,7 +960,7 @@ moves_loop: // When in check, search starts from here
       if (PvNode)
           (ss+1)->pv = nullptr;
 
-      extension = 0;
+      delayedExtension = extension = 0;
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
@@ -1027,12 +1023,12 @@ moves_loop: // When in check, search starts from here
           Value singularBeta = ttValue - 2 * depth;
           Depth halfDepth = depth / 2;
           ss->excludedMove = move;
-          value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, halfDepth, cutNode, delayedExtension);
+          value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, halfDepth, cutNode);
           ss->excludedMove = MOVE_NONE;
 
           if (value < singularBeta)
           {
-              extension = 1;
+              delayedExtension = 1;
               singularLMR = true;
           }
 
@@ -1060,6 +1056,9 @@ moves_loop: // When in check, search starts from here
       // Castling extension
       if (type_of(move) == CASTLING)
           extension = 1;
+
+      // Add extension to new depth
+      newDepth += extension;
 
       // Speculative prefetch as early as possible
       prefetch(TT.first_entry(pos.key_after(move)));
@@ -1156,7 +1155,7 @@ moves_loop: // When in check, search starts from here
 
           Depth d = clamp(newDepth - r, 1, newDepth);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, delayedExtension + extension);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, delayedExtension);
 
           doFullDepthSearch = (value > alpha && d != newDepth), didLMR = true;
       }
@@ -1166,7 +1165,7 @@ moves_loop: // When in check, search starts from here
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch)
       {
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, delayedExtension + extension);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, delayedExtension);
 
           if (didLMR && !captureOrPromotion)
           {
@@ -1188,7 +1187,7 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, delayedExtension + extension);
+          value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, delayedExtension);
       }
 
       // Step 18. Undo move
