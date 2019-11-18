@@ -1039,6 +1039,10 @@ moves_loop: // When in check, search starts from here
               return singularBeta;
       }
 
+      // Queen capture extension
+      else if (type_of(pos.piece_on(to_sq(move))) == QUEEN)
+          extension = 1;
+
       // Check extension (~2 Elo)
       else if (    givesCheck
                && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
