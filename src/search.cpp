@@ -584,7 +584,7 @@ namespace {
     }
 
     // Check if delayed extension should be added to depth
-    if (depth <= ss->ply)
+    if (delayedExtension > 0)
     {
         depth += delayedExtension;
         delayedExtension = 0;
