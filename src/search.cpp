@@ -1110,9 +1110,10 @@ moves_loop: // When in check, search starts from here
           if (singularLMR)
               r -= 2;
 
-          // Decrease reduction if not extended advanced passed pawn push
+          // Decrease reduction if not extended passed pawn push and first killer
           if (   !extension
-               && advancedPawnPush
+               && move == ss->killers[0]
+               && type_of(movedPiece) == PAWN
                && pos.pawn_passed(us, to_sq(move)))
               r--;
 
