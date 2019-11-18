@@ -599,7 +599,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, ttPv, inCheck, givesCheck, improving, didLMR, priorCapture;
+    bool ttHit, ttPv, inCheck, givesCheck, improving, didLMR, priorCapture, advancedPawnPush;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture, singularLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -961,6 +961,7 @@ moves_loop: // When in check, search starts from here
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
+      advancedPawnPush = pos.advanced_pawn_push(move);
 
       // Calculate new depth for this move
       newDepth = depth - 1;
@@ -975,7 +976,7 @@ moves_loop: // When in check, search starts from here
 
           if (   !captureOrPromotion
               && !givesCheck
-              && (!PvNode || !pos.advanced_pawn_push(move) || pos.non_pawn_material(~us) > BishopValueMg))
+              && (!PvNode || !advancedPawnPush || pos.non_pawn_material(~us) > BishopValueMg))
           {
               // Reduced depth of the next LMR search
               int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount), 0);
@@ -1046,7 +1047,7 @@ moves_loop: // When in check, search starts from here
 
       // Passed pawn extension
       else if (   move == ss->killers[0]
-               && pos.advanced_pawn_push(move)
+               && advancedPawnPush
                && pos.pawn_passed(us, to_sq(move)))
           extension = 1;
 
@@ -1108,6 +1109,12 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if ttMove has been singularly extended
           if (singularLMR)
               r -= 2;
+
+          // Decrease reduction if not extended advanced passed pawn push
+          if (   !extension
+               && advancedPawnPush
+               && pos.pawn_passed(us, to_sq(move)))
+              r--;
 
           if (!captureOrPromotion)
           {
