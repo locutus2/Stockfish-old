@@ -583,16 +583,16 @@ namespace {
             return alpha;
     }
 
-    // Dive into quiescence search when the depth reaches zero
-    if (depth <= 0)
+    // Check if delayed extension should be added to depth
+    if (depth <= ss->ply)
     {
-        // First add delayed extension to depth
         depth += delayedExtension;
         delayedExtension = 0;
-
-        if (depth <= 0)
-            return qsearch<NT>(pos, ss, alpha, beta);
     }
+
+    // Dive into quiescence search when the depth reaches zero
+    if (depth <= 0)
+        return qsearch<NT>(pos, ss, alpha, beta);
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
