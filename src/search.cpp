@@ -1051,11 +1051,11 @@ moves_loop: // When in check, search starts from here
       else if (   move == ss->killers[0]
                && pos.advanced_pawn_push(move)
                && pos.pawn_passed(us, to_sq(move)))
-          delayedExtension = 1;
+          extension = 1;
 
       // Castling extension
       if (type_of(move) == CASTLING)
-          extension = 1;
+          delayedExtension = 1;
 
       // Add extension to new depth
       newDepth += extension;
