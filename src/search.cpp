@@ -147,7 +147,7 @@ namespace {
   };
 
   template <NodeType NT>
-  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, int delayedExtension = 0);
+  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode);
 
   template <NodeType NT>
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth = 0);
@@ -566,7 +566,7 @@ namespace {
   // search<>() is the main search function for both PV and non-PV nodes
 
   template <NodeType NT>
-  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode, int delayedExtension) {
+  Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
     constexpr bool PvNode = NT == PV;
     const bool rootNode = PvNode && ss->ply == 0;
@@ -583,9 +583,6 @@ namespace {
             return alpha;
     }
 
-    // Add delayed extension
-    depth += delayedExtension;
-
     // Dive into quiescence search when the depth reaches zero
     if (depth <= 0)
         return qsearch<NT>(pos, ss, alpha, beta);
@@ -600,7 +597,7 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
-    Depth extension, newDepth;
+    Depth extension, newDepth, delayedExtension;
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, ttPv, inCheck, givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture, singularLMR;
@@ -1155,7 +1152,7 @@ moves_loop: // When in check, search starts from here
 
           Depth d = clamp(newDepth - r, 1, newDepth);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true, delayedExtension);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d + delayedExtension, true);
 
           doFullDepthSearch = (value > alpha && d != newDepth), didLMR = true;
       }
@@ -1165,7 +1162,7 @@ moves_loop: // When in check, search starts from here
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch)
       {
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode, delayedExtension);
+          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth + delayedExtension, !cutNode);
 
           if (didLMR && !captureOrPromotion)
           {
@@ -1187,7 +1184,7 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth, false, delayedExtension);
+          value = -search<PV>(pos, ss+1, -beta, -alpha, newDepth + delayedExtension, false);
       }
 
       // Step 18. Undo move
