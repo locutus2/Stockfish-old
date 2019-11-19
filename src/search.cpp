@@ -1044,11 +1044,10 @@ moves_loop: // When in check, search starts from here
                && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
           extension = 1;
 
-      // Passed pawn extension
+      // Advanced pawn extension
       else if (   move == ss->killers[0]
-               && type_of(movedPiece) == PAWN
-               && pos.pawn_passed(us, to_sq(move)))
-          (pos.advanced_pawn_push(move) ? extension : delayedExtension) = 1;
+               && pos.advanced_pawn_push(move))
+          (pos.pawn_passed(us, to_sq(move)) ? extension : delayedExtension) = 1;
 
       // Castling extension
       if (type_of(move) == CASTLING)
