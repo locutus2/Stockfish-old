@@ -1142,8 +1142,8 @@ moves_loop: // When in check, search starts from here
               if (ss->statScore >= -99 && (ss-1)->statScore < -116)
                   r--;
 
-              else if ((ss-1)->statScore >= -117 && ss->statScore < -144)
-                  r++;
+              else if ((ss-1)->statScore >= 0 && ss->statScore < 0)
+                  r += 1 + ttCapture;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 16384;
