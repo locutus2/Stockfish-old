@@ -1150,8 +1150,8 @@ moves_loop: // When in check, search starts from here
               r -= ss->statScore / 16384;
           }
 
-          // Decrease reduction for capture/promotion if in check for low depths
-          else if (inCheck && depth < 9)
+          // Decrease reduction for capture/promotion if in check for high depths
+          else if (inCheck && depth > 9)
               r--;
 
           Depth d = clamp(newDepth - r, 1, newDepth);
