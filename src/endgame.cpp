@@ -823,7 +823,7 @@ ScaleFactor Endgame<KTKT>::operator()(const Position& pos) const {
     
   assert(pos.count<ALL_PIECES>() <= 7);
 
-  return ScaleFactor(SCALE_FACTOR_NORMAL * (1 + tbs->win_ratio(strongSide)) * 0.5);
+  return ScaleFactor(SCALE_FACTOR_NORMAL * (3 + tbs->win_ratio(strongSide)) / 4);
 }
 
 #if defined(__GNUC__)
