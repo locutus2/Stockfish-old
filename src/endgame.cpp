@@ -820,10 +820,19 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
 
 template<>
 ScaleFactor Endgame<KTKT>::operator()(const Position& pos) const {
-    
+
   assert(pos.count<ALL_PIECES>() <= 7);
 
-  return ScaleFactor(SCALE_FACTOR_NORMAL * (1 + tbs->win_ratio(strongSide) - tbs->win_ratio(~strongSide)) / 2);
+  uint64_t total = tbs->tWins + tbs->tCursedWins + tbs->tDraws + tbs->tBlessedLosses + tbs->tLosses;
+  uint64_t score = 0;
+
+  if (pos.side_to_move() == WHITE)
+      score = (strongSide == WHITE ? tbs->wWins : tbs->wLosses);
+
+  else
+      score = (strongSide == WHITE ? tbs->bLosses : tbs->bWins);
+
+  return ScaleFactor(SCALE_FACTOR_NORMAL * score / total);
 }
 
 #if defined(__GNUC__)
