@@ -95,6 +95,8 @@ struct TBStat {
     float winRatio[COLOR_NB];
     float lossRatio[COLOR_NB];
 
+    ScaleFactor scaleFactor;
+
     void init_ratios()
     {
         //NOTE: Blessed or cursed results are discounted by 50%
@@ -112,6 +114,8 @@ struct TBStat {
 
         scoreRatio[WHITE] = winRatio[WHITE] + drawRatio[WHITE] * 0.5f;
         scoreRatio[BLACK] = winRatio[BLACK] + drawRatio[BLACK] * 0.5f;
+
+        scaleFactor = ScaleFactor(SCALE_FACTOR_NORMAL * winRatio[WHITE] + 0.5);
     }
 
     float score_ratio(Color stm) const { return scoreRatio[stm]; }
