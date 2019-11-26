@@ -115,7 +115,7 @@ struct TBStat {
         scoreRatio[WHITE] = winRatio[WHITE] + drawRatio[WHITE] * 0.5f;
         scoreRatio[BLACK] = winRatio[BLACK] + drawRatio[BLACK] * 0.5f;
 
-        scaleFactor = ScaleFactor(SCALE_FACTOR_NORMAL * winRatio[WHITE] + 0.5);
+        scaleFactor = ScaleFactor(SCALE_FACTOR_NORMAL * (winRatio[WHITE] + winRatio[BLACK]) / 2 + 0.5);
     }
 
     float score_ratio(Color stm) const { return scoreRatio[stm]; }

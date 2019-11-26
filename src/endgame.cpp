@@ -820,7 +820,7 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
 
 template<>
 ScaleFactor Endgame<KTKT>::operator()(const Position& pos) const {
-    
+
   assert(pos.count<ALL_PIECES>() <= 7);
 
   return tbs->scaleFactor;
