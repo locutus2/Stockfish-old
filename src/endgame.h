@@ -95,7 +95,7 @@ struct TBStat {
     float winRatio[COLOR_NB];
     float lossRatio[COLOR_NB];
 
-    ScaleFactor scaleFactor;
+    ScaleFactor scaleFactor[2]; // scale factor dependent on if the strong side is on move
 
     void init_ratios()
     {
@@ -115,13 +115,18 @@ struct TBStat {
         scoreRatio[WHITE] = winRatio[WHITE] + drawRatio[WHITE] * 0.5f;
         scoreRatio[BLACK] = winRatio[BLACK] + drawRatio[BLACK] * 0.5f;
 
-        scaleFactor = ScaleFactor(SCALE_FACTOR_NORMAL * (winRatio[WHITE] + winRatio[BLACK]) / 2 + 0.5);
+        constexpr double ALPHA = 0.5;
+        double p0 = bLosses / (double)bSum;
+        double p1 = wWins / (double)wSum;
+        scaleFactor[0] = ScaleFactor(SCALE_FACTOR_NORMAL * (1 - ALPHA * (1 - p0)) + 0.5);
+        scaleFactor[1] = ScaleFactor(SCALE_FACTOR_NORMAL * (1 - ALPHA * (1 - p1)) + 0.5);
     }
 
     float score_ratio(Color stm) const { return scoreRatio[stm]; }
     float draw_ratio(Color stm) const { return drawRatio[stm]; }
     float win_ratio(Color stm) const { return winRatio[stm]; }
     float loss_ratio(Color stm) const { return lossRatio[stm]; }
+    ScaleFactor scale_factor(Color strongSide, Color stm) const { return scaleFactor[strongSide == stm]; }
 };
 
 const int TB_STAT_COUNT = 1001;
