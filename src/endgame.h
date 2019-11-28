@@ -115,7 +115,7 @@ struct TBStat {
         scoreRatio[WHITE] = winRatio[WHITE] + drawRatio[WHITE] * 0.5f;
         scoreRatio[BLACK] = winRatio[BLACK] + drawRatio[BLACK] * 0.5f;
 
-        constexpr double ALPHA = 0.5;
+        constexpr double ALPHA = 0.2;
         double p = tWins / (double)(wSum + bSum);
         scaleFactor = ScaleFactor(SCALE_FACTOR_NORMAL * (1 - ALPHA * (1 - p)) + 0.5);
     }
