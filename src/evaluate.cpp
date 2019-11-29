@@ -748,8 +748,8 @@ namespace {
         if (   pos.opposite_bishops()
             && pos.non_pawn_material() == 2 * BishopValueMg)
         {
-            Bitboard undefendedPromotions = pos.pieces(strongSide, BISHOP) & DarkSquares ? FileBBB | FileDBB | FileFBB | FileHBB
-                                                                                         : FileABB | FileCBB | FileEBB | FileGBB;
+            Bitboard undefendedPromotions = pos.pieces(WHITE, BISHOP) & DarkSquares ? FileBBB | FileDBB | FileFBB | FileHBB
+                                                                                    : FileABB | FileCBB | FileEBB | FileGBB;
             sf = 18 + 4 * (  popcount(pe->passed_pawns( strongSide) & undefendedPromotions)
                            - popcount(pe->passed_pawns(~strongSide) & undefendedPromotions));
         }
