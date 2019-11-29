@@ -750,7 +750,7 @@ namespace {
         {
             Bitboard undefendedPromotions = pos.pieces(strongSide, BISHOP) & DarkSquares ? FileBBB | FileDBB | FileFBB | FileHBB
                                                                                          : FileABB | FileCBB | FileEBB | FileGBB;
-            sf = 18 + 4 * (  popcount(pe->passed_pawns( strongSide) & undefendedPromotions)
+            sf = 14 + 8 * (  popcount(pe->passed_pawns( strongSide) & undefendedPromotions)
                            - popcount(pe->passed_pawns(~strongSide) & undefendedPromotions));
         }
         else
