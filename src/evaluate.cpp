@@ -747,7 +747,12 @@ namespace {
     {
         if (   pos.opposite_bishops()
             && pos.non_pawn_material() == 2 * BishopValueMg)
-            sf = 22 ;
+        {
+            Bitboard undefendedPromotions = pos.pieces(strongSide, BISHOP) & DarkSquares ? FileBBB | FileDBB | FileFBB | FileHBB
+                                                                                         : FileABB | FileCBB | FileEBB | FileGBB;
+            sf = 18 + 4 * (  popcount(pe->passed_pawns( strongSide) & undefendedPromotions)
+                           - popcount(pe->passed_pawns(~strongSide) & undefendedPromotions));
+        }
         else
             sf = std::min(sf, 36 + (pos.opposite_bishops() ? 2 : 7) * pos.count<PAWN>(strongSide));
 
