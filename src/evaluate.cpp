@@ -750,7 +750,8 @@ namespace {
         {
             Bitboard undefendedPromotions = pos.pieces(WHITE, BISHOP) & DarkSquares ? FileBBB | FileDBB | FileFBB | FileHBB
                                                                                     : FileABB | FileCBB | FileEBB | FileGBB;
-            sf = 18 + 2 * (popcount(pe->passed_pawns(strongSide) & undefendedPromotions) + pe->passed_count(strongSide));
+            sf = 16 + 4 * popcount(pe->passed_pawns(strongSide) & undefendedPromotions)
+                    + 2 * pe->passed_count(strongSide);
         }
         else
             sf = std::min(sf, 36 + (pos.opposite_bishops() ? 2 : 7) * pos.count<PAWN>(strongSide));
