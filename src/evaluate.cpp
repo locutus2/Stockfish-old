@@ -749,7 +749,7 @@ namespace {
             && pos.non_pawn_material() == 2 * BishopValueMg)
         {
             Bitboard strongSideBishopSquares = pos.pieces(strongSide, BISHOP) & DarkSquares ? DarkSquares : ~DarkSquares;
-            sf = 22 - 8 * !(pos.pieces(~strongSide, PAWN) & strongSideBishopSquares);
+            sf = 30 - 8 * !(pos.pieces(~strongSide, PAWN) & strongSideBishopSquares);
         }
         else
             sf = std::min(sf, 36 + (pos.opposite_bishops() ? 2 : 7) * pos.count<PAWN>(strongSide));
