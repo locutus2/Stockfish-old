@@ -788,7 +788,7 @@ namespace {
     Value v = (mg_value(score) + eg_value(score)) / 2;
     Score safety = v > 0 ? pe->king_safety<WHITE>(pos)
                          : pe->king_safety<BLACK>(pos);
-    if (abs(v) > LazyThreshold + pos.non_pawn_material() / 64 - mg_value(safety))
+    if (abs(v) > LazyThreshold + pos.non_pawn_material() / 64 - std::min(2 * mg_value(safety), VALUE_ZERO))
        return pos.side_to_move() == WHITE ? v : -v;
 
     // Main evaluation begins here
