@@ -831,6 +831,7 @@ namespace {
         &&  ss->staticEval >= beta - 33 * depth + 299 - improving * 30
         && !excludedMove
         &&  pos.non_pawn_material(us)
+        && (!ttHit || cutNode || improving)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
