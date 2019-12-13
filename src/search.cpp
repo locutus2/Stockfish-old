@@ -831,7 +831,6 @@ namespace {
         &&  ss->staticEval >= beta - 33 * depth + 299 - improving * 30
         && !excludedMove
         &&  pos.non_pawn_material(us)
-        && (!ttHit || cutNode || improving)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
@@ -854,7 +853,7 @@ namespace {
             if (nullValue >= VALUE_MATE_IN_MAX_PLY)
                 nullValue = beta;
 
-            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 13))
+            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 13 && (!ttHit || cutNode || improving)))
                 return nullValue;
 
             assert(!thisThread->nmpMinPly); // Recursive verification is not allowed
