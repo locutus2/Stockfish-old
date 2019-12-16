@@ -831,7 +831,7 @@ namespace {
         &&  ss->staticEval >= beta - 33 * depth + 299 - improving * 30
         && !excludedMove
         &&  pos.non_pawn_material(us)
-        &&  thisThread->ttHitAverage < 590 * ttHitAverageResolution * ttHitAverageWindow / 1024
+        &&  thisThread->ttHitAverage < 700 * ttHitAverageResolution * ttHitAverageWindow / 1024
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
