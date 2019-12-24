@@ -1108,10 +1108,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction if static eval bad but best value good
-          if (ss->staticEval != VALUE_NONE && ss->staticEval < VALUE_DRAW && bestValue > VALUE_DRAW)
-              r--;
-
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 544 * ttHitAverageResolution * ttHitAverageWindow / 1024)
               r--;
@@ -1134,6 +1130,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Decrease reduction if static eval bad but best value good
+              if (ss->staticEval != VALUE_NONE && ss->staticEval < VALUE_DRAW && bestValue > VALUE_DRAW)
+                  r--;
+
               // Increase reduction if ttMove is a capture (~0 Elo)
               if (ttCapture)
                   r++;
