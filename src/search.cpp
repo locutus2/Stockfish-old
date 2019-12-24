@@ -1130,8 +1130,8 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Decrease reduction if static eval bad but best value good
-              if (ss->staticEval != VALUE_NONE && ss->staticEval < VALUE_DRAW && bestValue > VALUE_DRAW)
+              // Decrease reduction at PV nodes if static eval bad but best value good
+              if (PvNode && ss->staticEval != VALUE_NONE && ss->staticEval < VALUE_DRAW && bestValue > VALUE_DRAW)
                   r--;
 
               // Increase reduction if ttMove is a capture (~0 Elo)
