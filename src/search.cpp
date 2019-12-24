@@ -1099,7 +1099,8 @@ moves_loop: // When in check, search starts from here
       // re-searched at full depth.
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
-          && (!rootNode || thisThread->best_move_count(move) == 0)
+          && (!rootNode || (   thisThread->best_move_count(move) == 0
+                            && (std::abs(bestValue) >= 2 || !bestMove)))
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
@@ -1107,10 +1108,6 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 384 * ttHitAverageResolution * ttHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
-
-          // Decrease reduction if at PV node current best move is a draw
-          if (PvNode && std::abs(bestValue) < 2 && bestMove && ss->ply < depth)
-              r--;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 544 * ttHitAverageResolution * ttHitAverageWindow / 1024)
