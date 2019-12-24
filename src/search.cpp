@@ -1108,9 +1108,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction if at PV node current best is a draw
+          // Decrease reduction if at PV node current best move is a draw
           if (PvNode && bestValue == VALUE_DRAW && bestMove)
-              r--;
+              r -= 2;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 544 * ttHitAverageResolution * ttHitAverageWindow / 1024)
