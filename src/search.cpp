@@ -1109,7 +1109,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Randomly increase/decrease reduction
-          r += (2 * int(thisThread->nodes & 3) - 3) / 2;
+          r += (2 * int(thisThread->nodes & 7) - 7) / 7;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 500 * ttHitAverageResolution * ttHitAverageWindow / 1024)
