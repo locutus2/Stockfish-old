@@ -380,6 +380,7 @@ void Thread::search() {
   ttHitAverage = ttHitAverageWindow * ttHitAverageResolution / 2;
 
   int ct = int(Options["Contempt"]) * PawnValueEg / 100; // From centipawns
+  int shortPv = 0;
 
   // In analysis mode, adjust contempt in accordance with user preference
   if (Limits.infinite || Options["UCI_AnalyseMode"])
@@ -428,7 +429,7 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value previousScore = rootMoves[pvIdx].previousScore;
-              delta = Value(21 + abs(previousScore) / 256);
+              delta = Value(21 + shortPv + abs(previousScore) / 256);
               alpha = std::max(previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(previousScore + delta, VALUE_INFINITE);
 
@@ -496,6 +497,11 @@ void Thread::search() {
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
+
+          if (pvIdx == 0 && selDepth < rootDepth)
+              ++shortPv;
+          else
+              shortPv = 0;
 
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
