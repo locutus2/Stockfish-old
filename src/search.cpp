@@ -501,7 +501,7 @@ void Thread::search() {
           if (pvIdx == 0)
           {
               if (selDepth < rootDepth)
-                  shortPv = (rootDepth - selDepth) / 2;
+                  shortPv = (rootDepth - selDepth) * 2;
               else
                   shortPv = 0;
           }
