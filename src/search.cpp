@@ -380,6 +380,7 @@ void Thread::search() {
   ttHitAverage = ttHitAverageWindow * ttHitAverageResolution / 2;
 
   int ct = int(Options["Contempt"]) * PawnValueEg / 100; // From centipawns
+  shortPv = 0;
 
   // In analysis mode, adjust contempt in accordance with user preference
   if (Limits.infinite || Options["UCI_AnalyseMode"])
@@ -495,6 +496,14 @@ void Thread::search() {
               delta += delta / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
+          }
+
+          if (pvIdx == 0)
+          {
+              if (selDepth < rootDepth)
+                  shortPv = rootDepth - selDepth;
+              else
+                  shortPv = 0;
           }
 
           // Sort the PV lines searched so far and update the GUI
@@ -1166,7 +1175,7 @@ moves_loop: // When in check, search starts from here
                   r++;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= ss->statScore / 16384;
+              r -= (ss->statScore + 512 * thisThread->shortPv) / 16384;
           }
 
           Depth d = clamp(newDepth - r, 1, newDepth);
