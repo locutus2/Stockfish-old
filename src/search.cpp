@@ -498,10 +498,13 @@ void Thread::search() {
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
 
-          if (pvIdx == 0 && selDepth < rootDepth)
-              ++shortPv;
-          else
-              shortPv = 0;
+          if (pvIdx == 0)
+          {
+              if (selDepth < rootDepth)
+                  ++shortPv;
+              else
+                  shortPv = 0;
+          }
 
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
