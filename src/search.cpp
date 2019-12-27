@@ -429,7 +429,7 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value previousScore = rootMoves[pvIdx].previousScore;
-              delta = Value(21 + shortPv + abs(previousScore) / 256);
+              delta = Value(21 + 2 * shortPv + abs(previousScore) / 256);
               alpha = std::max(previousScore - delta,-VALUE_INFINITE);
               beta  = std::min(previousScore + delta, VALUE_INFINITE);
 
@@ -501,7 +501,7 @@ void Thread::search() {
           if (pvIdx == 0)
           {
               if (selDepth < rootDepth)
-                  shortPv = rootDepth - selDepth;
+                  ++shortPv;
               else
                   shortPv = 0;
           }
