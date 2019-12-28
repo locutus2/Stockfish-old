@@ -380,6 +380,7 @@ void Thread::search() {
   ttHitAverage = ttHitAverageWindow * ttHitAverageResolution / 2;
 
   int ct = int(Options["Contempt"]) * PawnValueEg / 100; // From centipawns
+  shortPv = 0;
 
   // In analysis mode, adjust contempt in accordance with user preference
   if (Limits.infinite || Options["UCI_AnalyseMode"])
@@ -495,6 +496,14 @@ void Thread::search() {
               delta += delta / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
+          }
+
+          if (pvIdx == 0)
+          {
+              if (selDepth < rootDepth)
+                  shortPv = rootDepth - selDepth;
+              else
+                  shortPv = 0;
           }
 
           // Sort the PV lines searched so far and update the GUI
@@ -818,7 +827,7 @@ namespace {
     // Step 8. Futility pruning: child node (~30 Elo)
     if (   !PvNode
         &&  depth < 6
-        &&  eval - futility_margin(depth, improving) >= beta
+        &&  eval - futility_margin(depth, improving) - thisThread->shortPv >= beta
         &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
         return eval;
 
