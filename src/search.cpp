@@ -501,9 +501,9 @@ void Thread::search() {
           if (pvIdx == 0)
           {
               if (selDepth < rootDepth)
-                  shortPv = rootDepth - selDepth;
+                  shortPv = 3 * (rootDepth - selDepth);
               else
-                  shortPv /= 2;
+                  shortPv = 0;
           }
 
           // Sort the PV lines searched so far and update the GUI
