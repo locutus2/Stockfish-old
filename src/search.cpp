@@ -1166,7 +1166,7 @@ moves_loop: // When in check, search starts from here
                   r++;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore + std::max(8192 * (thisThread->rootDepth - thisThread->selDepth) / thisThread->rootDepth, 0)) / 16384;
+              r -= (ss->statScore + std::max(7200 * (thisThread->rootDepth - thisThread->selDepth) / thisThread->rootDepth, 0)) / 16384;
           }
 
           Depth d = clamp(newDepth - r, 1, newDepth);
