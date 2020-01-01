@@ -1174,6 +1174,14 @@ moves_loop: // When in check, search starts from here
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
           doFullDepthSearch = (value > alpha && d != newDepth), didLMR = true;
+
+          if (doFullDepthSearch && !captureOrPromotion)
+              ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+                             + (*contHist[0])[movedPiece][to_sq(move)]
+                             + (*contHist[1])[movedPiece][to_sq(move)]
+                             + (*contHist[3])[movedPiece][to_sq(move)]
+                             - 4926;
+
       }
       else
           doFullDepthSearch = !PvNode || moveCount > 1, didLMR = false;
