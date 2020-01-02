@@ -24,12 +24,11 @@
 #include "misc.h"
 #include "types.h"
 
-/// TTEntry struct is the 10 bytes transposition table entry, defined as below:
+/// TTEntry struct is the 8 bytes transposition table entry, defined as below:
 ///
 /// key        16 bit
 /// move       16 bit
 /// value      16 bit
-/// eval value 16 bit
 /// generation  5 bit
 /// pv node     1 bit
 /// bound type  2 bit
@@ -39,11 +38,10 @@ struct TTEntry {
 
   Move  move()  const { return (Move )move16; }
   Value value() const { return (Value)value16; }
-  Value eval()  const { return (Value)eval16; }
   Depth depth() const { return (Depth)depth8 + DEPTH_OFFSET; }
   bool is_pv() const { return (bool)(genBound8 & 0x4); }
   Bound bound() const { return (Bound)(genBound8 & 0x3); }
-  void save(Key k, Value v, bool pv, Bound b, Depth d, Move m, Value ev);
+  void save(Key k, Value v, bool pv, Bound b, Depth d, Move m);
 
 private:
   friend class TranspositionTable;
@@ -51,7 +49,6 @@ private:
   uint16_t key16;
   uint16_t move16;
   int16_t  value16;
-  int16_t  eval16;
   uint8_t  genBound8;
   uint8_t  depth8;
 };
@@ -67,11 +64,10 @@ private:
 class TranspositionTable {
 
   static constexpr int CacheLineSize = 64;
-  static constexpr int ClusterSize = 3;
+  static constexpr int ClusterSize = 4;
 
   struct Cluster {
     TTEntry entry[ClusterSize];
-    char padding[2]; // Align to a divisor of the cache line size
   };
 
   static_assert(CacheLineSize % sizeof(Cluster) == 0, "Cluster size incorrect");
