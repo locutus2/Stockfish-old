@@ -57,9 +57,10 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm,
+                       Move* killers, bool rq)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
-             refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d) {
+             refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), reorderQuiets(rq) {
 
   assert(d > 0);
 
@@ -200,7 +201,7 @@ top:
       /* fallthrough */
 
   case QUIET_INIT:
-      if (!skipQuiets)
+      if (!skipQuiets && !reorderQuiets)
       {
           cur = endBadCaptures;
           endMoves = generate<QUIETS>(pos, cur);
@@ -213,11 +214,19 @@ top:
       /* fallthrough */
 
   case QUIET:
-      if (   !skipQuiets
-          && select<Next>([&](){return   *cur != refutations[0].move
-                                      && *cur != refutations[1].move
-                                      && *cur != refutations[2].move;}))
-          return *(cur - 1);
+      if (!skipQuiets)
+      {
+          if (reorderQuiets)
+          {
+              score<QUIETS>();
+              partial_insertion_sort(cur, endMoves, -3000 * depth);
+          }
+
+          if (select<Next>([&](){return   *cur != refutations[0].move
+                                       && *cur != refutations[1].move
+                                       && *cur != refutations[2].move;}))
+              return *(cur - 1);
+      }
 
       // Prepare the pointers to loop over the bad captures
       cur = moves;
