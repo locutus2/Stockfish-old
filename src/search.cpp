@@ -1282,6 +1282,9 @@ moves_loop: // When in check, search starts from here
           else if (!captureOrPromotion && quietCount < 64)
               quietsSearched[quietCount++] = move;
       }
+
+      if (rootNode)
+          mp.reorder(moveCountPruning);
     }
 
     // The following condition would detect a stop only after move loop has been

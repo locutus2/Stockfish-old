@@ -147,6 +147,16 @@ Move MovePicker::select(Pred filter) {
   return MOVE_NONE;
 }
 
+/// MovePicker::reorder() scores and sorts remaining QUIET stage moves again.
+void MovePicker::reorder(bool skipQuiets) {
+
+  if (stage == QUIET && !skipQuiets)
+  {
+      score<QUIETS>();
+      partial_insertion_sort(cur, endMoves, -3000 * depth);
+  }
+}
+
 /// MovePicker::next_move() is the most important method of the MovePicker class. It
 /// returns a new pseudo legal move every time it is called until there are no more
 /// moves left, picking the move with the highest score from a list of generated moves.
