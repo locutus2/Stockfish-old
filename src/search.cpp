@@ -1283,7 +1283,7 @@ moves_loop: // When in check, search starts from here
               quietsSearched[quietCount++] = move;
       }
 
-      if (depth >= 11)
+      if (ss->ply < 2)
           mp.reorder(moveCountPruning);
     }
 
