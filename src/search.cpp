@@ -1283,7 +1283,7 @@ moves_loop: // When in check, search starts from here
               quietsSearched[quietCount++] = move;
       }
 
-      if (PvNode)
+      if (depth >= 11)
           mp.reorder(moveCountPruning);
     }
 
