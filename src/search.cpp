@@ -1283,7 +1283,7 @@ moves_loop: // When in check, search starts from here
               quietsSearched[quietCount++] = move;
       }
 
-      if (rootNode)
+      if (PvNode)
           mp.reorder(moveCountPruning);
     }
 
