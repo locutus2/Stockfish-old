@@ -1099,6 +1099,7 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
       // Step 16. Reduced depth search (LMR). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1112,6 +1113,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          CC = true;
+          C = captureOrPromotion;
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 500 * ttHitAverageResolution * ttHitAverageWindow / 1024)
               r--;
@@ -1250,6 +1253,247 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if (CC)
+      {
+        dbg_hit_on(value>alpha, 0);
+        dbg_hit_on(value>alpha, moveCount);
+        dbg_hit_on(value>alpha, 100*(1+C));
+        dbg_hit_on(value>alpha, 100*(1+C) + moveCount);
+
+        dbg_hit_on(value>alpha, 1000);
+        dbg_hit_on(value>alpha, 1000 + depth);
+        dbg_hit_on(value>alpha, 1000 + 100*(1+C));
+        dbg_hit_on(value>alpha, 1000 + 100*(1+C) + depth);
+
+/*
+CC=true
+C=captureOrPromotion
+[0] Total 30342707 Hits 1693291 hit rate (%) 5.58055
+[2] Total 5223524 Hits 750114 hit rate (%) 14.3603
+[3] Total 3915331 Hits 335149 hit rate (%) 8.55991
+[4] Total 3084027 Hits 177782 hit rate (%) 5.76461
+[5] Total 2459728 Hits 105463 hit rate (%) 4.28759
+[6] Total 2058573 Hits 71889 hit rate (%) 3.49218
+[7] Total 1598739 Hits 44566 hit rate (%) 2.78757
+[8] Total 1353840 Hits 34816 hit rate (%) 2.57165
+[9] Total 1145635 Hits 29052 hit rate (%) 2.53589
+[10] Total 1110631 Hits 23703 hit rate (%) 2.13419
+[11] Total 953997 Hits 19472 hit rate (%) 2.0411
+[12] Total 825428 Hits 16916 hit rate (%) 2.04936
+[13] Total 731511 Hits 15210 hit rate (%) 2.07926
+[14] Total 600537 Hits 10971 hit rate (%) 1.82686
+[15] Total 567302 Hits 9119 hit rate (%) 1.60743
+[16] Total 495399 Hits 7235 hit rate (%) 1.46044
+[17] Total 430745 Hits 6135 hit rate (%) 1.42428
+[18] Total 366856 Hits 5091 hit rate (%) 1.38774
+[19] Total 337807 Hits 4455 hit rate (%) 1.3188
+[20] Total 389831 Hits 4259 hit rate (%) 1.09252
+[21] Total 358447 Hits 3668 hit rate (%) 1.0233
+[22] Total 288930 Hits 2962 hit rate (%) 1.02516
+[23] Total 227813 Hits 2264 hit rate (%) 0.993798
+[24] Total 191242 Hits 1738 hit rate (%) 0.908796
+[25] Total 167817 Hits 1523 hit rate (%) 0.907536
+[26] Total 156715 Hits 1290 hit rate (%) 0.82315
+[27] Total 180993 Hits 1257 hit rate (%) 0.694502
+[28] Total 156706 Hits 1130 hit rate (%) 0.721096
+[29] Total 131839 Hits 973 hit rate (%) 0.738021
+[30] Total 125296 Hits 978 hit rate (%) 0.780552
+[31] Total 108909 Hits 865 hit rate (%) 0.794241
+[32] Total 89410 Hits 678 hit rate (%) 0.758304
+[33] Total 71925 Hits 449 hit rate (%) 0.624261
+[34] Total 75467 Hits 405 hit rate (%) 0.536658
+[35] Total 63793 Hits 288 hit rate (%) 0.45146
+[36] Total 50995 Hits 236 hit rate (%) 0.46279
+[37] Total 41415 Hits 189 hit rate (%) 0.456356
+[38] Total 33634 Hits 162 hit rate (%) 0.481655
+[39] Total 28424 Hits 143 hit rate (%) 0.503096
+[40] Total 27534 Hits 142 hit rate (%) 0.515726
+[41] Total 26996 Hits 144 hit rate (%) 0.533412
+[42] Total 24159 Hits 121 hit rate (%) 0.500849
+[43] Total 19689 Hits 89 hit rate (%) 0.452029
+[44] Total 13887 Hits 72 hit rate (%) 0.518471
+[45] Total 9522 Hits 38 hit rate (%) 0.399076
+[46] Total 6265 Hits 26 hit rate (%) 0.415004
+[47] Total 4247 Hits 15 hit rate (%) 0.35319
+[48] Total 3032 Hits 17 hit rate (%) 0.560686
+[49] Total 2125 Hits 7 hit rate (%) 0.329412
+[50] Total 1501 Hits 4 hit rate (%) 0.266489
+[51] Total 1174 Hits 6 hit rate (%) 0.511073
+[52] Total 912 Hits 5 hit rate (%) 0.548246
+[53] Total 833 Hits 3 hit rate (%) 0.360144
+[54] Total 605 Hits 2 hit rate (%) 0.330579
+[55] Total 403 Hits 4 hit rate (%) 0.992556
+[56] Total 271 Hits 1 hit rate (%) 0.369004
+[57] Total 157 Hits 0 hit rate (%) 0
+[58] Total 94 Hits 0 hit rate (%) 0
+[59] Total 50 Hits 0 hit rate (%) 0
+[60] Total 23 Hits 0 hit rate (%) 0
+[61] Total 11 Hits 0 hit rate (%) 0
+[62] Total 4 Hits 0 hit rate (%) 0
+[63] Total 2 Hits 0 hit rate (%) 0
+[100] Total 27044451 Hits 1558138 hit rate (%) 5.7614
+[102] Total 4597675 Hits 655795 hit rate (%) 14.2636
+[103] Total 3753651 Hits 325852 hit rate (%) 8.68093
+[104] Total 3030001 Hits 176429 hit rate (%) 5.82274
+[105] Total 2430442 Hits 105020 hit rate (%) 4.32102
+[106] Total 2032913 Hits 71576 hit rate (%) 3.52086
+[107] Total 1440516 Hits 41596 hit rate (%) 2.88758
+[108] Total 1245907 Hits 32610 hit rate (%) 2.61737
+[109] Total 1084770 Hits 27680 hit rate (%) 2.55169
+[110] Total 841121 Hits 20336 hit rate (%) 2.41773
+[111] Total 775166 Hits 17853 hit rate (%) 2.30312
+[112] Total 728746 Hits 16068 hit rate (%) 2.20488
+[113] Total 683474 Hits 14759 hit rate (%) 2.15941
+[114] Total 523325 Hits 8400 hit rate (%) 1.60512
+[115] Total 411334 Hits 6259 hit rate (%) 1.52163
+[116] Total 392149 Hits 5606 hit rate (%) 1.42956
+[117] Total 374036 Hits 5353 hit rate (%) 1.43115
+[118] Total 337880 Hits 4742 hit rate (%) 1.40346
+[119] Total 319641 Hits 4242 hit rate (%) 1.32711
+[120] Total 259991 Hits 3514 hit rate (%) 1.35159
+[121] Total 186990 Hits 1828 hit rate (%) 0.977592
+[122] Total 177867 Hits 1654 hit rate (%) 0.929908
+[123] Total 168459 Hits 1570 hit rate (%) 0.931978
+[124] Total 161677 Hits 1405 hit rate (%) 0.869017
+[125] Total 152167 Hits 1364 hit rate (%) 0.896384
+[126] Total 143921 Hits 1184 hit rate (%) 0.822674
+[127] Total 111403 Hits 1000 hit rate (%) 0.897642
+[128] Total 104340 Hits 938 hit rate (%) 0.898984
+[129] Total 96959 Hits 822 hit rate (%) 0.847781
+[130] Total 72201 Hits 480 hit rate (%) 0.664811
+[131] Total 67031 Hits 411 hit rate (%) 0.613149
+[132] Total 61205 Hits 381 hit rate (%) 0.622498
+[133] Total 50458 Hits 285 hit rate (%) 0.564826
+[134] Total 40403 Hits 254 hit rate (%) 0.628666
+[135] Total 35440 Hits 194 hit rate (%) 0.547404
+[136] Total 30574 Hits 160 hit rate (%) 0.52332
+[137] Total 26475 Hits 138 hit rate (%) 0.521246
+[138] Total 22262 Hits 108 hit rate (%) 0.485132
+[139] Total 18683 Hits 84 hit rate (%) 0.449607
+[140] Total 15602 Hits 76 hit rate (%) 0.487117
+[141] Total 9544 Hits 32 hit rate (%) 0.335289
+[142] Total 7555 Hits 22 hit rate (%) 0.291198
+[143] Total 5407 Hits 17 hit rate (%) 0.314407
+[144] Total 4175 Hits 8 hit rate (%) 0.191617
+[145] Total 3342 Hits 15 hit rate (%) 0.448833
+[146] Total 2423 Hits 6 hit rate (%) 0.247627
+[147] Total 1706 Hits 5 hit rate (%) 0.293083
+[148] Total 1184 Hits 3 hit rate (%) 0.253378
+[149] Total 831 Hits 2 hit rate (%) 0.240674
+[150] Total 518 Hits 0 hit rate (%) 0
+[151] Total 324 Hits 1 hit rate (%) 0.308642
+[152] Total 219 Hits 1 hit rate (%) 0.456621
+[153] Total 160 Hits 0 hit rate (%) 0
+[154] Total 84 Hits 0 hit rate (%) 0
+[155] Total 64 Hits 0 hit rate (%) 0
+[156] Total 31 Hits 0 hit rate (%) 0
+[157] Total 11 Hits 0 hit rate (%) 0
+[158] Total 12 Hits 0 hit rate (%) 0
+[159] Total 5 Hits 0 hit rate (%) 0
+[160] Total 1 Hits 0 hit rate (%) 0
+[200] Total 3298256 Hits 135153 hit rate (%) 4.09771
+[202] Total 625849 Hits 94319 hit rate (%) 15.0706
+[203] Total 161680 Hits 9297 hit rate (%) 5.75025
+[204] Total 54026 Hits 1353 hit rate (%) 2.50435
+[205] Total 29286 Hits 443 hit rate (%) 1.51267
+[206] Total 25660 Hits 313 hit rate (%) 1.2198
+[207] Total 158223 Hits 2970 hit rate (%) 1.8771
+[208] Total 107933 Hits 2206 hit rate (%) 2.04386
+[209] Total 60865 Hits 1372 hit rate (%) 2.25417
+[210] Total 269510 Hits 3367 hit rate (%) 1.2493
+[211] Total 178831 Hits 1619 hit rate (%) 0.905324
+[212] Total 96682 Hits 848 hit rate (%) 0.877102
+[213] Total 48037 Hits 451 hit rate (%) 0.93886
+[214] Total 77212 Hits 2571 hit rate (%) 3.32979
+[215] Total 155968 Hits 2860 hit rate (%) 1.83371
+[216] Total 103250 Hits 1629 hit rate (%) 1.57772
+[217] Total 56709 Hits 782 hit rate (%) 1.37897
+[218] Total 28976 Hits 349 hit rate (%) 1.20445
+[219] Total 18166 Hits 213 hit rate (%) 1.17252
+[220] Total 129840 Hits 745 hit rate (%) 0.573783
+[221] Total 171457 Hits 1840 hit rate (%) 1.07316
+[222] Total 111063 Hits 1308 hit rate (%) 1.17771
+[223] Total 59354 Hits 694 hit rate (%) 1.16926
+[224] Total 29565 Hits 333 hit rate (%) 1.12633
+[225] Total 15650 Hits 159 hit rate (%) 1.01597
+[226] Total 12794 Hits 106 hit rate (%) 0.828513
+[227] Total 69590 Hits 257 hit rate (%) 0.369306
+[228] Total 52366 Hits 192 hit rate (%) 0.36665
+[229] Total 34880 Hits 151 hit rate (%) 0.432913
+[230] Total 53095 Hits 498 hit rate (%) 0.937941
+[231] Total 41878 Hits 454 hit rate (%) 1.0841
+[232] Total 28205 Hits 297 hit rate (%) 1.053
+[233] Total 21467 Hits 164 hit rate (%) 0.763963
+[234] Total 35064 Hits 151 hit rate (%) 0.430641
+[235] Total 28353 Hits 94 hit rate (%) 0.331535
+[236] Total 20421 Hits 76 hit rate (%) 0.372166
+[237] Total 14940 Hits 51 hit rate (%) 0.341365
+[238] Total 11372 Hits 54 hit rate (%) 0.474851
+[239] Total 9741 Hits 59 hit rate (%) 0.605687
+[240] Total 11932 Hits 66 hit rate (%) 0.553134
+[241] Total 17452 Hits 112 hit rate (%) 0.64176
+[242] Total 16604 Hits 99 hit rate (%) 0.596242
+[243] Total 14282 Hits 72 hit rate (%) 0.504131
+[244] Total 9712 Hits 64 hit rate (%) 0.658979
+[245] Total 6180 Hits 23 hit rate (%) 0.372168
+[246] Total 3842 Hits 20 hit rate (%) 0.520562
+[247] Total 2541 Hits 10 hit rate (%) 0.393546
+[248] Total 1848 Hits 14 hit rate (%) 0.757576
+[249] Total 1294 Hits 5 hit rate (%) 0.386399
+[250] Total 983 Hits 4 hit rate (%) 0.406918
+[251] Total 850 Hits 5 hit rate (%) 0.588235
+[252] Total 693 Hits 4 hit rate (%) 0.577201
+[253] Total 673 Hits 3 hit rate (%) 0.445765
+[254] Total 521 Hits 2 hit rate (%) 0.383877
+[255] Total 339 Hits 4 hit rate (%) 1.17994
+[256] Total 240 Hits 1 hit rate (%) 0.416667
+[257] Total 146 Hits 0 hit rate (%) 0
+[258] Total 82 Hits 0 hit rate (%) 0
+[259] Total 45 Hits 0 hit rate (%) 0
+[260] Total 22 Hits 0 hit rate (%) 0
+[261] Total 11 Hits 0 hit rate (%) 0
+[262] Total 4 Hits 0 hit rate (%) 0
+[263] Total 2 Hits 0 hit rate (%) 0
+[1000] Total 30342707 Hits 1693291 hit rate (%) 5.58055
+[1003] Total 8059416 Hits 696615 hit rate (%) 8.64349
+[1004] Total 6670550 Hits 413552 hit rate (%) 6.19967
+[1005] Total 4196260 Hits 234532 hit rate (%) 5.58907
+[1006] Total 3835094 Hits 165276 hit rate (%) 4.30957
+[1007] Total 2693172 Hits 91756 hit rate (%) 3.40699
+[1008] Total 1919106 Hits 51515 hit rate (%) 2.68432
+[1009] Total 1356049 Hits 24773 hit rate (%) 1.82685
+[1010] Total 892237 Hits 10357 hit rate (%) 1.16079
+[1011] Total 486545 Hits 3853 hit rate (%) 0.79191
+[1012] Total 191365 Hits 974 hit rate (%) 0.508975
+[1013] Total 42913 Hits 88 hit rate (%) 0.205066
+[1100] Total 27044451 Hits 1558138 hit rate (%) 5.7614
+[1103] Total 7210089 Hits 635292 hit rate (%) 8.81115
+[1104] Total 5669548 Hits 377497 hit rate (%) 6.65833
+[1105] Total 3702058 Hits 218156 hit rate (%) 5.89283
+[1106] Total 3379522 Hits 154938 hit rate (%) 4.58461
+[1107] Total 2434821 Hits 86166 hit rate (%) 3.5389
+[1108] Total 1782882 Hits 48342 hit rate (%) 2.71145
+[1109] Total 1294769 Hits 23307 hit rate (%) 1.80009
+[1110] Total 864952 Hits 9791 hit rate (%) 1.13197
+[1111] Total 475789 Hits 3627 hit rate (%) 0.762313
+[1112] Total 187819 Hits 934 hit rate (%) 0.497287
+[1113] Total 42202 Hits 88 hit rate (%) 0.208521
+[1200] Total 3298256 Hits 135153 hit rate (%) 4.09771
+[1203] Total 849327 Hits 61323 hit rate (%) 7.22019
+[1204] Total 1001002 Hits 36055 hit rate (%) 3.60189
+[1205] Total 494202 Hits 16376 hit rate (%) 3.31362
+[1206] Total 455572 Hits 10338 hit rate (%) 2.26924
+[1207] Total 258351 Hits 5590 hit rate (%) 2.16372
+[1208] Total 136224 Hits 3173 hit rate (%) 2.32925
+[1209] Total 61280 Hits 1466 hit rate (%) 2.3923
+[1210] Total 27285 Hits 566 hit rate (%) 2.0744
+[1211] Total 10756 Hits 226 hit rate (%) 2.10115
+[1212] Total 3546 Hits 40 hit rate (%) 1.12803
+[1213] Total 711 Hits 0 hit rate (%) 0
+
+*/
       }
 
       if (value > bestValue)
