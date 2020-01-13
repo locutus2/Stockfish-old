@@ -1146,7 +1146,7 @@ moves_loop: // When in check, search starts from here
               r -= 2;
 
           // Decrease reduction for early checks
-          if (givesCheck && moveCount < 8)
+          if (givesCheck && moveCount < 4)
               r--;
 
           if (!captureOrPromotion)
