@@ -1146,7 +1146,7 @@ moves_loop: // When in check, search starts from here
               r -= 2;
 
           // Decrease reduction for checks at low depth
-          if (givesCheck && depth < 5)
+          if (givesCheck && depth < 9)
               r--;
 
           if (!captureOrPromotion)
