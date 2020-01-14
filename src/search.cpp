@@ -1145,8 +1145,8 @@ moves_loop: // When in check, search starts from here
           if (singularLMR)
               r -= 2;
 
-          // Decrease reduction for checks at low depth
-          if (givesCheck && depth < 9)
+          // Decrease reduction for late checks
+          if (givesCheck && moveCount > 11)
               r--;
 
           if (!captureOrPromotion)
