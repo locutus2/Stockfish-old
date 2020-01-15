@@ -1148,7 +1148,7 @@ moves_loop: // When in check, search starts from here
           if (!captureOrPromotion)
           {
               // Decrease reduction for counter move at low depth
-              if (move == countermove && depth < 8)
+              if (move == countermove && depth < 5)
                   r--;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
