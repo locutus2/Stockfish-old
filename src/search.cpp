@@ -1133,7 +1133,8 @@ moves_loop: // When in check, search starts from here
           //C = inCheck;
           //C = !captureOrPromotion && move == ss->killers[0];
           //C = !captureOrPromotion && move == countermove;
-          C = cutNode;
+          //C = cutNode;
+          C = improving;
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 500 * ttHitAverageResolution * ttHitAverageWindow / 1024)
               r--;
