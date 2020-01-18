@@ -1128,6 +1128,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           CC = true;
+          int R = 1;
           //C = captureOrPromotion;
           //C = givesCheck;
           //C = inCheck;
@@ -1135,6 +1136,9 @@ moves_loop: // When in check, search starts from here
           //C = !captureOrPromotion && move == countermove;
           //C = cutNode;
           C = improving;
+          
+          if (CC) r += R;
+          
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 500 * ttHitAverageResolution * ttHitAverageWindow / 1024)
               r--;
