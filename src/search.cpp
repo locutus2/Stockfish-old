@@ -700,7 +700,7 @@ namespace {
                                 + ttHitAverageResolution * ttHit;
 
     // At non-PV nodes we check for an early TT cutoff
-    if (  !ttPv
+    if (  !PvNode
         && ttHit
         && tte->depth() >= depth
         && ttValue != VALUE_NONE // Possible in case of TT access race
@@ -836,7 +836,7 @@ namespace {
         return eval;
 
     // Step 9. Null move search with verification search (~40 Elo)
-    if (   !PvNode
+    if (   !ttPv
         && (ss-1)->currentMove != MOVE_NULL
         && (ss-1)->statScore < 23397
         &&  eval >= beta
