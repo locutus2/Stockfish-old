@@ -1150,9 +1150,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction if average path move count is high
+              // Decrease reduction if average path move count is high
               if ((ss+1)->totalMoveCount > (ss->ply + 1) * 16)
-                  r++;
+                  r--;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
