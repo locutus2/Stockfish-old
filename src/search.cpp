@@ -1149,7 +1149,7 @@ moves_loop: // When in check, search starts from here
               r -= 2;
 
           // Decrease reduction if average path move count is high
-          if ((ss+1)->totalMoveCount > (ss->ply + 1) * 16)
+          if ((ss+1)->totalMoveCount > (ss->ply + 1) * 20)
               r--;
 
           if (!captureOrPromotion)
