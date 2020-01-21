@@ -625,7 +625,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, ttPv, inCheck, givesCheck, improving, didLMR, priorCapture;
+    bool ttHit, ttPv, inCheck, givesCheck, improving, didLMR, priorCapture, ttMoveFailed;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture, singularLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -955,6 +955,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue;
     singularLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+    ttMoveFailed = false;
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1145,6 +1146,10 @@ moves_loop: // When in check, search starts from here
           if (singularLMR)
               r -= 2;
 
+          // Decrease reduction if ttMove failed
+          if (ttMoveFailed)
+              r--;
+
           if (!captureOrPromotion)
           {
               // Increase reduction if ttMove is a capture (~5 Elo)
@@ -1289,6 +1294,8 @@ moves_loop: // When in check, search starts from here
                   break;
               }
           }
+          else if (ttMove == move)
+              ttMoveFailed = true;
       }
 
       if (move != bestMove)
