@@ -852,6 +852,7 @@ namespace {
         Depth R = (854 + 68 * depth) / 258 + std::min(int(eval - beta) / 192, 3);
 
         ss->currentMove = MOVE_NULL;
+        (ss+1)->totalMoveCount = ss->totalMoveCount;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
 
         pos.do_null_move(st);
@@ -907,6 +908,7 @@ namespace {
                 probCutCount++;
 
                 ss->currentMove = move;
+                (ss+1)->totalMoveCount = ss->totalMoveCount + probCutCount;
                 ss->continuationHistory = &thisThread->continuationHistory[inCheck]
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
@@ -1104,6 +1106,7 @@ moves_loop: // When in check, search starts from here
 
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
+      (ss+1)->totalMoveCount = ss->totalMoveCount + moveCount;
       ss->continuationHistory = &thisThread->continuationHistory[inCheck]
                                                                 [captureOrPromotion]
                                                                 [movedPiece]
@@ -1144,6 +1147,10 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if ttMove has been singularly extended (~3 Elo)
           if (singularLMR)
               r -= 2;
+
+          // Increase reduction if average path move count is high
+          if ((ss+1)->totalMoveCount > (ss->ply + 1) * 16)
+              r++;
 
           if (!captureOrPromotion)
           {
