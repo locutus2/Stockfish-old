@@ -1288,6 +1288,9 @@ moves_loop: // When in check, search starts from here
                   ss->statScore = 0;
                   break;
               }
+
+              if (move != ttMove)
+                  ttCapture = false;
           }
       }
 
