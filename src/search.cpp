@@ -1025,7 +1025,11 @@ moves_loop: // When in check, search starts from here
 
               // Prune moves with negative SEE (~20 Elo)
               if (!pos.see_ge(move, Value(-(32 - std::min(lmrDepth, 18)) * lmrDepth * lmrDepth)))
+              {
+                  if (quietCount < 64)
+                      quietsSearched[quietCount++] = move;
                   continue;
+              }
           }
           else if (!pos.see_ge(move, Value(-194) * depth)) // (~25 Elo)
                   continue;
