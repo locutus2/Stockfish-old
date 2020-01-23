@@ -999,7 +999,7 @@ moves_loop: // When in check, search starts from here
           && bestValue > VALUE_MATED_IN_MAX_PLY)
       {
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
-          moveCountPruning = !PvNode && moveCount >= futility_move_count(improving, depth);
+          moveCountPruning = !ttPv && moveCount >= futility_move_count(improving, depth);
 
           if (   !captureOrPromotion
               && !givesCheck)
