@@ -1031,6 +1031,10 @@ moves_loop: // When in check, search starts from here
           {
               if (captureOrPromotion && captureCount < 32)
                   capturesSearched[captureCount++] = move;
+
+              else if (!captureOrPromotion && quietCount < 64)
+                  quietsSearched[quietCount++] = move;
+
               continue;
           }
       }
