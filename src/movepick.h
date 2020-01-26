@@ -110,13 +110,13 @@ struct Stats<T, D, Smoothing, Size> : public std::array<StatsEntry<T, D, Smoothi
 /// In stats table, D=0 means that the template parameter is not used
 enum StatsParams { NOT_USED = 0 };
 enum StatsType   { NoCaptures, Captures };
-enum StatsSmooth { NO_SMOOTHING = 0, DEFAULT_SMOOTHING = 8 };
+enum StatsSmooth { NO_SMOOTHING = 0, DEFAULT_SMOOTHING = 4 };
 
 /// ButterflyHistory records how often quiet moves have been successful or
 /// unsuccessful during the current search, and is used for reduction and move
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
-typedef Stats<int16_t, 10692, DEFAULT_SMOOTHING, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
+typedef Stats<int16_t, 10692, NO_SMOOTHING, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
 
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
 /// move, see www.chessprogramming.org/Countermove_Heuristic
@@ -126,7 +126,7 @@ typedef Stats<Move, NOT_USED, NO_SMOOTHING, PIECE_NB, SQUARE_NB> CounterMoveHist
 typedef Stats<int16_t, 10692, DEFAULT_SMOOTHING, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
 
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
-typedef Stats<int16_t, 29952, DEFAULT_SMOOTHING, PIECE_NB, SQUARE_NB> PieceToHistory;
+typedef Stats<int16_t, 29952, NO_SMOOTHING, PIECE_NB, SQUARE_NB> PieceToHistory;
 
 /// ContinuationHistory is the combined history of a given pair of moves, usually
 /// the current one given a previous one. The nested history table is based on
