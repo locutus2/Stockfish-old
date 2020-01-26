@@ -110,7 +110,7 @@ struct Stats<T, D, Smoothing, Size> : public std::array<StatsEntry<T, D, Smoothi
 /// In stats table, D=0 means that the template parameter is not used
 enum StatsParams { NOT_USED = 0 };
 enum StatsType   { NoCaptures, Captures };
-enum StatsSmooth { NO_SMOOTHING = 0, DEFAULT_SMOOTHING_PERIOD = 2 };
+enum StatsSmooth { NO_SMOOTHING = 0, DEFAULT_SMOOTHING_PERIOD = 4 };
 
 /// ButterflyHistory records how often quiet moves have been successful or
 /// unsuccessful during the current search, and is used for reduction and move
