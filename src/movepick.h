@@ -33,7 +33,7 @@
 /// be a move or even a nested history. We use a class instead of naked value
 /// to directly call history update operator<<() on the entry so to use stats
 /// tables at caller sites as simple multi-dim arrays.
-template<typename T, int D>
+template<typename T, int D, int F>
 class StatsEntry {
 
   T entry;
@@ -45,10 +45,13 @@ public:
   operator const T&() const { return entry; }
 
   void operator<<(int bonus) {
-    assert(abs(bonus) <= D); // Ensure range is [-D, D]
+    assert(abs(bonus) <= (F > 0 ?  D * F / F + 1 : D)); // Ensure range is [-D, D]
     static_assert(D <= std::numeric_limits<T>::max(), "D overflows T");
 
-    entry += bonus - entry * abs(bonus) / D;
+    if (F > 0)
+        entry += (bonus - entry * abs(bonus) / D) * (F + 1) / F;
+    else
+        entry += bonus - entry * abs(bonus) / D;
 
     assert(abs(entry) <= D);
   }
@@ -59,49 +62,49 @@ public:
 /// template parameter D limits the range of updates in [-D, D] when we update
 /// values with the << operator, while the last parameters (Size and Sizes)
 /// encode the dimensions of the array.
-template <typename T, int D, int Size, int... Sizes>
-struct Stats : public std::array<Stats<T, D, Sizes...>, Size>
+template <typename T, int D, int F, int Size, int... Sizes>
+struct Stats : public std::array<Stats<T, D, F, Sizes...>, Size>
 {
-  typedef Stats<T, D, Size, Sizes...> stats;
+  typedef Stats<T, D, F, Size, Sizes...> stats;
 
   void fill(const T& v) {
 
     // For standard-layout 'this' points to first struct member
     assert(std::is_standard_layout<stats>::value);
 
-    typedef StatsEntry<T, D> entry;
+    typedef StatsEntry<T, D, F> entry;
     entry* p = reinterpret_cast<entry*>(this);
     std::fill(p, p + sizeof(*this) / sizeof(entry), v);
   }
 };
 
-template <typename T, int D, int Size>
-struct Stats<T, D, Size> : public std::array<StatsEntry<T, D>, Size> {};
+template <typename T, int D, int F, int Size>
+struct Stats<T, D, F, Size> : public std::array<StatsEntry<T, D, F>, Size> {};
 
 /// In stats table, D=0 means that the template parameter is not used
-enum StatsParams { NOT_USED = 0 };
+enum StatsParams { NOT_USED = 0, DEFAULT_FACTOR = 2 };
 enum StatsType { NoCaptures, Captures };
 
 /// ButterflyHistory records how often quiet moves have been successful or
 /// unsuccessful during the current search, and is used for reduction and move
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
-typedef Stats<int16_t, 10692, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
+typedef Stats<int16_t, 10692, DEFAULT_FACTOR, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
 
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
 /// move, see www.chessprogramming.org/Countermove_Heuristic
-typedef Stats<Move, NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
+typedef Stats<Move, NOT_USED, NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
 
 /// CapturePieceToHistory is addressed by a move's [piece][to][captured piece type]
-typedef Stats<int16_t, 10692, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
+typedef Stats<int16_t, 10692, DEFAULT_FACTOR, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
 
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
-typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
+typedef Stats<int16_t, 29952, DEFAULT_FACTOR, PIECE_NB, SQUARE_NB> PieceToHistory;
 
 /// ContinuationHistory is the combined history of a given pair of moves, usually
 /// the current one given a previous one. The nested history table is based on
 /// PieceToHistory instead of ButterflyBoards.
-typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
+typedef Stats<PieceToHistory, NOT_USED, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
