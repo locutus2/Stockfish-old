@@ -82,7 +82,7 @@ template <typename T, int D, int F, int Size>
 struct Stats<T, D, F, Size> : public std::array<StatsEntry<T, D, F>, Size> {};
 
 /// In stats table, D=0 means that the template parameter is not used
-enum StatsParams { NOT_USED = 0, DEFAULT_FACTOR = 2 };
+enum StatsParams { NOT_USED = 0, DEFAULT_FACTOR = 4 };
 enum StatsType { NoCaptures, Captures };
 
 /// ButterflyHistory records how often quiet moves have been successful or
