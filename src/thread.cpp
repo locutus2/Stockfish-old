@@ -190,7 +190,12 @@ void ThreadPool::start_thinking(Position& pos, StateListPtr& states,
           rootMoves.emplace_back(m);
 
   if (!rootMoves.empty())
+  {
       Tablebases::rank_root_moves(pos, rootMoves);
+
+      for (Search::RootMove &rm : rootMoves)
+          rm.pieceMove = PieceMove(pos.moved_piece(rm.pv[0]), rm.pv[0]);
+  }
 
   // After ownership transfer 'states' becomes empty, so if we stop the search
   // and call 'go' again without setting a new position states.get() == NULL.

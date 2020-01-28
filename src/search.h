@@ -72,6 +72,7 @@ struct RootMove {
   int tbRank = 0;
   int bestMoveCount = 0;
   Value tbScore;
+  PieceMove pieceMove;
   std::vector<Move> pv;
 };
 

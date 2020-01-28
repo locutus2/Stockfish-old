@@ -249,6 +249,14 @@ enum Rank : int {
   RANK_1, RANK_2, RANK_3, RANK_4, RANK_5, RANK_6, RANK_7, RANK_8, RANK_NB
 };
 
+struct PieceMove {
+  Piece piece;
+  Move move;
+  PieceMove(Piece p = NO_PIECE, Move m = MOVE_NONE) : piece(p), move(m) {}
+  bool operator==(const PieceMove& pm) const { return move == pm.move && piece == pm.piece; }
+  bool operator!=(const PieceMove& pm) const { return !(*this == pm); }
+};
+
 
 /// Score enum stores a middlegame and an endgame value in a single integer (enum).
 /// The least significant 16 bits are used to store the middlegame value and the

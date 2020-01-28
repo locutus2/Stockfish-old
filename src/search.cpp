@@ -1121,7 +1121,7 @@ moves_loop: // When in check, search starts from here
       if (    depth >= 3
           &&  moveCount > 1 + rootNode + (rootNode && bestValue < alpha)
           && (!rootNode || thisThread->best_move_count(move) == 0)
-          &&  move != thisThread->rootMoves[0].pv[0]
+          &&  PieceMove(movedPiece, move) != thisThread->rootMoves[0].pieceMove
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
