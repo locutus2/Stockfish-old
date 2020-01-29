@@ -1651,7 +1651,7 @@ moves_loop: // When in check, search starts from here
 
     for (int i : {1, 2, 3, 4, 6})
         if (is_ok((ss-i)->currentMove))
-            (*(ss-i)->continuationHistory)[pc][to] << (i == 3 ? bonus / 32 : bonus);
+            (*(ss-i)->continuationHistory)[pc][to] << (i == 3 ? bonus / 16 : bonus);
   }
 
 
