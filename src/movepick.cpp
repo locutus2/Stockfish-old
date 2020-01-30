@@ -111,12 +111,12 @@ void MovePicker::score() {
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if (Type == QUIETS)
-          m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   + 2 * (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[2])[pos.moved_piece(m)][to_sq(m)] / 11
-                   + 2 * (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
+          m.value =  17 * (*mainHistory)[pos.side_to_move()][from_to(m)]
+                   +  9 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                   + 15 * (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                   + 10 * (*continuationHistory[2])[pos.moved_piece(m)][to_sq(m)]
+                   + 16 * (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                   + 13 * (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
 
       else // Type == EVASIONS
       {
@@ -207,7 +207,7 @@ top:
           endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, -3000 * depth);
+          partial_insertion_sort(cur, endMoves, -36000 * depth);
       }
 
       ++stage;
