@@ -1693,7 +1693,7 @@ moves_loop: // When in check, search starts from here
 
     if (ss->killers[0] != move)
     {
-        if (ss->killers[1] && pos.checkers())
+        if (ss->killers[0] && pos.checkers())
             ss->killers[1] = move;
         else
         {
