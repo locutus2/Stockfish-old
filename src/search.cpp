@@ -1691,10 +1691,15 @@ moves_loop: // When in check, search starts from here
 
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, int depth) {
 
-    if (ss->killers[0] != move && !pos.checkers())
+    if (ss->killers[0] != move)
     {
-        ss->killers[1] = ss->killers[0];
-        ss->killers[0] = move;
+        if (ss->killers[1] && pos.checkers())
+            ss->killers[1] = move;
+        else
+        {
+            ss->killers[1] = ss->killers[0];
+            ss->killers[0] = move;
+        }
     }
 
     Color us = pos.side_to_move();
