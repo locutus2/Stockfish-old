@@ -1693,7 +1693,9 @@ moves_loop: // When in check, search starts from here
 
     if (ss->killers[0] != move)
     {
-        if (from_sq(move) != from_sq(ss->killers[0]) || from_sq(move) == from_sq(ss->killers[1]))
+        if (   from_sq(move) != from_sq(ss->killers[0])
+            || from_sq(move) == from_sq(ss->killers[1])
+            || ss->killers[1] == MOVE_NONE)
             ss->killers[1] = ss->killers[0];
         ss->killers[0] = move;
     }
