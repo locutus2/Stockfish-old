@@ -1226,7 +1226,7 @@ moves_loop: // When in check, search starts from here
               int bonus = value > alpha ?  stat_bonus(newDepth)
                                         : -stat_bonus(newDepth);
 
-              bonus = bonus * 3 * moveCount / (2 * moveCount + 8);
+              bonus += bonus * moveCount / (moveCount + 16);
 
               if (move == ss->killers[0])
                   bonus += bonus / 4;
