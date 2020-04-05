@@ -1223,8 +1223,10 @@ moves_loop: // When in check, search starts from here
 
           if (didLMR && !captureOrPromotion)
           {
-              int bonus = value > alpha ?  stat_bonus(newDepth) + moveCount
+              int bonus = value > alpha ?  stat_bonus(newDepth)
                                         : -stat_bonus(newDepth);
+
+              bonus = bonus * 2 * moveCount / (moveCount + 8);
 
               if (move == ss->killers[0])
                   bonus += bonus / 4;
