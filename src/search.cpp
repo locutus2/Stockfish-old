@@ -1243,8 +1243,13 @@ moves_loop: // When in check, search starts from here
 
                   update_continuation_histories(ss, movedPiece, to_sq(move), bonus);
               }
-              else if (!givesCheck)
+              else
+              {
+                  if (value > alpha)
+                      bonus /= 2;
+
                   captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] << bonus;
+              }
           }
       }
 
