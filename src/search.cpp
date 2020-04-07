@@ -1237,7 +1237,7 @@ moves_loop: // When in check, search starts from here
                                         : -stat_bonus(newDepth);
 
               if (captureOrPromotion)
-                  captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] << bonus;
+                  captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] << bonus / 2;
 
               else
               {
