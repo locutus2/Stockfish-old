@@ -1210,9 +1210,9 @@ moves_loop: // When in check, search starts from here
                 && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 200 * depth <= alpha)
                 r++;
 
-            // Increase reduction for captures/promotions if capture history is bad
-            if (captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 0)
-                r++;
+            // Decrease reduction for captures/promotions if capture history is good
+            if (captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0)
+                r--;
           }
 
           Depth d = Utility::clamp(newDepth - r, 1, newDepth);
