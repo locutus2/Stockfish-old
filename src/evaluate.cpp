@@ -642,7 +642,7 @@ namespace {
     }
 
     if (eg_value(mobility[Them]) < 0)
-        score += score / 2;
+        score += score / 4;
 
     if (T)
         Trace::add(PASSED, Us, score);
