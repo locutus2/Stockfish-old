@@ -1199,7 +1199,7 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 16434;
           }
-          else
+          else if(type_of(movedPiece) != PAWN)
           {
             // Increase reduction for captures/promotions if late move and at low depth
             if (depth < 8 && moveCount > 2)
