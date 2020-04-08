@@ -1143,6 +1143,11 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Increase reduction if position eval is worse than previous score
+          if (   eval != VALUE_NONE
+              && eval < thisThread->rootMoves[thisThread->pvIdx].previousScore)
+              r++;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 500 * ttHitAverageResolution * ttHitAverageWindow / 1024)
               r--;
