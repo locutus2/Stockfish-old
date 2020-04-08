@@ -1143,8 +1143,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Increase reduction if position eval is worse than previous score
-          if (   eval != VALUE_NONE
+          // Increase reduction if position eval is worse than previous score at PV
+          if (   PvNode
+              && eval != VALUE_NONE
               && eval < thisThread->rootMoves[thisThread->pvIdx].previousScore)
               r++;
 
