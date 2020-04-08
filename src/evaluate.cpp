@@ -641,7 +641,7 @@ namespace {
         score += bonus - PassedFile * edge_distance(file_of(s));
     }
 
-    if (eg_value(mobility[Them]) <= 0)
+    if (eg_value(mobility[Them]) < 0)
         score += score / 2;
 
     if (T)
