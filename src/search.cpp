@@ -1199,15 +1199,14 @@ moves_loop: // When in check, search starts from here
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
               r -= ss->statScore / 16434;
           }
-          else
+          else if (!givesCheck)
           {
             // Increase reduction for captures/promotions if late move and at low depth
             if (depth < 8 && moveCount > 2)
                 r++;
 
-            // Unless giving check, this capture is likely bad
-            if (   !givesCheck
-                && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 200 * depth <= alpha)
+            // Increase reduction this captures/promotion if likely is bad
+            if (ss->staticEval + PieceValue[EG][pos.captured_piece()] + 200 * depth <= alpha)
                 r++;
           }
 
