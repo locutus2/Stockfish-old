@@ -801,6 +801,12 @@ namespace {
 
     score += mobility[WHITE] - mobility[BLACK];
 
+    Value mob_mg = mg_value(mobility[WHITE] - mobility[BLACK]);
+    Value mob_eg = eg_value(mobility[WHITE] - mobility[BLACK]);
+
+    score += make_score(mob_mg * abs(mob_mg) / 256,
+                        mob_eg * abs(mob_eg) / 256);
+
     score +=  king<   WHITE>() - king<   BLACK>()
             + threats<WHITE>() - threats<BLACK>()
             + passed< WHITE>() - passed< BLACK>()
