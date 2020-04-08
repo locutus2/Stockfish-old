@@ -1207,11 +1207,10 @@ moves_loop: // When in check, search starts from here
 
             // Unless giving check, this capture is likely bad
             if (   !givesCheck
-                && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 200 * depth <= alpha)
-                r++;
-
-            // Increase reduction for captures/promotions if capture history is bad
-            if (captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < -7000)
+                &&  ss->staticEval
+                  + PieceValue[EG][pos.captured_piece()]
+                  + 200 * depth
+                  + captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] / 64 <= alpha)
                 r++;
           }
 
