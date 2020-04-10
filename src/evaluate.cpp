@@ -230,6 +230,7 @@ namespace {
     mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pos.blockers_for_king(Us) | pe->pawn_attacks(Them));
 
     // Initialize attackedBy[] for king and pawns
+    attackedBy[Us][DISCOVERED] = 0;
     attackedBy[Us][KING] = pos.attacks_from<KING>(ksq);
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
@@ -276,6 +277,17 @@ namespace {
         attackedBy2[Us] |= attackedBy[Us][ALL_PIECES] & b;
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
+
+        if (Pt != KNIGHT)
+        {
+            Bitboard blockers = b & pos.pieces();
+            bb =  Pt == BISHOP ?   attacks_bb<BISHOP>(s, ~blockers & (pos.pieces() ^ pos.pieces(QUEEN)))
+                : Pt ==   ROOK ?   attacks_bb<  ROOK>(s, ~blockers & (pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK)))
+                               :   attacks_bb<BISHOP>(s, ~blockers & pos.pieces())
+                                || attacks_bb<  ROOK>(s, ~blockers & pos.pieces());
+
+            attackedBy[Us][DISCOVERED] |= bb;
+        }
 
         if (b & kingRing[Them])
         {
@@ -376,7 +388,7 @@ namespace {
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
                                            : AllSquares ^ Rank1BB ^ Rank2BB ^ Rank3BB);
 
-    Bitboard weak, b1, b2, b3, safe, unsafeChecks = 0;
+    Bitboard weak, b1, b2, b3, safe, unsafeChecks = 0, blockedAttacks;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
@@ -435,6 +447,11 @@ namespace {
     else
         unsafeChecks |= knightChecks;
 
+    // Blocked attacks around the king
+    blockedAttacks =  attackedBy[Us][KING]
+                    & attackedBy[Them][DISCOVERED]
+                    & ~(pos.pieces() | attackedBy[Them][ALL_PIECES]);
+
     // Find the squares that opponent attacks in our king flank, the squares
     // which they attack twice in that flank, and the squares that we defend.
     b1 = attackedBy[Them][ALL_PIECES] & KingFlank[file_of(ksq)] & Camp;
@@ -448,6 +465,7 @@ namespace {
                  + 185 * popcount(kingRing[Us] & weak)
                  + 148 * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
+                 +  50 * popcount(blockedAttacks)
                  +  69 * kingAttacksCount[Them]
                  +   3 * kingFlankAttack * kingFlankAttack / 8
                  +       mg_value(mobility[Them] - mobility[Us])
