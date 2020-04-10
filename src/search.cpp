@@ -693,7 +693,7 @@ namespace {
     posKey = pos.key() ^ Key(excludedMove << 16); // Isn't a very good hash
     tte = TT.probe(posKey, ttHit);
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
-    ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx + thisThread->idx % (thisThread->rootMoves.size() - thisThread->pvIdx)].pv[0]
+    ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx + thisThread->idx % (std::min(int(thisThread->rootMoves.size()), 2) - thisThread->pvIdx)].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
     ttPv = PvNode || (ttHit && tte->is_pv());
 

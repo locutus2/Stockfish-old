@@ -42,6 +42,10 @@
 
 class Thread {
 
+public:
+  size_t idx;
+  
+private:
   std::mutex mutex;
   std::condition_variable cv;
   bool exit = false, searching = true; // Set before starting std::thread
@@ -57,7 +61,6 @@ public:
   void wait_for_search_finished();
   int best_move_count(Move move) const;
 
-  size_t idx;
   Pawns::Table pawnsTable;
   Material::Table materialTable;
   size_t pvIdx, pvLast;
