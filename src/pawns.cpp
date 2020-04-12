@@ -70,9 +70,9 @@ namespace {
 
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
-	constexpr Direction LeftUp   = Us == WHITE ? NORTH_WEST : SOUTH_EAST;
-	constexpr Direction RightUp  = Us == WHITE ? NORTH_EAST : SOUTH_WEST;
-	constexpr Bitboard  LeftSide = Us == WHITE ? FileABB | FileBBB | FileCBB | FileDBB
+    constexpr Direction LeftUp   = Us == WHITE ? NORTH_WEST : SOUTH_EAST;
+    constexpr Direction RightUp  = Us == WHITE ? NORTH_EAST : SOUTH_WEST;
+    constexpr Bitboard  LeftSide = Us == WHITE ? FileABB | FileBBB | FileCBB | FileDBB
                                                : FileHBB | FileGBB | FileFBB | FileEBB;
 
     Bitboard neighbours, stoppers, support, centerSupport, phalanx, opposed;
@@ -140,7 +140,7 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            int v =  Connected[r] * (1 + bool(phalanx) - bool(opposed) + bool(centerSupport & s))
+            int v =  Connected[r] * (2 + bool(phalanx) - bool(opposed)) * bool(centerSupport & s)
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
