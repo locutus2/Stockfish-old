@@ -612,7 +612,16 @@ namespace {
 
     // Dive into quiescence search when the depth reaches zero
     if (depth <= 0)
-        return qsearch<NT>(pos, ss, alpha, beta);
+    {
+        // Extend the search at a PV terminal node
+        if (PvNode && !ss->terminalExtension)
+        {
+            depth = 1;
+            ss->terminalExtension = true;
+        }
+        else
+            return qsearch<NT>(pos, ss, alpha, beta);
+    }
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
@@ -860,6 +869,7 @@ namespace {
         // Null move dynamic reduction based on depth and value
         Depth R = (854 + 68 * depth) / 258 + std::min(int(eval - beta) / 192, 3);
 
+        (ss+1)->terminalExtension = ss->terminalExtension;
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
 
@@ -916,6 +926,7 @@ namespace {
                 captureOrPromotion = true;
                 probCutCount++;
 
+                (ss+1)->terminalExtension = ss->terminalExtension;
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[inCheck]
                                                                           [captureOrPromotion]
@@ -1130,6 +1141,7 @@ moves_loop: // When in check, search starts from here
       }
 
       // Update the current move (this must be done after singular extension search)
+      (ss+1)->terminalExtension = ss->terminalExtension;
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[inCheck]
                                                                 [captureOrPromotion]
