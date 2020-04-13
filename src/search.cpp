@@ -610,13 +610,15 @@ namespace {
             return alpha;
     }
 
+    Thread* thisThread = pos.this_thread();
+
     // Dive into quiescence search when the depth reaches zero
     if (depth <= 0)
     {
-        // Extend the search at a PV terminal node
-        if (PvNode && !ss->terminalExtension)
+        // Extend the search at a PV terminal node if iteration depth is sufficient
+        if (PvNode && thisThread->rootDepth >= 12 && !ss->terminalExtension)
         {
-            depth = 2;
+            depth = 1;
             ss->terminalExtension = true;
         }
         else
@@ -641,7 +643,6 @@ namespace {
     int moveCount, captureCount, quietCount;
 
     // Step 1. Initialize node
-    Thread* thisThread = pos.this_thread();
     inCheck = pos.checkers();
     priorCapture = pos.captured_piece();
     Color us = pos.side_to_move();
