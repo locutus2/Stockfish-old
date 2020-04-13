@@ -616,7 +616,7 @@ namespace {
         // Extend the search at a PV terminal node
         if (PvNode && !ss->terminalExtension)
         {
-            depth = 1;
+            depth = 2;
             ss->terminalExtension = true;
         }
         else
