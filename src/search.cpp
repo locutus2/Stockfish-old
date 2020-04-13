@@ -618,7 +618,7 @@ namespace {
         // Extend the search at a PV terminal node if iteration depth is sufficient
         if (PvNode && thisThread->rootDepth >= 12 && !ss->terminalExtension)
         {
-            depth = 1;
+            depth = 2;
             ss->terminalExtension = true;
         }
         else
