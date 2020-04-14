@@ -70,8 +70,12 @@ namespace {
 
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
+    constexpr Direction LeftUp   = Us == WHITE ? NORTH_WEST : SOUTH_EAST;
+    constexpr Direction RightUp  = Us == WHITE ? NORTH_EAST : SOUTH_WEST;
+    constexpr Bitboard  LeftSide = Us == WHITE ? FileABB | FileBBB | FileCBB | FileDBB
+                                               : FileHBB | FileGBB | FileFBB | FileEBB;
 
-    Bitboard neighbours, stoppers, support, phalanx, opposed;
+    Bitboard neighbours, stoppers, support, centerSupport, phalanx, opposed;
     Bitboard lever, leverPush, blocked;
     Square s;
     bool backward, passed, doubled;
@@ -82,6 +86,8 @@ namespace {
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
+
+    centerSupport = shift<RightUp>(ourPawns & LeftSide) || shift<LeftUp>(ourPawns & ~LeftSide);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -138,7 +144,7 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - (blocked && !(centerSupport & s))) / 2
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
