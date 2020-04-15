@@ -138,7 +138,7 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked || more_than_one(leverPush))) / 2
+            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - (blocked || (!phalanx && more_than_one(leverPush)))) / 2
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
