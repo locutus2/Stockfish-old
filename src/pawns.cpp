@@ -36,6 +36,7 @@ namespace {
   constexpr Score BlockedStorm  = S(82, 82);
   constexpr Score Doubled       = S(11, 56);
   constexpr Score Isolated      = S( 5, 15);
+  constexpr Score PawnChain     = S( 5,  5);
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
 
@@ -68,8 +69,10 @@ namespace {
   template<Color Us>
   Score evaluate(const Position& pos, Pawns::Entry* e) {
 
-    constexpr Color     Them = ~Us;
-    constexpr Direction Up   = pawn_push(Us);
+    constexpr Color     Them    = ~Us;
+    constexpr Direction Up      = pawn_push(Us);
+    constexpr Direction LeftUp  = Up + (Us == WHITE ? WEST : EAST);
+    constexpr Direction RightUp = Up + (Us == WHITE ? EAST : WEST);
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
     Bitboard lever, leverPush, blocked;
@@ -82,6 +85,11 @@ namespace {
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
+    Bitboard pawnChains = (  shift<LeftUp >(shift<LeftUp >(ourPawns) & ourPawns)
+                           | shift<RightUp>(shift<RightUp>(ourPawns) & ourPawns))
+	                  & ourPawns;
+
+    score += PawnChain * popcount(pawnChains);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
