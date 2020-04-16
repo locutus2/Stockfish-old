@@ -87,7 +87,7 @@ namespace {
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
     Bitboard pawnChains = (  shift<LeftUp >(shift<LeftUp >(ourPawns) & ourPawns)
                            | shift<RightUp>(shift<RightUp>(ourPawns) & ourPawns))
-                         & ourPawns & ~(FileABB | FileHBB);
+                         & ourPawns & CenterFiles;
 
     score += PawnChain * popcount(pawnChains);
 
