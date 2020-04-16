@@ -73,8 +73,6 @@ namespace {
     constexpr Direction Up       = pawn_push(Us);
     constexpr Direction LeftUp   = Up + (Us == WHITE ? WEST : EAST);
     constexpr Direction RightUp  = Up + (Us == WHITE ? EAST : WEST);
-    constexpr Bitboard  CampThem = (Us == WHITE ? Rank5BB | Rank6BB | Rank7BB
-                                                : Rank4BB | Rank3BB | Rank2BB);
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
     Bitboard lever, leverPush, blocked;
@@ -89,7 +87,7 @@ namespace {
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
     Bitboard pawnChains = (  shift<LeftUp >(shift<LeftUp >(ourPawns) & ourPawns)
                            | shift<RightUp>(shift<RightUp>(ourPawns) & ourPawns))
-                         & ourPawns & CampThem;
+                         & ourPawns & ~(FileABB | FileHBB);
 
     score += PawnChain * popcount(pawnChains);
 
