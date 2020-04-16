@@ -149,7 +149,7 @@ namespace {
                      + WeakUnopposed * !opposed;
 
         else if (backward)
-            score -=   Backward * (1 + more_than_one(leverPush)) * 2 / 3
+            score -=   Backward * (2 + bool(blocked)) / 2
                      + WeakUnopposed * !opposed;
 
         if (!support)
