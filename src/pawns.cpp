@@ -149,7 +149,7 @@ namespace {
                      + WeakUnopposed * !opposed;
 
         else if (backward)
-            score -=   Backward * (3 + bool(blocked)) / 4
+            score -=   Backward * (1 + 3 * bool(blocked)) / 4
                      + WeakUnopposed * !opposed;
 
         if (!support)
