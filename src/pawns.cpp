@@ -36,7 +36,7 @@ namespace {
   constexpr Score BlockedStorm  = S(82, 82);
   constexpr Score Doubled       = S(11, 56);
   constexpr Score Isolated      = S( 5, 15);
-  constexpr Score PawnChain     = S( 5,  5);
+  constexpr Score PawnChain     = S(10, 10);
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
 
@@ -87,7 +87,7 @@ namespace {
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
     Bitboard pawnChains = (  shift<LeftUp >(shift<LeftUp >(ourPawns) & ourPawns)
                            | shift<RightUp>(shift<RightUp>(ourPawns) & ourPawns))
-                         & ourPawns & CenterFiles;
+                         & ourPawns & ~(FileABB | FileHBB);
 
     score += PawnChain * popcount(pawnChains);
 
