@@ -90,7 +90,8 @@ namespace {
                            | shift<RightUp>(shift<RightUp>(ourPawns) & ourPawns))
                          & ourPawns & CenterFiles;
 
-    score += PawnChain * (popcount(pawnChains) - 1);
+    int pc = popcount(pawnChains);
+    score += PawnChain * pc * pc;
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
