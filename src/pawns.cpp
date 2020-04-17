@@ -105,7 +105,7 @@ namespace {
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
-        unblockedSupport = support && shift<-Up>(~theirPawns);
+        unblockedSupport = support & shift<-Up>(~theirPawns);
 
         e->blockedCount[Us] += blocked || more_than_one(leverPush);
 
@@ -139,8 +139,9 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
-                   + 11 * popcount(support) + 10 * popcount(unblockedSupport);
+            int v =  Connected[r] * (4 + 2 * bool(phalanx) + bool(unblockedSupport)
+                                       - 2 * bool(opposed) - bool(blocked)) / 2
+                   + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
         }
