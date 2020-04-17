@@ -72,7 +72,7 @@ namespace {
     constexpr Direction Up   = pawn_push(Us);
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
-    Bitboard lever, leverPush, blocked;
+    Bitboard lever, leverPush, blocked, unblockedSupport;
     Square s;
     bool backward, passed, doubled;
     Score score = SCORE_ZERO;
@@ -105,6 +105,7 @@ namespace {
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
+        unblockedSupport = support && shift<-Up>(~theirPawns);
 
         e->blockedCount[Us] += blocked || more_than_one(leverPush);
 
@@ -138,7 +139,8 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+            int v =  Connected[r] * (  4 + 2 * bool(phalanx) + bool(unblockedSupport)
+                                         - 2 * bool(opposed) - bool(blocked)) / 2
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
