@@ -81,7 +81,9 @@ namespace {
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
+    Bitboard attackThem = pawn_attacks_bb<Them>(theirPawns);
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
+    Bitboard unblockedPush = ~shift<-Up>(theirPawns | attackThem);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -105,7 +107,7 @@ namespace {
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
-        unblockedSupport = support & shift<-Up>(~theirPawns);
+        unblockedSupport = support & unblockedPush;
 
         e->blockedCount[Us] += blocked || more_than_one(leverPush);
 
