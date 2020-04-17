@@ -72,7 +72,7 @@ namespace {
     constexpr Direction Up   = pawn_push(Us);
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
-    Bitboard lever, leverPush, blocked, unblockedSupport;
+    Bitboard lever, leverPush, blocked;
     Square s;
     bool backward, passed, doubled;
     Score score = SCORE_ZERO;
@@ -83,7 +83,7 @@ namespace {
 
     Bitboard attackThem = pawn_attacks_bb<Them>(theirPawns);
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
-    Bitboard unblockedPush = ~shift<-Up>(theirPawns | attackThem);
+    Bitboard unblockedPush = ~shift<-Up>(pos.pieces(PAWN) | attackThem);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -107,7 +107,6 @@ namespace {
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
-        unblockedSupport = support & unblockedPush;
 
         e->blockedCount[Us] += blocked || more_than_one(leverPush);
 
@@ -142,7 +141,7 @@ namespace {
         if (support | phalanx)
         {
             int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
-                   + 18 * popcount(support) + 6 * popcount(unblockedSupport);
+                   + 18 * popcount(support) + 6 * popcount(support & unblockedPush);
 
             score += make_score(v, v * (r - 2) / 4);
         }
