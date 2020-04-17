@@ -140,7 +140,7 @@ namespace {
         if (support | phalanx)
         {
             int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
-                   + 16 * popcount(support) + 10 * popcount(unblockedSupport);
+                   + 18 * popcount(support) + 6 * popcount(unblockedSupport);
 
             score += make_score(v, v * (r - 2) / 4);
         }
