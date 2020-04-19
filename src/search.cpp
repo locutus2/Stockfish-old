@@ -1192,9 +1192,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction for reverse of last own move if alpha is at least a draw and last move was not a capture
-              if (alpha >= VALUE_DRAW && !priorCapture && (ss-2)->currentMove == reverse_move(move))
-                  r++;
+              // Decrease reduction for reverse of last own move if alpha is worse a draw and last move was not a capture
+              if (alpha < VALUE_DRAW && !priorCapture && (ss-2)->currentMove == reverse_move(move))
+                  r--;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
