@@ -1192,6 +1192,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Increase reduction for reverse of last own move if in main line and last move was not a capture
+              if ((ss-1)->moveCount == 1 && !priorCapture && (ss-2)->currentMove == reverse_move(move))
+                  r++;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
