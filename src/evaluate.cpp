@@ -257,7 +257,7 @@ namespace {
     constexpr Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
                                                    : Rank5BB | Rank4BB | Rank3BB);
     const Square* pl = pos.squares<Pt>(Us);
-	constexpr Piece movedPiece = make_piece(Us, Pt);
+    constexpr Piece movedPiece = make_piece(Us, Pt);
 
     Bitboard b, bb;
     Score score = SCORE_ZERO;
@@ -296,15 +296,15 @@ namespace {
         {
             Square to = pop_lsb(&bb);
             Piece captured = pos.piece_on(to);
-			volatile int h;
+            volatile int h;
 
             if (captured)
                 h = thisThread->captureHistory[movedPiece][to][type_of(captured)];
             else
                 h = thisThread->mainHistory[movedPiece][to];
-			hist = std::max(h, hist);
+            hist = std::max(h, hist);
         }
-		score += make_score(hist / 100000, hist / 100000);
+        score += make_score(hist / 100000, hist / 100000);
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
