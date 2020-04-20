@@ -292,7 +292,7 @@ namespace {
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         volatile int hist = 0;
-        int nhist = 0;
+        volatile int hist2 = 0;
         while (bb)
         {
             Square to = pop_lsb(&bb);
@@ -303,12 +303,12 @@ namespace {
                 h = thisThread->captureHistory[movedPiece][to][type_of(captured)];
             else
                 h = thisThread->mainHistory[movedPiece][to];
-            hist += h;
-            nhist++;
+            hist += abs(h);
+            hist2 += abs(h) * h;
         }
 
-        if (nhist)
-            score += make_score(hist / (nhist * 1024), hist / (nhist * 1024));
+        if (hist)
+            score += make_score(hist2 / (hist * 1024), hist2 / (hist * 1024));
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
