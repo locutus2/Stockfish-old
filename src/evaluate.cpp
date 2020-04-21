@@ -292,7 +292,6 @@ namespace {
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         volatile int hist = 0;
-        int maxHist = -thisThread->mainHistory.divisor;
         int nhist = 0;
 
         while (bb)
@@ -306,12 +305,12 @@ namespace {
             else
                 h = thisThread->mainHistory[movedPiece][to];
             hist += h;
-            maxHist = std::max((int)h, maxHist);
             nhist++;
         }
 
         if (nhist)
-            score += make_score((hist / nhist + maxHist) / 2048, (hist / nhist + maxHist) / 2048);
+            score += make_score(hist / (nhist * (Pt == KNIGHT ? 512 : 1024)),
+                                hist / (nhist * (Pt == KNIGHT ? 512 : 1024)));
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
