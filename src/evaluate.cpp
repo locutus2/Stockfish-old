@@ -309,8 +309,8 @@ namespace {
         }
 
         if (nhist)
-            score += make_score(hist / (nhist * (Pt == QUEEN ? 512 : 1024)),
-                                hist / (nhist * (Pt == QUEEN ? 512 : 1024)));
+            score += make_score(hist / (nhist * (Pt == ROOK ? 683 : 1024)),
+                                hist / (nhist * (Pt == ROOK ? 683 : 1024)));
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
