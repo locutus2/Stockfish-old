@@ -308,7 +308,7 @@ namespace {
         }
 
         if (nhist)
-            score += make_score(hist / (nhist * 1024), hist / (nhist * 1024));
+            score += make_score(hist / (nhist * 512), hist / (nhist * 512));
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
