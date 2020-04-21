@@ -293,6 +293,7 @@ namespace {
 
         volatile int hist = 0;
         int nhist = 0;
+	bb &= pos.pieces(Us);
         while (bb)
         {
             Square to = pop_lsb(&bb);
