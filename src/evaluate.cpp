@@ -291,7 +291,7 @@ namespace {
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
-        volatile int hist = 0;
+        int hist = 0;
         int nhist = 0;
         bb &= ~pos.pieces(Us, PAWN);
 
@@ -299,7 +299,7 @@ namespace {
         {
             Square to = pop_lsb(&bb);
             Piece captured = pos.piece_on(to);
-            volatile int h;
+            int h;
 
             if (captured)
                 h = thisThread->captureHistory[movedPiece][to][type_of(captured)];
