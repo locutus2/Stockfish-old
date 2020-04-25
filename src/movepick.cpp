@@ -208,7 +208,7 @@ top:
       /* fallthrough */
 
   case QUIET:
-      if (   !skipQuiets
+      if (   (!skipQuiets || (cur < endMoves && type_of(pos.moved_piece(*cur)) == PAWN))
           && select<Next>([&](){return   *cur != refutations[0].move
                                       && *cur != refutations[1].move
                                       && *cur != refutations[2].move;}))
