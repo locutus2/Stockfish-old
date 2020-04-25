@@ -204,7 +204,7 @@ top:
       /* fallthrough */
 
   case QUIET:
-      if (   (!skipQuiets || cur - endBadCaptures < 1)
+      if (   (!skipQuiets || (cur < endMoves && cur->value > 0))
           && select<Next>([&](){return   *cur != refutations[0].move
                                       && *cur != refutations[1].move
                                       && *cur != refutations[2].move;}))
