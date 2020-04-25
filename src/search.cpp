@@ -1179,6 +1179,10 @@ moves_loop: // When in check, search starts from here
           if (ttPv)
               r -= 2;
 
+          // Decrease reduction if on a possible new PV
+          if (PvNode && (ss-1)->moveCount > 1)
+              r--;
+
           if (moveCountPruning && !formerPv)
               r++;
 
