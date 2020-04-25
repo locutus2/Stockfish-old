@@ -1177,7 +1177,11 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if position is or has been on the PV (~10 Elo)
           if (ttPv)
-              r -= 1 + (PvNode || (ss-1)->moveCount > 1);
+              r -= 2;
+
+          // Decrease reduction at PV nodes if last two moves are moves which searched first as PV move
+          if (PvNode && (ss-1)->moveCount > 1 && (ss-2)->moveCount > 1)
+              r--;
 
           if (moveCountPruning && !formerPv)
               r++;
