@@ -25,8 +25,21 @@
 #include "pawns.h"
 #include "position.h"
 #include "thread.h"
+#include "material.h"
 
 namespace {
+
+  int IBackwardMG;
+  int IBackwardEG;
+  int IDoubledMG;
+  int IDoubledEG;
+  int IIsolatedMG;
+  int IIsolatedEG;
+  int IWeakLeverMG;
+  int IWeakLeverEG;
+  int IWeakUnopposedMG;
+  int IWeakUnopposedEG;
+  int IConnected[RANK_NB];
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
@@ -71,6 +84,12 @@ namespace {
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
 
+    Phase phase = Material::probe(pos)->game_phase();
+    Score PBackward = make_score(Tuning::getParam(IBackwardMG), Tuning::getParam(IBackwardEG));
+    Score PDoubled = make_score(Tuning::getParam(IDoubledMG), Tuning::getParam(IDoubledEG));
+    Score PIsolated = make_score(Tuning::getParam(IIsolatedMG), Tuning::getParam(IIsolatedEG));
+    Score PWeakLever = make_score(Tuning::getParam(IWeakLeverMG), Tuning::getParam(IWeakLeverEG));
+    Score PWeakUnopposed = make_score(Tuning::getParam(IWeakUnopposedMG), Tuning::getParam(IWeakUnopposedEG));
     Bitboard neighbours, stoppers, support, phalanx, opposed;
     Bitboard lever, leverPush, blocked;
     Square s;
@@ -138,23 +157,46 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+            int v =  (int)Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
+	    double grad_mg = (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2.0;
+	    double grad_eg = grad_mg * (r - 2) / 4;
+	    double grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
+   	    Tuning::updateGradient(Us, IConnected[r], grad);
         }
 
         else if (!neighbours)
-            score -=   Isolated
-                     + WeakUnopposed * !opposed;
+	{
+            score -=   PIsolated
+                     + PWeakUnopposed * !opposed;
+   		Tuning::updateGradient(Us, IIsolatedMG, -1.0 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IIsolatedEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IWeakUnopposedMG, -1.0 * !opposed * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IWeakUnopposedEG, -1.0 * !opposed * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	}
 
         else if (backward)
-            score -=   Backward
-                     + WeakUnopposed * !opposed;
+	{
+            score -=   PBackward
+                     + PWeakUnopposed * !opposed;
+
+   		Tuning::updateGradient(Us, IBackwardMG, -1.0 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IBackwardEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IWeakUnopposedMG, -1.0 * !opposed * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IWeakUnopposedEG, -1.0 * !opposed * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	}
 
         if (!support)
-            score -=   Doubled * doubled
-                     + WeakLever * more_than_one(lever);
+	{
+            score -=   PDoubled * doubled
+                     + PWeakLever * more_than_one(lever);
+   		Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IWeakLeverMG, -1.0 * more_than_one(lever) * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IWeakLeverEG, -1.0 * more_than_one(lever) * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	}
     }
 
     return score;
@@ -174,13 +216,12 @@ Entry* probe(const Position& pos) {
   Key key = pos.pawn_key();
   Entry* e = pos.this_thread()->pawnsTable[key];
 
-  if (e->key == key)
-      return e;
+  //if (e->key == key)
+   //   return e;
 
   e->key = key;
   e->scores[WHITE] = evaluate<WHITE>(pos, e);
   e->scores[BLACK] = evaluate<BLACK>(pos, e);
-
   return e;
 }
 
@@ -252,6 +293,21 @@ Score Entry::do_king_safety(const Position& pos) {
       minPawnDist = std::min(minPawnDist, distance(ksq, pop_lsb(&pawns)));
 
   return shelter - make_score(0, 16 * minPawnDist);
+}
+
+void init() {
+	IBackwardMG = Tuning::addParam(mg_value(Backward));
+	IBackwardEG = Tuning::addParam(eg_value(Backward));
+	IDoubledMG = Tuning::addParam(mg_value(Doubled));
+	IDoubledEG = Tuning::addParam(eg_value(Doubled));
+	IIsolatedMG = Tuning::addParam(mg_value(Isolated));
+	IIsolatedEG = Tuning::addParam(eg_value(Isolated));
+	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever));
+	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever));
+	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed));
+	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed));
+	for(Rank r = RANK_2; r < RANK_8; ++r)
+		IConnected[r] = Tuning::addParam(Connected[r]);
 }
 
 // Explicit template instantiation

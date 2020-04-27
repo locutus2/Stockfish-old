@@ -106,17 +106,31 @@ const vector<string> Defaults = {
 /// bench 64 1 100000 default nodes -> search default positions for 100K nodes each
 /// bench 16 1 5 default perft -> run a perft 5 on default positions
 
-vector<string> setup_bench(const Position& current, istream& is) {
+vector<string> setup_bench(const Position& current, istream& is, bool tune = false) {
 
   vector<string> fens, list;
   string go, token;
 
   // Assign default values to missing arguments
-  string ttSize    = (is >> token) ? token : "16";
-  string threads   = (is >> token) ? token : "1";
-  string limit     = (is >> token) ? token : "13";
-  string fenFile   = (is >> token) ? token : "default";
-  string limitType = (is >> token) ? token : "depth";
+  string ttSize    = "16";
+  string threads   = "1";
+  string limit     = "13";
+  string fenFile   = "default";
+  string limitType = "depth";
+
+  if(tune)
+  {
+  	fenFile   = (is >> token) ? token : "FENSSHUFFLED2500000.fen";
+	limitType = "eval";
+  }
+  else
+  {
+  	ttSize    = (is >> token) ? token : "16";
+  	threads   = (is >> token) ? token : "1";
+  	limit     = (is >> token) ? token : "13";
+  	fenFile   = (is >> token) ? token : "default";
+  	limitType = (is >> token) ? token : "depth";
+  }
 
   go = limitType == "eval" ? "eval" : "go " + limitType + " " + limit;
 

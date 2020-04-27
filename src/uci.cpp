@@ -22,6 +22,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 #include "evaluate.h"
 #include "movegen.h"
@@ -35,7 +36,7 @@
 
 using namespace std;
 
-extern vector<string> setup_bench(const Position&, istream&);
+extern vector<string> setup_bench(const Position&, istream&, bool tune = false);
 
 namespace {
 
@@ -77,6 +78,52 @@ namespace {
     }
   }
 
+
+  void position(Position& pos, istringstream& is, StateListPtr& states, int &gameResult, int &score) {
+
+    Move m;
+    string token, fen;
+    gameResult = VALUE_NONE;
+    score = VALUE_NONE;
+
+    is >> token;
+
+    if (token == "startpos")
+    {
+        fen = StartFEN;
+        is >> token; // Consume "moves" token if any
+    }
+    else if (token == "fen")
+        while (is >> token && token != "moves")
+	{
+            if(token == "[0.0]")
+	        gameResult = -1;
+            else if(token == "[0.5]")
+	        gameResult = 0;
+            else if(token == "[1.0]")
+	        gameResult = 1;
+	    else
+                fen += token + " ";
+
+            if(gameResult != VALUE_NONE && is >> token)
+            {
+	        score = std::stoi(token) * PawnValueEg / 100;
+            }
+	}
+    else
+        return;
+
+    states = StateListPtr(new std::deque<StateInfo>(1)); // Drop old and create a new one
+    pos.set(fen, Options["UCI_Chess960"], &states->back(), Threads.main());
+
+    // Parse move list (if any)
+    while (is >> token && (m = UCI::to_move(pos, token)) != MOVE_NONE)
+    {
+        states->emplace_back();
+        pos.do_move(m, states->back());
+    }
+
+  }
 
   // setoption() is called when engine receives the "setoption" UCI command. The
   // function updates the UCI option ("name") to the given value ("value").
@@ -181,6 +228,122 @@ namespace {
          << "\nNodes searched  : " << nodes
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
+  
+  void tune(Position& pos, istream& args, StateListPtr& states) {
+
+    string token;
+    uint64_t nodes = 0;
+
+    vector<string> list = setup_bench(pos, args, true);
+    int num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
+
+    TimePoint elapsed = now();
+    int gameResult = VALUE_NONE, score = VALUE_NONE;
+
+    const bool DEBUG = false;
+    const bool USE_SCORE = false;
+    const bool USE_RESULT = true;
+
+    double mse = std::numeric_limits<double>().max() / 2;
+    double last_mse = 0;
+    double lastErr = 0;
+    double err = std::numeric_limits<double>().max() / 2;
+    constexpr double EPS = 1e-14;
+    cerr << "Positions loaded n=" << num << endl;
+    Tuning::printParams(cerr);
+    //for(int it = 0; std::abs(err-lastErr) > EPS; it++)
+    for(int it = 0; err > EPS; it++)
+    {
+         Tuning::clearTotalGradients();
+	    last_mse = mse;
+    mse = 0;
+    int n = 0;
+    for (const auto& cmd : list)
+    {
+        istringstream is(cmd);
+        is >> skipws >> token;
+
+        if (token == "position")   
+	{
+                if(DEBUG) cerr << is.str() << endl;
+		position(pos, is, states, gameResult, score);
+		if(DEBUG) cerr << "result=" << gameResult << " score=" << score << endl;
+	}
+        else if (token == "ucinewgame") 
+	{ 
+		Search::clear(); 
+		elapsed = now(); 
+	} // Search::clear() may take some while
+	else if (token == "eval")
+	{
+		if(!pos.checkers())
+		{
+			Tuning::clearGradients();
+			int value = Eval::evaluate(pos);
+		        if(std::abs(value) < VALUE_KNOWN_WIN)
+		       {
+			       if(pos.side_to_move() == BLACK)
+					value = -value;
+		       	       
+			       if(USE_SCORE && score != VALUE_NONE)
+			       {
+
+		        	++n;
+				double error = Tuning::updateTotalGradients(value, score);
+				mse += error;
+                		if(DEBUG) cerr << "SCORE: eval=" << value << " error=" << error << endl;
+			      }
+		       	       if(USE_RESULT && gameResult != VALUE_NONE)
+			       {
+				       constexpr double LAMBDA = 0.9;
+				       double p = (1 + gameResult * LAMBDA) / 2;
+                                double pscore = (int)PawnValueEg * 4 * std::log(p/(1-p)) / std::log(10);
+		        	++n;
+				double error = Tuning::updateTotalGradients(value, pscore);
+				mse += error;
+                		if(DEBUG) cerr << "SCORE: eval=" << value << " error=" << error << endl;
+			      }
+		       }
+		}
+	}
+/*
+        if (token == "go" || token == "eval")
+        {
+            if(DEBUG) cerr << "\nPosition: " << cnt++ << '/' << num << endl;
+            if (token == "go")
+            {
+               go(pos, is, states);
+               Threads.main()->wait_for_search_finished();
+               nodes += Threads.nodes_searched();
+            }
+            else
+               sync_cout << "\n" << Eval::trace(pos) << sync_endl;
+        }
+        else if (token == "setoption")  setoption(is);
+        else if (token == "position")   
+	{
+		position(pos, is, states, gameResult, score);
+		if(DEBUG) cerr << "result=" << gameResult << " score=" << score << endl;
+	}
+        else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+	*/
+    }
+    Tuning::updateParams();
+    lastErr = err;
+    err = Tuning::totalError();
+    cerr << "Iteration=" << it << " n=" << n << " mse=" << mse << " error=" << err << endl << std::flush;
+    Tuning::printParams(cerr);
+    }
+
+    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
+
+    dbg_print(); // Just before exiting
+
+    cerr << "\n==========================="
+         << "\nTotal time (ms) : " << elapsed
+         << "\nNodes searched  : " << nodes
+         << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+  }
 
 } // namespace
 
@@ -237,6 +400,7 @@ void UCI::loop(int argc, char* argv[]) {
       // Do not use these commands during a search!
       else if (token == "flip")     pos.flip();
       else if (token == "bench")    bench(pos, is, states);
+      else if (token == "tune")     tune(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
       else if (token == "eval")     sync_cout << Eval::trace(pos) << sync_endl;
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;

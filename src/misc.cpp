@@ -46,6 +46,7 @@ typedef bool(*fun3_t)(HANDLE, CONST GROUP_AFFINITY*, PGROUP_AFFINITY);
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <cmath>
 
 #if defined(__linux__) && !defined(__ANDROID__)
 #include <stdlib.h>
@@ -427,3 +428,79 @@ void bindThisThread(size_t idx) {
 #endif
 
 } // namespace WinProcGroup
+
+namespace Tuning {
+	constexpr double ALPHA = 0.0000001;
+
+	std::vector<double> param;
+	std::vector<double> isActive;
+	std::vector<double> gradient;
+	std::vector<double> total_gradient;
+
+	void clearGradients() {
+		for(auto &x : gradient)
+			x = 0;
+	}
+
+	void clearTotalGradients() {
+		for(auto &x : total_gradient)
+			x = 0;
+	}
+
+	int addParam(int value, bool active) {
+		int index = (int)param.size();
+		param.push_back(value);
+		isActive.push_back(active);
+		gradient.push_back(0);
+		total_gradient.push_back(0);
+		return index;
+	}
+
+	double getParam(int index) {
+		return param[index];
+	}
+
+	void updateGradient(Color c, int index, int value) {
+		gradient[index] += (c == WHITE ? value : -value);
+	}
+
+	void updateParams() {
+		int n = (int)param.size();
+		for(int i = 0; i < n;  ++i)
+		{
+			if(isActive[i])
+				param[i] -= ALPHA * total_gradient[i];
+		}
+	}
+
+	double updateTotalGradients(int value, int targetValue) {
+		double diff = value - targetValue;
+		double error = diff * diff;
+		int n = (int)param.size();
+		for(int i = 0; i < n;  ++i)
+		{
+			total_gradient[i] += diff * gradient[i];
+		}
+		return error;
+	}
+
+	double totalError() {
+		double error = 0;
+		int n = (int)param.size();
+		for(int i = 0; i < n;  ++i)
+		    if(isActive[i])
+			error += std::pow(ALPHA * total_gradient[i], 2);
+		return error;
+	}
+
+	std::ostream& printParams(std::ostream &out) {
+		out << "=>";
+		int n = (int)param.size();
+		for(int i = 0; i < n;  ++i)
+		    if(isActive[i])
+			out << ' ' << param[i];
+		return out << std::endl;;
+	}
+
+}
+

@@ -66,6 +66,7 @@ struct Entry {
 typedef HashTable<Entry, 131072> Table;
 
 Entry* probe(const Position& pos);
+void init();
 
 } // namespace Pawns
 
