@@ -26,6 +26,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "types.h"
 
@@ -118,6 +119,18 @@ public:
 
 namespace WinProcGroup {
   void bindThisThread(size_t idx);
+}
+
+namespace Tuning {
+  double totalError();
+  void clearGradients();
+  void clearTotalGradients();
+  int addParam(int value, bool active = true);
+  double getParam(int index);
+  void updateGradient(Color c, int index, int value);
+  double updateTotalGradients(int value, int targetValue);
+  void updateParams();
+  std::ostream& printParams(std::ostream& out = std::cout);
 }
 
 #endif // #ifndef MISC_H_INCLUDED
