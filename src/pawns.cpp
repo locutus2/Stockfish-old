@@ -31,12 +31,12 @@ namespace {
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int A = -5;
+  constexpr int A = 5;
 
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
-  constexpr Score BlockedStorm  = S(82+A, 82-A);
-  constexpr Score Doubled       = S(11, 56);
+  constexpr Score BlockedStorm  = S(82, 82);
+  constexpr Score Doubled       = S(11+A, 56-A);
   constexpr Score Isolated      = S( 5, 15);
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
