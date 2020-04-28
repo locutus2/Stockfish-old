@@ -31,7 +31,7 @@ namespace {
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int A = 5;
+  constexpr int A = -5;
 
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
