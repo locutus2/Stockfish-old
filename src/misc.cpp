@@ -430,7 +430,8 @@ void bindThisThread(size_t idx) {
 } // namespace WinProcGroup
 
 namespace Tuning {
-	constexpr double ALPHA = 0.0000001;
+	//constexpr double ALPHA = 0.0000001;
+	constexpr double ALPHA = 0.00000001;
 
 	std::vector<double> param;
 	std::vector<double> isActive;

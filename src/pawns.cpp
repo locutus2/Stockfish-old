@@ -41,6 +41,9 @@ namespace {
   int IWeakUnopposedEG;
   int IConnected[RANK_NB];
 
+  int IBlockedStormMG;
+  int IBlockedStormEG;
+
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
@@ -156,7 +159,7 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            int v =  (int)Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+            double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
@@ -229,6 +232,9 @@ Entry* probe(const Position& pos) {
 /// Entry::evaluate_shelter() calculates the shelter bonus and the storm
 /// penalty for a king, looking at the king file and the two closest files.
 
+int blockedstorm_mg;
+int blockedstorm_eg;
+
 template<Color Us>
 Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
 
@@ -238,7 +244,10 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
   Bitboard ourPawns = b & pos.pieces(Us);
   Bitboard theirPawns = b & pos.pieces(Them);
 
+  blockedstorm_mg = 0;
+  blockedstorm_eg = 0;
   Score bonus = make_score(5, 5);
+  Score PBlockedStorm = make_score(Tuning::getParam(IBlockedStormMG), Tuning::getParam(IBlockedStormEG));
 
   File center = Utility::clamp(file_of(ksq), FILE_B, FILE_G);
   for (File f = File(center - 1); f <= File(center + 1); ++f)
@@ -253,7 +262,11 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
       bonus += make_score(ShelterStrength[d][ourRank], 0);
 
       if (ourRank && (ourRank == theirRank - 1))
-          bonus -= BlockedStorm * int(theirRank == RANK_3);
+      {
+          bonus -= PBlockedStorm * int(theirRank == RANK_3);
+	  blockedstorm_mg -= int(theirRank == RANK_3);
+	  blockedstorm_eg -= int(theirRank == RANK_3);
+      }
       else
           bonus -= make_score(UnblockedStorm[d][theirRank], 0);
   }
@@ -274,14 +287,34 @@ Score Entry::do_king_safety(const Position& pos) {
   auto compare = [](Score a, Score b) { return mg_value(a) < mg_value(b); };
 
   Score shelter = evaluate_shelter<Us>(pos, ksq);
+  int bs_mg = blockedstorm_mg;
+  int bs_eg = blockedstorm_mg;
+
+  Phase phase = Material::probe(pos)->game_phase();
 
   // If we can castle use the bonus after castling if it is bigger
 
   if (pos.can_castle(Us & KING_SIDE))
-      shelter = std::max(shelter, evaluate_shelter<Us>(pos, relative_square(Us, SQ_G1)), compare);
+  {
+      Score sh = evaluate_shelter<Us>(pos, relative_square(Us, SQ_G1));
+      if(compare(shelter, sh))
+      {
+          bs_mg = blockedstorm_mg;
+          bs_eg = blockedstorm_mg;
+      }
+      shelter = std::max(shelter, sh, compare);
+  }
 
   if (pos.can_castle(Us & QUEEN_SIDE))
-      shelter = std::max(shelter, evaluate_shelter<Us>(pos, relative_square(Us, SQ_C1)), compare);
+  {
+      Score sh = evaluate_shelter<Us>(pos, relative_square(Us, SQ_C1));
+      if(compare(shelter, sh))
+      {
+          bs_mg = blockedstorm_mg;
+          bs_eg = blockedstorm_mg;
+      }
+      shelter = std::max(shelter, sh, compare);
+  }
 
   // In endgame we like to bring our king near our closest pawn
   Bitboard pawns = pos.pieces(Us, PAWN);
@@ -292,6 +325,8 @@ Score Entry::do_king_safety(const Position& pos) {
   else while (pawns)
       minPawnDist = std::min(minPawnDist, distance(ksq, pop_lsb(&pawns)));
 
+  Tuning::updateGradient(Us, IBlockedStormMG, bs_mg * phase / PHASE_MIDGAME);
+  Tuning::updateGradient(Us, IBlockedStormEG, bs_eg * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
   return shelter - make_score(0, 16 * minPawnDist);
 }
 
@@ -308,6 +343,9 @@ void init() {
 	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed));
 	for(Rank r = RANK_2; r < RANK_8; ++r)
 		IConnected[r] = Tuning::addParam(Connected[r]);
+
+	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm));
+	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm));
 }
 
 // Explicit template instantiation
