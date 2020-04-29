@@ -72,6 +72,10 @@ namespace Trace {
 using namespace Trace;
 
 namespace {
+  constexpr bool USE_FOR_TUNING = true;
+
+  int IMobilityBonus[4][28][2];
+
 
   // Threshold for lazy and space evaluation
   constexpr Value LazyThreshold  = Value(1400);
@@ -286,7 +290,12 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
-        mobility[Us] += MobilityBonus[Pt - 2][mob];
+        mobility[Us] += make_score(Tuning::getParam(IMobilityBonus[Pt - 2][mob][0]),
+			           Tuning::getParam(IMobilityBonus[Pt - 2][mob][1]));
+
+	Phase phase = Material::probe(pos)->game_phase();
+        Tuning::updateGradient(Us, IMobilityBonus[Pt - 2][mob][0], 1.0 * phase / PHASE_MIDGAME);
+        Tuning::updateGradient(Us, IMobilityBonus[Pt - 2][mob][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
@@ -853,6 +862,17 @@ namespace {
   }
 
 } // namespace
+
+void Eval::init() {
+	for(auto x : {std::make_pair(0, 9), std::make_pair(1, 14), std::make_pair(2, 15), std::make_pair(3, 28)})
+	{	
+		for(int i = 0; i < x.second; ++i)
+		{
+			IMobilityBonus[x.first][i][0] = Tuning::addParam(mg_value(MobilityBonus[x.first][i]), USE_FOR_TUNING);
+			IMobilityBonus[x.first][i][1] = Tuning::addParam(eg_value(MobilityBonus[x.first][i]), USE_FOR_TUNING);
+		}
+	}
+}
 
 
 /// evaluate() is the evaluator for the outer world. It returns a static

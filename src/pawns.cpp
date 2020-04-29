@@ -29,6 +29,8 @@
 
 namespace {
 
+  constexpr bool USE_FOR_TUNING = false;
+
   int IBackwardMG;
   int IBackwardEG;
   int IDoubledMG;
@@ -331,21 +333,21 @@ Score Entry::do_king_safety(const Position& pos) {
 }
 
 void init() {
-	IBackwardMG = Tuning::addParam(mg_value(Backward));
-	IBackwardEG = Tuning::addParam(eg_value(Backward));
-	IDoubledMG = Tuning::addParam(mg_value(Doubled));
-	IDoubledEG = Tuning::addParam(eg_value(Doubled));
-	IIsolatedMG = Tuning::addParam(mg_value(Isolated));
-	IIsolatedEG = Tuning::addParam(eg_value(Isolated));
-	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever));
-	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever));
-	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed));
-	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed));
+	IBackwardMG = Tuning::addParam(mg_value(Backward), USE_FOR_TUNING);
+	IBackwardEG = Tuning::addParam(eg_value(Backward), USE_FOR_TUNING);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), USE_FOR_TUNING);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), USE_FOR_TUNING);
+	IIsolatedMG = Tuning::addParam(mg_value(Isolated), USE_FOR_TUNING);
+	IIsolatedEG = Tuning::addParam(eg_value(Isolated), USE_FOR_TUNING);
+	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), USE_FOR_TUNING);
+	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), USE_FOR_TUNING);
+	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), USE_FOR_TUNING);
+	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), USE_FOR_TUNING);
 	for(Rank r = RANK_2; r < RANK_8; ++r)
-		IConnected[r] = Tuning::addParam(Connected[r]);
+		IConnected[r] = Tuning::addParam(Connected[r], USE_FOR_TUNING);
 
-	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm));
-	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm));
+	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
+	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
 }
 
 // Explicit template instantiation
