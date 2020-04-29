@@ -480,7 +480,8 @@ namespace Tuning {
 		int n = (int)param.size();
 		for(int i = 0; i < n;  ++i)
 		{
-			total_gradient[i] += diff * gradient[i];
+			if(isActive[i])
+				total_gradient[i] += diff * gradient[i];
 		}
 		return error;
 	}
