@@ -31,16 +31,20 @@ namespace {
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
+  constexpr int A = 100;
+
+  #define W(o, n) ((o) + ((n) - (o)) * A / 100)
+
   // Pawn penalties
-  constexpr Score Backward      = S(15, 13);
-  constexpr Score BlockedStorm  = S(82, 82);
-  constexpr Score Doubled       = S(55, 75);
-  constexpr Score Isolated      = S( 3, 16);
-  constexpr Score WeakLever     = S(14, 58);
-  constexpr Score WeakUnopposed = S(22, 26);
+  constexpr Score Backward      = S(W( 9,16), W(24,12));
+  constexpr Score BlockedStorm  = S(W(82,84), W(82,70));
+  constexpr Score Doubled       = S(W(11,89), W(56,85));
+  constexpr Score Isolated      = S(W( 5, 2), W(15,15));
+  constexpr Score WeakLever     = S(W( 0,28), W(56,60));
+  constexpr Score WeakUnopposed = S(W(13,22), W(27,27));
 
   // Connected pawn bonus
-  constexpr int Connected[RANK_NB] = { 0, 1, 2, 11, 30, 49, 86 };
+  constexpr int Connected[RANK_NB] = { 0, W(7,1), W(8,1), W(12,11), W(29,30), W(48,49), W(86,86) };
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
