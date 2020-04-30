@@ -88,7 +88,7 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int AN = 100, B0 = 111, B1 = 25;
+  constexpr int AN = 100, B0 = 0, B1 = 0;
 
   #define WN(o, n) ((o) + ((n) - (o)) * AN / 100)
 
