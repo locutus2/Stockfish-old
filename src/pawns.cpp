@@ -45,9 +45,15 @@ namespace {
 
   int IBlockedStormMG;
   int IBlockedStormEG;
+  
+  int IDoubledMGS;
+  int IDoubledEGS;
+  
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
+  
+  constexpr Score DoubledS       = S(0, 0);
 
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
@@ -201,6 +207,14 @@ namespace {
    		Tuning::updateGradient(Us, IWeakLeverMG, -1.0 * more_than_one(lever) * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IWeakLeverEG, -1.0 * more_than_one(lever) * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	}
+	else{
+		Score PDoubledS = make_score(Tuning::getParam(IDoubledMGS), Tuning::getParam(IDoubledEGS));
+		score -=   PDoubledS * doubled
+                     ;//+ PWeakLever * more_than_one(lever);
+   		Tuning::updateGradient(Us, IDoubledMGS, -1.0 * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledEGS, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		
+	}
     }
 
     return score;
@@ -348,6 +362,10 @@ void init() {
 
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
 	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
+	
+	IDoubledMGS = Tuning::addParam(mg_value(DoubledS), true);
+	IDoubledEGS = Tuning::addParam(eg_value(DoubledS), true);
+	
 }
 
 // Explicit template instantiation

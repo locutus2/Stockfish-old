@@ -72,7 +72,7 @@ namespace Trace {
 using namespace Trace;
 
 namespace {
-  constexpr bool USE_FOR_TUNING = true;
+  constexpr bool USE_FOR_TUNING = false;
 
   int IMobilityBonus[4][28][2];
 
