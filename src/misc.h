@@ -122,6 +122,8 @@ namespace WinProcGroup {
 }
 
 namespace Tuning {
+	extern double ALPHA;
+	
   double totalError();
   void clearGradients();
   void clearTotalGradients();

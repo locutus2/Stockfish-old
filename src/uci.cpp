@@ -331,7 +331,7 @@ namespace {
     Tuning::updateParams();
     lastErr = err;
     err = Tuning::totalError();
-    cerr << "Iteration=" << it << " n=" << n << " mse=" << mse << " error=" << err << endl << std::flush;
+    cerr << "Iteration=" << it << " n=" << n << " mse=" << mse << " error=" << err << " alpha=" << Tuning::ALPHA << endl << std::flush;
     Tuning::printParams(cerr);
     }
 
