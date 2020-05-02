@@ -433,7 +433,7 @@ namespace Tuning {
 	//constexpr double ALPHA = 0.0000001/0.0030737;
 	//constexpr double ALPHA = 0.0000001/0.1538/0.6835/0.2/0.3084;
 	constexpr double ALPHA0 = 0.0000001;
-	constexpr bool FIXED = true;
+	constexpr bool FIXED = false;
 
 	std::vector<double> param;
 	std::vector<double> isActive;
