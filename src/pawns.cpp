@@ -349,8 +349,8 @@ Score Entry::do_king_safety(const Position& pos) {
 void init() {
 	IBackwardMG = Tuning::addParam(mg_value(Backward), USE_FOR_TUNING);
 	IBackwardEG = Tuning::addParam(eg_value(Backward), USE_FOR_TUNING);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), USE_FOR_TUNING);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), USE_FOR_TUNING);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), true);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), true);
 	IIsolatedMG = Tuning::addParam(mg_value(Isolated), USE_FOR_TUNING);
 	IIsolatedEG = Tuning::addParam(eg_value(Isolated), USE_FOR_TUNING);
 	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), USE_FOR_TUNING);
@@ -363,8 +363,8 @@ void init() {
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
 	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
 	
-	IDoubledMGS = Tuning::addParam(mg_value(DoubledS), true);
-	IDoubledEGS = Tuning::addParam(eg_value(DoubledS), true);
+	IDoubledMGS = Tuning::addParam(mg_value(DoubledS), false);
+	IDoubledEGS = Tuning::addParam(eg_value(DoubledS), false);
 	
 }
 

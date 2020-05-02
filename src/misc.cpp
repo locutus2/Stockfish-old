@@ -430,8 +430,10 @@ void bindThisThread(size_t idx) {
 } // namespace WinProcGroup
 
 namespace Tuning {
-	constexpr double ALPHA = 0.0000001;
+	//constexpr double ALPHA = 0.0000001/0.0030737;
+	constexpr double ALPHA = 0.0000001/0.1538/0.6835/0.2;
 	//constexpr double ALPHA = 0.00000001;
+	constexpr bool FIXED = true;
 
 	std::vector<double> param;
 	std::vector<double> isActive;
@@ -467,10 +469,25 @@ namespace Tuning {
 
 	void updateParams() {
 		int n = (int)param.size();
+		double s = 0;
+		
+		if(FIXED)
+		{
+				int na = 0;
+			for(int i = 0; i < n;  ++i)
+		{
+			if(isActive[i])
+			{
+				++na;
+				s += total_gradient[i];
+			}
+		}
+			s /= na;
+		}
 		for(int i = 0; i < n;  ++i)
 		{
 			if(isActive[i])
-				param[i] -= ALPHA * total_gradient[i];
+				param[i] -= ALPHA * (total_gradient[i] - s);
 		}
 	}
 
@@ -478,6 +495,8 @@ namespace Tuning {
 		double diff = value - targetValue;
 		double error = diff * diff;
 		int n = (int)param.size();
+		
+	
 		for(int i = 0; i < n;  ++i)
 		{
 			if(isActive[i])
