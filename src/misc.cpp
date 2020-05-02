@@ -431,8 +431,8 @@ void bindThisThread(size_t idx) {
 
 namespace Tuning {
 	//constexpr double ALPHA = 0.0000001/0.0030737;
-	constexpr double ALPHA = 0.0000001/0.1538/0.6835/0.2/0.3084;
-	//constexpr double ALPHA = 0.00000001;
+	//constexpr double ALPHA = 0.0000001/0.1538/0.6835/0.2/0.3084;
+	constexpr double ALPHA = 0.000001/0.599;
 	constexpr bool FIXED = true;
 
 	std::vector<double> param;

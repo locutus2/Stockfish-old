@@ -49,11 +49,16 @@ namespace {
   int IDoubledMGS;
   int IDoubledEGS;
   
+  int IDoubledMGU;
+  int IDoubledEGU;
+  
+  
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
   
   constexpr Score DoubledS       = S(0, 0);
+  constexpr Score DoubledU       = S(11, 56);
 
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
@@ -101,6 +106,7 @@ namespace {
     Score PIsolated = make_score(Tuning::getParam(IIsolatedMG), Tuning::getParam(IIsolatedEG));
     Score PWeakLever = make_score(Tuning::getParam(IWeakLeverMG), Tuning::getParam(IWeakLeverEG));
     Score PWeakUnopposed = make_score(Tuning::getParam(IWeakUnopposedMG), Tuning::getParam(IWeakUnopposedEG));
+	
     Bitboard neighbours, stoppers, support, phalanx, opposed;
     Bitboard lever, leverPush, blocked;
     Square s;
@@ -200,12 +206,20 @@ namespace {
 
         if (!support)
 	{
-            score -=   PDoubled * doubled
+		Score PDoubledU = make_score(Tuning::getParam(IDoubledMGU), Tuning::getParam(IDoubledEGU));
+            score -=   (opposed ? PDoubled : PDoubledU) * doubled
                      + PWeakLever * more_than_one(lever);
-   		Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		//Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
+		//Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		Tuning::updateGradient(Us, IWeakLeverMG, -1.0 * more_than_one(lever) * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IWeakLeverEG, -1.0 * more_than_one(lever) * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
+		Tuning::updateGradient(Us, IDoubledMG, -1.0 * bool(opposed) * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledEG, -1.0 * bool(opposed) * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		
+		Tuning::updateGradient(Us, IDoubledMGU, -1.0 * !opposed * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledEGU, -1.0 * !opposed * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		
 	}
 	else{
 		Score PDoubledS = make_score(Tuning::getParam(IDoubledMGS), Tuning::getParam(IDoubledEGS));
@@ -349,8 +363,8 @@ Score Entry::do_king_safety(const Position& pos) {
 void init() {
 	IBackwardMG = Tuning::addParam(mg_value(Backward), USE_FOR_TUNING);
 	IBackwardEG = Tuning::addParam(eg_value(Backward), USE_FOR_TUNING);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), USE_FOR_TUNING);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), USE_FOR_TUNING);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), true);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), true);
 	IIsolatedMG = Tuning::addParam(mg_value(Isolated), USE_FOR_TUNING);
 	IIsolatedEG = Tuning::addParam(eg_value(Isolated), USE_FOR_TUNING);
 	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), USE_FOR_TUNING);
@@ -360,11 +374,14 @@ void init() {
 	for(Rank r = RANK_2; r < RANK_8; ++r)
 		IConnected[r] = Tuning::addParam(Connected[r], USE_FOR_TUNING);
 
-	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), true || USE_FOR_TUNING);
-	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), true || USE_FOR_TUNING);
+	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
+	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
 	
 	IDoubledMGS = Tuning::addParam(mg_value(DoubledS), false);
 	IDoubledEGS = Tuning::addParam(eg_value(DoubledS), false);
+	
+	IDoubledMGU = Tuning::addParam(mg_value(DoubledU), true);
+	IDoubledEGU = Tuning::addParam(eg_value(DoubledU), true);
 	
 }
 
