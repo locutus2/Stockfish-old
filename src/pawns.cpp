@@ -31,7 +31,7 @@ namespace {
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int A = 100;
+  constexpr int A = 50;
 
   #define W(o, n) ((o) + ((n) - (o)) * A / 100)
 
