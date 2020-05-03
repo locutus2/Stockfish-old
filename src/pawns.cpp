@@ -55,6 +55,10 @@ namespace {
   int IDoubledMGP;
   int IDoubledEGP;
   
+  int IPawnChainMG;
+  int IPawnChainEG;
+  
+
   
 
   #define V Value
@@ -63,6 +67,7 @@ namespace {
   constexpr Score DoubledS       = S(0, 0);
   constexpr Score DoubledU       = S(11, 56);
   constexpr Score DoubledP       = S(11, 56);
+  constexpr Score PawnChain      = S( 0,  0);
 
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
@@ -103,6 +108,8 @@ namespace {
 
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
+	constexpr Direction LeftUp   = Up + (Us == WHITE ? WEST : EAST);
+    constexpr Direction RightUp  = Up + (Us == WHITE ? EAST : WEST);
 
     Phase phase = Material::probe(pos)->game_phase();
     Score PBackward = make_score(Tuning::getParam(IBackwardMG), Tuning::getParam(IBackwardEG));
@@ -122,6 +129,12 @@ namespace {
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
+	
+	Bitboard pawnChains = (  shift<LeftUp >(shift<LeftUp >(ourPawns) & ourPawns)
+                           | shift<RightUp>(shift<RightUp>(ourPawns) & ourPawns))
+                         & ourPawns;
+    
+	
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -133,6 +146,15 @@ namespace {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
         Rank r = relative_rank(Us, s);
+		
+		if (pawnChains & s)
+		{
+			Score PPawnChain = make_score(Tuning::getParam(IPawnChainMG), Tuning::getParam(IPawnChainEG));
+			score += PPawnChain;
+			Tuning::updateGradient(Us, IPawnChainMG, 1.0 * phase / PHASE_MIDGAME);
+		    Tuning::updateGradient(Us, IPawnChainEG, 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		
+		}
 
         // Flag the pawn
         opposed    = theirPawns & forward_file_bb(Us, s);
@@ -377,8 +399,8 @@ Score Entry::do_king_safety(const Position& pos) {
 void init() {
 	IBackwardMG = Tuning::addParam(mg_value(Backward), USE_FOR_TUNING);
 	IBackwardEG = Tuning::addParam(eg_value(Backward), USE_FOR_TUNING);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), true);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), true);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), USE_FOR_TUNING);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), USE_FOR_TUNING);
 	IIsolatedMG = Tuning::addParam(mg_value(Isolated), USE_FOR_TUNING);
 	IIsolatedEG = Tuning::addParam(eg_value(Isolated), USE_FOR_TUNING);
 	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), USE_FOR_TUNING);
@@ -397,8 +419,12 @@ void init() {
 	IDoubledMGU = Tuning::addParam(mg_value(DoubledU), false);
 	IDoubledEGU = Tuning::addParam(eg_value(DoubledU), false);
 	
-	IDoubledMGP = Tuning::addParam(mg_value(DoubledP), true);
-	IDoubledEGP = Tuning::addParam(eg_value(DoubledP), true);
+	IDoubledMGP = Tuning::addParam(mg_value(DoubledP), false);
+	IDoubledEGP = Tuning::addParam(eg_value(DoubledP), false);
+	
+	IPawnChainMG = Tuning::addParam(mg_value(PawnChain), true);
+	IPawnChainEG = Tuning::addParam(eg_value(PawnChain), true);
+
 	
 }
 
