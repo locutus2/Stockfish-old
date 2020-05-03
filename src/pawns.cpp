@@ -149,10 +149,11 @@ namespace {
 		
 		if (pawnChains & s)
 		{
-			Score PPawnChain = make_score(Tuning::getParam(IPawnChainMG[r]), Tuning::getParam(IPawnChainEG[r]));
+			File f = File(edge_distance(file_of(s)));
+			Score PPawnChain = make_score(Tuning::getParam(IPawnChainMG[f]), Tuning::getParam(IPawnChainEG[f]));
 			score += PPawnChain;
-			Tuning::updateGradient(Us, IPawnChainMG[r], 1.0 * phase / PHASE_MIDGAME);
-		    Tuning::updateGradient(Us, IPawnChainEG[r], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IPawnChainMG[f], 1.0 * phase / PHASE_MIDGAME);
+		    Tuning::updateGradient(Us, IPawnChainEG[f], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		
 		}
 
@@ -425,10 +426,11 @@ void init() {
 	//IPawnChainMG = Tuning::addParam(mg_value(PawnChain), true);
 	//IPawnChainEG = Tuning::addParam(eg_value(PawnChain), true);
 
-	for(Rank r = RANK_4; r < RANK_8; ++r)
+	for(File f = FILE_A; f < FILE_E; ++f)
+	//for(Rank r = RANK_4; r < RANK_8; ++r)
 	{
-		IPawnChainMG[r] = Tuning::addParam(mg_value(PawnChain), true);
-	IPawnChainEG[r] = Tuning::addParam(eg_value(PawnChain), true);
+		IPawnChainMG[f] = Tuning::addParam(mg_value(PawnChain), true);
+	IPawnChainEG[f] = Tuning::addParam(eg_value(PawnChain), true);
 
 	}
 }
