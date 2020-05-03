@@ -58,6 +58,9 @@ namespace {
   int IPawnChainMG[8];
   int IPawnChainEG[8];
   
+  int IDoubledFMG[4];
+  int IDoubledFEG[4];
+  
 
   
 
@@ -235,8 +238,11 @@ namespace {
 	{
 		Score PDoubledU = make_score(Tuning::getParam(IDoubledMGU), Tuning::getParam(IDoubledEGU));
 		Score PDoubledP = make_score(Tuning::getParam(IDoubledMGP), Tuning::getParam(IDoubledEGP));
+		File f = File(edge_distance(file_of(s)));
+		Score PDoubledF = make_score(Tuning::getParam(IDoubledFMG[f]), Tuning::getParam(IDoubledFEG[f]));
 		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
-            score -=   (phalanx ? PDoubledP : PDoubled) * doubled
+            //score -=   (phalanx ? PDoubledP : PDoubled) * doubled
+			score -=   PDoubledF * doubled
                      + PWeakLever * more_than_one(lever);
    		//Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
 		//Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -256,6 +262,10 @@ namespace {
    		
 		Tuning::updateGradient(Us, IDoubledMGU, -1.0 * !opposed * doubled * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IDoubledEGU, -1.0 * !opposed * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
+		Tuning::updateGradient(Us, IDoubledFMG[f], -1.0 * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledFEG[f], -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
    		
 	}
 	else{
@@ -429,8 +439,11 @@ void init() {
 	for(File f = FILE_A; f < FILE_E; ++f)
 	//for(Rank r = RANK_4; r < RANK_8; ++r)
 	{
-		IPawnChainMG[f] = Tuning::addParam(mg_value(PawnChain), true);
-	IPawnChainEG[f] = Tuning::addParam(eg_value(PawnChain), true);
+		IDoubledFMG[f] = Tuning::addParam(mg_value(Doubled), true);
+	IDoubledFEG[f] = Tuning::addParam(eg_value(Doubled), true);
+	
+		IPawnChainMG[f] = Tuning::addParam(mg_value(PawnChain), false);
+	IPawnChainEG[f] = Tuning::addParam(eg_value(PawnChain), false);
 
 	}
 }
