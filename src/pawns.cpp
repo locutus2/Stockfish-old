@@ -52,6 +52,9 @@ namespace {
   int IDoubledMGU;
   int IDoubledEGU;
   
+  int IDoubledMGP;
+  int IDoubledEGP;
+  
   
 
   #define V Value
@@ -59,6 +62,7 @@ namespace {
   
   constexpr Score DoubledS       = S(0, 0);
   constexpr Score DoubledU       = S(11, 56);
+  constexpr Score DoubledP       = S(11, 56);
 
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
@@ -207,15 +211,25 @@ namespace {
         if (!support)
 	{
 		Score PDoubledU = make_score(Tuning::getParam(IDoubledMGU), Tuning::getParam(IDoubledEGU));
-            score -=   (opposed ? PDoubled : PDoubledU) * doubled
+		Score PDoubledP = make_score(Tuning::getParam(IDoubledMGP), Tuning::getParam(IDoubledEGP));
+		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
+            score -=   (phalanx ? PDoubledP : PDoubled) * doubled
                      + PWeakLever * more_than_one(lever);
    		//Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
 		//Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		Tuning::updateGradient(Us, IWeakLeverMG, -1.0 * more_than_one(lever) * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IWeakLeverEG, -1.0 * more_than_one(lever) * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		
-		Tuning::updateGradient(Us, IDoubledMG, -1.0 * bool(opposed) * doubled * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IDoubledEG, -1.0 * bool(opposed) * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledMG, -1.0 * !(phalanx) * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledEG, -1.0 * !(phalanx) * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
+		Tuning::updateGradient(Us, IDoubledMGP, -1.0 * bool(phalanx) * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledEGP, -1.0 * bool(phalanx) * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
+		
+		//Tuning::updateGradient(Us, IDoubledMG, -1.0 * bool(opposed) * doubled * phase / PHASE_MIDGAME);
+		//Tuning::updateGradient(Us, IDoubledEG, -1.0 * bool(opposed) * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		
    		
 		Tuning::updateGradient(Us, IDoubledMGU, -1.0 * !opposed * doubled * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IDoubledEGU, -1.0 * !opposed * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -380,8 +394,11 @@ void init() {
 	IDoubledMGS = Tuning::addParam(mg_value(DoubledS), false);
 	IDoubledEGS = Tuning::addParam(eg_value(DoubledS), false);
 	
-	IDoubledMGU = Tuning::addParam(mg_value(DoubledU), true);
-	IDoubledEGU = Tuning::addParam(eg_value(DoubledU), true);
+	IDoubledMGU = Tuning::addParam(mg_value(DoubledU), false);
+	IDoubledEGU = Tuning::addParam(eg_value(DoubledU), false);
+	
+	IDoubledMGP = Tuning::addParam(mg_value(DoubledP), true);
+	IDoubledEGP = Tuning::addParam(eg_value(DoubledP), true);
 	
 }
 
