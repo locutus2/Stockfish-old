@@ -55,8 +55,8 @@ namespace {
   int IDoubledMGP;
   int IDoubledEGP;
   
-  int IPawnChainMG;
-  int IPawnChainEG;
+  int IPawnChainMG[8];
+  int IPawnChainEG[8];
   
 
   
@@ -149,10 +149,10 @@ namespace {
 		
 		if (pawnChains & s)
 		{
-			Score PPawnChain = make_score(Tuning::getParam(IPawnChainMG), Tuning::getParam(IPawnChainEG));
+			Score PPawnChain = make_score(Tuning::getParam(IPawnChainMG[r]), Tuning::getParam(IPawnChainEG[r]));
 			score += PPawnChain;
-			Tuning::updateGradient(Us, IPawnChainMG, 1.0 * phase / PHASE_MIDGAME);
-		    Tuning::updateGradient(Us, IPawnChainEG, 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IPawnChainMG[r], 1.0 * phase / PHASE_MIDGAME);
+		    Tuning::updateGradient(Us, IPawnChainEG[r], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		
 		}
 
@@ -422,10 +422,15 @@ void init() {
 	IDoubledMGP = Tuning::addParam(mg_value(DoubledP), false);
 	IDoubledEGP = Tuning::addParam(eg_value(DoubledP), false);
 	
-	IPawnChainMG = Tuning::addParam(mg_value(PawnChain), true);
-	IPawnChainEG = Tuning::addParam(eg_value(PawnChain), true);
+	//IPawnChainMG = Tuning::addParam(mg_value(PawnChain), true);
+	//IPawnChainEG = Tuning::addParam(eg_value(PawnChain), true);
 
-	
+	for(Rank r = RANK_4; r < RANK_8; ++r)
+	{
+		IPawnChainMG[r] = Tuning::addParam(mg_value(PawnChain), true);
+	IPawnChainEG[r] = Tuning::addParam(eg_value(PawnChain), true);
+
+	}
 }
 
 // Explicit template instantiation
