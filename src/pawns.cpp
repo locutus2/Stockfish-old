@@ -60,6 +60,9 @@ namespace {
   
   int IDoubledFMG[4];
   int IDoubledFEG[4];
+
+  int IDoubledRMG[RANK_NB];
+  int IDoubledREG[RANK_NB];
   
 
   
@@ -240,9 +243,12 @@ namespace {
 		Score PDoubledP = make_score(Tuning::getParam(IDoubledMGP), Tuning::getParam(IDoubledEGP));
 		File f = File(edge_distance(file_of(s)));
 		Score PDoubledF = make_score(Tuning::getParam(IDoubledFMG[f]), Tuning::getParam(IDoubledFEG[f]));
+		Score PDoubledR = make_score(Tuning::getParam(IDoubledRMG[r]), Tuning::getParam(IDoubledREG[r]));
+		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
 		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
             //score -=   (phalanx ? PDoubledP : PDoubled) * doubled
-			score -=   PDoubledF * doubled
+			//score -=   PDoubledF * doubled
+			score -=   PDoubledR * doubled
                      + PWeakLever * more_than_one(lever);
    		//Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
 		//Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -265,6 +271,9 @@ namespace {
 		
 		Tuning::updateGradient(Us, IDoubledFMG[f], -1.0 * doubled * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IDoubledFEG[f], -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+
+		Tuning::updateGradient(Us, IDoubledRMG[r], -1.0 * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledREG[r], -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		
    		
 	}
@@ -439,11 +448,19 @@ void init() {
 	for(File f = FILE_A; f < FILE_E; ++f)
 	//for(Rank r = RANK_4; r < RANK_8; ++r)
 	{
-		IDoubledFMG[f] = Tuning::addParam(mg_value(Doubled), true);
-	IDoubledFEG[f] = Tuning::addParam(eg_value(Doubled), true);
+		IDoubledFMG[f] = Tuning::addParam(mg_value(Doubled), false);
+	IDoubledFEG[f] = Tuning::addParam(eg_value(Doubled), false);
 	
 		IPawnChainMG[f] = Tuning::addParam(mg_value(PawnChain), false);
 	IPawnChainEG[f] = Tuning::addParam(eg_value(PawnChain), false);
+
+	}
+
+	for(Rank r = RANK_3; r < RANK_8; ++r)
+	{
+		IDoubledRMG[r] = Tuning::addParam(mg_value(Doubled), true);
+	IDoubledREG[r] = Tuning::addParam(eg_value(Doubled), true);
+	
 
 	}
 }
