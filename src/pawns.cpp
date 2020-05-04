@@ -31,7 +31,7 @@ namespace {
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int A = 12;
+  constexpr int A = 100;
 
   #define W(o, n) ((o) + ((n) - (o)) * A / 100)
 
@@ -42,8 +42,8 @@ namespace {
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
 
-  // Doubled penalty in dependancy of distance to edge
-  constexpr Score Doubled[FILE_NB/2] = { S(W(11,-4), W(56,128)), S(W(11,128), W(56,84)), S(W(11,62), W(56,75)), S(W(11,183), W(56,107)) };
+  // Doubled penalty in dependancy of rank
+  constexpr Score Doubled[RANK_NB] = { S(0,0), S(0,0), S(W(11,46), W(56,46)), S(W(11,119), W(56,82)), S(W(11,139), W(56,146)), S(W(11,35), W(56,105)), S(W(11,9), W(56,58)) };
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -158,7 +158,7 @@ namespace {
                      + WeakUnopposed * !opposed;
 
         if (!support)
-            score -=   Doubled[edge_distance(file_of(s))] * doubled
+            score -=   Doubled[r] * doubled
                      + WeakLever * more_than_one(lever);
     }
 
