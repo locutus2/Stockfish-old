@@ -67,6 +67,8 @@ namespace {
   int IDoubledLinMG[3]; 
   int IDoubledLinEG[3]; 
 
+  int IIsolatedRMG[RANK_NB];
+  int IIsolatedREG[RANK_NB];
   
 
   #define V Value
@@ -220,12 +222,16 @@ namespace {
 
         else if (!neighbours)
 	{
-            score -=   PIsolated
+	    Score PIsolatedR = make_score(Tuning::getParam(IIsolatedRMG[r]), Tuning::getParam(IIsolatedREG[r]));
+            //score -=   PIsolated
+            score -=   PIsolatedR
                      + PWeakUnopposed * !opposed;
    		Tuning::updateGradient(Us, IIsolatedMG, -1.0 * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		Tuning::updateGradient(Us, IWeakUnopposedMG, -1.0 * !opposed * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IWeakUnopposedEG, -1.0 * !opposed * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IIsolatedRMG[r], -1.0 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IIsolatedREG[r], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	}
 
         else if (backward)
@@ -477,12 +483,19 @@ void init() {
 
 	}
 
-	IDoubledLinMG[0] = Tuning::addParam(mg_value(Doubled), true);
-	IDoubledLinMG[1] = Tuning::addParam(0, true);
-	IDoubledLinMG[2] = Tuning::addParam(0, true);
-	IDoubledLinEG[0] = Tuning::addParam(eg_value(Doubled), true);
-	IDoubledLinEG[1] = Tuning::addParam(0, true);
-	IDoubledLinEG[2] = Tuning::addParam(0, true);
+	IDoubledLinMG[0] = Tuning::addParam(mg_value(Doubled), false);
+	IDoubledLinMG[1] = Tuning::addParam(0, false);
+	IDoubledLinMG[2] = Tuning::addParam(0, false);
+	IDoubledLinEG[0] = Tuning::addParam(eg_value(Doubled), false);
+	IDoubledLinEG[1] = Tuning::addParam(0, false);
+	IDoubledLinEG[2] = Tuning::addParam(0, false);
+
+	for(Rank r = RANK_2; r < RANK_8; ++r)
+	{
+		IIsolatedRMG[r] = Tuning::addParam(mg_value(Isolated), true);
+		IIsolatedREG[r] = Tuning::addParam(eg_value(Isolated), true);
+	
+        }
 }
 
 // Explicit template instantiation
