@@ -70,6 +70,8 @@ namespace {
   int IIsolatedRMG[RANK_NB];
   int IIsolatedREG[RANK_NB];
   
+  int IIsolatedLinMG[2];
+  int IIsolatedLinEG[2];
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
@@ -223,8 +225,11 @@ namespace {
         else if (!neighbours)
 	{
 	    Score PIsolatedR = make_score(Tuning::getParam(IIsolatedRMG[r]), Tuning::getParam(IIsolatedREG[r]));
+	    Score PIsolatedLin[2] =  { make_score(Tuning::getParam(IIsolatedLinMG[0]), Tuning::getParam(IIsolatedLinEG[0]))
+	                             , make_score(Tuning::getParam(IIsolatedLinMG[1]), Tuning::getParam(IIsolatedLinEG[1])) };
             //score -=   PIsolated
-            score -=   PIsolatedR
+            //score -=   PIsolatedR
+            score -=   (PIsolatedLin[0] + PIsolatedLin[1] * r)
                      + PWeakUnopposed * !opposed;
    		Tuning::updateGradient(Us, IIsolatedMG, -1.0 * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -232,6 +237,10 @@ namespace {
 		Tuning::updateGradient(Us, IWeakUnopposedEG, -1.0 * !opposed * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		Tuning::updateGradient(Us, IIsolatedRMG[r], -1.0 * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedREG[r], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IIsolatedLinMG[0], -1.0 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IIsolatedLinEG[0], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IIsolatedLinMG[1], -1.0 * r * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IIsolatedLinEG[1], -1.0 * r * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	}
 
         else if (backward)
@@ -492,10 +501,15 @@ void init() {
 
 	for(Rank r = RANK_2; r < RANK_8; ++r)
 	{
-		IIsolatedRMG[r] = Tuning::addParam(mg_value(Isolated), true);
-		IIsolatedREG[r] = Tuning::addParam(eg_value(Isolated), true);
+		IIsolatedRMG[r] = Tuning::addParam(mg_value(Isolated), false);
+		IIsolatedREG[r] = Tuning::addParam(eg_value(Isolated), false);
 	
         }
+
+	IIsolatedLinMG[0] = Tuning::addParam(mg_value(Isolated), true);
+	IIsolatedLinMG[1] = Tuning::addParam(0, true);
+	IIsolatedLinEG[0] = Tuning::addParam(eg_value(Isolated), true);
+	IIsolatedLinEG[1] = Tuning::addParam(0, true);
 }
 
 // Explicit template instantiation
