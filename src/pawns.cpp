@@ -63,7 +63,9 @@ namespace {
 
   int IDoubledRMG[RANK_NB];
   int IDoubledREG[RANK_NB];
-  
+ 
+  int IDoubledLinMG[3]; 
+  int IDoubledLinEG[3]; 
 
   
 
@@ -244,11 +246,16 @@ namespace {
 		File f = File(edge_distance(file_of(s)));
 		Score PDoubledF = make_score(Tuning::getParam(IDoubledFMG[f]), Tuning::getParam(IDoubledFEG[f]));
 		Score PDoubledR = make_score(Tuning::getParam(IDoubledRMG[r]), Tuning::getParam(IDoubledREG[r]));
+		Score PDoubledLin[3] = { make_score(Tuning::getParam(IDoubledLinMG[0]), Tuning::getParam(IDoubledLinEG[0]))
+		                        ,make_score(Tuning::getParam(IDoubledLinMG[1]), Tuning::getParam(IDoubledLinEG[1]))
+		                        ,make_score(Tuning::getParam(IDoubledLinMG[2]), Tuning::getParam(IDoubledLinEG[2]))};
 		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
 		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
             //score -=   (phalanx ? PDoubledP : PDoubled) * doubled
 			//score -=   PDoubledF * doubled
-			score -=   PDoubledR * doubled
+			//score -=   PDoubledR * doubled
+			//score -=   (PDoubledLin[0] + PDoubledLin[1] * r) * doubled
+			score -=   (PDoubledLin[0] + PDoubledLin[1] * r + PDoubledLin[2] * r * r) * doubled
                      + PWeakLever * more_than_one(lever);
    		//Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
 		//Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -275,6 +282,12 @@ namespace {
 		Tuning::updateGradient(Us, IDoubledRMG[r], -1.0 * doubled * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IDoubledREG[r], -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		
+		Tuning::updateGradient(Us, IDoubledLinMG[0], -1.0 * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledLinMG[1], -1.0 * r * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledLinMG[2], -1.0 * r * r * doubled * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledLinEG[0], -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledLinEG[1], -1.0 * r * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IDoubledLinEG[2], -1.0 * r * r * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		
 	}
 	else{
@@ -458,11 +471,18 @@ void init() {
 
 	for(Rank r = RANK_3; r < RANK_8; ++r)
 	{
-		IDoubledRMG[r] = Tuning::addParam(mg_value(Doubled), true);
-	IDoubledREG[r] = Tuning::addParam(eg_value(Doubled), true);
+		IDoubledRMG[r] = Tuning::addParam(mg_value(Doubled), false);
+	IDoubledREG[r] = Tuning::addParam(eg_value(Doubled), false);
 	
 
 	}
+
+	IDoubledLinMG[0] = Tuning::addParam(mg_value(Doubled), true);
+	IDoubledLinMG[1] = Tuning::addParam(0, true);
+	IDoubledLinMG[2] = Tuning::addParam(0, true);
+	IDoubledLinEG[0] = Tuning::addParam(eg_value(Doubled), true);
+	IDoubledLinEG[1] = Tuning::addParam(0, true);
+	IDoubledLinEG[2] = Tuning::addParam(0, true);
 }
 
 // Explicit template instantiation
