@@ -231,10 +231,14 @@ namespace {
 	    double grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
    	    Tuning::updateGradient(Us, IConnected[r], grad);
 
+   	    //Tuning::updateGradient(Us, IConnectedPoly[0], grad / 32);
+   	    //Tuning::updateGradient(Us, IConnectedPoly[1], r * grad / 32);
+   	    //Tuning::updateGradient(Us, IConnectedPoly[2], r * r * grad / 32);
+   	    //Tuning::updateGradient(Us, IConnectedPoly[3], r * r * r * grad / 32);
    	    Tuning::updateGradient(Us, IConnectedPoly[0], grad / 32);
-   	    Tuning::updateGradient(Us, IConnectedPoly[1], r * grad / 32);
-   	    Tuning::updateGradient(Us, IConnectedPoly[2], r * r * grad / 32);
-   	    Tuning::updateGradient(Us, IConnectedPoly[3], r * r * r * grad / 32);
+   	    Tuning::updateGradient(Us, IConnectedPoly[1], r * grad / 32 * 2);
+   	    Tuning::updateGradient(Us, IConnectedPoly[2], r * r * grad / 32 * 4);
+   	    Tuning::updateGradient(Us, IConnectedPoly[3], r * r * r * grad / 32 * 8);
         }
 
         else if (!neighbours)
