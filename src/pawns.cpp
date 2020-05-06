@@ -73,6 +73,9 @@ namespace {
   int IIsolatedLinMG[2];
   int IIsolatedLinEG[2];
 
+  int IIsolatedGDMG[RANK_NB];
+  int IIsolatedGDEG[RANK_NB];
+
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
   
@@ -227,9 +230,13 @@ namespace {
 	    Score PIsolatedR = make_score(Tuning::getParam(IIsolatedRMG[r]), Tuning::getParam(IIsolatedREG[r]));
 	    Score PIsolatedLin[2] =  { make_score(Tuning::getParam(IIsolatedLinMG[0]), Tuning::getParam(IIsolatedLinEG[0]))
 	                             , make_score(Tuning::getParam(IIsolatedLinMG[1]), Tuning::getParam(IIsolatedLinEG[1])) };
+	    Score PIsolatedGD[3] =  { make_score(Tuning::getParam(IIsolatedGDMG[r-1]), Tuning::getParam(IIsolatedGDEG[r-1]))
+	                             , make_score(Tuning::getParam(IIsolatedGDMG[r]), Tuning::getParam(IIsolatedGDEG[r]))
+	                             , make_score(Tuning::getParam(IIsolatedGDMG[r+1]), Tuning::getParam(IIsolatedGDEG[r+1])) };
             //score -=   PIsolated
             //score -=   PIsolatedR
-            score -=   (PIsolatedLin[0] + PIsolatedLin[1] * r)
+            //score -=   (PIsolatedLin[0] + PIsolatedLin[1] * r)
+            score -=   (PIsolatedGD[0] + PIsolatedGD[1] + PIsolatedGD[2]) / 3
                      + PWeakUnopposed * !opposed;
    		Tuning::updateGradient(Us, IIsolatedMG, -1.0 * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -241,6 +248,13 @@ namespace {
 		Tuning::updateGradient(Us, IIsolatedLinEG[0], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		Tuning::updateGradient(Us, IIsolatedLinMG[1], -1.0 * r * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedLinEG[1], -1.0 * r * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+
+   		Tuning::updateGradient(Us, IIsolatedGDMG[r-1], -1.0 / 3 * phase / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IIsolatedGDMG[r], -1.0 / 3 * phase / PHASE_MIDGAME);
+   		Tuning::updateGradient(Us, IIsolatedGDMG[r+1], -1.0 / 3 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IIsolatedGDEG[r-1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IIsolatedGDEG[r], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IIsolatedGDEG[r+1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	}
 
         else if (backward)
@@ -503,13 +517,18 @@ void init() {
 	{
 		IIsolatedRMG[r] = Tuning::addParam(mg_value(Isolated), false);
 		IIsolatedREG[r] = Tuning::addParam(eg_value(Isolated), false);
-	
         }
 
-	IIsolatedLinMG[0] = Tuning::addParam(mg_value(Isolated), true);
-	IIsolatedLinMG[1] = Tuning::addParam(0, true);
-	IIsolatedLinEG[0] = Tuning::addParam(eg_value(Isolated), true);
-	IIsolatedLinEG[1] = Tuning::addParam(0, true);
+	IIsolatedLinMG[0] = Tuning::addParam(mg_value(Isolated), false);
+	IIsolatedLinMG[1] = Tuning::addParam(0, false);
+	IIsolatedLinEG[0] = Tuning::addParam(eg_value(Isolated), false);
+	IIsolatedLinEG[1] = Tuning::addParam(0, false);
+
+	for(int r = (int)RANK_1; r <= (int)RANK_8; ++r)
+	{
+		IIsolatedGDMG[r] = Tuning::addParam(mg_value(Isolated), true);
+		IIsolatedGDEG[r] = Tuning::addParam(eg_value(Isolated), true);
+        }
 }
 
 // Explicit template instantiation
