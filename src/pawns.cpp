@@ -31,7 +31,7 @@ namespace {
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int A = 12;
+  constexpr int A = 100;
 
   #define W(o, n) ((o) + ((n) - (o)) * A / 100)
 
@@ -43,7 +43,8 @@ namespace {
   constexpr Score WeakUnopposed = S(13, 27);
 
   // Doubled penalty in dependancy of rank
-  constexpr Score Doubled[RANK_NB] = { S(0,0), S(0,0), S(W(11,94), W(56,96)), S(W(11,63), W(56,73)), S(W(11,31), W(56,50)), S(W(11,-1), W(56,27)), S(W(11,-32), W(56,4)) };
+  constexpr Score Doubled[RANK_NB] = { S(0,0), S(0,0), S(W(11,72), W(56,93)), S(W(11,63), W(56,73)),
+	                               S(W(11,60), W(56,47)), S(W(11,62), W(56,15)), S(W(11,70), W(56,-24)) };
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
