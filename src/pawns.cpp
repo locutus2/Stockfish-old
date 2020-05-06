@@ -76,6 +76,8 @@ namespace {
   int IIsolatedGDMG[RANK_NB];
   int IIsolatedGDEG[RANK_NB];
 
+  int IConnectedPoly[4];
+
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
   
@@ -215,7 +217,12 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+            //double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+	    double P = Tuning::getParam(IConnectedPoly[0])
+	    		+ r * Tuning::getParam(IConnectedPoly[1])
+	    		+ r * r * Tuning::getParam(IConnectedPoly[2])
+	    		+ r * r * r * Tuning::getParam(IConnectedPoly[3]);
+            double v =  P * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 64
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
@@ -223,6 +230,11 @@ namespace {
 	    double grad_eg = grad_mg * (r - 2) / 4;
 	    double grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
    	    Tuning::updateGradient(Us, IConnected[r], grad);
+
+   	    Tuning::updateGradient(Us, IConnectedPoly[0], grad / 32);
+   	    Tuning::updateGradient(Us, IConnectedPoly[1], r * grad / 32);
+   	    Tuning::updateGradient(Us, IConnectedPoly[2], r * r * grad / 32);
+   	    Tuning::updateGradient(Us, IConnectedPoly[3], r * r * r * grad / 32);
         }
 
         else if (!neighbours)
@@ -526,9 +538,14 @@ void init() {
 
 	for(int r = (int)RANK_1; r <= (int)RANK_8; ++r)
 	{
-		IIsolatedGDMG[r] = Tuning::addParam(mg_value(Isolated), true);
-		IIsolatedGDEG[r] = Tuning::addParam(eg_value(Isolated), true);
+		IIsolatedGDMG[r] = Tuning::addParam(mg_value(Isolated), false);
+		IIsolatedGDEG[r] = Tuning::addParam(eg_value(Isolated), false);
         }
+
+	IConnectedPoly[0] = Tuning::addParam(281, true);
+	IConnectedPoly[1] = Tuning::addParam(-52, true);
+	IConnectedPoly[2] = Tuning::addParam(-6, true);
+	IConnectedPoly[3] = Tuning::addParam(14, true);
 }
 
 // Explicit template instantiation
