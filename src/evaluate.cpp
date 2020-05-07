@@ -192,6 +192,7 @@ namespace {
     // kingRing[color] are the squares adjacent to the king plus some other
     // very near squares, depending on king position.
     Bitboard kingRing[COLOR_NB];
+    Bitboard outerKingRing[COLOR_NB];
 
     // kingAttackersCount[color] is the number of pieces of the given color
     // which attack a square in the kingRing of the enemy king.
@@ -242,13 +243,15 @@ namespace {
     // Init our king safety tables
     Square s = make_square(Utility::clamp(file_of(ksq), FILE_B, FILE_G),
                            Utility::clamp(rank_of(ksq), RANK_2, RANK_7));
-    kingRing[Us] = PseudoAttacks[KING][s] | s;
+    kingRing[Us] = b = PseudoAttacks[KING][s] | s;
+    outerKingRing[Us] = shift<WEST >(b) | shift<EAST >(b) | shift<NORTH>(b) | shift<SOUTH>(b);
 
     kingAttackersCount[Them] = popcount(kingRing[Us] & pe->pawn_attacks(Them));
     kingAttacksCount[Them] = kingAttackersWeight[Them] = 0;
 
     // Remove from kingRing[] the squares defended by two pawns
     kingRing[Us] &= ~dblAttackByPawn;
+    outerKingRing[Us] &= ~(dblAttackByPawn | kingRing[Us]);
   }
 
 
@@ -287,6 +290,8 @@ namespace {
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
+        else if (b & outerKingRing[Us])
+            kingAttackersWeight[Us] += KingAttackWeights[Pt] / 2;
 
         int mob = popcount(b & mobilityArea[Us]);
 
