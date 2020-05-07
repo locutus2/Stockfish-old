@@ -77,6 +77,7 @@ namespace {
   int IIsolatedGDEG[RANK_NB];
 
   int IConnectedPoly[4];
+  int IConnectedFactor[4];
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
@@ -222,7 +223,11 @@ namespace {
 	    		+ r * Tuning::getParam(IConnectedPoly[1])
 	    		+ r * r * Tuning::getParam(IConnectedPoly[2])
 	    		+ r * r * r * Tuning::getParam(IConnectedPoly[3]);
-            double v =  P * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 64
+            //double v =  P * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 64
+            double v =  Connected[r] * (Tuning::getParam(IConnectedFactor[0]) 
+			               + Tuning::getParam(IConnectedFactor[1]) * bool(phalanx) 
+				       + Tuning::getParam(IConnectedFactor[2]) * bool(opposed) 
+				       + Tuning::getParam(IConnectedFactor[3]) *  bool(blocked)) / (2 * 64)
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
@@ -239,6 +244,15 @@ namespace {
    	    Tuning::updateGradient(Us, IConnectedPoly[1], r * grad / 32 * 2);
    	    Tuning::updateGradient(Us, IConnectedPoly[2], r * r * grad / 32 * 4);
    	    Tuning::updateGradient(Us, IConnectedPoly[3], r * r * r * grad / 32 * 8);
+
+	    double rgrad_mg = Connected[r] / (2.0 * 64);
+	    double rgrad_eg = grad_mg * (r - 2) / 4;
+	    double rgrad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
+
+   	    Tuning::updateGradient(Us, IConnectedFactor[0], rgrad);
+   	    Tuning::updateGradient(Us, IConnectedFactor[1], rgrad * bool(phalanx));
+   	    Tuning::updateGradient(Us, IConnectedFactor[2], rgrad * bool(opposed));
+   	    Tuning::updateGradient(Us, IConnectedFactor[3], rgrad * bool(blocked));
         }
 
         else if (!neighbours)
@@ -546,10 +560,15 @@ void init() {
 		IIsolatedGDEG[r] = Tuning::addParam(eg_value(Isolated), false);
         }
 
-	IConnectedPoly[0] = Tuning::addParam(281, true);
-	IConnectedPoly[1] = Tuning::addParam(-52, true);
-	IConnectedPoly[2] = Tuning::addParam(-6, true);
-	IConnectedPoly[3] = Tuning::addParam(14, true);
+	IConnectedPoly[0] = Tuning::addParam(281, false);
+	IConnectedPoly[1] = Tuning::addParam(-52, false);
+	IConnectedPoly[2] = Tuning::addParam(-6, false);
+	IConnectedPoly[3] = Tuning::addParam(14, false);
+
+	IConnectedFactor[0] = Tuning::addParam(4 * 64, true);
+	IConnectedFactor[1] = Tuning::addParam(2 * 64, true);
+	IConnectedFactor[2] = Tuning::addParam(-2 * 64, true);
+	IConnectedFactor[3] = Tuning::addParam(-1 * 64, true);
 }
 
 // Explicit template instantiation
