@@ -462,8 +462,10 @@ namespace {
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -   6 * mg_value(score) / 8
                  -   4 * kingFlankDefense
-                 -  80 * bool(pos.castling_rights(Us))
                  +  37;
+
+    if (pos.castling_rights(Us))
+        kingDanger /= 2;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
