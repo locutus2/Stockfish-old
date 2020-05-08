@@ -78,6 +78,8 @@ namespace {
   int IBishopXRayPawnsMG;
   int IBishopXRayPawnsEG;
 
+  int IKDweak;
+
   constexpr bool USE_FOR_TUNING = false;
 
   int IMobilityBonus[4][28][2];
@@ -416,6 +418,8 @@ namespace {
     int kingDanger = 0;
     const Square ksq = pos.square<KING>(Us);
 
+    Phase phase = Material::probe(pos)->game_phase();
+
     // Init the score with king shelter and enemy pawns storm
     Score score = pe->king_safety<Us>(pos);
 
@@ -480,7 +484,8 @@ namespace {
     int kingFlankDefense = popcount(b3);
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
-                 + 185 * popcount(kingRing[Us] & weak)
+                 //+ 185 * popcount(kingRing[Us] & weak)
+                 + Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak)
                  + 148 * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
                  +  69 * kingAttacksCount[Them]
@@ -494,7 +499,13 @@ namespace {
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
+    {
         score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
+	double grad_mg = 2.0 * kingDanger * popcount(kingRing[Us] & weak) / 4096.0;
+	double grad_eg = popcount(kingRing[Us] & weak) / 16.0;
+	double grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
+	Tuning::updateGradient(Us, IKDweak, -grad);
+    }
 
     // Penalty when our king is on a pawnless flank
     if (!(pos.pieces(PAWN) & KingFlank[file_of(ksq)]))
@@ -901,8 +912,10 @@ void Eval::init() {
 
         IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), false);
         IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), false);
-        IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), true);
-        IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), true);
+        IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), false);
+        IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), false);
+
+        IKDweak = Tuning::addParam(185, true);
 }
 
 
