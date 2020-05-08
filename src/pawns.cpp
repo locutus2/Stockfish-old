@@ -91,7 +91,8 @@ namespace {
   constexpr Score Backward      = S( 9, 24);
   constexpr Score BlockedStorm  = S(82, 82);
   constexpr Score Doubled       = S(11, 56);
-  constexpr Score Isolated      = S( 5, 15);
+  //constexpr Score Isolated      = S( 5, 15);
+  constexpr Score Isolated      = S( 0, 0);
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
 
@@ -263,10 +264,10 @@ namespace {
 	    Score PIsolatedGD[3] =  { make_score(Tuning::getParam(IIsolatedGDMG[r-1]), Tuning::getParam(IIsolatedGDEG[r-1]))
 	                             , make_score(Tuning::getParam(IIsolatedGDMG[r]), Tuning::getParam(IIsolatedGDEG[r]))
 	                             , make_score(Tuning::getParam(IIsolatedGDMG[r+1]), Tuning::getParam(IIsolatedGDEG[r+1])) };
-            //score -=   PIsolated
+            score -=   PIsolated
             //score -=   PIsolatedR
             //score -=   (PIsolatedLin[0] + PIsolatedLin[1] * r)
-            score -=   (PIsolatedGD[0] + PIsolatedGD[1] + PIsolatedGD[2]) / 3
+            //score -=   (PIsolatedGD[0] + PIsolatedGD[1] + PIsolatedGD[2]) / 3
                      + PWeakUnopposed * !opposed;
    		Tuning::updateGradient(Us, IIsolatedMG, -1.0 * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -493,8 +494,8 @@ void init() {
 	IBackwardEG = Tuning::addParam(eg_value(Backward), USE_FOR_TUNING);
 	IDoubledMG = Tuning::addParam(mg_value(Doubled), USE_FOR_TUNING);
 	IDoubledEG = Tuning::addParam(eg_value(Doubled), USE_FOR_TUNING);
-	IIsolatedMG = Tuning::addParam(mg_value(Isolated), USE_FOR_TUNING);
-	IIsolatedEG = Tuning::addParam(eg_value(Isolated), USE_FOR_TUNING);
+	IIsolatedMG = Tuning::addParam(mg_value(Isolated), true);
+	IIsolatedEG = Tuning::addParam(eg_value(Isolated), true);
 	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), USE_FOR_TUNING);
 	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), USE_FOR_TUNING);
 	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), USE_FOR_TUNING);
@@ -565,10 +566,10 @@ void init() {
 	IConnectedPoly[2] = Tuning::addParam(-6, false);
 	IConnectedPoly[3] = Tuning::addParam(14, false);
 
-	IConnectedFactor[0] = Tuning::addParam(4 * 64, true);
-	IConnectedFactor[1] = Tuning::addParam(2 * 64, true);
-	IConnectedFactor[2] = Tuning::addParam(-2 * 64, true);
-	IConnectedFactor[3] = Tuning::addParam(-1 * 64, true);
+	IConnectedFactor[0] = Tuning::addParam(4 * 64, false);
+	IConnectedFactor[1] = Tuning::addParam(2 * 64, false);
+	IConnectedFactor[2] = Tuning::addParam(-2 * 64, false);
+	IConnectedFactor[3] = Tuning::addParam(-1 * 64, false);
 }
 
 // Explicit template instantiation

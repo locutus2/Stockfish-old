@@ -490,7 +490,7 @@ namespace Tuning {
 			s /= na;
 		}
 		
-		if(firstUpdate || RESACLE_EVERYTIME)
+		if(firstUpdate || RESCALE_EVERYTIME)
 		{
 			double m = 0;
 			for(int i = 0; i < n;  ++i)
