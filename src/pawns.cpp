@@ -97,8 +97,8 @@ namespace {
   //constexpr Score Isolated      = S( 0, 0);
   constexpr Score WeakLever     = S( 0, 56);
   //constexpr Score WeakLever     = S( 0, 0);
-  //constexpr Score WeakUnopposed = S(13, 27);
-  constexpr Score WeakUnopposed = S(0, 0);
+  constexpr Score WeakUnopposed = S(13, 27);
+  //constexpr Score WeakUnopposed = S(0, 0);
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -503,8 +503,8 @@ void init() {
 	IIsolatedEG = Tuning::addParam(eg_value(Isolated), false);
 	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), false);
 	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), false);
-	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), true);
-	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), true);
+	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), false);
+	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), false);
 	for(Rank r = RANK_2; r < RANK_8; ++r)
 		IConnected[r] = Tuning::addParam(Connected[r], USE_FOR_TUNING);
 

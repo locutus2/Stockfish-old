@@ -72,6 +72,10 @@ namespace Trace {
 using namespace Trace;
 
 namespace {
+
+  int IBishopPawnsMG;
+  int IBishopPawnsEG;
+
   constexpr bool USE_FOR_TUNING = false;
 
   int IMobilityBonus[4][28][2];
@@ -265,6 +269,8 @@ namespace {
     constexpr Bitboard OutpostRanks = (Us == WHITE ? Rank4BB | Rank5BB | Rank6BB
                                                    : Rank5BB | Rank4BB | Rank3BB);
     const Square* pl = pos.squares<Pt>(Us);
+    Phase phase = me->game_phase();
+//	Phase phase = Material::probe(pos)->game_phase();
 
     Bitboard b, bb;
     Score score = SCORE_ZERO;
@@ -297,7 +303,6 @@ namespace {
         mobility[Us] += make_score(Tuning::getParam(IMobilityBonus[Pt - 2][mob][0]),
 			           Tuning::getParam(IMobilityBonus[Pt - 2][mob][1]));
 
-	Phase phase = Material::probe(pos)->game_phase();
         Tuning::updateGradient(Us, IMobilityBonus[Pt - 2][mob][0], 1.0 * phase / PHASE_MIDGAME);
         Tuning::updateGradient(Us, IMobilityBonus[Pt - 2][mob][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
@@ -325,8 +330,14 @@ namespace {
                 // when the bishop is outside the pawn chain.
                 Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces());
 
-                score -= BishopPawns * pos.pawns_on_same_color_squares(Us, s)
-                                     * (!(attackedBy[Us][PAWN] & s) + popcount(blocked & CenterFiles));
+		Score PBishopPawns = make_score(Tuning::getParam(IBishopPawnsMG),
+				                Tuning::getParam(IBishopPawnsEG));
+                //score -= BishopPawns * pos.pawns_on_same_color_squares(Us, s)
+                double grad = pos.pawns_on_same_color_squares(Us, s)
+                              * (!(attackedBy[Us][PAWN] & s) + popcount(blocked & CenterFiles));
+                score -= PBishopPawns * (int)grad;
+		Tuning::updateGradient(Us, IBishopPawnsMG, -grad * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IBishopPawnsEG, -grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
                 // Penalty for all enemy pawns x-rayed
                 score -= BishopXRayPawns * popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
@@ -879,6 +890,9 @@ void Eval::init() {
 			IMobilityBonus[x.first][i][1] = Tuning::addParam(eg_value(MobilityBonus[x.first][i]), USE_FOR_TUNING);
 		}
 	}
+
+        IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), true);
+        IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), true);
 }
 
 
