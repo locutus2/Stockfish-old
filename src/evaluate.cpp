@@ -127,7 +127,7 @@ namespace {
   };
 
   // Assorted bonuses and penalties
-  constexpr Score BishopPawns         = S(  3,  7);
+  constexpr Score BishopPawns         = S(  4,  9);
   constexpr Score BishopXRayPawns     = S(  4,  5);
   constexpr Score CorneredBishop      = S( 50, 50);
   constexpr Score FlankAttacks        = S(  8,  0);
@@ -319,7 +319,7 @@ namespace {
                                   & (DarkSquares & s ? DarkSquares : ~DarkSquares);
 
                 score -= BishopPawns * pos.pawns_on_same_color_squares(Us, s)
-                                     * (!(attackedBy[Us][PAWN] & s) + 2 * popcount(blocked & CenterFiles));
+                                     * (!(attackedBy[Us][PAWN] & s) + popcount(blocked & CenterFiles));
 
                 // Penalty for all enemy pawns x-rayed
                 score -= BishopXRayPawns * popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
