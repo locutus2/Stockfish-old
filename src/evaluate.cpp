@@ -75,6 +75,8 @@ namespace {
 
   int IBishopPawnsMG;
   int IBishopPawnsEG;
+  int IBishopXRayPawnsMG;
+  int IBishopXRayPawnsEG;
 
   constexpr bool USE_FOR_TUNING = false;
 
@@ -340,7 +342,13 @@ namespace {
 		Tuning::updateGradient(Us, IBishopPawnsEG, -grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
                 // Penalty for all enemy pawns x-rayed
-                score -= BishopXRayPawns * popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
+		Score PBishopXRayPawns = make_score(Tuning::getParam(IBishopXRayPawnsMG),
+				                Tuning::getParam(IBishopXRayPawnsEG));
+                //score -= BishopXRayPawns * popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
+                grad = popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
+                score -= PBishopXRayPawns * (int)grad;
+		Tuning::updateGradient(Us, IBishopXRayPawnsMG, -grad * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IBishopXRayPawnsEG, -grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
@@ -891,8 +899,10 @@ void Eval::init() {
 		}
 	}
 
-        IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), true);
-        IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), true);
+        IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), false);
+        IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), false);
+        IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), true);
+        IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), true);
 }
 
 
