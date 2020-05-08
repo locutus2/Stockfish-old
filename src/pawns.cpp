@@ -95,7 +95,8 @@ namespace {
   //constexpr Score Doubled       = S(0, 0);
   constexpr Score Isolated      = S( 5, 15);
   //constexpr Score Isolated      = S( 0, 0);
-  constexpr Score WeakLever     = S( 0, 56);
+  //constexpr Score WeakLever     = S( 0, 56);
+  constexpr Score WeakLever     = S( 0, 0);
   constexpr Score WeakUnopposed = S(13, 27);
 
   // Connected pawn bonus
@@ -493,14 +494,14 @@ Score Entry::do_king_safety(const Position& pos) {
 }
 
 void init() {
-	IBackwardMG = Tuning::addParam(mg_value(Backward), true);
-	IBackwardEG = Tuning::addParam(eg_value(Backward), true);
+	IBackwardMG = Tuning::addParam(mg_value(Backward), false);
+	IBackwardEG = Tuning::addParam(eg_value(Backward), false);
 	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
 	IDoubledEG = Tuning::addParam(eg_value(Doubled), false);
 	IIsolatedMG = Tuning::addParam(mg_value(Isolated), false);
 	IIsolatedEG = Tuning::addParam(eg_value(Isolated), false);
-	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), USE_FOR_TUNING);
-	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), USE_FOR_TUNING);
+	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), true);
+	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), true);
 	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), USE_FOR_TUNING);
 	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), USE_FOR_TUNING);
 	for(Rank r = RANK_2; r < RANK_8; ++r)
