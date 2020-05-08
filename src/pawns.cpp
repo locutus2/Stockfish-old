@@ -88,10 +88,11 @@ namespace {
   constexpr Score PawnChain      = S( 0,  0);
 
   // Pawn penalties
-  constexpr Score Backward      = S( 9, 24);
+  //constexpr Score Backward      = S( 9, 24);
+  constexpr Score Backward      = S( 0, 0);
   constexpr Score BlockedStorm  = S(82, 82);
-  //constexpr Score Doubled       = S(11, 56);
-  constexpr Score Doubled       = S(0, 0);
+  constexpr Score Doubled       = S(11, 56);
+  //constexpr Score Doubled       = S(0, 0);
   constexpr Score Isolated      = S( 5, 15);
   //constexpr Score Isolated      = S( 0, 0);
   constexpr Score WeakLever     = S( 0, 56);
@@ -492,10 +493,10 @@ Score Entry::do_king_safety(const Position& pos) {
 }
 
 void init() {
-	IBackwardMG = Tuning::addParam(mg_value(Backward), USE_FOR_TUNING);
-	IBackwardEG = Tuning::addParam(eg_value(Backward), USE_FOR_TUNING);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), true);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), true);
+	IBackwardMG = Tuning::addParam(mg_value(Backward), true);
+	IBackwardEG = Tuning::addParam(eg_value(Backward), true);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), false);
 	IIsolatedMG = Tuning::addParam(mg_value(Isolated), false);
 	IIsolatedEG = Tuning::addParam(eg_value(Isolated), false);
 	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), USE_FOR_TUNING);
