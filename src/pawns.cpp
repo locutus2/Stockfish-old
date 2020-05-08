@@ -88,8 +88,8 @@ namespace {
   constexpr Score PawnChain      = S( 0,  0);
 
   // Pawn penalties
-  //constexpr Score Backward      = S( 9, 24);
-  constexpr Score Backward      = S( 0, 0);
+  constexpr Score Backward      = S( 9, 24);
+  //constexpr Score Backward      = S( 0, 0);
   constexpr Score BlockedStorm  = S(82, 82);
   constexpr Score Doubled       = S(11, 56);
   //constexpr Score Doubled       = S(0, 0);
