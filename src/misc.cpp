@@ -433,8 +433,9 @@ namespace Tuning {
 	//constexpr double ALPHA = 0.0000001/0.0030737;
 	//constexpr double ALPHA = 0.0000001/0.1538/0.6835/0.2/0.3084;
 	constexpr double ALPHA0 = 0.0000001;
+	constexpr double RESCALE_BASE = 1;
 	constexpr bool FIXED = false;
-	constexpr bool RESCALE_EVERYTIME = false;
+	constexpr bool RESCALE_EVERYTIME = true;
 
 	std::vector<double> param;
 	std::vector<double> isActive;
@@ -489,7 +490,7 @@ namespace Tuning {
 			s /= na;
 		}
 		
-		if(firstUpdate)
+		if(firstUpdate || RESACLE_EVERYTIME)
 		{
 			double m = 0;
 			for(int i = 0; i < n;  ++i)
@@ -497,18 +498,8 @@ namespace Tuning {
 				if(isActive[i])
 					m = std::max(m, std::abs(total_gradient[i] - s));
 			}
-			ALPHA = 1/m;
+			ALPHA = RESCALE_BASE/m;
 			firstUpdate = false;
-		}
-		else if(RESCALE_EVERYTIME)
-		{
-			double m = 0;
-			for(int i = 0; i < n;  ++i)
-			{
-				if(isActive[i])
-					m = std::max(m, std::abs(total_gradient[i] - s));
-			}
-			ALPHA = 1/m;
 		}
 		
 		for(int i = 0; i < n;  ++i)
