@@ -77,8 +77,12 @@ namespace {
   int IBishopPawnsEG;
   int IBishopXRayPawnsMG;
   int IBishopXRayPawnsEG;
+  int IPawnlessFlankMG;
+  int IPawnlessFlankEG;
 
   int IKDweak;
+  int IKDweakEG;
+  int IKDunsafeChecks;
 
   constexpr bool USE_FOR_TUNING = false;
 
@@ -485,8 +489,8 @@ namespace {
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
                  //+ 185 * popcount(kingRing[Us] & weak)
-                 + Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak)
-                 + 148 * popcount(unsafeChecks)
+                 //+ Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak)
+                 + Tuning::getParam(IKDunsafeChecks) * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
                  +  69 * kingAttacksCount[Them]
                  +   3 * kingFlankAttack * kingFlankAttack / 8
@@ -496,20 +500,35 @@ namespace {
                  -   6 * mg_value(score) / 8
                  -   4 * kingFlankDefense
                  +  37;
-
+     int kingDangerEG = kingDanger + Tuning::getParam(IKDweakEG) * popcount(kingRing[Us] & weak);
+	 kingDanger += Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak);
+	 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
     {
-        score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
+        score -= make_score(kingDanger * kingDanger / 4096, kingDangerEG / 16);
 	double grad_mg = 2.0 * kingDanger * popcount(kingRing[Us] & weak) / 4096.0;
 	double grad_eg = popcount(kingRing[Us] & weak) / 16.0;
 	double grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
-	Tuning::updateGradient(Us, IKDweak, -grad);
+	//Tuning::updateGradient(Us, IKDweak, -grad);
+	Tuning::updateGradient(Us, IKDweak, -grad_mg);
+	Tuning::updateGradient(Us, IKDweakEG, -grad_eg);
+	
+	
+	grad_eg = popcount(unsafeChecks) / 16.0;
+	grad_mg = grad_eg * kingDanger / 128.0;
+	grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
+	Tuning::updateGradient(Us, IKDunsafeChecks, -grad);
+
     }
 
     // Penalty when our king is on a pawnless flank
     if (!(pos.pieces(PAWN) & KingFlank[file_of(ksq)]))
+	{
         score -= PawnlessFlank;
+		Tuning::updateGradient(Us, IPawnlessFlankMG, -1.0 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IPawnlessFlankEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	}
 
     // Penalty if king flank is under attack, potentially moving toward the king
     score -= FlankAttacks * kingFlankAttack;
@@ -914,8 +933,13 @@ void Eval::init() {
         IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), false);
         IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), false);
         IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), false);
+		IPawnlessFlankMG = Tuning::addParam(mg_value(PawnlessFlank), true);
+		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), true);
+		
 
-        IKDweak = Tuning::addParam(185, true);
+        IKDweak = Tuning::addParam(185, false);
+		IKDweakEG = Tuning::addParam(185, false);
+		IKDunsafeChecks = Tuning::addParam(148, false);
 }
 
 
