@@ -79,6 +79,8 @@ namespace {
   int IConnectedPoly[4];
   int IConnectedFactor[4];
   int IConnectedC[4];
+  
+  int IConnectedBR[RANK_NB];
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
@@ -229,11 +231,12 @@ namespace {
 	    		+ r * Tuning::getParam(IConnectedPoly[1])
 	    		+ r * r * Tuning::getParam(IConnectedPoly[2])
 	    		+ r * r * r * Tuning::getParam(IConnectedPoly[3]);
-            //double v =  P * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 64
-            double v =  Connected[r] * (Tuning::getParam(IConnectedFactor[0]) 
-			               + Tuning::getParam(IConnectedFactor[1]) * bool(phalanx) 
-				       + Tuning::getParam(IConnectedFactor[2]) * bool(opposed) 
-				       + Tuning::getParam(IConnectedFactor[3]) *  bool(blocked)) / (2 * 64)
+			//double v =  P * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 64
+			double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) + bool(blocked) * Tuning::getParam(IConnectedBR[r]) / 64) / 2
+            //double v =  Connected[r] * (Tuning::getParam(IConnectedFactor[0]) 
+			//               + Tuning::getParam(IConnectedFactor[1]) * bool(phalanx) 
+			//	       + Tuning::getParam(IConnectedFactor[2]) * bool(opposed) 
+			//	       + Tuning::getParam(IConnectedFactor[3]) *  bool(blocked)) / (2 * 64)
                    + 21 * popcount(support);
 
             score += make_score(v * (IConnectedC[0] + IConnectedC[1] * r) / 64, (IConnectedC[2] + IConnectedC[3] * r) / 64);
@@ -265,6 +268,14 @@ namespace {
    	    Tuning::updateGradient(Us, IConnectedFactor[1], rgrad * bool(phalanx));
    	    Tuning::updateGradient(Us, IConnectedFactor[2], rgrad * bool(opposed));
    	    Tuning::updateGradient(Us, IConnectedFactor[3], rgrad * bool(blocked));
+		
+		if (blocked)
+		{
+			grad_mg = Tuning::getParam(IConnected[r]) / 2.0;
+			grad_eg = grad_mg * (r - 2) / 4;
+			grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
+			Tuning::updateGradient(Us, IConnectedBR[r], grad);
+		}
         }
 
         else if (!neighbours)
@@ -583,10 +594,16 @@ void init() {
 	IConnectedFactor[2] = Tuning::addParam(-2 * 64, false);
 	IConnectedFactor[3] = Tuning::addParam(-1 * 64, false);
 	
-	IConnectedC[0] = Tuning::addParam(64, true);
-	IConnectedC[1] = Tuning::addParam(0, true);
-	IConnectedC[2] = Tuning::addParam(-32, true);
-	IConnectedC[3] = Tuning::addParam(16, true);
+	IConnectedC[0] = Tuning::addParam(64, false);
+	IConnectedC[1] = Tuning::addParam(0, false);
+	IConnectedC[2] = Tuning::addParam(-32, false);
+	IConnectedC[3] = Tuning::addParam(16, false);
+	
+	IConnectedBR[1] = Tuning::addParam(-64, true);
+	IConnectedBR[2] = Tuning::addParam(-64, true);
+	IConnectedBR[3] = Tuning::addParam(-64, true);
+	IConnectedBR[4] = Tuning::addParam(-64, true);
+	IConnectedBR[5] = Tuning::addParam(-64, true);
 
 }
 

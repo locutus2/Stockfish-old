@@ -435,7 +435,7 @@ namespace Tuning {
 	constexpr double ALPHA0 = 0.0000001;
 	constexpr double RESCALE_BASE = 1;
 	constexpr bool FIXED = false;
-	constexpr bool RESCALE_EVERYTIME = true;
+	constexpr bool RESCALE_EVERYTIME = false;
 
 	std::vector<double> param;
 	std::vector<double> isActive;
