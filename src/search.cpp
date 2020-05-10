@@ -1776,7 +1776,7 @@ moves_loop: // When in check, search starts from here
     {
         // This is our magic formula
         int push = (  weakness * int(topScore - rootMoves[i].score)
-                    + delta * (rng.rand<unsigned>() % weakness)) / 128;
+                    + delta * (rng.rand<unsigned>() % weakness)) * multiPV / 512;
 
         if (rootMoves[i].score + push >= maxScore)
         {
