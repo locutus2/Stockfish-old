@@ -140,7 +140,7 @@ namespace {
             int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
                    + 21 * popcount(support);
 
-            score += make_score(v * (10 + r) / 16, v * (r - 2) / 4);
+            score += make_score(v * (r + 2) / 8, v * (r - 2) / 4);
         }
 
         else if (!neighbours)
