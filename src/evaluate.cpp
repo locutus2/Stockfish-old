@@ -933,8 +933,8 @@ void Eval::init() {
         IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), false);
         IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), false);
         IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), false);
-		IPawnlessFlankMG = Tuning::addParam(mg_value(PawnlessFlank), true);
-		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), true);
+		IPawnlessFlankMG = Tuning::addParam(mg_value(PawnlessFlank), false);
+		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
 
         IKDweak = Tuning::addParam(185, false);

@@ -78,6 +78,7 @@ namespace {
 
   int IConnectedPoly[4];
   int IConnectedFactor[4];
+  int IConnectedC[4];
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
@@ -235,7 +236,8 @@ namespace {
 				       + Tuning::getParam(IConnectedFactor[3]) *  bool(blocked)) / (2 * 64)
                    + 21 * popcount(support);
 
-            score += make_score(v, v * (r - 2) / 4);
+            score += make_score(v * (IConnectedC[0] + IConnectedC[1] * r) / 64, (IConnectedC[2] + IConnectedC[3] * r) / 64);
+			//score += make_score(v, v * (r - 2) / 4);
 	    double grad_mg = (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2.0;
 	    double grad_eg = grad_mg * (r - 2) / 4;
 	    double grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
@@ -249,6 +251,11 @@ namespace {
    	    Tuning::updateGradient(Us, IConnectedPoly[1], r * grad / 32 * 2);
    	    Tuning::updateGradient(Us, IConnectedPoly[2], r * r * grad / 32 * 4);
    	    Tuning::updateGradient(Us, IConnectedPoly[3], r * r * r * grad / 32 * 8);
+		
+		Tuning::updateGradient(Us, IConnectedC[0], v / 64.0 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IConnectedC[1], v * r / 64.0 * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IConnectedC[2], v / 64.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IConnectedC[3], v * r / 64.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
 	    double rgrad_mg = Connected[r] / (2.0 * 64);
 	    double rgrad_eg = grad_mg * (r - 2) / 4;
@@ -575,6 +582,12 @@ void init() {
 	IConnectedFactor[1] = Tuning::addParam(2 * 64, false);
 	IConnectedFactor[2] = Tuning::addParam(-2 * 64, false);
 	IConnectedFactor[3] = Tuning::addParam(-1 * 64, false);
+	
+	IConnectedC[0] = Tuning::addParam(64, true);
+	IConnectedC[1] = Tuning::addParam(0, true);
+	IConnectedC[2] = Tuning::addParam(-32, true);
+	IConnectedC[3] = Tuning::addParam(16, true);
+
 }
 
 // Explicit template instantiation
