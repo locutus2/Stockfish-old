@@ -433,9 +433,11 @@ namespace Tuning {
 	//constexpr double ALPHA = 0.0000001/0.0030737;
 	//constexpr double ALPHA = 0.0000001/0.1538/0.6835/0.2/0.3084;
 	constexpr double ALPHA0 = 0.0000001;
+	constexpr double K = 1;
 	constexpr double RESCALE_BASE = 1;
 	constexpr bool FIXED = false;
 	constexpr bool RESCALE_EVERYTIME = false;
+	constexpr bool USE_LOGIT = true;
 
 	std::vector<double> param;
 	std::vector<double> isActive;
@@ -515,12 +517,27 @@ namespace Tuning {
 		double diff = value - targetValue;
 		double error = diff * diff;
 		int n = (int)param.size();
+
+		auto cp2p = [](double x) { return 1.0/(1.0 + std::pow(10.0, -x/4/PawnValueEg)); };
 		
 	
 		for(int i = 0; i < n;  ++i)
 		{
 			if(isActive[i])
-				total_gradient[i] += diff * gradient[i];
+			{
+				if (USE_LOGIT)
+				{
+					double valueP = cp2p(value);
+					double targetValueP = cp2p(targetValue);
+					diff = valueP - targetValueP;
+				        diff *= valueP * valueP * std::pow(10.0, -value/4/PawnValueEg);	
+					total_gradient[i] += diff * gradient[i];
+				}
+				else
+				{
+					total_gradient[i] += diff * gradient[i];
+				}
+			}
 		}
 		return error;
 	}
