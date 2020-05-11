@@ -518,25 +518,20 @@ namespace Tuning {
 		double error = diff * diff;
 		int n = (int)param.size();
 
-		auto cp2p = [](double x) { return 1.0/(1.0 + std::pow(10.0, -x/4/PawnValueEg)); };
-		
+		if(USE_LOGIT)
+		{
+		   auto powp = [](double x)->double { return std::pow(10.0, -x/4/PawnValueEg); };
+		   auto cp2p = [&powp](double x)->double { return 1.0/(1.0 + powp(x)); };
+		   double valueP = cp2p(value);
+		   double targetValueP = cp2p(targetValue);
+	           diff = (valueP - targetValueP) * valueP * valueP * powp(value);	
+		}
 	
 		for(int i = 0; i < n;  ++i)
 		{
 			if(isActive[i])
 			{
-				if (USE_LOGIT)
-				{
-					double valueP = cp2p(value);
-					double targetValueP = cp2p(targetValue);
-					diff = valueP - targetValueP;
-				        diff *= valueP * valueP * std::pow(10.0, -value/4/PawnValueEg);	
-					total_gradient[i] += diff * gradient[i];
-				}
-				else
-				{
-					total_gradient[i] += diff * gradient[i];
-				}
+				total_gradient[i] += diff * gradient[i];
 			}
 		}
 		return error;
