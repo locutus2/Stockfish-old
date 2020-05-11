@@ -674,6 +674,7 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
+    ss->delayedPruning = false;
     Square prevSq = to_sq((ss-1)->currentMove);
 
     // Initialize statScore to zero for the grandchildren of the current position.
@@ -1004,6 +1005,7 @@ moves_loop: // When in check, search starts from here
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
+      ss->delayedPruning = false;
 
       // Calculate new depth for this move
       newDepth = depth - 1;
@@ -1023,10 +1025,15 @@ moves_loop: // When in check, search starts from here
               && !givesCheck)
           {
               // Countermoves based pruning (~20 Elo)
-              if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
-                  && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-                  continue;
+              if (lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1))
+              {
+                  if ((ss-1)->delayedPruning)
+                      continue;
+
+                  if (   (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
+                      && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+                      ss->delayedPruning = true;
+              }
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 6
