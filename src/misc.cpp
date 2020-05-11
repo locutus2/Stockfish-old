@@ -434,7 +434,7 @@ namespace Tuning {
 	//constexpr double ALPHA = 0.0000001/0.1538/0.6835/0.2/0.3084;
 	constexpr double ALPHA0 = 0.0000001;
 	constexpr double K = 1;
-	constexpr double RESCALE_BASE = 1;
+	constexpr double RESCALE_BASE = 0.1;
 	constexpr bool FIXED = false;
 	constexpr bool RESCALE_EVERYTIME = false;
 	constexpr bool USE_LOGIT = true;

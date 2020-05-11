@@ -81,6 +81,7 @@ namespace {
   int IConnectedC[4];
   
   int IConnectedBR[RANK_NB];
+  int IConnectedBRPoly[2];
 
   #define V Value
   #define S(mg, eg) make_score(mg, eg)
@@ -232,7 +233,8 @@ namespace {
 	    		+ r * r * Tuning::getParam(IConnectedPoly[2])
 	    		+ r * r * r * Tuning::getParam(IConnectedPoly[3]);
 			//double v =  P * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 64
-			double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) + bool(blocked) * Tuning::getParam(IConnectedBR[r]) / 64) / 2
+			//double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) + bool(blocked) * Tuning::getParam(IConnectedBR[r]) / 64) / 2
+			double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) + bool(blocked) * (Tuning::getParam(IConnectedBRPoly[0]) + Tuning::getParam(IConnectedBRPoly[1]) * r)) / 2
             //double v =  Connected[r] * (Tuning::getParam(IConnectedFactor[0]) 
 			//               + Tuning::getParam(IConnectedFactor[1]) * bool(phalanx) 
 			//	       + Tuning::getParam(IConnectedFactor[2]) * bool(opposed) 
@@ -275,6 +277,12 @@ namespace {
 			grad_eg = grad_mg * (r - 2) / 4;
 			grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
 			Tuning::updateGradient(Us, IConnectedBR[r], grad);
+
+			grad_mg = Tuning::getParam(IConnected[r]) / 2.0;
+			grad_eg = grad_mg * (r - 2) / 4;
+			grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
+			Tuning::updateGradient(Us, IConnectedBRPoly[0], grad);
+			Tuning::updateGradient(Us, IConnectedBRPoly[1], grad * r);
 		}
         }
 
@@ -599,12 +607,14 @@ void init() {
 	IConnectedC[2] = Tuning::addParam(-32, false);
 	IConnectedC[3] = Tuning::addParam(16, false);
 	
-	IConnectedBR[1] = Tuning::addParam(-64, true);
-	IConnectedBR[2] = Tuning::addParam(-64, true);
-	IConnectedBR[3] = Tuning::addParam(-64, true);
-	IConnectedBR[4] = Tuning::addParam(-64, true);
-	IConnectedBR[5] = Tuning::addParam(-64, true);
+	IConnectedBR[1] = Tuning::addParam(-64, false);
+	IConnectedBR[2] = Tuning::addParam(-64, false);
+	IConnectedBR[3] = Tuning::addParam(-64, false);
+	IConnectedBR[4] = Tuning::addParam(-64, false);
+	IConnectedBR[5] = Tuning::addParam(-64, false);
 
+	IConnectedBRPoly[0] = Tuning::addParam(-1, true);
+	IConnectedBRPoly[1] = Tuning::addParam(0, true);
 }
 
 // Explicit template instantiation
