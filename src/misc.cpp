@@ -524,6 +524,8 @@ namespace Tuning {
 	constexpr bool FIXED = false;
 	constexpr bool RESCALE_EVERYTIME = false;
 	constexpr bool USE_LOGIT = true;
+	constexpr bool SCALE_TO_MSE = false;
+	constexpr double MSE_BASE = 0.0001;
 
 	std::vector<double> param;
 	std::vector<double> isActive;
@@ -532,6 +534,7 @@ namespace Tuning {
 	
 	double ALPHA = ALPHA0;
 	bool firstUpdate = true;
+	double mse = 0;
 
 	void clearGradients() {
 		for(auto &x : gradient)
@@ -539,6 +542,7 @@ namespace Tuning {
 	}
 
 	void clearTotalGradients() {
+		mse = 0;
 		for(auto &x : total_gradient)
 			x = 0;
 	}
@@ -580,13 +584,29 @@ namespace Tuning {
 		
 		if(firstUpdate || RESCALE_EVERYTIME)
 		{
-			double m = 0;
-			for(int i = 0; i < n;  ++i)
+			if(SCALE_TO_MSE)
 			{
-				if(isActive[i])
-					m = std::max(m, std::abs(total_gradient[i] - s));
+				double m = 0;
+				for(int i = 0; i < n;  ++i)
+				{
+					if(isActive[i])
+						m += total_gradient[i] - s;
+				}
+				if(m)
+				{
+					ALPHA = MSE_BASE * mse / abs(m);
+				}
 			}
-			ALPHA = RESCALE_BASE/m;
+			else
+			{
+				double m = 0;
+				for(int i = 0; i < n;  ++i)
+				{
+					if(isActive[i])
+						m = std::max(m, std::abs(total_gradient[i] - s));
+				}
+				ALPHA = RESCALE_BASE/m;
+			}
 			firstUpdate = false;
 		}
 		
@@ -610,7 +630,13 @@ namespace Tuning {
 		   auto cp2p = [&powp](double x)->double { return 1.0/(1.0 + powp(x)); };
 		   double valueP = cp2p(value);
 		   double targetValueP = cp2p(targetValue);
-	           diff = (valueP - targetValueP) * valueP * valueP * powp(value);	
+	           diff = valueP - targetValueP;
+		   mse += diff * diff;
+	           diff *= valueP * valueP * powp(value);	
+		}
+		else
+		{	
+		   mse += diff * diff;
 		}
 	
 		for(int i = 0; i < n;  ++i)
