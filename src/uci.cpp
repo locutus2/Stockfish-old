@@ -240,9 +240,10 @@ namespace {
     TimePoint elapsed = now();
     int gameResult = VALUE_NONE, score = VALUE_NONE;
 
-    const bool DEBUG = false;
-    const bool USE_SCORE = false;
-    const bool USE_RESULT = true;
+    constexpr bool DEBUG = false;
+    constexpr bool USE_SCORE = false;
+    constexpr bool USE_RESULT = true;
+    constexpr double MAX_VALUE = PawnValueEg;
 
     double mse = std::numeric_limits<double>().max() / 2;
     double last_mse = 0;
@@ -280,7 +281,7 @@ namespace {
 		{
 			Tuning::clearGradients();
 			int value = Eval::evaluate(pos);
-		        if(std::abs(value) < VALUE_KNOWN_WIN)
+		        if(std::abs(value) < MAX_VALUE)
 		       {
 			       if(pos.side_to_move() == BLACK)
 					value = -value;
