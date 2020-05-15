@@ -25,7 +25,7 @@
 namespace {
 
   enum Stages {
-    MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
+    MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUICK_HISTORY_INIT, QUICK_HISTORY, QUIET_INIT, QUIET, BAD_CAPTURE,
     EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
     QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
@@ -57,9 +57,9 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const LowPlyHistory* lp,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, Move* killers, int pl)
-           : pos(p), mainHistory(mh), lowPlyHistory(lp), captureHistory(cph), continuationHistory(ch),
-             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl) {
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const QuickHistoryMoves* qm, Move cm, Move* killers, int pl, bool sqhm)
+           : pos(p), mainHistory(mh), lowPlyHistory(lp), captureHistory(cph), continuationHistory(ch), quickHistoryMoves(qm),
+             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl), skipQuickHistoryMoves(sqhm) {
 
   assert(d > 0);
 
@@ -142,6 +142,16 @@ Move MovePicker::select(Pred filter) {
   return MOVE_NONE;
 }
 
+bool MovePicker::isQuickHistoryMove(Move move) const {
+
+    if (!skipQuickHistoryMoves)
+        for(ExtMove em : quickMoves)
+            if(em == move)
+                return true;
+
+    return false;
+}
+
 /// MovePicker::next_move() is the most important method of the MovePicker class. It
 /// returns a new pseudo legal move every time it is called until there are no more
 /// moves left, picking the move with the highest score from a list of generated moves.
@@ -191,6 +201,31 @@ top:
                                     && !pos.capture(*cur)
                                     &&  pos.pseudo_legal(*cur); }))
           return *(cur - 1);
+
+      ++stage;
+      /* fallthrough */
+
+  case QUICK_HISTORY_INIT:
+      if (!skipQuickHistoryMoves)
+      {
+          for (int i = 0; i < quickHistoryMoves->Ranked; ++i)
+               quickMoves[i] = (*quickHistoryMoves)[i];
+
+          cur = quickMoves;
+          endMoves = quickMoves + quickHistoryMoves->Ranked;
+      }
+      ++stage;
+      /* fallthrough */
+
+  case QUICK_HISTORY:
+      if (   !skipQuickHistoryMoves
+          && select<Next>([&](){ return   *cur != MOVE_NONE
+                                       && !pos.capture(*cur)
+                                       && *cur != refutations[0].move
+                                       && *cur != refutations[1].move
+                                       && *cur != refutations[2].move
+                                       &&  pos.pseudo_legal(*cur); }))
+          return *(cur - 1);
       ++stage;
       /* fallthrough */
 
@@ -211,7 +246,8 @@ top:
       if (   !skipQuiets
           && select<Next>([&](){return   *cur != refutations[0].move
                                       && *cur != refutations[1].move
-                                      && *cur != refutations[2].move;}))
+                                      && *cur != refutations[2].move
+                                      && !isQuickHistoryMove(*cur);}))
           return *(cur - 1);
 
       // Prepare the pointers to loop over the bad captures

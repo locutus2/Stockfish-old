@@ -70,6 +70,8 @@ void Thread::clear() {
   mainHistory.fill(0);
   lowPlyHistory.fill(0);
   captureHistory.fill(0);
+  quickHistoryMoves[WHITE].clear();
+  quickHistoryMoves[BLACK].clear();
 
   for (bool inCheck : { false, true })
       for (StatsType c : { NoCaptures, Captures })

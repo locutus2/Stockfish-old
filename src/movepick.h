@@ -25,6 +25,7 @@
 #include <limits>
 #include <type_traits>
 
+#include "misc.h"
 #include "movegen.h"
 #include "position.h"
 #include "types.h"
@@ -109,6 +110,60 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
+struct MoveHistoryEntry {
+    Move move;
+    int rank;
+
+    MoveHistoryEntry(Move m = MOVE_NONE, int r = -1) : move(m) , rank(r) {}
+};
+
+template<int SIZE, int RANKED>
+class MoveHistoryTable {
+
+public:
+  static constexpr int Size = SIZE;
+  static constexpr int Ranked = RANKED;
+private:
+  HashTable<MoveHistoryEntry, SIZE> hashTable;
+  Move histMove[RANKED];
+
+public:
+  void clear() {
+
+      hashTable = HashTable<MoveHistoryEntry, SIZE>();
+      std::fill(histMove, histMove + RANKED, MOVE_NONE);
+  }
+
+  Move operator[](unsigned int index) const { return histMove[index]; }
+
+  void operator<<(Move move) {
+
+      MoveHistoryEntry* e = hashTable[move];
+
+      if(e->move == move)
+      {
+          int rank = e->rank;
+          if(rank < 0)
+          {
+              hashTable[histMove[RANKED-1]]->rank = -1;
+              e->rank = RANKED-1;
+              histMove[RANKED-1] = move;
+          }
+          else if(rank > 0)
+          {
+              MoveHistoryEntry* above = hashTable[histMove[rank - 1]];
+              e->rank--;
+              histMove[rank - 1] = move;
+              above->rank = rank;
+              histMove[rank] = above->move;
+          }
+      }
+      else if(e->rank < 0)
+          e->move = move;
+  }
+};
+
+typedef MoveHistoryTable<256, 32> QuickHistoryMoves;
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a
@@ -132,29 +187,35 @@ public:
                                            const LowPlyHistory*,
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
+                                           const QuickHistoryMoves*,
                                            Move,
                                            Move*,
-                                           int);
+                                           int,
+                                           bool);
   Move next_move(bool skipQuiets = false);
 
 private:
   template<PickType T, typename Pred> Move select(Pred);
   template<GenType> void score();
-  ExtMove* begin() { return cur; }
-  ExtMove* end() { return endMoves; }
+  ExtMove* begin() const { return cur; }
+  ExtMove* end() const { return endMoves; }
+  bool isQuickHistoryMove(Move move) const ;
 
   const Position& pos;
   const ButterflyHistory* mainHistory;
   const LowPlyHistory* lowPlyHistory;
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** continuationHistory;
+  const QuickHistoryMoves* quickHistoryMoves;
   Move ttMove;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
+  ExtMove quickMoves[QuickHistoryMoves::Ranked];
   int stage;
   Square recaptureSquare;
   Value threshold;
   Depth depth;
   int ply;
+  bool skipQuickHistoryMoves;
   ExtMove moves[MAX_MOVES];
 };
 

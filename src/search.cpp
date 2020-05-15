@@ -509,6 +509,7 @@ void Thread::search() {
           if (    mainThread
               && (Threads.stop || pvIdx + 1 == multiPV || Time.elapsed() > 3000))
               sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
+
       }
 
       if (!Threads.stop)
@@ -963,9 +964,11 @@ moves_loop: // When in check, search starts from here
                                       &thisThread->lowPlyHistory,
                                       &captureHistory,
                                       contHist,
+                                      &thisThread->quickHistoryMoves[us],
                                       countermove,
                                       ss->killers,
-                                      depth > 12 ? ss->ply : MAX_PLY);
+                                      depth > 12 ? ss->ply : MAX_PLY,
+                                      !rootNode);
 
     value = bestValue;
     singularLMR = moveCountPruning = false;
@@ -1740,6 +1743,7 @@ moves_loop: // When in check, search starts from here
     Thread* thisThread = pos.this_thread();
     thisThread->mainHistory[us][from_to(move)] << bonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
+    thisThread->quickHistoryMoves[us] << move;
 
     if (type_of(pos.moved_piece(move)) != PAWN)
         thisThread->mainHistory[us][from_to(reverse_move(move))] << -bonus;
