@@ -42,7 +42,7 @@ namespace {
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
 
   // Blocked storm penalty dependent on file distance to edge
-  constexpr Score BlockedStorm[FILE_NB/2]  = { S(84, 35), S(77, 39), S(79, 0), S(81, 79) };
+  constexpr Score BlockedStorm[FILE_NB/2]  = { S(83, 59), S(80, 61), S(81, 41), S(82, 81) };
 
   // Strength of pawn shelter for our king by [distance from edge][rank].
   // RANK_1 = 0 is used for files where we have no pawn, or pawn is behind our king.
