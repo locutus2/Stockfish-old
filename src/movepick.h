@@ -190,8 +190,7 @@ public:
                                            const QuickHistoryMoves*,
                                            Move,
                                            Move*,
-                                           int,
-                                           bool);
+                                           int);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -215,7 +214,6 @@ private:
   Value threshold;
   Depth depth;
   int ply;
-  bool skipQuickHistoryMoves;
   ExtMove moves[MAX_MOVES];
 };
 

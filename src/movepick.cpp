@@ -57,9 +57,9 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const LowPlyHistory* lp,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const QuickHistoryMoves* qm, Move cm, Move* killers, int pl, bool sqhm)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, const QuickHistoryMoves* qm, Move cm, Move* killers, int pl)
            : pos(p), mainHistory(mh), lowPlyHistory(lp), captureHistory(cph), continuationHistory(ch), quickHistoryMoves(qm),
-             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl), skipQuickHistoryMoves(sqhm) {
+             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl) {
 
   assert(d > 0);
 
@@ -144,10 +144,9 @@ Move MovePicker::select(Pred filter) {
 
 bool MovePicker::isQuickHistoryMove(Move move) const {
 
-    if (!skipQuickHistoryMoves)
-        for(ExtMove em : quickMoves)
-            if(em == move)
-                return true;
+    for(ExtMove em : quickMoves)
+        if(em == move)
+            return true;
 
     return false;
 }
@@ -206,25 +205,21 @@ top:
       /* fallthrough */
 
   case QUICK_HISTORY_INIT:
-      if (!skipQuickHistoryMoves)
-      {
-          for (int i = 0; i < quickHistoryMoves->Ranked; ++i)
-               quickMoves[i] = (*quickHistoryMoves)[i];
+      for (int i = 0; i < quickHistoryMoves->Ranked; ++i)
+          quickMoves[i] = (*quickHistoryMoves)[i];
 
-          cur = quickMoves;
-          endMoves = quickMoves + quickHistoryMoves->Ranked;
-      }
+      cur = quickMoves;
+      endMoves = quickMoves + quickHistoryMoves->Ranked;
       ++stage;
       /* fallthrough */
 
   case QUICK_HISTORY:
-      if (   !skipQuickHistoryMoves
-          && select<Next>([&](){ return   *cur != MOVE_NONE
-                                       && !pos.capture(*cur)
-                                       && *cur != refutations[0].move
-                                       && *cur != refutations[1].move
-                                       && *cur != refutations[2].move
-                                       &&  pos.pseudo_legal(*cur); }))
+      if (select<Next>([&](){ return   *cur != MOVE_NONE
+                                    && !pos.capture(*cur)
+                                    && *cur != refutations[0].move
+                                    && *cur != refutations[1].move
+                                    && *cur != refutations[2].move
+                                    &&  pos.pseudo_legal(*cur); }))
           return *(cur - 1);
       ++stage;
       /* fallthrough */
