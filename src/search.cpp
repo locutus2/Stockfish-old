@@ -964,11 +964,9 @@ moves_loop: // When in check, search starts from here
                                       &thisThread->lowPlyHistory,
                                       &captureHistory,
                                       contHist,
-                                      &thisThread->quickHistoryMoves[us],
                                       countermove,
                                       ss->killers,
-                                      depth > 12 ? ss->ply : MAX_PLY,
-                                      !rootNode);
+                                      depth > 12 ? ss->ply : MAX_PLY);
 
     value = bestValue;
     singularLMR = moveCountPruning = false;
@@ -1202,6 +1200,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+			  // Decrease reduction if move is a good historic move
+              if (thisThread->quickHistoryMoves[us].good(move))
+                  r--;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;

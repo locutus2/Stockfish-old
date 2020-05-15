@@ -136,6 +136,12 @@ public:
 
   Move operator[](unsigned int index) const { return histMove[index]; }
 
+  bool good(Move move) {
+
+      const MoveHistoryEntry* e = hashTable[move];
+	  return e->move == move && e->rank >= 0;
+  }
+
   void operator<<(Move move) {
 
       MoveHistoryEntry* e = hashTable[move];
@@ -187,11 +193,9 @@ public:
                                            const LowPlyHistory*,
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
-                                           const QuickHistoryMoves*,
                                            Move,
                                            Move*,
-                                           int,
-                                           bool);
+                                           int);
   Move next_move(bool skipQuiets = false);
 
 private:
@@ -199,23 +203,19 @@ private:
   template<GenType> void score();
   ExtMove* begin() const { return cur; }
   ExtMove* end() const { return endMoves; }
-  bool isQuickHistoryMove(Move move) const ;
 
   const Position& pos;
   const ButterflyHistory* mainHistory;
   const LowPlyHistory* lowPlyHistory;
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** continuationHistory;
-  const QuickHistoryMoves* quickHistoryMoves;
   Move ttMove;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
-  ExtMove quickMoves[QuickHistoryMoves::Ranked];
   int stage;
   Square recaptureSquare;
   Value threshold;
   Depth depth;
   int ply;
-  bool skipQuickHistoryMoves;
   ExtMove moves[MAX_MOVES];
 };
 
