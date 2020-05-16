@@ -117,7 +117,7 @@ struct MoveHistoryEntry {
     MoveHistoryEntry(Move m = MOVE_NONE, int r = -1) : move(m) , rank(r) {}
 };
 
-template<int SIZE, int RANKED>
+template<int SIZE, int RANKED, int TOP_RANKED>
 class MoveHistoryTable {
 
 public:
@@ -139,7 +139,7 @@ public:
   bool good(Move move) {
 
       const MoveHistoryEntry* e = hashTable[key(move)];
-	  return e->move == move && e->rank >= 0 && e->rank < RANKED / 2;
+	  return e->move == move && e->rank >= 0 && e->rank < TOP_RANKED;
   }
 
   uint32_t key(Move move) {
@@ -173,7 +173,7 @@ public:
   }
 };
 
-typedef MoveHistoryTable<256, 32> QuickHistoryMoves;
+typedef MoveHistoryTable<256, 32, 8> QuickHistoryMoves;
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a
