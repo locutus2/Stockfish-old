@@ -138,26 +138,30 @@ public:
 
   bool good(Move move) {
 
-      const MoveHistoryEntry* e = hashTable[move];
+      const MoveHistoryEntry* e = hashTable[key(move)];
 	  return e->move == move && e->rank >= 0;
+  }
+
+  uint32_t key(Move move) {
+	  return (move * 822116480) >> 24; // 9% hash collisions
   }
 
   void operator<<(Move move) {
 
-      MoveHistoryEntry* e = hashTable[move];
+      MoveHistoryEntry* e = hashTable[key(move)];
 
       if(e->move == move)
       {
           int rank = e->rank;
           if(rank < 0)
           {
-              hashTable[histMove[RANKED-1]]->rank = -1;
+              hashTable[key(histMove[RANKED-1])]->rank = -1;
               e->rank = RANKED-1;
               histMove[RANKED-1] = move;
           }
           else if(rank > 0)
           {
-              MoveHistoryEntry* above = hashTable[histMove[rank - 1]];
+              MoveHistoryEntry* above = hashTable[key(histMove[rank - 1])];
               e->rank--;
               histMove[rank - 1] = move;
               above->rank = rank;
@@ -169,7 +173,7 @@ public:
   }
 };
 
-typedef MoveHistoryTable<128, 16> QuickHistoryMoves;
+typedef MoveHistoryTable<256, 32> QuickHistoryMoves;
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a
