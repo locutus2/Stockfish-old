@@ -139,7 +139,7 @@ public:
   bool good(Move move) {
 
       const MoveHistoryEntry* e = hashTable[key(move)];
-	  return e->move == move && e->rank >= 0;
+	  return e->move == move && e->rank >= 0 && e->rank < RANKED / 2;
   }
 
   uint32_t key(Move move) {
