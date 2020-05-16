@@ -123,6 +123,7 @@ class MoveHistoryTable {
 public:
   static constexpr int Size = SIZE;
   static constexpr int Ranked = RANKED;
+
 private:
   HashTable<MoveHistoryEntry, SIZE> hashTable;
   Move histMove[RANKED];
@@ -136,22 +137,26 @@ public:
 
   Move operator[](unsigned int index) const { return histMove[index]; }
 
+  uint32_t key(Move move) {
+      return (move * 822116480) >> 24; // 9% hash collisions
+  }
+
   void operator<<(Move move) {
 
-      MoveHistoryEntry* e = hashTable[move];
+      MoveHistoryEntry* e = hashTable[key(move)];
 
       if(e->move == move)
       {
           int rank = e->rank;
           if(rank < 0)
           {
-              hashTable[histMove[RANKED-1]]->rank = -1;
+              hashTable[key(histMove[RANKED-1])]->rank = -1;
               e->rank = RANKED-1;
               histMove[RANKED-1] = move;
           }
           else if(rank > 0)
           {
-              MoveHistoryEntry* above = hashTable[histMove[rank - 1]];
+              MoveHistoryEntry* above = hashTable[key(histMove[rank - 1])];
               e->rank--;
               histMove[rank - 1] = move;
               above->rank = rank;
@@ -209,7 +214,7 @@ private:
   const QuickHistoryMoves* quickHistoryMoves;
   Move ttMove;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
-  ExtMove quickMoves[QuickHistoryMoves::Ranked];
+  ExtMove quickMoves[QuickHistoryMoves::Ranked / 2];
   int stage;
   Square recaptureSquare;
   Value threshold;
