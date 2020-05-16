@@ -169,7 +169,7 @@ public:
   }
 };
 
-typedef MoveHistoryTable<256, 32, 16> QuickHistoryMoves;
+typedef MoveHistoryTable<256, 32, 8> QuickHistoryMoves;
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a
