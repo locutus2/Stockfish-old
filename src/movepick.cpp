@@ -208,7 +208,7 @@ top:
   case QUICK_HISTORY_INIT:
       if (!skipQuickHistoryMoves)
       {
-          for (int i = 0; i < quickHistoryMoves->Ranked / 2; ++i)
+          for (int i = 0; i < quickHistoryMoves->Ranked / 4; ++i)
                quickMoves[i] = (*quickHistoryMoves)[i];
 
           cur = quickMoves;

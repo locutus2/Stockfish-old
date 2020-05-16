@@ -214,7 +214,7 @@ private:
   const QuickHistoryMoves* quickHistoryMoves;
   Move ttMove;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
-  ExtMove quickMoves[QuickHistoryMoves::Ranked / 2];
+  ExtMove quickMoves[QuickHistoryMoves::Ranked / 4];
   int stage;
   Square recaptureSquare;
   Value threshold;
