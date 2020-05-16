@@ -208,11 +208,11 @@ top:
   case QUICK_HISTORY_INIT:
       if (!skipQuickHistoryMoves)
       {
-          for (int i = 0; i < quickHistoryMoves->Ranked / 4; ++i)
+          for (int i = 0; i < quickHistoryMoves->TopRanked; ++i)
                quickMoves[i] = (*quickHistoryMoves)[i];
 
           cur = quickMoves;
-          endMoves = quickMoves + quickHistoryMoves->Ranked;
+          endMoves = quickMoves + quickHistoryMoves->TopRanked;
       }
       ++stage;
       /* fallthrough */

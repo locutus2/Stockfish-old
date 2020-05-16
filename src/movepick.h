@@ -117,12 +117,13 @@ struct MoveHistoryEntry {
     MoveHistoryEntry(Move m = MOVE_NONE, int r = -1) : move(m) , rank(r) {}
 };
 
-template<int SIZE, int RANKED>
+template<int SIZE, int RANKED, int TOP_RANKED>
 class MoveHistoryTable {
 
 public:
   static constexpr int Size = SIZE;
   static constexpr int Ranked = RANKED;
+  static constexpr int TopRanked = TOP_RANKED;
 
 private:
   HashTable<MoveHistoryEntry, SIZE> hashTable;
@@ -168,7 +169,7 @@ public:
   }
 };
 
-typedef MoveHistoryTable<256, 32> QuickHistoryMoves;
+typedef MoveHistoryTable<256, 32, 16> QuickHistoryMoves;
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a
@@ -214,7 +215,7 @@ private:
   const QuickHistoryMoves* quickHistoryMoves;
   Move ttMove;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
-  ExtMove quickMoves[QuickHistoryMoves::Ranked / 4];
+  ExtMove quickMoves[QuickHistoryMoves::TopRanked];
   int stage;
   Square recaptureSquare;
   Value threshold;
