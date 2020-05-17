@@ -72,7 +72,7 @@ namespace {
     constexpr Direction Up   = pawn_push(Us);
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
-    Bitboard lever, leverPush, blocked;
+    Bitboard lever, leverPush, possibleLever, blocked;
     Square s;
     bool backward, passed, doubled;
     Score score = SCORE_ZERO;
@@ -100,6 +100,7 @@ namespace {
         stoppers   = theirPawns & passed_pawn_span(Us, s);
         lever      = theirPawns & PawnAttacks[Us][s];
         leverPush  = theirPawns & PawnAttacks[Us][s + Up];
+        possibleLever = theirPawns & pawn_attack_span(Us, s + Up);
         doubled    = ourPawns   & (s - Up);
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
@@ -122,8 +123,8 @@ namespace {
         // (c) there is only one front stopper which can be levered.
         //     (Refined in Evaluation::passed)
         passed =   !(stoppers ^ lever)
-                || (   !(stoppers ^ leverPush)
-                    && popcount(phalanx) >= popcount(leverPush))
+                || (   !(stoppers ^ possibleLever)
+                    && popcount(phalanx) >= popcount(possibleLever))
                 || (   stoppers == blocked && r >= RANK_5
                     && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)));
 
