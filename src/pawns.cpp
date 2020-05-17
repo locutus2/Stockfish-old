@@ -129,8 +129,7 @@ namespace {
                 || (   !(stoppers ^ possibleLever)
                     && phalanx
                     && popcount(possibleLever) == 1
-                    && (   !(phalanx & forward_file_bb(Them, lsb(possibleLever)))
-                        || !(attackThem & pawn_attack_span(Us, s) & forward_file_bb(Them, lsb(possibleLever) - Up))))
+                    && !(attackThem & pawn_attack_span(Us, s) & forward_ranks_bb(Them, lsb(possibleLever) - Up)))
                 || (   stoppers == blocked && r >= RANK_5
                     && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)));
 
