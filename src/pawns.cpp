@@ -82,6 +82,7 @@ namespace {
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
+	Bitboard attacksThem = pawn_attacks_bb<Them>(theirPawns);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -123,7 +124,7 @@ namespace {
         //     (Refined in Evaluation::passed)
         passed =   !(stoppers ^ lever)
                 || (   !(stoppers ^ leverPush)
-                    && popcount(phalanx) >= popcount(leverPush))
+                    && popcount(phalanx | (shift<Up>(support) & ~(theirPawns | attacksThem))) >= popcount(leverPush))
                 || (   stoppers == blocked && r >= RANK_5
                     && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)));
 
