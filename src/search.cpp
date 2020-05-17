@@ -340,7 +340,7 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
-      (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][i & 1]; // Use as a sentinel
+      (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][!(i & 1)]; // Use as a sentinel
 
   ss->pv = pv;
 
