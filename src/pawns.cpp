@@ -82,6 +82,7 @@ namespace {
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
+    Bitboard attackThem = pawn_attacks_bb<Them>(theirPawns);
 
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
@@ -123,8 +124,13 @@ namespace {
         // (c) there is only one front stopper which can be levered.
         //     (Refined in Evaluation::passed)
         passed =   !(stoppers ^ lever)
+                || (   !(stoppers ^ leverPush)
+                    && popcount(phalanx) >= popcount(leverPush))
                 || (   !(stoppers ^ possibleLever)
-                    && popcount(phalanx) >= popcount(possibleLever))
+                    && phalanx
+                    && popcount(possibleLever) == 1
+                    && (   !(phalanx & forward_file_bb(Them, lsb(possibleLever)))
+                        || !(attackThem & pawn_attack_span(Us, s) & forward_file_bb(Them, lsb(possibleLever) - Up))))
                 || (   stoppers == blocked && r >= RANK_5
                     && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)));
 
