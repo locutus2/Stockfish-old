@@ -589,7 +589,7 @@ namespace {
 
     auto king_proximity = [&](Color c, Square s) {
       int d = distance(pos.square<KING>(c), s);
-      return std::min(d * (13 - d) , 40);
+      return std::min(d * (d + 3) , 40);
     };
 
     Bitboard b, bb, squaresToQueen, unsafeSquares, candidatePassers, leverable;
