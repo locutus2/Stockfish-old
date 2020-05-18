@@ -629,14 +629,14 @@ void init() {
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
 	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
 
-	IBlockedStormFMG[0] = Tuning::addParam(mg_value(BlockedStorm), true);
-	IBlockedStormFEG[0] = Tuning::addParam(mg_value(BlockedStorm), true);
-	IBlockedStormFMG[1] = Tuning::addParam(mg_value(BlockedStorm), true);
-	IBlockedStormFEG[1] = Tuning::addParam(mg_value(BlockedStorm), true);
-	IBlockedStormFMG[2] = Tuning::addParam(mg_value(BlockedStorm), true);
-	IBlockedStormFEG[2] = Tuning::addParam(mg_value(BlockedStorm), true);
-	IBlockedStormFMG[3] = Tuning::addParam(mg_value(BlockedStorm), true);
-	IBlockedStormFEG[3] = Tuning::addParam(mg_value(BlockedStorm), true);
+	IBlockedStormFMG[0] = Tuning::addParam(mg_value(BlockedStorm), false);
+	IBlockedStormFEG[0] = Tuning::addParam(mg_value(BlockedStorm), false);
+	IBlockedStormFMG[1] = Tuning::addParam(mg_value(BlockedStorm), false);
+	IBlockedStormFEG[1] = Tuning::addParam(mg_value(BlockedStorm), false);
+	IBlockedStormFMG[2] = Tuning::addParam(mg_value(BlockedStorm), false);
+	IBlockedStormFEG[2] = Tuning::addParam(mg_value(BlockedStorm), false);
+	IBlockedStormFMG[3] = Tuning::addParam(mg_value(BlockedStorm), false);
+	IBlockedStormFEG[3] = Tuning::addParam(mg_value(BlockedStorm), false);
 
 	IBlockedStormPolyMG[0] = Tuning::addParam(mg_value(BlockedStorm), false);
 	IBlockedStormPolyMG[1] = Tuning::addParam(-mg_value(BlockedStorm), false);

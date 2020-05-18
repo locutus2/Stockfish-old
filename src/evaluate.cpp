@@ -84,6 +84,8 @@ namespace {
   int IKDweakEG;
   int IKDunsafeChecks;
 
+  int IKingDistanceThemBlock;
+
   constexpr bool USE_FOR_TUNING = false;
 
   int IMobilityBonus[4][28][2];
@@ -679,15 +681,20 @@ namespace {
         int r = relative_rank(Us, s);
 
         Score bonus = PassedRank[r];
-
+        double kingThem_grad = 0;
+	
         if (r > RANK_3)
         {
             int w = 5 * r - 13;
             Square blockSq = s + Up;
+            Square promotionSq = relative_square(Us, make_square(file_of(s), RANK_8));
 
             // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (  (king_proximity(Them, blockSq) * 19) / 4
-                                     - king_proximity(Us,   blockSq) *  2) * w);
+            bonus += make_score(0, (   king_proximity(Them, promotionSq) * (19 - Tuning::getParam(IKingDistanceThemBlock))
+                                     + king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlock)
+                                     - king_proximity(Us,   blockSq) *  8) * w / 4);
+            kingThem_grad = (king_proximity(Them, blockSq) - king_proximity(Them, promotionSq)) * w / 4.0;
+	    Tuning::updateGradient(Us, IKingDistanceThemBlock, kingThem_grad);
 
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
@@ -718,6 +725,7 @@ namespace {
 
                 bonus += make_score(k * w, k * w);
             }
+
         } // r > RANK_3
 
         score += bonus - PassedFile * edge_distance(file_of(s));
@@ -940,6 +948,8 @@ void Eval::init() {
         IKDweak = Tuning::addParam(185, false);
 		IKDweakEG = Tuning::addParam(185, false);
 		IKDunsafeChecks = Tuning::addParam(148, false);
+
+        IKingDistanceThemBlock = Tuning::addParam(19, true);
 }
 
 
