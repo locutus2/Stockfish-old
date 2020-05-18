@@ -86,6 +86,8 @@ namespace {
 
   int IKingDistanceThemBlock;
   int IKingDistanceUsBlock;
+  int IKingDistanceThemProm;
+  int IKingDistanceUsProm;
 
   constexpr bool USE_FOR_TUNING = false;
 
@@ -684,6 +686,8 @@ namespace {
         Score bonus = PassedRank[r];
         double kingThem_grad = 0;
         double kingUs_grad = 0;
+        double kingThemP_grad = 0;
+        double kingUsP_grad = 0;
 	
         if (r > RANK_3)
         {
@@ -697,6 +701,8 @@ namespace {
               //                       - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock)) * w / 4);
             bonus += make_score(0, (  king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlock)
                                     - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock)) * w / 4);
+            bonus += make_score(0, (  king_proximity(Them, promotionSq) * Tuning::getParam(IKingDistanceThemProm)
+                                    - king_proximity(Us,   promotionSq) * Tuning::getParam(IKingDistanceUsProm)) * w / 4);
             double val = king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlock)
                        - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock);
 
@@ -705,6 +711,9 @@ namespace {
 
             //kingUs_grad = (king_proximity(Us, blockSq) - king_proximity(Them, blockSq)) * w / 4.0;
             kingUs_grad = -king_proximity(Us, blockSq) * w / 4.0;
+
+            kingThemP_grad = king_proximity(Them, promotionSq) * w / 4.0;
+            kingUsP_grad = -king_proximity(Us, promotionSq) * w / 4.0;
 /*
 	    if (val < -5 * 8)
 	    {
@@ -720,6 +729,8 @@ namespace {
 	    Phase phase = me->game_phase();
 	    Tuning::updateGradient(Us, IKingDistanceThemBlock, kingThem_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	    Tuning::updateGradient(Us, IKingDistanceUsBlock, kingUs_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	    Tuning::updateGradient(Us, IKingDistanceThemProm, kingThemP_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	    Tuning::updateGradient(Us, IKingDistanceUsProm, kingUsP_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
@@ -976,6 +987,8 @@ void Eval::init() {
 
         IKingDistanceThemBlock = Tuning::addParam(19, true);
         IKingDistanceUsBlock = Tuning::addParam(8, true);
+        IKingDistanceThemProm = Tuning::addParam(0, true);
+        IKingDistanceUsProm = Tuning::addParam(0, true);
 }
 
 
