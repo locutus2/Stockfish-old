@@ -692,15 +692,34 @@ namespace {
             Square promotionSq = relative_square(Us, make_square(file_of(s), RANK_8));
 
             // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (   king_proximity(Them, promotionSq) * (19 - Tuning::getParam(IKingDistanceThemBlock))
-                                     + king_proximity(Them, blockSq) * (Tuning::getParam(IKingDistanceThemBlock) + 8 - Tuning::getParam(IKingDistanceUsBlock))
-                                     - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock)) * w / 4);
-            kingThem_grad = (king_proximity(Them, blockSq) - king_proximity(Them, promotionSq)) * w / 4.0;
-	    Tuning::updateGradient(Us, IKingDistanceThemBlock, kingThem_grad);
+            //bonus += make_score(0, (   king_proximity(Them, promotionSq) * (19 - Tuning::getParam(IKingDistanceThemBlock))
+             //                        + king_proximity(Them, blockSq) * (Tuning::getParam(IKingDistanceThemBlock) + 8 - Tuning::getParam(IKingDistanceUsBlock))
+              //                       - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock)) * w / 4);
+            bonus += make_score(0, (  king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlock)
+                                    - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock)) * w / 4);
+            double val = king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlock)
+                       - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock);
 
+            //kingThem_grad = (king_proximity(Them, blockSq) - king_proximity(Them, promotionSq)) * w / 4.0;
+            kingThem_grad = king_proximity(Them, blockSq) * w / 4.0;
 
-            kingUs_grad = (king_proximity(Us, blockSq) - king_proximity(Them, blockSq)) * w / 4.0;
-	    Tuning::updateGradient(Us, IKingDistanceUsBlock, kingUs_grad);
+            //kingUs_grad = (king_proximity(Us, blockSq) - king_proximity(Them, blockSq)) * w / 4.0;
+            kingUs_grad = -king_proximity(Us, blockSq) * w / 4.0;
+/*
+	    if (val < -5 * 8)
+	    {
+		    if(kingThem_grad < 0) kingThem_grad *= -1;
+		    if(kingUs_grad < 0) kingUs_grad *= -1;
+	    }
+	    else if(val > 5 * 19)
+	    {
+		    if(kingThem_grad > 0) kingThem_grad *= -1;
+		    if(kingUs_grad > 0) kingUs_grad *= -1;
+	    }
+	    */
+	    Phase phase = me->game_phase();
+	    Tuning::updateGradient(Us, IKingDistanceThemBlock, kingThem_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	    Tuning::updateGradient(Us, IKingDistanceUsBlock, kingUs_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
@@ -955,7 +974,7 @@ void Eval::init() {
 		IKDweakEG = Tuning::addParam(185, false);
 		IKDunsafeChecks = Tuning::addParam(148, false);
 
-        IKingDistanceThemBlock = Tuning::addParam(19, false);
+        IKingDistanceThemBlock = Tuning::addParam(19, true);
         IKingDistanceUsBlock = Tuning::addParam(8, true);
 }
 
