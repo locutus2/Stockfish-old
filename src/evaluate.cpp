@@ -86,6 +86,8 @@ namespace {
 
   int IKingDistanceThemBlock;
   int IKingDistanceUsBlock;
+  int IKingDistanceThemBlockMG;
+  int IKingDistanceUsBlockMG;
   int IKingDistanceThemProm;
   int IKingDistanceUsProm;
 
@@ -701,6 +703,8 @@ namespace {
               //                       - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock)) * w / 4);
             bonus += make_score(0, (  king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlock)
                                     - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlock)) * w / 4);
+            bonus += make_score((  king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlockMG)
+                                    - king_proximity(Us,   blockSq) * Tuning::getParam(IKingDistanceUsBlockMG)) * w / 4, 0);
             bonus += make_score(0, (  king_proximity(Them, promotionSq) * Tuning::getParam(IKingDistanceThemProm)
                                     - king_proximity(Us,   promotionSq) * Tuning::getParam(IKingDistanceUsProm)) * w / 4);
             double val = king_proximity(Them, blockSq) * Tuning::getParam(IKingDistanceThemBlock)
@@ -727,6 +731,8 @@ namespace {
 	    }
 	    */
 	    Phase phase = me->game_phase();
+	    Tuning::updateGradient(Us, IKingDistanceThemBlockMG, kingThem_grad * phase / PHASE_MIDGAME);
+	    Tuning::updateGradient(Us, IKingDistanceUsBlockMG, kingUs_grad * phase / PHASE_MIDGAME);
 	    Tuning::updateGradient(Us, IKingDistanceThemBlock, kingThem_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	    Tuning::updateGradient(Us, IKingDistanceUsBlock, kingUs_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	    Tuning::updateGradient(Us, IKingDistanceThemProm, kingThemP_grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -985,10 +991,12 @@ void Eval::init() {
 		IKDweakEG = Tuning::addParam(185, false);
 		IKDunsafeChecks = Tuning::addParam(148, false);
 
+        IKingDistanceThemBlockMG = Tuning::addParam(0, true);
+        IKingDistanceUsBlockMG = Tuning::addParam(0, true);
         IKingDistanceThemBlock = Tuning::addParam(19, true);
         IKingDistanceUsBlock = Tuning::addParam(8, true);
-        IKingDistanceThemProm = Tuning::addParam(0, true);
-        IKingDistanceUsProm = Tuning::addParam(0, true);
+        IKingDistanceThemProm = Tuning::addParam(0, false);
+        IKingDistanceUsProm = Tuning::addParam(0, false);
 }
 
 
