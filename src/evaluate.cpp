@@ -579,6 +579,9 @@ namespace {
 
   // Evaluation::passed() evaluates the passed pawns and candidate passed
   // pawns of the given color.
+  
+  constexpr int A = 100;
+#define W(o,n) ((o) + ((n) - (o)) * A / 100)
 
   template<Tracing T> template<Color Us>
   Score Evaluation<T>::passed() const {
@@ -626,10 +629,13 @@ namespace {
         {
             int w = 5 * r - 13;
             Square blockSq = s + Up;
+            Square promotionSq = make_square(file_of(s), relative_rank(Us, RANK_8));
 
             // Adjust bonus based on the king's proximity
-            bonus += make_score(0, (  (king_proximity(Them, blockSq) * 19) / 4
-                                     - king_proximity(Us,   blockSq) *  2) * w);
+            bonus += make_score(0, (  king_proximity(Them, blockSq)     * W(19,11)
+                                    + king_proximity(Them, promotionSq) * W(0,7)
+                                    - king_proximity(Us,   blockSq)     * W(8,4)
+                                    - king_proximity(Us,   promotionSq) * W(8,5)) * w / 4);
 
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
