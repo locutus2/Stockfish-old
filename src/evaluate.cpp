@@ -589,7 +589,7 @@ namespace {
 
     auto king_proximity = [&](Color c, Square s) {
       int d = distance(pos.square<KING>(c), s);
-      return std::min(d * (d + 3) , 40);
+      return std::min(d * (d + 11) , 80);
     };
 
     Bitboard b, bb, squaresToQueen, unsafeSquares, candidatePassers, leverable;
@@ -630,11 +630,11 @@ namespace {
 
             // Adjust bonus based on the king's proximity
             bonus += make_score(0, (  king_proximity(Them, blockSq) * 19
-                                    - king_proximity(Us,   blockSq) *  8) * w / 32);
+                                    - king_proximity(Us,   blockSq) *  8) * w / 64);
 
             // If blockSq is not the queening square then consider also a second push
             if (r != RANK_7)
-                bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w / 8);
+                bonus -= make_score(0, king_proximity(Us, blockSq + Up) * w / 16);
 
             // If the pawn is free to advance, then increase the bonus
             if (pos.empty(blockSq))
