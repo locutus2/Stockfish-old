@@ -580,7 +580,7 @@ namespace {
   // Evaluation::passed() evaluates the passed pawns and candidate passed
   // pawns of the given color.
   
-  constexpr int A = 100;
+  constexpr int A = 50;
 #define W(o,n) ((o) + ((n) - (o)) * A / 100)
 
   template<Tracing T> template<Color Us>
