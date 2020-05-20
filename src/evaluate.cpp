@@ -94,6 +94,7 @@ namespace {
   constexpr bool USE_FOR_TUNING = false;
 
   int IMobilityBonus[4][28][2];
+  int IMobilityBonusPolyAdd[4][2][2];
 
 
   // Threshold for lazy and space evaluation
@@ -316,7 +317,14 @@ namespace {
         int mob = popcount(b & mobilityArea[Us]);
 
         mobility[Us] += make_score(Tuning::getParam(IMobilityBonus[Pt - 2][mob][0]),
-			           Tuning::getParam(IMobilityBonus[Pt - 2][mob][1]));
+			           Tuning::getParam(IMobilityBonus[Pt - 2][mob][1]))
+		        + make_score(Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][0][0]) + Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][1][0]) * mob,
+				     Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][0][1]) + Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][1][1]) * mob);
+
+        Tuning::updateGradient(Us, IMobilityBonusPolyAdd[Pt - 2][0][0], 1.0 * phase / PHASE_MIDGAME);
+        Tuning::updateGradient(Us, IMobilityBonusPolyAdd[Pt - 2][1][0], 1.0 * mob * phase / PHASE_MIDGAME);
+        Tuning::updateGradient(Us, IMobilityBonusPolyAdd[Pt - 2][0][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+        Tuning::updateGradient(Us, IMobilityBonusPolyAdd[Pt - 2][1][1], 1.0 * mob * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 
         Tuning::updateGradient(Us, IMobilityBonus[Pt - 2][mob][0], 1.0 * phase / PHASE_MIDGAME);
         Tuning::updateGradient(Us, IMobilityBonus[Pt - 2][mob][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -974,9 +982,17 @@ void Eval::init() {
 	{	
 		for(int i = 0; i < x.second; ++i)
 		{
-			IMobilityBonus[x.first][i][0] = Tuning::addParam(mg_value(MobilityBonus[x.first][i]), USE_FOR_TUNING);
-			IMobilityBonus[x.first][i][1] = Tuning::addParam(eg_value(MobilityBonus[x.first][i]), USE_FOR_TUNING);
+			IMobilityBonus[x.first][i][0] = Tuning::addParam(mg_value(MobilityBonus[x.first][i]), false);
+			IMobilityBonus[x.first][i][1] = Tuning::addParam(eg_value(MobilityBonus[x.first][i]), false);
 		}
+	}
+
+	for(auto x : {std::make_pair(0, 9), std::make_pair(1, 14), std::make_pair(2, 15), std::make_pair(3, 28)})
+	{	
+			IMobilityBonusPolyAdd[x.first][0][0] = Tuning::addParam(0, x.first == 0);
+			IMobilityBonusPolyAdd[x.first][0][1] = Tuning::addParam(0, x.first == 0);
+			IMobilityBonusPolyAdd[x.first][1][0] = Tuning::addParam(0, x.first == 0);
+			IMobilityBonusPolyAdd[x.first][1][1] = Tuning::addParam(0, x.first == 0);
 	}
 
         IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), false);
@@ -991,10 +1007,10 @@ void Eval::init() {
 		IKDweakEG = Tuning::addParam(185, false);
 		IKDunsafeChecks = Tuning::addParam(148, false);
 
-        IKingDistanceThemBlockMG = Tuning::addParam(0, true);
-        IKingDistanceUsBlockMG = Tuning::addParam(0, true);
-        IKingDistanceThemBlock = Tuning::addParam(19, true);
-        IKingDistanceUsBlock = Tuning::addParam(8, true);
+        IKingDistanceThemBlockMG = Tuning::addParam(0, false);
+        IKingDistanceUsBlockMG = Tuning::addParam(0, false);
+        IKingDistanceThemBlock = Tuning::addParam(19, false);
+        IKingDistanceUsBlock = Tuning::addParam(8, false);
         IKingDistanceThemProm = Tuning::addParam(0, false);
         IKingDistanceUsProm = Tuning::addParam(0, false);
 }
