@@ -130,7 +130,7 @@ namespace Tuning {
   void clearTotalGradients();
   int addParam(int value, bool active = true);
   double getParam(int index);
-  void updateGradient(Color c, int index, int value);
+  void updateGradient(Color c, int index, double value);
   double updateTotalGradients(int value, int targetValue);
   void updateParams();
   std::ostream& printParams(std::ostream& out = std::cout);

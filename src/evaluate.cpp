@@ -95,6 +95,7 @@ namespace {
 
   int IMobilityBonus[4][28][2];
   int IMobilityBonusPolyAdd[4][2][2];
+  int IMobilityBonusSmooth[4][32][2];
 
 
   // Threshold for lazy and space evaluation
@@ -316,10 +317,35 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
+	double val_mg = 0;
+	double val_eg = 0;
+	double sum = 0;
+
+	int M = Pt == KNIGHT ? 8 :
+		Pt == BISHOP ? 13 :
+		Pt == ROOK   ? 14 : 27;
+		for(int i = 0; i <= M; ++i)
+		{
+			double w = M+1 - std::abs(i - mob);
+			val_mg += w * Tuning::getParam(IMobilityBonusSmooth[Pt - 2][i][0]);
+			val_eg += w * Tuning::getParam(IMobilityBonusSmooth[Pt - 2][i][1]);
+			sum += w;
+		}
+		val_mg /= sum;
+		val_eg /= sum;
+		for(int i = 0; i <= M; ++i)
+		{
+			double w = M+1 - std::abs(i - mob);
+			//std::cerr << "i=" << i << " w=" << w << " mg=" << w/sum*phase/PHASE_MIDGAME << std::endl;
+        		Tuning::updateGradient(Us, IMobilityBonusSmooth[Pt - 2][i][0], w / sum * phase / PHASE_MIDGAME);
+        		Tuning::updateGradient(Us, IMobilityBonusSmooth[Pt - 2][i][1], w / sum * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		}
+
         mobility[Us] += make_score(Tuning::getParam(IMobilityBonus[Pt - 2][mob][0]),
 			           Tuning::getParam(IMobilityBonus[Pt - 2][mob][1]))
 		        + make_score(Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][0][0]) + Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][1][0]) * mob,
-				     Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][0][1]) + Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][1][1]) * mob);
+				     Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][0][1]) + Tuning::getParam(IMobilityBonusPolyAdd[Pt - 2][1][1]) * mob)
+			+ make_score(val_mg, val_eg);
 
         Tuning::updateGradient(Us, IMobilityBonusPolyAdd[Pt - 2][0][0], 1.0 * phase / PHASE_MIDGAME);
         Tuning::updateGradient(Us, IMobilityBonusPolyAdd[Pt - 2][1][0], 1.0 * mob * phase / PHASE_MIDGAME);
@@ -989,10 +1015,21 @@ void Eval::init() {
 
 	for(auto x : {std::make_pair(0, 9), std::make_pair(1, 14), std::make_pair(2, 15), std::make_pair(3, 28)})
 	{	
-			IMobilityBonusPolyAdd[x.first][0][0] = Tuning::addParam(0, x.first == 0);
-			IMobilityBonusPolyAdd[x.first][0][1] = Tuning::addParam(0, x.first == 0);
-			IMobilityBonusPolyAdd[x.first][1][0] = Tuning::addParam(0, x.first == 0);
-			IMobilityBonusPolyAdd[x.first][1][1] = Tuning::addParam(0, x.first == 0);
+			IMobilityBonusPolyAdd[x.first][0][0] = Tuning::addParam(0, false);
+			IMobilityBonusPolyAdd[x.first][0][1] = Tuning::addParam(0, false);
+			IMobilityBonusPolyAdd[x.first][1][0] = Tuning::addParam(0, false);
+			IMobilityBonusPolyAdd[x.first][1][1] = Tuning::addParam(0, false);
+	}
+
+	for(auto x : {std::make_pair(0, 9), std::make_pair(1, 14), std::make_pair(2, 15), std::make_pair(3, 28)})
+	{	
+		for(int i = 0; i < x.second; ++i)
+		{
+            		//IMobilityBonusSmooth[x.first][i][0] = Tuning::addParam(mg_value(MobilityBonus[x.first][i]), x.first == 0);
+            		//IMobilityBonusSmooth[x.first][i][1] = Tuning::addParam(eg_value(MobilityBonus[x.first][i]), x.first == 0);
+            		IMobilityBonusSmooth[x.first][i][0] = Tuning::addParam(0, x.first == 0);
+            		IMobilityBonusSmooth[x.first][i][1] = Tuning::addParam(0, x.first == 0);
+		}
 	}
 
         IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), false);

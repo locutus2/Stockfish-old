@@ -569,7 +569,7 @@ namespace Tuning {
 		return param[index];
 	}
 
-	void updateGradient(Color c, int index, int value) {
+	void updateGradient(Color c, int index, double value) {
 		gradient[index] += (c == WHITE ? value : -value);
 	}
 
@@ -612,7 +612,10 @@ namespace Tuning {
 				for(int i = 0; i < n;  ++i)
 				{
 					if(isActive[i])
+					{
 						m = std::max(m, std::abs(total_gradient[i] - s));
+				//std::cerr << "m=" << m << std::endl;
+					}
 				}
 				ALPHA = RESCALE_BASE/m;
 			}
@@ -653,6 +656,7 @@ namespace Tuning {
 			if(isActive[i])
 			{
 				total_gradient[i] += diff * gradient[i];
+	//		std::cerr << "i=" << i << " grad=" << gradient[i] << std::endl;
 			}
 		}
 		return error;
