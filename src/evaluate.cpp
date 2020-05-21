@@ -1025,10 +1025,10 @@ void Eval::init() {
 	{	
 		for(int i = 0; i < x.second; ++i)
 		{
-            		//IMobilityBonusSmooth[x.first][i][0] = Tuning::addParam(mg_value(MobilityBonus[x.first][i]), x.first == 0);
-            		//IMobilityBonusSmooth[x.first][i][1] = Tuning::addParam(eg_value(MobilityBonus[x.first][i]), x.first == 0);
-            		IMobilityBonusSmooth[x.first][i][0] = Tuning::addParam(0, x.first == 0);
-            		IMobilityBonusSmooth[x.first][i][1] = Tuning::addParam(0, x.first == 0);
+            		//IMobilityBonusSmooth[x.first][i][0] = Tuning::addParam(mg_value(MobilityBonus[x.first][i]), false);
+            		//IMobilityBonusSmooth[x.first][i][1] = Tuning::addParam(eg_value(MobilityBonus[x.first][i]), false);
+            		IMobilityBonusSmooth[x.first][i][0] = Tuning::addParam(0, false);
+            		IMobilityBonusSmooth[x.first][i][1] = Tuning::addParam(0, false);
 		}
 	}
 

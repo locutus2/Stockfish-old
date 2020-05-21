@@ -42,6 +42,7 @@ namespace {
   int IWeakUnopposedMG;
   int IWeakUnopposedEG;
   int IConnected[RANK_NB];
+  int ISupported;
 
   int IBlockedStormMG;
   int IBlockedStormEG;
@@ -235,21 +236,21 @@ namespace {
         // Score this pawn
         if (support | phalanx)
         {
-            //double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+            double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2;
 	    double P = Tuning::getParam(IConnectedPoly[0])
 	    		+ r * Tuning::getParam(IConnectedPoly[1])
 	    		+ r * r * Tuning::getParam(IConnectedPoly[2])
 	    		+ r * r * r * Tuning::getParam(IConnectedPoly[3]);
 			//double v =  P * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 64
 			//double v =  Tuning::getParam(IConnected[r]) * (4 + 2 * bool(phalanx) - 2 * bool(opposed) + bool(blocked) * Tuning::getParam(IConnectedBR[r]) / 64) / 2
-			double v =  Tuning::getParam(IConnected[r]) * (4 
-					+ bool(phalanx) * (IConnectedPHPoly[0] + IConnectedPHPoly[1] * r) 
-					- 2 * bool(opposed) + bool(blocked) * (Tuning::getParam(IConnectedBRPoly[0]) + Tuning::getParam(IConnectedBRPoly[1]) * r)) / 2
+			//double v =  Tuning::getParam(IConnected[r]) * (4 
+				//	+ bool(phalanx) * (IConnectedPHPoly[0] + IConnectedPHPoly[1] * r) 
+					//- 2 * bool(opposed) + bool(blocked) * (Tuning::getParam(IConnectedBRPoly[0]) + Tuning::getParam(IConnectedBRPoly[1]) * r)) / 2
             //double v =  Connected[r] * (Tuning::getParam(IConnectedFactor[0]) 
 			//               + Tuning::getParam(IConnectedFactor[1]) * bool(phalanx) 
 			//	       + Tuning::getParam(IConnectedFactor[2]) * bool(opposed) 
 			//	       + Tuning::getParam(IConnectedFactor[3]) *  bool(blocked)) / (2 * 64)
-                   + 21 * popcount(support);
+                  v += Tuning::getParam(ISupported) * popcount(support);
 
             score += make_score(v * (IConnectedC[0] + IConnectedC[1] * r) / 64, (IConnectedC[2] + IConnectedC[3] * r) / 64);
 			//score += make_score(v, v * (r - 2) / 4);
@@ -257,7 +258,8 @@ namespace {
 	    double grad_eg = grad_mg * (r - 2) / 4;
 	    double grad = (grad_mg * phase + grad_eg * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
    	    Tuning::updateGradient(Us, IConnected[r], grad);
-
+		double grad_s = popcount(support) * (phase + (r-2)/4.0 * (PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
+		Tuning::updateGradient(Us, ISupported, grad_s);
    	    //Tuning::updateGradient(Us, IConnectedPoly[0], grad / 32);
    	    //Tuning::updateGradient(Us, IConnectedPoly[1], r * grad / 32);
    	    //Tuning::updateGradient(Us, IConnectedPoly[2], r * r * grad / 32);
@@ -613,18 +615,19 @@ Score Entry::do_king_safety(const Position& pos) {
 }
 
 void init() {
-	IBackwardMG = Tuning::addParam(mg_value(Backward), false);
-	IBackwardEG = Tuning::addParam(eg_value(Backward), false);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), false);
-	IIsolatedMG = Tuning::addParam(mg_value(Isolated), false);
-	IIsolatedEG = Tuning::addParam(eg_value(Isolated), false);
-	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), false);
-	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), false);
-	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), false);
-	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), false);
+	IBackwardMG = Tuning::addParam(mg_value(Backward), true);
+	IBackwardEG = Tuning::addParam(eg_value(Backward), true);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), true);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), true);
+	IIsolatedMG = Tuning::addParam(mg_value(Isolated), true);
+	IIsolatedEG = Tuning::addParam(eg_value(Isolated), true);
+	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), true);
+	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), true);
+	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), true);
+	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), true);
+	ISupported = Tuning::addParam(21, true);
 	for(Rank r = RANK_2; r < RANK_8; ++r)
-		IConnected[r] = Tuning::addParam(Connected[r], USE_FOR_TUNING);
+		IConnected[r] = Tuning::addParam(Connected[r], true);
 
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
 	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
