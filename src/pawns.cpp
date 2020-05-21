@@ -31,6 +31,8 @@ namespace {
 
   constexpr bool USE_FOR_TUNING = false;
 
+  int IDoubledIsolated[2];
+  
   int IBackwardMG;
   int IBackwardEG;
   int IDoubledMG;
@@ -369,6 +371,7 @@ namespace {
 			//score -=   (PDoubledLin[0] + PDoubledLin[1] * r) * doubled
 			//score -=   (PDoubledLin[0] + PDoubledLin[1] * r + PDoubledLin[2] * r * r) * doubled
                      + PWeakLever * more_than_one(lever);
+		
    		Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		Tuning::updateGradient(Us, IWeakLeverMG, -1.0 * more_than_one(lever) * phase / PHASE_MIDGAME);
@@ -401,6 +404,7 @@ namespace {
 		Tuning::updateGradient(Us, IDoubledLinEG[1], -1.0 * r * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IDoubledLinEG[2], -1.0 * r * r * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		
+	
 	}
 	else{
 		Score PDoubledS = make_score(Tuning::getParam(IDoubledMGS), Tuning::getParam(IDoubledEGS));
@@ -410,6 +414,16 @@ namespace {
 		Tuning::updateGradient(Us, IDoubledEGS, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		
 	}
+	
+		if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && popcount(opposed) == 1 && !(theirPawns & adjacent_files_bb(s)))	
+		{			
+					 score -= make_score(Tuning::getParam(IDoubledIsolated[0]), Tuning::getParam(IDoubledIsolated[1]));
+					 Tuning::updateGradient(Us, IDoubledIsolated[0], -1.0 * phase / PHASE_MIDGAME);
+					 Tuning::updateGradient(Us, IDoubledIsolated[1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+
+		}
+
+	
     }
 
     return score;
@@ -615,19 +629,21 @@ Score Entry::do_king_safety(const Position& pos) {
 }
 
 void init() {
-	IBackwardMG = Tuning::addParam(mg_value(Backward), true);
-	IBackwardEG = Tuning::addParam(eg_value(Backward), true);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), true);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), true);
-	IIsolatedMG = Tuning::addParam(mg_value(Isolated), true);
-	IIsolatedEG = Tuning::addParam(eg_value(Isolated), true);
-	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), true);
-	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), true);
-	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), true);
-	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), true);
-	ISupported = Tuning::addParam(21, true);
+IDoubledIsolated[0] = Tuning::addParam(0, true);
+IDoubledIsolated[1] = Tuning::addParam(0, true);
+	IBackwardMG = Tuning::addParam(mg_value(Backward), false);
+	IBackwardEG = Tuning::addParam(eg_value(Backward), false);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), false);
+	IIsolatedMG = Tuning::addParam(mg_value(Isolated), false);
+	IIsolatedEG = Tuning::addParam(eg_value(Isolated), false);
+	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), false);
+	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), false);
+	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), false);
+	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), false);
+	ISupported = Tuning::addParam(21, false);
 	for(Rank r = RANK_2; r < RANK_8; ++r)
-		IConnected[r] = Tuning::addParam(Connected[r], true);
+		IConnected[r] = Tuning::addParam(Connected[r], false);
 
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
 	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
