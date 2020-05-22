@@ -149,7 +149,7 @@ namespace {
             score -=   Isolated
                      + WeakUnopposed * !opposed;
 
-            if (   (ourPawns & forward_file_bb(Them, s))
+            if (   doubled
                 && popcount(opposed) == 1
                 && !(theirPawns & adjacent_files_bb(s)))
                 score -= DoubledIsolated;
@@ -164,7 +164,7 @@ namespace {
             score -= WeakLever * more_than_one(lever);
 
             if (doubled)
-                score -= Doubled / distance<Rank>(s, frontmost_sq(Us, doubled));
+                score -= Doubled * (6 - distance<Rank>(s, frontmost_sq(Us, doubled))) / 5;
         }
     }
 
