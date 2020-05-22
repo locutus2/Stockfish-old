@@ -152,7 +152,7 @@ namespace {
             if (   (ourPawns & forward_file_bb(Them, s))
                 && !lever
                 && popcount(stoppers) == 1)
-                score -= opposed ? DoubledIsolated : DoubledIsolated / 2;
+                score -= opposed ? DoubledIsolated : DoubledIsolated / 4;
         }
 
         else if (backward)
