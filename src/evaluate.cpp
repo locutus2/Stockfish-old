@@ -88,7 +88,7 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
-  constexpr int A = 50;
+  constexpr int A = 25;
 #define W(o,n) ((o) + ((n) - (o)) * A / 100)
 
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
