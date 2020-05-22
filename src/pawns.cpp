@@ -32,6 +32,7 @@ namespace {
   constexpr bool USE_FOR_TUNING = false;
 
   int IDoubledIsolated[2];
+  int IDoubledIsolatedOpposed[2];
   
   int IBackwardMG;
   int IBackwardEG;
@@ -418,9 +419,15 @@ namespace {
 		//if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && popcount(opposed) == 1 && !(theirPawns & adjacent_files_bb(s)))	
 		if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && !lever && popcount(stoppers) == 1)
 		{			
-					 score -= make_score(Tuning::getParam(IDoubledIsolated[0]), Tuning::getParam(IDoubledIsolated[1]));
+					 score -= make_score(Tuning::getParam(IDoubledIsolated[0]), Tuning::getParam(IDoubledIsolated[1]))
+					 + make_score(Tuning::getParam(IDoubledIsolatedOpposed[0]), Tuning::getParam(IDoubledIsolatedOpposed[1])) * bool(opposed);
 					 Tuning::updateGradient(Us, IDoubledIsolated[0], -1.0 * phase / PHASE_MIDGAME);
 					 Tuning::updateGradient(Us, IDoubledIsolated[1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					 if(opposed)
+					 {
+					 Tuning::updateGradient(Us, IDoubledIsolatedOpposed[0], -1.0 * phase / PHASE_MIDGAME);
+					 Tuning::updateGradient(Us, IDoubledIsolatedOpposed[1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					 }
 
 		}
 
@@ -632,6 +639,8 @@ Score Entry::do_king_safety(const Position& pos) {
 void init() {
 IDoubledIsolated[0] = Tuning::addParam(0, true);
 IDoubledIsolated[1] = Tuning::addParam(0, true);
+IDoubledIsolatedOpposed[0] = Tuning::addParam(15, false);
+IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
 	IBackwardMG = Tuning::addParam(mg_value(Backward), false);
 	IBackwardEG = Tuning::addParam(eg_value(Backward), false);
 	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
