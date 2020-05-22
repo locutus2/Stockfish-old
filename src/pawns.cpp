@@ -415,7 +415,8 @@ namespace {
    		
 	}
 	
-		if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && popcount(opposed) == 1 && !(theirPawns & adjacent_files_bb(s)))	
+		//if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && popcount(opposed) == 1 && !(theirPawns & adjacent_files_bb(s)))	
+		if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && !lever && popcount(stoppers) == 1)
 		{			
 					 score -= make_score(Tuning::getParam(IDoubledIsolated[0]), Tuning::getParam(IDoubledIsolated[1]));
 					 Tuning::updateGradient(Us, IDoubledIsolated[0], -1.0 * phase / PHASE_MIDGAME);
