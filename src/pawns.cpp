@@ -149,10 +149,16 @@ namespace {
             score -=   Isolated
                      + WeakUnopposed * !opposed;
 
-            if (   (ourPawns & forward_file_bb(Them, s))
-                && !lever
-                && popcount(stoppers) == 1)
-                score -= opposed ? DoubledIsolated : DoubledIsolated / 4;
+            if (ourPawns & forward_file_bb(Them, s))
+            {
+                if (   popcount(opposed) == 1
+                    && !(theirPawns & adjacent_files_bb(s)))
+                    score -= DoubledIsolated;
+
+                else if (  !opposed
+                         && popcount(stoppers) >= 2)
+                    score -= DoubledIsolated;
+            }
         }
 
         else if (backward)
