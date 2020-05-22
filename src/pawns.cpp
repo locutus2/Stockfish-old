@@ -419,14 +419,19 @@ namespace {
 		//if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && popcount(opposed) == 1 && !(theirPawns & adjacent_files_bb(s)))	
 		if(!neighbours && (ourPawns & forward_file_bb(Them, s)) && !lever && popcount(stoppers) == 1)
 		{			
-					 score -= make_score(Tuning::getParam(IDoubledIsolated[0]), Tuning::getParam(IDoubledIsolated[1]))
-					 + make_score(Tuning::getParam(IDoubledIsolatedOpposed[0]), Tuning::getParam(IDoubledIsolatedOpposed[1])) * bool(opposed);
-					 Tuning::updateGradient(Us, IDoubledIsolated[0], -1.0 * phase / PHASE_MIDGAME);
-					 Tuning::updateGradient(Us, IDoubledIsolated[1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+			if(!opposed)
+					 score -= make_score(Tuning::getParam(IDoubledIsolated[0]), Tuning::getParam(IDoubledIsolated[1]));
+			else
+					 score -= make_score(Tuning::getParam(IDoubledIsolatedOpposed[0]), Tuning::getParam(IDoubledIsolatedOpposed[1])) * bool(opposed);
 					 if(opposed)
 					 {
 					 Tuning::updateGradient(Us, IDoubledIsolatedOpposed[0], -1.0 * phase / PHASE_MIDGAME);
 					 Tuning::updateGradient(Us, IDoubledIsolatedOpposed[1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					 }
+					 else
+					 {
+					 Tuning::updateGradient(Us, IDoubledIsolated[0], -1.0 * phase / PHASE_MIDGAME);
+					 Tuning::updateGradient(Us, IDoubledIsolated[1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 					 }
 
 		}
