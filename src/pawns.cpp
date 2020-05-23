@@ -163,8 +163,8 @@ namespace {
         {
             score -= WeakLever * more_than_one(lever);
 
-            if (doubled)
-                score -= Doubled / (2 * distance<Rank>(s, frontmost_sq(Us, doubled)) - 1);
+            if (doubled && distance<Rank>(s, frontmost_sq(Us, doubled)) < 3)
+                score -= Doubled;
         }
     }
 
