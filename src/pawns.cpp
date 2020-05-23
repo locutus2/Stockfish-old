@@ -34,10 +34,12 @@ namespace {
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
   constexpr Score BlockedStorm  = S(82, 82);
-  constexpr Score Doubled       = S(11, 56);
   constexpr Score Isolated      = S( 5, 15);
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
+
+  // Doubled[distance > 1] doubled penalty dependent if distance between doubled pawns is greater than 1
+  constexpr Score Doubled[2] = { S(11, 56), S(0, 22) };
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -72,9 +74,9 @@ namespace {
     constexpr Direction Up   = pawn_push(Us);
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
-    Bitboard lever, leverPush, blocked;
+    Bitboard lever, leverPush, blocked, doubled;
     Square s;
-    bool backward, passed, doubled;
+    bool backward, passed;
     Score score = SCORE_ZERO;
     const Square* pl = pos.squares<PAWN>(Us);
 
@@ -101,7 +103,7 @@ namespace {
         stoppers   = theirPawns & passed_pawn_span(Us, s);
         lever      = theirPawns & PawnAttacks[Us][s];
         leverPush  = theirPawns & PawnAttacks[Us][s + Up];
-        doubled    = ourPawns   & (s - Up);
+        doubled    = ourPawns   & forward_file_bb(Them, s);
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
@@ -147,10 +149,10 @@ namespace {
             score -=   Isolated
                      + WeakUnopposed * !opposed;
 
-            if (   (ourPawns & forward_file_bb(Them, s))
+            if (   doubled
                 && popcount(opposed) == 1
                 && !(theirPawns & adjacent_files_bb(s)))
-                score -= Doubled;
+                score -= Doubled[0];
         }
 
         else if (backward)
@@ -158,8 +160,12 @@ namespace {
                      + WeakUnopposed * !opposed;
 
         if (!support)
-            score -=   Doubled * doubled
-                     + WeakLever * more_than_one(lever);
+        {
+            score -= WeakLever * more_than_one(lever);
+
+            if (doubled)
+                score -= Doubled[!(doubled & (s - Up))];
+        }
     }
 
     return score;
