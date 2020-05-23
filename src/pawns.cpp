@@ -72,7 +72,7 @@ namespace {
     constexpr Direction Up   = pawn_push(Us);
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
-    Bitboard lever, leverPush, blocked;
+    Bitboard lever, leverPush, blocked, semiDoubled;
     Square s;
     bool backward, passed, doubled;
     Score score = SCORE_ZERO;
@@ -96,15 +96,16 @@ namespace {
         Rank r = relative_rank(Us, s);
 
         // Flag the pawn
-        opposed    = theirPawns & forward_file_bb(Us, s);
-        blocked    = theirPawns & (s + Up);
-        stoppers   = theirPawns & passed_pawn_span(Us, s);
-        lever      = theirPawns & PawnAttacks[Us][s];
-        leverPush  = theirPawns & PawnAttacks[Us][s + Up];
-        doubled    = ourPawns   & (s - Up);
-        neighbours = ourPawns   & adjacent_files_bb(s);
-        phalanx    = neighbours & rank_bb(s);
-        support    = neighbours & rank_bb(s - Up);
+        opposed     = theirPawns & forward_file_bb(Us, s);
+        blocked     = theirPawns & (s + Up);
+        stoppers    = theirPawns & passed_pawn_span(Us, s);
+        lever       = theirPawns & PawnAttacks[Us][s];
+        leverPush   = theirPawns & PawnAttacks[Us][s + Up];
+        doubled     = ourPawns   & (s - Up);
+        semiDoubled = ourPawns   & forward_file_bb(Them, s);
+        neighbours  = ourPawns   & adjacent_files_bb(s);
+        phalanx     = neighbours & rank_bb(s);
+        support     = neighbours & rank_bb(s - Up);
 
         // A pawn is backward when it is behind all pawns of the same color on
         // the adjacent files and cannot safely advance.
@@ -147,9 +148,9 @@ namespace {
             score -=   Isolated
                      + WeakUnopposed * !opposed;
 
-            if (   (ourPawns & forward_file_bb(Them, s))
+            if (   semiDoubled
                 && popcount(opposed) == 1
-                && !(theirPawns & adjacent_files_bb(s)))
+                && !(theirPawns & pawn_attack_span(Us, frontmost_sq(Us, semiDoubled))))
                 score -= Doubled;
         }
 
