@@ -65,6 +65,8 @@ namespace {
   int IDoubledMGP;
   int IDoubledEGP;
   
+  int IDoubledDist[6][2];
+  
   int IPawnChainMG[8];
   int IPawnChainEG[8];
   
@@ -642,8 +644,8 @@ Score Entry::do_king_safety(const Position& pos) {
 }
 
 void init() {
-IDoubledIsolated[0] = Tuning::addParam(0, true);
-IDoubledIsolated[1] = Tuning::addParam(0, true);
+IDoubledIsolated[0] = Tuning::addParam(0, false);
+IDoubledIsolated[1] = Tuning::addParam(0, false);
 IDoubledIsolatedOpposed[0] = Tuning::addParam(15, false);
 IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
 	IBackwardMG = Tuning::addParam(mg_value(Backward), false);
@@ -659,6 +661,12 @@ IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
 	ISupported = Tuning::addParam(21, false);
 	for(Rank r = RANK_2; r < RANK_8; ++r)
 		IConnected[r] = Tuning::addParam(Connected[r], false);
+	
+	for(int d = 1; d <= 5; ++d)
+	{
+		IDoubledDist[d][0] = Tuning::addParam(d == 1 ? mg_value(Doubled): 0, true);
+		IDoubledDist[d][1] = Tuning::addParam(d == 1 ? eg_value(Doubled): 0, true);
+	}
 
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
 	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
