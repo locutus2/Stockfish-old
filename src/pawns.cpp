@@ -40,7 +40,7 @@ namespace {
   constexpr Score WeakUnopposed   = S(13, 27);
 
   // Doubled isolated penalty dependent on opposed state
-  constexpr Score DoubledIsolated[2] = { S(0, 29), S(15, 57) };
+  constexpr Score DoubledIsolated[2] = { S(29, 29), S(15, 57) };
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
