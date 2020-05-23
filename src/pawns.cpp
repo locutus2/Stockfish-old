@@ -371,8 +371,10 @@ namespace {
 								
 								int d = doubled2 ? distance<Rank>(s, frontmost_sq(Us, doubled2)) : 1;
 	Score PDoubledD	= make_score(Tuning::getParam(IDoubledDist[d][0]), Tuning::getParam(IDoubledDist[d][1]));
+	Score PDoubledAll	= make_score(Tuning::getParam(IDoubledMG), Tuning::getParam(IDoubledEG));
 		
-		score -=   PDoubledD * bool(doubled2)
+		score -=   PDoubledAll * bool(doubled2)
+		//score -=   PDoubledD * bool(doubled2)
 			//score -=   PDoubled * doubled
 
 		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
@@ -388,10 +390,13 @@ namespace {
 		{
 			Tuning::updateGradient(Us, IDoubledDist[d][0], -1.0 * phase / PHASE_MIDGAME);	
 			Tuning::updateGradient(Us, IDoubledDist[d][1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+			
+			Tuning::updateGradient(Us, IDoubledMG, -1.0 * phase / PHASE_MIDGAME);
+		    Tuning::updateGradient(Us, IDoubledEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		}
 		
-   		Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+   		//Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
+		//Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
    		Tuning::updateGradient(Us, IWeakLeverMG, -1.0 * more_than_one(lever) * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IWeakLeverEG, -1.0 * more_than_one(lever) * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		
@@ -665,8 +670,8 @@ IDoubledIsolatedOpposed[0] = Tuning::addParam(15, false);
 IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
 	IBackwardMG = Tuning::addParam(mg_value(Backward), false);
 	IBackwardEG = Tuning::addParam(eg_value(Backward), false);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), false);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), true);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), true);
 	IIsolatedMG = Tuning::addParam(mg_value(Isolated), false);
 	IIsolatedEG = Tuning::addParam(eg_value(Isolated), false);
 	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), false);
@@ -679,8 +684,8 @@ IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
 	
 	for(int d = 1; d <= 5; ++d)
 	{
-		IDoubledDist[d][0] = Tuning::addParam(d == 1 ? mg_value(Doubled): 0, true);
-		IDoubledDist[d][1] = Tuning::addParam(d == 1 ? eg_value(Doubled): 0, true);
+		IDoubledDist[d][0] = Tuning::addParam(d == 1 ? mg_value(Doubled): 0, false);
+		IDoubledDist[d][1] = Tuning::addParam(d == 1 ? eg_value(Doubled): 0, false);
 	}
 
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
