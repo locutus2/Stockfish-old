@@ -167,7 +167,7 @@ namespace {
   private:
     template<Color Us> void initialize();
     template<Color Us, PieceType Pt> Score pieces();
-    template<Color Us> Score king() const;
+    template<Color Us> Score king(Score initiativeScore) const;
     template<Color Us> Score threats() const;
     template<Color Us> Score passed() const;
     template<Color Us> Score space() const;
@@ -377,7 +377,7 @@ namespace {
 
   // Evaluation::king() assigns bonuses and penalties to a king of a given color
   template<Tracing T> template<Color Us>
-  Score Evaluation<T>::king() const {
+  Score Evaluation<T>::king(Score initiativeScore) const {
 
     constexpr Color    Them = ~Us;
     constexpr Bitboard Camp = (Us == WHITE ? AllSquares ^ Rank6BB ^ Rank7BB ^ Rank8BB
@@ -462,6 +462,7 @@ namespace {
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -   6 * mg_value(score) / 8
                  -   4 * kingFlankDefense
+                 -       mg_value(initiativeScore)
                  +  37;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
@@ -803,6 +804,7 @@ namespace {
     // the position object (material + piece square tables) and the material
     // imbalance. Score is computed internally from the white point of view.
     Score score = pos.psq_score() + me->imbalance() + pos.this_thread()->contempt;
+    Score initiativeScore;
 
     // Probe the pawn hash table
     pe = Pawns::probe(pos);
@@ -828,12 +830,13 @@ namespace {
     score += mobility[WHITE] - mobility[BLACK];
 
     // More complex interactions that require fully populated attack bitboards
-    score +=  king<   WHITE>() - king<   BLACK>()
-            + threats<WHITE>() - threats<BLACK>()
+    score +=  threats<WHITE>() - threats<BLACK>()
             + passed< WHITE>() - passed< BLACK>()
             + space<  WHITE>() - space<  BLACK>();
 
-    score += initiative(score);
+    score += initiativeScore = initiative(score);
+
+    score += king<WHITE>(initiativeScore) - king<BLACK>(-initiativeScore);
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = scale_factor(eg_value(score));
