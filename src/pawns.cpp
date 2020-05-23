@@ -691,10 +691,10 @@ IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
 		IDoubledDist[d][1] = Tuning::addParam(d == 1 ? eg_value(Doubled): 0, false);
 	}
 	
-	IDoubledD2[0][0] = Tuning::addParam(mg_value(Doubled), false);
-	IDoubledD2[0][1] = Tuning::addParam(eg_value(Doubled), false);
-    IDoubledD2[1][0] = Tuning::addParam(0, true);
-	IDoubledD2[1][1] = Tuning::addParam(0, true);
+	IDoubledD2[0][0] = Tuning::addParam(mg_value(Doubled), false, 0);
+	IDoubledD2[0][1] = Tuning::addParam(eg_value(Doubled), false, 0);
+    IDoubledD2[1][0] = Tuning::addParam(0, true, 0);
+	IDoubledD2[1][1] = Tuning::addParam(0, true, 0);
 
 
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
