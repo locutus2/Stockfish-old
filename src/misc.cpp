@@ -537,6 +537,8 @@ namespace Tuning {
 	constexpr double MSE_BASE = 0.0001;
 
 	std::vector<double> param;
+	std::vector<double> minParam;
+	std::vector<double> maxParam;
 	std::vector<double> isActive;
 	std::vector<double> gradient;
 	std::vector<double> total_gradient;
@@ -556,9 +558,11 @@ namespace Tuning {
 			x = 0;
 	}
 
-	int addParam(int value, bool active) {
+	int addParam(double value, bool active, double minValue, double maxValue) {
 		int index = (int)param.size();
 		param.push_back(value);
+		minParam.push_back(minValue);
+		maxParam.push_back(maxValue);
 		isActive.push_back(active);
 		gradient.push_back(0);
 		total_gradient.push_back(0);
@@ -625,7 +629,7 @@ namespace Tuning {
 		for(int i = 0; i < n;  ++i)
 		{
 			if(isActive[i])
-				param[i] -= ALPHA * (total_gradient[i] - s);
+				param[i] = std::max(minParam[i], std::min(maxParam[i], param[i] - ALPHA * (total_gradient[i] - s)));
 		}
 		
 		

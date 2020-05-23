@@ -124,11 +124,12 @@ namespace WinProcGroup {
 
 namespace Tuning {
   extern double ALPHA;
+  constexpr double INF = std::numeric_limits<double>().max();
 	
   double totalError();
   void clearGradients();
   void clearTotalGradients();
-  int addParam(int value, bool active = true);
+  int addParam(double value, bool active = true, double minValue = -INF, double maxValue = INF);
   double getParam(int index);
   void updateGradient(Color c, int index, double value);
   double updateTotalGradients(int value, int targetValue);
