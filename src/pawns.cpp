@@ -150,7 +150,7 @@ namespace {
 
             if (   semiDoubled
                 && popcount(opposed) == 1
-                && !(theirPawns & pawn_attack_span(Us, frontmost_sq(Us, semiDoubled))))
+                && stoppers == opposed)
                 score -= Doubled;
         }
 
