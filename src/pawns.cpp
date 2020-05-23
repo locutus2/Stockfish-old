@@ -106,17 +106,13 @@ namespace {
   constexpr Score PawnChain      = S( 0,  0);
 
   // Pawn penalties
-  constexpr Score Backward      = S( 9, 24);
-  //constexpr Score Backward      = S( 0, 0);
-  constexpr Score BlockedStorm  = S(82, 82);
-  constexpr Score Doubled       = S(11, 56);
-  //constexpr Score Doubled       = S(0, 0);
-  constexpr Score Isolated      = S( 5, 15);
-  //constexpr Score Isolated      = S( 0, 0);
-  constexpr Score WeakLever     = S( 0, 56);
-  //constexpr Score WeakLever     = S( 0, 0);
-  constexpr Score WeakUnopposed = S(13, 27);
-  //constexpr Score WeakUnopposed = S(0, 0);
+  constexpr Score Backward        = S( 9, 24);
+  constexpr Score BlockedStorm    = S(82, 82);
+  constexpr Score Doubled         = S(11, 56);
+  constexpr Score DoubledIsolated = S(15, 57);
+  constexpr Score Isolated        = S( 5, 15);
+  constexpr Score WeakLever       = S( 0, 56);
+  constexpr Score WeakUnopposed   = S(13, 27);
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -160,7 +156,7 @@ namespace {
     Score PWeakUnopposed = make_score(Tuning::getParam(IWeakUnopposedMG), Tuning::getParam(IWeakUnopposedEG));
 	
     Bitboard neighbours, stoppers, support, phalanx, opposed;
-    Bitboard lever, leverPush, blocked;
+    Bitboard lever, leverPush, blocked, doubled2;
     Square s;
     bool backward, passed, doubled;
     Score score = SCORE_ZERO;
@@ -205,6 +201,7 @@ namespace {
         lever      = theirPawns & PawnAttacks[Us][s];
         leverPush  = theirPawns & PawnAttacks[Us][s + Up];
         doubled    = ourPawns   & (s - Up);
+		doubled2    = ourPawns   & forward_file_bb(Them, s);
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
@@ -342,7 +339,13 @@ namespace {
 		Tuning::updateGradient(Us, IIsolatedGDEG[r-1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedGDEG[r], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IIsolatedGDEG[r+1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-	}
+	
+
+            if (   (ourPawns & forward_file_bb(Them, s))
+                && popcount(opposed) == 1
+                && !(theirPawns & adjacent_files_bb(s)))
+                score -= DoubledIsolated;
+        }
 
         else if (backward)
 	{
@@ -365,7 +368,13 @@ namespace {
 		Score PDoubledLin[3] = { make_score(Tuning::getParam(IDoubledLinMG[0]), Tuning::getParam(IDoubledLinEG[0]))
 		                        ,make_score(Tuning::getParam(IDoubledLinMG[1]), Tuning::getParam(IDoubledLinEG[1]))
 		                        ,make_score(Tuning::getParam(IDoubledLinMG[2]), Tuning::getParam(IDoubledLinEG[2]))};
-			score -=   PDoubled * doubled
+								
+								int d = doubled2 ? distance<Rank>(s, frontmost_sq(Us, doubled2)) : 1;
+	Score PDoubledD	= make_score(Tuning::getParam(IDoubledDist[d][0]), Tuning::getParam(IDoubledDist[d][1]));
+		
+		score -=   PDoubledD * bool(doubled2)
+			//score -=   PDoubled * doubled
+
 		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
 		//score -=   (opposed ? PDoubled : PDoubledU) * doubled
             //score -=   (phalanx ? PDoubledP : PDoubled) * doubled
@@ -374,6 +383,12 @@ namespace {
 			//score -=   (PDoubledLin[0] + PDoubledLin[1] * r) * doubled
 			//score -=   (PDoubledLin[0] + PDoubledLin[1] * r + PDoubledLin[2] * r * r) * doubled
                      + PWeakLever * more_than_one(lever);
+		
+		if(doubled2)
+		{
+			Tuning::updateGradient(Us, IDoubledDist[d][0], -1.0 * phase / PHASE_MIDGAME);	
+			Tuning::updateGradient(Us, IDoubledDist[d][1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		}
 		
    		Tuning::updateGradient(Us, IDoubledMG, -1.0 * doubled * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IDoubledEG, -1.0 * doubled * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
