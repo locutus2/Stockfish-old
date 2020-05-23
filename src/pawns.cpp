@@ -34,7 +34,7 @@ namespace {
   // Pawn penalties
   constexpr Score Backward        = S( 9, 24);
   constexpr Score BlockedStorm    = S(82, 82);
-  constexpr Score Doubled         = S(11, 56);
+  constexpr Score Doubled         = S(-94, 33);
   constexpr Score DoubledIsolated = S(15, 57);
   constexpr Score Isolated        = S( 5, 15);
   constexpr Score WeakLever       = S( 0, 56);
@@ -102,7 +102,7 @@ namespace {
         stoppers   = theirPawns & passed_pawn_span(Us, s);
         lever      = theirPawns & PawnAttacks[Us][s];
         leverPush  = theirPawns & PawnAttacks[Us][s + Up];
-        doubled    = ourPawns   & (s - Up);
+        doubled    = ourPawns   & forward_file_bb(Them, s);
         neighbours = ourPawns   & adjacent_files_bb(s);
         phalanx    = neighbours & rank_bb(s);
         support    = neighbours & rank_bb(s - Up);
@@ -148,7 +148,7 @@ namespace {
             score -=   Isolated
                      + WeakUnopposed * !opposed;
 
-            if (   (ourPawns & forward_file_bb(Them, s))
+            if (   doubled
                 && popcount(opposed) == 1
                 && !(theirPawns & adjacent_files_bb(s)))
                 score -= DoubledIsolated;
