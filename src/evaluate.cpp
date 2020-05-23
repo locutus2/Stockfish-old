@@ -834,9 +834,11 @@ namespace {
             + passed< WHITE>() - passed< BLACK>()
             + space<  WHITE>() - space<  BLACK>();
 
-    score += initiativeScore = initiative(score);
+    initiativeScore = initiative(score);
 
     score += king<WHITE>(initiativeScore) - king<BLACK>(-initiativeScore);
+
+    score += initiative(score);
 
     // Interpolate between a middlegame and a (scaled by 'sf') endgame score
     ScaleFactor sf = scale_factor(eg_value(score));
