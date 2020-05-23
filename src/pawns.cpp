@@ -164,7 +164,7 @@ namespace {
             score -= WeakLever * more_than_one(lever);
 
             if (doubled)
-                score -= Doubled * (6 - distance<Rank>(s, frontmost_sq(Us, doubled))) / 5;
+                score -= Doubled / (2 * distance<Rank>(s, frontmost_sq(Us, doubled)) - 1);
         }
     }
 
