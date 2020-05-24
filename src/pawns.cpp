@@ -669,8 +669,8 @@ IDoubledIsolated[0] = Tuning::addParam(mg_value(DoubledIsolated), false);
 IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
 //IDoubledIsolatedOpposed[0] = Tuning::addParam(15, false);
 //IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
-	IBackwardMG = Tuning::addParam(mg_value(Backward), false);
-	IBackwardEG = Tuning::addParam(eg_value(Backward), false);
+	IBackwardMG = Tuning::addParam(mg_value(Backward), true, 0);
+	IBackwardEG = Tuning::addParam(eg_value(Backward), true, 0);
 	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
 	IDoubledEG = Tuning::addParam(eg_value(Doubled), false);
 	IIsolatedMG = Tuning::addParam(mg_value(Isolated), false);
@@ -691,8 +691,8 @@ IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
 	
 	IDoubledD2[0][0] = Tuning::addParam(mg_value(Doubled), false, 0);
 	IDoubledD2[0][1] = Tuning::addParam(eg_value(Doubled), false, 0);
-    IDoubledD2[1][0] = Tuning::addParam(0, true, 0);
-	IDoubledD2[1][1] = Tuning::addParam(0, true, 0);
+    IDoubledD2[1][0] = Tuning::addParam(0, false, 0);
+	IDoubledD2[1][1] = Tuning::addParam(0, false, 0);
 
 
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
