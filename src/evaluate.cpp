@@ -83,6 +83,7 @@ namespace {
   int IKDweak;
   int IKDweakEG;
   int IKDunsafeChecks;
+  int IKDblockers;
 
   int IKingDistanceThemBlock;
   int IKingDistanceUsBlock;
@@ -532,7 +533,7 @@ namespace {
                  //+ 185 * popcount(kingRing[Us] & weak)
                  + Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak)
                  + Tuning::getParam(IKDunsafeChecks) * popcount(unsafeChecks)
-                 +  98 * popcount(pos.blockers_for_king(Us))
+                 + Tuning::getParam(IKDblockers) * popcount(pos.blockers_for_king(Us))
                  +  69 * kingAttacksCount[Them]
                  +   3 * kingFlankAttack * kingFlankAttack / 8
                  +       mg_value(mobility[Them] - mobility[Us])
@@ -563,6 +564,9 @@ namespace {
 		//Tuning::updateGradient(Us, IKDweakEG, -grad_eg * popcount(kingRing[Us] & weak));
 				
 		Tuning::updateGradient(Us, IKDunsafeChecks, -grad * popcount(unsafeChecks));
+		
+		Tuning::updateGradient(Us, IKDblockers, -grad * popcount(pos.blockers_for_king(Us)));
+		
 
     }
 
@@ -1043,6 +1047,7 @@ void Eval::init() {
         IKDweak = Tuning::addParam(185, false, 0);
 		//IKDweakEG = Tuning::addParam(185, false);
 		IKDunsafeChecks = Tuning::addParam(148, false, 0);
+		IKDblockers = Tuning::addParam(98, true, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
