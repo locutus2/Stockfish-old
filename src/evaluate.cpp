@@ -372,11 +372,11 @@ namespace {
                     {
                         if (pos.is_on_semiopen_file(Them, sq))
                         {
-                            rof = RookOnFile[1] / 2;
+                            rof = RookOnFile[1] / 4;
                             break;
                         }
                         else
-                            rof = RookOnFile[0] / 2;
+                            rof = RookOnFile[0] / 4;
                     }
                 }
                 score += rof;
