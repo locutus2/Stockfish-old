@@ -361,6 +361,7 @@ namespace {
                         score -= TrappedRook * (1 + !pos.castling_rights(Us));
                 }
 
+                Score rof = SCORE_ZERO;
                 bb = b & mobilityArea[Us] & rank_bb(s);
                 while (bb)
                 {
@@ -369,10 +370,16 @@ namespace {
                     // Bonus for rook which can move on an open or semi-open file
                     if (pos.is_on_semiopen_file(Us, sq))
                     {
-                        score += RookOnFile[pos.is_on_semiopen_file(Them, sq)] / 2;
-                        break;
+                        if (pos.is_on_semiopen_file(Them, sq))
+                        {
+                            rof = RookOnFile[1] / 2;
+                            break;
+                        }
+                        else
+                            rof = RookOnFile[0] / 2;
                     }
                 }
+                score += rof;
             }
         }
 
