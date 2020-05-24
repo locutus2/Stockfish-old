@@ -80,6 +80,7 @@ namespace {
   int IPawnlessFlankMG;
   int IPawnlessFlankEG;
 
+  int IKDbase;
   int IKDweak;
   int IKDweakEG;
   int IKDunsafeChecks;
@@ -542,9 +543,9 @@ namespace {
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -   6 * mg_value(score) / 8
                  -   4 * kingFlankDefense
-                 +  37;
+                 +  Tuning::getParam(IKDbase);
      //int kingDangerEG = kingDanger + Tuning::getParam(IKDweakEG) * popcount(kingRing[Us] & weak);
-	 kingDanger += Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak);
+	 //kingDanger += Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak);
 	 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
@@ -560,6 +561,8 @@ namespace {
 		//double grad_eg = popcount(kingRing[Us] & weak) / 16.0;
 		//double grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
 		
+		
+		Tuning::updateGradient(Us, IKDbase, -grad);
 		Tuning::updateGradient(Us, IKDweak, -grad * popcount(kingRing[Us] & weak));
 		//Tuning::updateGradient(Us, IKDweak, -grad_mg * popcount(kingRing[Us] & weak));
 		//Tuning::updateGradient(Us, IKDweakEG, -grad_eg * popcount(kingRing[Us] & weak));
@@ -1045,10 +1048,10 @@ void Eval::init() {
 		IPawnlessFlankMG = Tuning::addParam(mg_value(PawnlessFlank), false);
 		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
-
-        IKDweak = Tuning::addParam(185, true, 0);
+		IKDbase = Tuning::addParam(37, true);
+        IKDweak = Tuning::addParam(185, false, 0);
 		//IKDweakEG = Tuning::addParam(185, false);
-		IKDunsafeChecks = Tuning::addParam(148, true, 0);
+		IKDunsafeChecks = Tuning::addParam(148, false, 0);
 		IKDblockers = Tuning::addParam(98, false, 0);
 		IKDattackCount = Tuning::addParam(69, false, 0);
 
