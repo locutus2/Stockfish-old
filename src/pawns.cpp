@@ -39,7 +39,7 @@ namespace {
   constexpr Score WeakUnopposed = S(13, 27);
 
   // Doubled[distance > 1] doubled penalty dependent if distance between doubled pawns is greater than 1
-  constexpr Score Doubled[2] = { S(11, 56), S(0, 5) };
+  constexpr Score Doubled[2] = { S(11, 56), S(5, 5) };
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
