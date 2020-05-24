@@ -362,7 +362,7 @@ namespace {
                 }
 
                 Score rof = SCORE_ZERO;
-                bb = b & mobilityArea[Us] & rank_bb(s);
+                bb = b & mobilityArea[Us] & rank_bb(s) & ~pos.pieces(Us, ROOK);
                 while (bb)
                 {
                     Square sq = pop_lsb(&bb);
