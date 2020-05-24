@@ -530,7 +530,7 @@ namespace {
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
                  //+ 185 * popcount(kingRing[Us] & weak)
-                 //+ Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak)
+                 + Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak)
                  + Tuning::getParam(IKDunsafeChecks) * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
                  +  69 * kingAttacksCount[Them]
@@ -541,26 +541,28 @@ namespace {
                  -   6 * mg_value(score) / 8
                  -   4 * kingFlankDefense
                  +  37;
-     int kingDangerEG = kingDanger + Tuning::getParam(IKDweakEG) * popcount(kingRing[Us] & weak);
+     //int kingDangerEG = kingDanger + Tuning::getParam(IKDweakEG) * popcount(kingRing[Us] & weak);
 	 kingDanger += Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak);
 	 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
     {
-        score -= make_score(kingDanger * kingDanger / 4096, kingDangerEG / 16);
-	double grad_mg = 2.0 * kingDanger * popcount(kingRing[Us] & weak) / 4096.0;
-	double grad_eg = popcount(kingRing[Us] & weak) / 16.0;
-	double grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
-	//Tuning::updateGradient(Us, IKDweak, -grad);
-	Tuning::updateGradient(Us, IKDweak, -grad_mg);
-	Tuning::updateGradient(Us, IKDweakEG, -grad_eg);
-	
-	
-	grad_eg = 1 / 16.0;
-	grad_mg = kingDanger / 2048.0;
-	grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
+        //score -= make_score(kingDanger * kingDanger / 4096, kingDangerEG / 16);
+		score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
+		
+		double grad_eg = 1 / 16.0;
+		double grad_mg = kingDanger / 2048.0;
+		double grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
 
-	Tuning::updateGradient(Us, IKDunsafeChecks, -grad * popcount(unsafeChecks));
+		//double grad_mg = 2.0 * kingDanger * popcount(kingRing[Us] & weak) / 4096.0;
+		//double grad_eg = popcount(kingRing[Us] & weak) / 16.0;
+		//double grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
+		
+		Tuning::updateGradient(Us, IKDweak, -grad * popcount(kingRing[Us] & weak));
+		//Tuning::updateGradient(Us, IKDweak, -grad_mg * popcount(kingRing[Us] & weak));
+		//Tuning::updateGradient(Us, IKDweakEG, -grad_eg * popcount(kingRing[Us] & weak));
+				
+		Tuning::updateGradient(Us, IKDunsafeChecks, -grad * popcount(unsafeChecks));
 
     }
 
@@ -1038,9 +1040,9 @@ void Eval::init() {
 		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
 
-        IKDweak = Tuning::addParam(185, false);
-		IKDweakEG = Tuning::addParam(185, false);
-		IKDunsafeChecks = Tuning::addParam(148, true, 0);
+        IKDweak = Tuning::addParam(185, true, 0);
+		//IKDweakEG = Tuning::addParam(185, false);
+		IKDunsafeChecks = Tuning::addParam(148, false, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
