@@ -351,12 +351,28 @@ namespace {
             if (pos.is_on_semiopen_file(Us, s))
                 score += RookOnFile[pos.is_on_semiopen_file(Them, s)];
 
-            // Penalty when trapped by the king, even more if the king cannot castle
-            else if (mob <= 3)
+            else
             {
-                File kf = file_of(pos.square<KING>(Us));
-                if ((kf < FILE_E) == (file_of(s) < kf))
-                    score -= TrappedRook * (1 + !pos.castling_rights(Us));
+                // Penalty when trapped by the king, even more if the king cannot castle
+                if (mob <= 3)
+                {
+                    File kf = file_of(pos.square<KING>(Us));
+                    if ((kf < FILE_E) == (file_of(s) < kf))
+                        score -= TrappedRook * (1 + !pos.castling_rights(Us));
+                }
+
+                bb = b & mobilityArea[Us] & rank_bb(s);
+                while (bb)
+                {
+                    Square sq = pop_lsb(&bb);
+
+                    // Bonus for rook which can move on an open or semi-open file
+                    if (pos.is_on_semiopen_file(Us, sq))
+                    {
+                        score += RookOnFile[pos.is_on_semiopen_file(Them, sq)] / 2;
+                        break;
+                    }
+                }
             }
         }
 
