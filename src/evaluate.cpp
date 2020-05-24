@@ -556,10 +556,11 @@ namespace {
 	Tuning::updateGradient(Us, IKDweakEG, -grad_eg);
 	
 	
-	grad_eg = popcount(unsafeChecks) / 16.0;
-	grad_mg = grad_eg * kingDanger / 128.0;
+	grad_eg = 1 / 16.0;
+	grad_mg = kingDanger / 2048.0;
 	grad = (phase * grad_mg + (PHASE_MIDGAME - phase) * grad_eg) / PHASE_MIDGAME;
-	Tuning::updateGradient(Us, IKDunsafeChecks, -grad);
+
+	Tuning::updateGradient(Us, IKDunsafeChecks, -grad * popcount(unsafeChecks));
 
     }
 
@@ -1039,7 +1040,7 @@ void Eval::init() {
 
         IKDweak = Tuning::addParam(185, false);
 		IKDweakEG = Tuning::addParam(185, false);
-		IKDunsafeChecks = Tuning::addParam(148, false);
+		IKDunsafeChecks = Tuning::addParam(148, true, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
