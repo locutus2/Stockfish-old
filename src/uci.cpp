@@ -244,6 +244,7 @@ namespace {
     constexpr bool USE_SCORE = false;
     constexpr bool USE_RESULT = true;
     constexpr double MAX_VALUE = PawnValueEg;
+    constexpr Depth = DEPTH_ZERO;
 
     double mse = std::numeric_limits<double>().max() / 2;
     double last_mse = 0;
@@ -280,20 +281,36 @@ namespace {
 		if(!pos.checkers())
 		{
 			Tuning::clearGradients();
-			int value = Eval::evaluate(pos);
+			int value;
+			if (depth > DEPTH_ZERO)
+			{
+                            go(pos, is, states);
+                            Threads.main()->wait_for_search_finished();
+                            nodes += Threads.nodes_searched();
+			    value = Threads.main()->bestPreviousScore;
+			    if(pos.side_to_move() == BLACK)
+				value = -value;
+			}
+			else
+			{
+		            value = Eval::evaluate(pos);
+			}
+
 		        if(std::abs(value) < MAX_VALUE)
-		       {
-			       if(pos.side_to_move() == BLACK)
-					value = -value;
+		        {
 		       	       
 			       if(USE_SCORE && score != VALUE_NONE)
 			       {
-
+			        if(pos.side_to_move() == BLACK)
+			    	    score = -score;
+				    //value = -value;
+				    
 		        	++n;
 				double error = Tuning::updateTotalGradients(value, score);
 				mse += error;
                 		if(DEBUG) cerr << "SCORE: eval=" << value << " error=" << error << endl;
-			      }
+			       }
+
 		       	       if(USE_RESULT && gameResult != VALUE_NONE)
 			       {
 				       constexpr double LAMBDA = 0.9;
@@ -304,7 +321,7 @@ namespace {
 				mse += error;
                 		if(DEBUG) cerr << "SCORE: eval=" << value << " error=" << error << endl;
 			      }
-		       }
+		        }
 		}
 	}
 /*
