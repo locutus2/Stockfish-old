@@ -374,7 +374,7 @@ namespace {
     return score;
   }
 
-  constexpr int A = 25;
+  constexpr int A = 100;
   #define W(o,n) ((o) + ((n) - (o)) * A / 100)
 
 
@@ -456,9 +456,9 @@ namespace {
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
                  + 185 * popcount(kingRing[Us] & weak)
-                 + W(148, 206) * popcount(unsafeChecks)
+                 + 148 * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
-                 +  69 * kingAttacksCount[Them]
+                 + W(69,12) * kingAttacksCount[Them]
                  +   3 * kingFlankAttack * kingFlankAttack / 8
                  +       mg_value(mobility[Them] - mobility[Us])
                  - 873 * !pos.count<QUEEN>(Them)
