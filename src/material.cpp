@@ -227,7 +227,7 @@ Entry* probe(const Position& pos) {
 }
 
 void init() {
-	IMaterialScale = Tuning::addParam(0, true);
+	IMaterialScale = Tuning::addParam(0, false);
 }
 
 } // namespace Material

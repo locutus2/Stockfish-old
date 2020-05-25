@@ -87,6 +87,7 @@ namespace {
   int IKDattackCount;
   int IKDblockers;
   int IKDBishopAttack;
+  int IKDBishopPin;
 
   int IKingDistanceThemBlock;
   int IKingDistanceUsBlock;
@@ -546,9 +547,17 @@ namespace {
                  +  Tuning::getParam(IKDbase);
      //int kingDangerEG = kingDanger + Tuning::getParam(IKDweakEG) * popcount(kingRing[Us] & weak);
 	 //kingDanger += Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak);
-	 b1 = pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]);    b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ b1);
+	 b1 = pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]);    
+	 b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ b1);
 	    b3 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ b1) & ~b2);
 	       kingDanger += Tuning::getParam(IKDBishopAttack) * bool(b3 & pos.pieces(Them, BISHOP)); 
+
+	 b1 = pos.attacks_from<BISHOP>(ksq) & pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]); 
+	 b2 = attacks_bb<BISHOP>(pos.pieces() ^ b1) & pos.pieces(Them, BISHOP);
+	
+	 if(b2)
+		 kingDanger += Tuning::getParam(IKDBishopPin);
+  
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
     {
@@ -574,6 +583,10 @@ namespace {
 		Tuning::updateGradient(Us, IKDattackCount, -grad * kingAttacksCount[Them]);
 		Tuning::updateGradient(Us, IKDBishopAttack, -grad * bool(b3 & pos.pieces(Them, BISHOP)));
 		
+	       if(b2)
+	       {
+		 Tuning::updateGradient(Us, IKDBishopPin, -grad);
+	       }
 		
 
     }
@@ -1058,6 +1071,7 @@ void Eval::init() {
 		IKDblockers = Tuning::addParam(98, false, 0);
 		IKDattackCount = Tuning::addParam(69, false, 0);
 		IKDBishopAttack = Tuning::addParam(0, false, 0);
+		IKDBishopPin = Tuning::addParam(0, true, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
