@@ -108,12 +108,13 @@ namespace {
 
   // Pawn penalties
   constexpr Score Backward      = S( 9, 24);
-  constexpr Score BlockedStorm  = S(82, 82);
   constexpr Score Doubled       = S(11, 56);
   constexpr Score DoubledIsolated = S(11, 56);
   constexpr Score Isolated      = S( 5, 15);
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
+
+  constexpr Score BlockedStorm[RANK_NB]  = {S( 0, 0), S( 0, 0), S( 76, 78), S(-10, 15), S(-7, 10), S(-4, 6), S(-1, 2)};
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -505,8 +506,8 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
   constexpr Color Them = ~Us;
 
   Bitboard b = pos.pieces(PAWN) & ~forward_ranks_bb(Them, ksq);
-  Bitboard ourPawns = b & pos.pieces(Us);
-  Bitboard theirPawns = b & pos.pieces(Them);
+  Bitboard ourPawns = b & pos.pieces(Us) & ~pawnAttacks[Them];
+  Bitboard theirPawns = b & pos.pieces(Them) & ~pawnAttacks[Us];
 
   blockedstormf_mg[0] = 0;
   blockedstormf_mg[1] = 0;
@@ -522,7 +523,7 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
   blockedstorm_eg[0] = 0;
   blockedstorm_eg[1] = 0;
   Score bonus = make_score(5, 5);
-  Score PBlockedStorm = make_score(Tuning::getParam(IBlockedStormMG), Tuning::getParam(IBlockedStormEG));
+  //Score PBlockedStorm = make_score(Tuning::getParam(IBlockedStormMG), Tuning::getParam(IBlockedStormEG));
 
   File center = Utility::clamp(file_of(ksq), FILE_B, FILE_G);
   for (File f = File(center - 1); f <= File(center + 1); ++f)
@@ -538,9 +539,9 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
 
       if (ourRank && (ourRank == theirRank - 1))
       {
-                Score PBlockedStormF = 
-		  	make_score(Tuning::getParam(IBlockedStormFMG[d]), Tuning::getParam(IBlockedStormFEG[d]));
-          bonus -= PBlockedStormF * int(theirRank == RANK_3);
+                //Score PBlockedStormF = 
+		 // 	make_score(Tuning::getParam(IBlockedStormFMG[d]), Tuning::getParam(IBlockedStormFEG[d]));
+      //    bonus -= PBlockedStormF * int(theirRank == RANK_3);
 	  blockedstormf_mg[d] -= int(theirRank == RANK_3);
 	  blockedstormf_eg[d] -= int(theirRank == RANK_3);
           //bonus -= PBlockedStorm * int(theirRank == RANK_3);
@@ -550,16 +551,18 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
 	  //
 	  if (RANK_3 <= theirRank && theirRank <= RANK_4)
 	  {
-                Score PBlockedStormPoly[2] = {
+               /* Score PBlockedStormPoly[2] = {
 		  	make_score(Tuning::getParam(IBlockedStormPolyMG[0]), Tuning::getParam(IBlockedStormPolyEG[0])),
 		  	make_score(Tuning::getParam(IBlockedStormPolyMG[1]), Tuning::getParam(IBlockedStormPolyEG[1]))
 	                 };
-          	bonus -= PBlockedStormPoly[0] + PBlockedStormPoly[1] * int(theirRank - RANK_3);
+			 */
+       //   	bonus -= PBlockedStormPoly[0] + PBlockedStormPoly[1] * int(theirRank - RANK_3);
 	  	blockedstorm_mg[0] -= 1;
 	  	blockedstorm_mg[1] -= int(theirRank - RANK_3);
 	  	blockedstorm_eg[0] -= 1;
 	  	blockedstorm_eg[1] -= int(theirRank - RANK_3);
 	  }
+          bonus -= BlockedStorm[theirRank];
       }
       else
           bonus -= make_score(UnblockedStorm[d][theirRank], 0);
@@ -694,7 +697,7 @@ IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
     IDoubledD2[1][0] = Tuning::addParam(0, false, 0);
 	IDoubledD2[1][1] = Tuning::addParam(0, false, 0);
 
-
+/*
 	IBlockedStormMG = Tuning::addParam(mg_value(BlockedStorm), USE_FOR_TUNING);
 	IBlockedStormEG = Tuning::addParam(eg_value(BlockedStorm), USE_FOR_TUNING);
 
@@ -709,11 +712,11 @@ IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
 
 	IBlockedStormPolyMG[0] = Tuning::addParam(mg_value(BlockedStorm), false);
 	IBlockedStormPolyMG[1] = Tuning::addParam(-mg_value(BlockedStorm), false);
-	//IBlockedStormPolyMG[1] = Tuning::addParam(-mg_value(BlockedStorm) / 2, true);
+	IBlockedStormPolyMG[1] = Tuning::addParam(-mg_value(BlockedStorm) / 2, true);
 	IBlockedStormPolyEG[0] = Tuning::addParam(eg_value(BlockedStorm), false);
 	IBlockedStormPolyEG[1] = Tuning::addParam(-eg_value(BlockedStorm), false);
 	//IBlockedStormPolyEG[1] = Tuning::addParam(-eg_value(BlockedStorm) / 2, true);
-	
+*/	
 	IDoubledMGS = Tuning::addParam(mg_value(DoubledS), false);
 	IDoubledEGS = Tuning::addParam(eg_value(DoubledS), false);
 	

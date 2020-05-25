@@ -173,6 +173,7 @@ namespace {
   constexpr Score PassedFile          = S( 11,  8);
   constexpr Score PawnlessFlank       = S( 17, 95);
   constexpr Score RestrictedPiece     = S(  7,  7);
+  constexpr Score RookOnKingRing      = S( 16,  0);
   constexpr Score RookOnQueenFile     = S(  5,  9);
   constexpr Score SliderOnQueen       = S( 59, 18);
   constexpr Score ThreatByKing        = S( 24, 89);
@@ -319,6 +320,8 @@ namespace {
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
+        else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
+            score += RookOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
 
@@ -553,7 +556,7 @@ namespace {
 	       kingDanger += Tuning::getParam(IKDBishopAttack) * bool(b3 & pos.pieces(Them, BISHOP)); 
 
 	 b1 = pos.attacks_from<BISHOP>(ksq) & pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]); 
-	 b2 = attacks_bb<BISHOP>(pos.pieces() ^ b1) & pos.pieces(Them, BISHOP);
+	 b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ b1) & pos.pieces(Them, BISHOP);
 	
 	 if(b2)
 		 kingDanger += Tuning::getParam(IKDBishopPin);
