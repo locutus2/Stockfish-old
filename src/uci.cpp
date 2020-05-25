@@ -244,7 +244,7 @@ namespace {
     constexpr bool USE_SCORE = false;
     constexpr bool USE_RESULT = true;
     constexpr double MAX_VALUE = PawnValueEg;
-    constexpr Depth = DEPTH_ZERO;
+    constexpr Depth depth = 0;
 
     double mse = std::numeric_limits<double>().max() / 2;
     double last_mse = 0;
@@ -282,7 +282,7 @@ namespace {
 		{
 			Tuning::clearGradients();
 			int value;
-			if (depth > DEPTH_ZERO)
+			if (depth > 0)
 			{
                             go(pos, is, states);
                             Threads.main()->wait_for_search_finished();
