@@ -1050,9 +1050,9 @@ void Eval::init() {
 		IKDbase = Tuning::addParam(37, false);
         IKDweak = Tuning::addParam(185, false, 0);
 		//IKDweakEG = Tuning::addParam(185, false);
-		IKDunsafeChecks = Tuning::addParam(148, false, 0);
+		IKDunsafeChecks = Tuning::addParam(148, true, 0);
 		IKDblockers = Tuning::addParam(98, false, 0);
-		IKDattackCount = Tuning::addParam(69, true, 0);
+		IKDattackCount = Tuning::addParam(69, false, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
