@@ -23,6 +23,7 @@
 #include "bitboard.h"
 #include "endgame.h"
 #include "evaluate.h"
+#include "material.h"
 #include "position.h"
 #include "search.h"
 #include "thread.h"
@@ -45,6 +46,7 @@ int main(int argc, char* argv[]) {
   Position::init();
   Bitbases::init();
   Endgames::init();
+  Material::init();
   Pawns::init();
   Eval::init();
   Threads.set(size_t(Options["Threads"]));

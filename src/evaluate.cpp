@@ -1057,7 +1057,7 @@ void Eval::init() {
 		IKDunsafeChecks = Tuning::addParam(148, false, 0);
 		IKDblockers = Tuning::addParam(98, false, 0);
 		IKDattackCount = Tuning::addParam(69, false, 0);
-		IKDBishopAttack = Tuning::addParam(0, true, 0);
+		IKDBishopAttack = Tuning::addParam(0, false, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);

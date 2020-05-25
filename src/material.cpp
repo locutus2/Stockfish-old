@@ -22,9 +22,12 @@
 #include <cstring>   // For std::memset
 
 #include "material.h"
+#include "misc.h"
 #include "thread.h"
 
 using namespace std;
+
+int IMaterialScale;
 
 namespace {
 
@@ -213,7 +216,18 @@ Entry* probe(const Position& pos) {
     pos.count<BISHOP>(BLACK)    , pos.count<ROOK>(BLACK), pos.count<QUEEN >(BLACK) } };
 
   e->value = int16_t((imbalance<WHITE>(pieceCount) - imbalance<BLACK>(pieceCount)) / 16);
+
+  //double grad = double(npm_w - npm_b + e->value) / 256.0;
+  double grad = double(npm_w - npm_b + (pos.count<PAWN>(WHITE) - pos.count<PAWN>(BLACK)) * PawnValueMg + e->value) / 256.0;
+  double v = grad * Tuning::getParam(IMaterialScale);
+  e->value -= v;
+  Tuning::updateGradient(WHITE, IMaterialScale, -grad);
+
   return e;
+}
+
+void init() {
+	IMaterialScale = Tuning::addParam(0, true);
 }
 
 } // namespace Material

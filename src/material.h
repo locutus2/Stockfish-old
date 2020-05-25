@@ -66,6 +66,7 @@ struct Entry {
 
 typedef HashTable<Entry, 8192> Table;
 
+void init();
 Entry* probe(const Position& pos);
 
 } // namespace Material
