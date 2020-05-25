@@ -532,7 +532,6 @@ namespace {
     int kingFlankDefense = popcount(b3);
 
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
-                 //+ 185 * popcount(kingRing[Us] & weak)
                  + Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak)
                  + Tuning::getParam(IKDunsafeChecks) * popcount(unsafeChecks)
                  + Tuning::getParam(IKDblockers) * popcount(pos.blockers_for_king(Us))
@@ -1048,12 +1047,12 @@ void Eval::init() {
 		IPawnlessFlankMG = Tuning::addParam(mg_value(PawnlessFlank), false);
 		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
-		IKDbase = Tuning::addParam(37, true);
+		IKDbase = Tuning::addParam(37, false);
         IKDweak = Tuning::addParam(185, false, 0);
 		//IKDweakEG = Tuning::addParam(185, false);
 		IKDunsafeChecks = Tuning::addParam(148, false, 0);
 		IKDblockers = Tuning::addParam(98, false, 0);
-		IKDattackCount = Tuning::addParam(69, false, 0);
+		IKDattackCount = Tuning::addParam(69, true, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
