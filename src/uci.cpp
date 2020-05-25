@@ -182,6 +182,16 @@ namespace {
     Threads.start_thinking(pos, states, limits, ponderMode);
   }
 
+  void go(Position& pos, int depth, StateListPtr& states) {
+
+    Search::LimitsType limits;
+    bool ponderMode = false;
+
+    limits.startTime = now(); // As early as possible!
+
+    limits.depth = depth;
+    Threads.start_thinking(pos, states, limits, ponderMode);
+  }
 
   // bench() is called when engine receives the "bench" command. Firstly
   // a list of UCI commands is setup according to bench parameters, then
@@ -244,7 +254,7 @@ namespace {
     constexpr bool USE_SCORE = false;
     constexpr bool USE_RESULT = true;
     constexpr double MAX_VALUE = PawnValueEg;
-    constexpr Depth depth = 0;
+    constexpr Depth depth = 1;
 
     double mse = std::numeric_limits<double>().max() / 2;
     double last_mse = 0;
@@ -284,17 +294,18 @@ namespace {
 			int value;
 			if (depth > 0)
 			{
-                            go(pos, is, states);
+                            go(pos, depth, states);
                             Threads.main()->wait_for_search_finished();
                             nodes += Threads.nodes_searched();
 			    value = Threads.main()->bestPreviousScore;
-			    if(pos.side_to_move() == BLACK)
-				value = -value;
 			}
 			else
 			{
 		            value = Eval::evaluate(pos);
 			}
+
+			if(pos.side_to_move() == BLACK)
+			    value = -value;
 
 		        if(std::abs(value) < MAX_VALUE)
 		        {

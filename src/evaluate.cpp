@@ -1048,9 +1048,9 @@ void Eval::init() {
 		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
 		IKDbase = Tuning::addParam(37, false);
-        IKDweak = Tuning::addParam(185, false, 0);
+        IKDweak = Tuning::addParam(185, true, 0);
 		//IKDweakEG = Tuning::addParam(185, false);
-		IKDunsafeChecks = Tuning::addParam(148, true, 0);
+		IKDunsafeChecks = Tuning::addParam(148, false, 0);
 		IKDblockers = Tuning::addParam(98, false, 0);
 		IKDattackCount = Tuning::addParam(69, false, 0);
 
