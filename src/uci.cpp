@@ -254,7 +254,7 @@ namespace {
     constexpr bool USE_SCORE = false;
     constexpr bool USE_RESULT = true;
     constexpr double MAX_VALUE = PawnValueEg;
-    constexpr Depth depth = 1;
+    constexpr Depth depth = 0;
 
     double mse = std::numeric_limits<double>().max() / 2;
     double last_mse = 0;

@@ -86,6 +86,7 @@ namespace {
   int IKDunsafeChecks;
   int IKDattackCount;
   int IKDblockers;
+  int IKDBishopAttack;
 
   int IKingDistanceThemBlock;
   int IKingDistanceUsBlock;
@@ -545,7 +546,9 @@ namespace {
                  +  Tuning::getParam(IKDbase);
      //int kingDangerEG = kingDanger + Tuning::getParam(IKDweakEG) * popcount(kingRing[Us] & weak);
 	 //kingDanger += Tuning::getParam(IKDweak) * popcount(kingRing[Us] & weak);
-	 
+	 b1 = pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]);    b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ b1);
+	    b3 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ b1) & ~b2);
+	       kingDanger += Tuning::getParam(IKDBishopAttack) * bool(b3 & pos.pieces(Them, BISHOP)); 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
     {
@@ -569,6 +572,7 @@ namespace {
 		Tuning::updateGradient(Us, IKDunsafeChecks, -grad * popcount(unsafeChecks));		
 		Tuning::updateGradient(Us, IKDblockers, -grad * popcount(unsafeChecks));
 		Tuning::updateGradient(Us, IKDattackCount, -grad * kingAttacksCount[Them]);
+		Tuning::updateGradient(Us, IKDBishopAttack, -grad * bool(b3 & pos.pieces(Them, BISHOP)));
 		
 		
 
@@ -1048,11 +1052,12 @@ void Eval::init() {
 		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
 		IKDbase = Tuning::addParam(37, false);
-        IKDweak = Tuning::addParam(185, true, 0);
+        IKDweak = Tuning::addParam(185, false, 0);
 		//IKDweakEG = Tuning::addParam(185, false);
 		IKDunsafeChecks = Tuning::addParam(148, false, 0);
 		IKDblockers = Tuning::addParam(98, false, 0);
 		IKDattackCount = Tuning::addParam(69, false, 0);
+		IKDBishopAttack = Tuning::addParam(0, true, 0);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
