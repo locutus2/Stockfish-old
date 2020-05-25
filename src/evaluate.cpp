@@ -374,7 +374,7 @@ namespace {
     return score;
   }
 
-  constexpr int A = 50;
+  constexpr int A = 25;
   #define W(o,n) ((o) + ((n) - (o)) * A / 100)
 
 
