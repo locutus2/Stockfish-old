@@ -100,7 +100,9 @@ namespace {
 
   int IMobilityBonus[4][28][2];
   int IMobilityBonusPolyAdd[4][2][2];
-  int IMobilityBonusSmooth[4][32][2];
+ int IMobilityBonusSmooth[4][32][2];
+
+ int IUnopposedBishop[2][2];
 
 
   // Threshold for lazy and space evaluation
@@ -408,6 +410,22 @@ namespace {
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
                     score += LongDiagonalBishop;
+
+		Bitboard sq = (DarkSquares & s) ? DarkSquares : ~DarkSquares;
+		if (pos.pieces(Them, BISHOP) & sq)
+		{
+			score += make_score(Tuning::getParam(IUnopposedBishop[1][0]),
+				            Tuning::getParam(IUnopposedBishop[1][1]));
+			Tuning::updateGradient(Us, IUnopposedBishop[1][0], -1.0 * phase / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IUnopposedBishop[1][1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		}
+		else
+		{
+			score += make_score(Tuning::getParam(IUnopposedBishop[0][0]),
+				            Tuning::getParam(IUnopposedBishop[0][1]));
+			Tuning::updateGradient(Us, IUnopposedBishop[0][0], -1.0 * phase / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IUnopposedBishop[0][1], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		}
 
                 // An important Chess960 pattern: a cornered bishop blocked by a friendly
                 // pawn diagonally in front of it is a very serious problem, especially
@@ -1074,7 +1092,12 @@ void Eval::init() {
 		IKDblockers = Tuning::addParam(98, false, 0);
 		IKDattackCount = Tuning::addParam(69, false, 0);
 		IKDBishopAttack = Tuning::addParam(0, false, 0);
-		IKDBishopPin = Tuning::addParam(0, true, 0);
+		IKDBishopPin = Tuning::addParam(0, false, 0);
+
+		IUnopposedBishop[0][0] = Tuning::addParam(0, true);
+		IUnopposedBishop[0][1] = Tuning::addParam(0, true);
+		IUnopposedBishop[1][0] = Tuning::addParam(0, true);
+		IUnopposedBishop[1][1] = Tuning::addParam(0, true);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
