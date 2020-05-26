@@ -1096,8 +1096,8 @@ void Eval::init() {
 
 		IUnopposedBishop[0][0] = Tuning::addParam(0, true);
 		IUnopposedBishop[0][1] = Tuning::addParam(0, true);
-		IUnopposedBishop[1][0] = Tuning::addParam(0, true);
-		IUnopposedBishop[1][1] = Tuning::addParam(0, true);
+		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
+		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);
