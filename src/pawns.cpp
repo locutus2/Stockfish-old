@@ -507,7 +507,7 @@ Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
 
   Bitboard b = pos.pieces(PAWN) & ~forward_ranks_bb(Them, ksq);
   Bitboard ourPawns = b & pos.pieces(Us) & ~pawnAttacks[Them];
-  Bitboard theirPawns = b & pos.pieces(Them) & ~pawnAttacks[Us];
+  Bitboard theirPawns = b & pos.pieces(Them);
 
   blockedstormf_mg[0] = 0;
   blockedstormf_mg[1] = 0;
