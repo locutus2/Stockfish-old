@@ -1080,8 +1080,8 @@ void Eval::init() {
 
         IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), false);
         IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), false);
-        IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), false);
-        IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), false);
+        IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), true, 0);
+        IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), true, 0);
 		IPawnlessFlankMG = Tuning::addParam(mg_value(PawnlessFlank), false);
 		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
