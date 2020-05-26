@@ -91,7 +91,12 @@ namespace {
 
     constexpr Color Them = ~Us;
 
+    QuadraticOurs[BISHOP][PAWN] = Tuning::getParam(IQuadraticOurs[BISHOP][PAWN]);
+
     QuadraticTheirs[BISHOP][KNIGHT] = Tuning::getParam(IQuadraticTheirs[BISHOP][KNIGHT]);
+
+    Tuning::updateGradient(Us, IQuadraticOurs[BISHOP][PAWN],  pieceCount[Us][BISHOP] * pieceCount[Us][PAWN] / 16.0);
+
     Tuning::updateGradient(Us, IQuadraticTheirs[BISHOP][KNIGHT],  pieceCount[Us][BISHOP] * pieceCount[Them][KNIGHT] / 16.0);
 
     int bonus = 0;
@@ -234,7 +239,9 @@ Entry* probe(const Position& pos) {
 void init() {
 	IMaterialScale = Tuning::addParam(0, false);
 
-	IQuadraticTheirs[BISHOP][KNIGHT] = Tuning::addParam(QuadraticTheirs[BISHOP][KNIGHT], true);
+	IQuadraticOurs[BISHOP][PAWN] = Tuning::addParam(QuadraticOurs[BISHOP][PAWN], false);
+
+	IQuadraticTheirs[BISHOP][KNIGHT] = Tuning::addParam(QuadraticTheirs[BISHOP][KNIGHT], false);
 }
 
 } // namespace Material
