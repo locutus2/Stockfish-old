@@ -88,6 +88,7 @@ namespace {
   int IKDblockers;
   int IKDBishopAttack;
   int IKDBishopPin;
+  int IKDWeakPawnBlocker;
 
   int IKingDistanceThemBlock;
   int IKingDistanceUsBlock;
@@ -579,6 +580,10 @@ namespace {
 	 if(b2)
 		 kingDanger += Tuning::getParam(IKDBishopPin);
   
+	 b1 = pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us];    
+	 b2 = pos.pieces(Us, PAWN) & pos.blockers_for_king(Us) & pawn_attacks_bb<Them>(b1);    
+	 kingDanger += Tuning::getParam(IKDWeakPawnBlocker) * bool(b2); 
+
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
     if (kingDanger > 100)
     {
@@ -604,9 +609,11 @@ namespace {
 		Tuning::updateGradient(Us, IKDattackCount, -grad * kingAttacksCount[Them]);
 		Tuning::updateGradient(Us, IKDBishopAttack, -grad * bool(b3 & pos.pieces(Them, BISHOP)));
 		
+	        Tuning::updateGradient(Us, IKDWeakPawnBlocker, -grad * bool(b2));
+
 	       if(b2)
 	       {
-		 Tuning::updateGradient(Us, IKDBishopPin, -grad);
+		 //Tuning::updateGradient(Us, IKDBishopPin, -grad);
 	       }
 		
 
@@ -1080,8 +1087,8 @@ void Eval::init() {
 
         IBishopPawnsMG = Tuning::addParam(mg_value(BishopPawns), false);
         IBishopPawnsEG = Tuning::addParam(eg_value(BishopPawns), false);
-        IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), true, 0);
-        IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), true, 0);
+        IBishopXRayPawnsMG = Tuning::addParam(mg_value(BishopXRayPawns), false, 0);
+        IBishopXRayPawnsEG = Tuning::addParam(eg_value(BishopXRayPawns), false, 0);
 		IPawnlessFlankMG = Tuning::addParam(mg_value(PawnlessFlank), false);
 		IPawnlessFlankEG = Tuning::addParam(eg_value(PawnlessFlank), false);
 		
@@ -1093,6 +1100,7 @@ void Eval::init() {
 		IKDattackCount = Tuning::addParam(69, false, 0);
 		IKDBishopAttack = Tuning::addParam(0, false, 0);
 		IKDBishopPin = Tuning::addParam(0, false, 0);
+                IKDWeakPawnBlocker = Tuning::addParam(0, true);
 
 		IUnopposedBishop[0][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[0][1] = Tuning::addParam(0, false);
