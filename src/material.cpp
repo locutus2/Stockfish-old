@@ -28,12 +28,14 @@
 using namespace std;
 
 int IMaterialScale;
+int IQuadraticOurs[PIECE_TYPE_NB][PIECE_TYPE_NB];
+int IQuadraticTheirs[PIECE_TYPE_NB][PIECE_TYPE_NB];
 
 namespace {
 
   // Polynomial material imbalance parameters
 
-  constexpr int QuadraticOurs[][PIECE_TYPE_NB] = {
+  int QuadraticOurs[][PIECE_TYPE_NB] = {
     //            OUR PIECES
     // pair pawn knight bishop rook queen
     {1438                               }, // Bishop pair
@@ -44,7 +46,7 @@ namespace {
     {-189,   24, 117,   133,  -134, -6  }  // Queen
   };
 
-  constexpr int QuadraticTheirs[][PIECE_TYPE_NB] = {
+  int QuadraticTheirs[][PIECE_TYPE_NB] = {
     //           THEIR PIECES
     // pair pawn knight bishop rook queen
     {   0                               }, // Bishop pair
@@ -88,6 +90,9 @@ namespace {
   int imbalance(const int pieceCount[][PIECE_TYPE_NB]) {
 
     constexpr Color Them = ~Us;
+
+    QuadraticTheirs[BISHOP][KNIGHT] = Tuning::getParam(IQuadraticTheirs[BISHOP][KNIGHT]);
+    Tuning::updateGradient(Us, IQuadraticTheirs[BISHOP][KNIGHT],  pieceCount[Us][BISHOP] * pieceCount[Them][KNIGHT] / 16.0);
 
     int bonus = 0;
 
@@ -228,6 +233,8 @@ Entry* probe(const Position& pos) {
 
 void init() {
 	IMaterialScale = Tuning::addParam(0, false);
+
+	IQuadraticTheirs[BISHOP][KNIGHT] = Tuning::addParam(QuadraticTheirs[BISHOP][KNIGHT], true);
 }
 
 } // namespace Material

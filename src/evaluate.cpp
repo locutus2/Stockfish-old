@@ -1094,8 +1094,8 @@ void Eval::init() {
 		IKDBishopAttack = Tuning::addParam(0, false, 0);
 		IKDBishopPin = Tuning::addParam(0, false, 0);
 
-		IUnopposedBishop[0][0] = Tuning::addParam(0, true);
-		IUnopposedBishop[0][1] = Tuning::addParam(0, true);
+		IUnopposedBishop[0][0] = Tuning::addParam(0, false);
+		IUnopposedBishop[0][1] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
 
