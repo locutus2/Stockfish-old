@@ -389,6 +389,7 @@ namespace {
     Bitboard weak, b1, b2, b3, safe, unsafeChecks = 0;
     Bitboard rookChecks, queenChecks, bishopChecks, knightChecks;
     int kingDanger = 0;
+    bool strongBishopPin;
     const Square ksq = pos.square<KING>(Us);
 
     // Init the score with king shelter and enemy pawns storm
@@ -454,11 +455,23 @@ namespace {
     int kingFlankAttack = popcount(b1) + popcount(b2);
     int kingFlankDefense = popcount(b3);
 
+    // Find opponent bishop pin of our pawn which is the only defender of a
+    // attacked piece.
+    b1 =  pos.pieces(Us)
+        & attackedBy[Them][ALL_PIECES]
+        & ~attackedBy2[Us];
+    b2 =  pos.pieces(Us, PAWN)
+        & pawn_attacks_bb<Them>(b1)
+        & pos.attacks_from<BISHOP>(ksq);
+
+    strongBishopPin = attacks_bb<BISHOP>(ksq, pos.pieces() ^ b2) & pos.pieces(Them, BISHOP);
+
     kingDanger +=        kingAttackersCount[Them] * kingAttackersWeight[Them]
                  + 185 * popcount(kingRing[Us] & weak)
                  + 148 * popcount(unsafeChecks)
                  +  98 * popcount(pos.blockers_for_king(Us))
                  +  69 * kingAttacksCount[Them]
+                 + 110 * strongBishopPin
                  +   3 * kingFlankAttack * kingFlankAttack / 8
                  +       mg_value(mobility[Them] - mobility[Us])
                  - 873 * !pos.count<QUEEN>(Them)
