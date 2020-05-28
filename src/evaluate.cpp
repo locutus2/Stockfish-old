@@ -361,6 +361,10 @@ namespace {
                 if ((kf < FILE_E) == (file_of(s) < kf))
                     score -= TrappedRook * (1 + !pos.castling_rights(Us));
             }
+
+            // Penalty when no moves along both the rank and file are possible
+            else if(!(b & mobilityArea[Us] & file_bb(s)) || !(b & mobilityArea[Us] & rank_bb(s)))
+                score -= TrappedRook;
         }
 
         if (Pt == QUEEN)
