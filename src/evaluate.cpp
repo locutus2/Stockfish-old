@@ -363,8 +363,8 @@ namespace {
             }
 
             // Penalty when no moves along both the rank and file are possible
-            else if(!(b & mobilityArea[Us] & file_bb(s)) || !(b & mobilityArea[Us] & rank_bb(s)))
-                score -= TrappedRook / 2;
+            if(!(b & mobilityArea[Us] & file_bb(s)) || !(b & mobilityArea[Us] & rank_bb(s)))
+                score -= make_score(10, 10);
         }
 
         if (Pt == QUEEN)
