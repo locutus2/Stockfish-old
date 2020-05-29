@@ -460,8 +460,7 @@ namespace {
                  +  98 * popcount(pos.blockers_for_king(Us))
                  +  69 * kingAttacksCount[Them]
                  +   3 * kingFlankAttack * kingFlankAttack / 8
-                 + (   9 * mg_value(mobility[Them] - mobility[Us])
-                    + 47 * eg_value(mobility[Them] - mobility[Us])) / 32
+                 +   9 * mg_value(mobility[Them] - mobility[Us]) / 8
                  - 873 * !pos.count<QUEEN>(Them)
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -   6 * mg_value(score) / 8
