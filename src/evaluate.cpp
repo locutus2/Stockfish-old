@@ -89,6 +89,7 @@ namespace {
   int IKDBishopAttack;
   int IKDBishopPin;
   int IKDWeakPawnBlocker;
+  int IKDMobility;
 
   int IKingDistanceThemBlock;
   int IKingDistanceUsBlock;
@@ -561,7 +562,7 @@ namespace {
                  + Tuning::getParam(IKDblockers) * popcount(pos.blockers_for_king(Us))
                  + Tuning::getParam(IKDattackCount) * kingAttacksCount[Them]
                  +   3 * kingFlankAttack * kingFlankAttack / 8
-                 +       mg_value(mobility[Them] - mobility[Us])
+                 +       Tuning::getParam(IKDMobility) * (int)mg_value(mobility[Them] - mobility[Us]) / 64
                  - 873 * !pos.count<QUEEN>(Them)
                  - 100 * bool(attackedBy[Us][KNIGHT] & attackedBy[Us][KING])
                  -   6 * mg_value(score) / 8
@@ -607,6 +608,7 @@ namespace {
 		Tuning::updateGradient(Us, IKDunsafeChecks, -grad * popcount(unsafeChecks));		
 		Tuning::updateGradient(Us, IKDblockers, -grad * popcount(unsafeChecks));
 		Tuning::updateGradient(Us, IKDattackCount, -grad * kingAttacksCount[Them]);
+		Tuning::updateGradient(Us, IKDMobility, -grad * (int)mg_value(mobility[Them] - mobility[Us]) / 64);
 		Tuning::updateGradient(Us, IKDBishopAttack, -grad * bool(b3 & pos.pieces(Them, BISHOP)));
 		
 	        Tuning::updateGradient(Us, IKDWeakPawnBlocker, -grad * bool(b2));
@@ -1100,7 +1102,8 @@ void Eval::init() {
 		IKDattackCount = Tuning::addParam(69, false, 0);
 		IKDBishopAttack = Tuning::addParam(0, false, 0);
 		IKDBishopPin = Tuning::addParam(0, false, 0);
-                IKDWeakPawnBlocker = Tuning::addParam(0, true);
+                IKDWeakPawnBlocker = Tuning::addParam(0, false);
+                IKDMobility = Tuning::addParam(64, true);
 
 		IUnopposedBishop[0][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[0][1] = Tuning::addParam(0, false);
