@@ -282,7 +282,10 @@ namespace {
         attackedBy[Us][Pt] |= b;
         attackedBy[Us][ALL_PIECES] |= b;
 
-        if (b & kingRing[Them])
+        if (  kingRing[Them]
+            & (  (Pt == KNIGHT ? b : 0)
+               | (Pt == ROOK   || Pt == QUEEN ? attacks_bb<ROOK  >(s, pos.pieces(Us, PAWN)) : 0)
+			   | (Pt == BISHOP || Pt == QUEEN ? attacks_bb<BISHOP>(s, pos.pieces(Us, PAWN)) : 0)))
         {
             kingAttackersCount[Us]++;
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
