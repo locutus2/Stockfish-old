@@ -268,7 +268,7 @@ namespace {
     mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pos.blockers_for_king(Us) | pe->pawn_attacks(Them));
 
     // Initialize attackedBy[] for king and pawns
-    attackedBy[Us][KING] = pos.attacks_from<KING>(ksq);
+    attackedBy[Us][KING] = attacks_bb<KING>(ksq);
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
     attackedBy2[Us] = dblAttackByPawn | (attackedBy[Us][KING] & attackedBy[Us][PAWN]);
@@ -276,7 +276,7 @@ namespace {
     // Init our king safety tables
     Square s = make_square(Utility::clamp(file_of(ksq), FILE_B, FILE_G),
                            Utility::clamp(rank_of(ksq), RANK_2, RANK_7));
-    kingRing[Us] = PseudoAttacks[KING][s] | s;
+    kingRing[Us] = attacks_bb<KING>(s) | s;
 
     kingAttackersCount[Them] = popcount(kingRing[Us] & pe->pawn_attacks(Them));
     kingAttacksCount[Them] = kingAttackersWeight[Them] = 0;
@@ -308,7 +308,7 @@ namespace {
         // Find attacked squares, including x-ray attacks for bishops and rooks
         b = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN))
           : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
-                         : pos.attacks_from<Pt>(s);
+                         : attacks_bb<Pt>(s, pos.pieces());
 
         if (pos.blockers_for_king(Us) & s)
             b &= LineBB[pos.square<KING>(Us)][s];
@@ -403,7 +403,7 @@ namespace {
 		Score PBishopXRayPawns = make_score(Tuning::getParam(IBishopXRayPawnsMG),
 				                Tuning::getParam(IBishopXRayPawnsEG));
                 //score -= BishopXRayPawns * popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
-                grad = popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
+                grad = popcount(attacks_bb<BISHOP>(s) & pos.pieces(Them, PAWN));
                 score -= PBishopXRayPawns * (int)grad;
 		Tuning::updateGradient(Us, IBishopXRayPawnsMG, -grad * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IBishopXRayPawnsEG, -grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -539,7 +539,7 @@ namespace {
         unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
     // Enemy knights checks
-    knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
+    knightChecks = attacks_bb<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
     if (knightChecks & safe)
         kingDanger += more_than_one(knightChecks & safe) ? KnightSafeCheck * 162/100
                                                          : KnightSafeCheck;
@@ -574,7 +574,7 @@ namespace {
 	    b3 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ b1) & ~b2);
 	       kingDanger += Tuning::getParam(IKDBishopAttack) * bool(b3 & pos.pieces(Them, BISHOP)); 
 
-	 b1 = pos.attacks_from<BISHOP>(ksq) & pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]); 
+	 b1 = attacks_bb<BISHOP>(ksq, pos.pieces()) & pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]); 
 	 b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ b1) & pos.pieces(Them, BISHOP);
 	
 	 if(b2)
@@ -716,12 +716,12 @@ namespace {
         Square s = pos.square<QUEEN>(Them);
         safe = mobilityArea[Us] & ~stronglyProtected;
 
-        b = attackedBy[Us][KNIGHT] & pos.attacks_from<KNIGHT>(s);
+        b = attackedBy[Us][KNIGHT] & attacks_bb<KNIGHT>(s);
 
         score += KnightOnQueen * popcount(b & safe);
 
-        b =  (attackedBy[Us][BISHOP] & pos.attacks_from<BISHOP>(s))
-           | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
+        b =  (attackedBy[Us][BISHOP] & attacks_bb<BISHOP>(s, pos.pieces()))
+           | (attackedBy[Us][ROOK  ] & attacks_bb<ROOK  >(s, pos.pieces()));
 
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
