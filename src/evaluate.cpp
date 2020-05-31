@@ -294,7 +294,7 @@ namespace {
             score += RookOnKingRing;
 
         else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
-            kingAttacksCount[Us] += 2, score += BishopOnKingRing;
+            kingAttackersCount[Us]++, score += BishopOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
 
