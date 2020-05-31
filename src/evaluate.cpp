@@ -128,7 +128,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns         = S(  3,  7);
-  constexpr Score BishopOnKingRing    = S( 32,  0);
+  constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopXRayPawns     = S(  4,  5);
   constexpr Score CorneredBishop      = S( 50, 50);
   constexpr Score FlankAttacks        = S(  8,  0);
@@ -293,8 +293,8 @@ namespace {
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
             score += RookOnKingRing;
 
-        else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
-            score += BishopOnKingRing;
+        else if (Pt == BISHOP && (bb = (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them])))
+            score += BishopOnKingRing * 1 / std::max(1, popcount(between_bb(s, frontmost_sq(Them, bb)) & pos.pieces()));
 
         int mob = popcount(b & mobilityArea[Us]);
 
