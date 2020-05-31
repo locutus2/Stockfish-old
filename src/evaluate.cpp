@@ -98,6 +98,7 @@ namespace {
   int IKingDistanceUsProm;
   
   int IRookOnKingRing[2][2];
+  int IBishopOnKingRing[2];
 
   constexpr bool USE_FOR_TUNING = false;
 
@@ -163,6 +164,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns         = S(  3,  7);
+  constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopXRayPawns     = S(  4,  5);
   constexpr Score CorneredBishop      = S( 50, 50);
   constexpr Score FlankAttacks        = S(  8,  0);
@@ -333,6 +335,15 @@ namespace {
 			Tuning::updateGradient(Us, IRookOnKingRing[c][0], 1.0 * phase / PHASE_MIDGAME);
 			Tuning::updateGradient(Us, IRookOnKingRing[c][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		}
+		else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
+		{
+			Score PBishopOnKingRing = make_score(Tuning::getParam(IBishopOnKingRing[0]), Tuning::getParam(IBishopOnKingRing[1]));
+            score += PBishopOnKingRing;
+			Tuning::updateGradient(Us, IBishopOnKingRing[0], 1.0 * phase / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IBishopOnKingRing[1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
+		}
+
 
         int mob = popcount(b & mobilityArea[Us]);
 
@@ -1115,10 +1126,13 @@ void Eval::init() {
 		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
 		
-		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), true);
-		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), true);
-		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), true);
-		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), true);
+		IBishopOnKingRing[0] = Tuning::addParam(mg_value(BishopOnKingRing), true);
+		IBishopOnKingRing[1] = Tuning::addParam(eg_value(BishopOnKingRing), true);
+		
+		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), false);
+		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), false);
+		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), false);
+		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), false);
 
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
