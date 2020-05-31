@@ -128,7 +128,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns         = S(  3,  7);
-  constexpr Score BishopOnKingRing    = S( 24,  0);
+  constexpr Score BishopOnKingRing    = S( 32,  0);
   constexpr Score BishopXRayPawns     = S(  4,  5);
   constexpr Score CorneredBishop      = S( 50, 50);
   constexpr Score FlankAttacks        = S(  8,  0);
@@ -294,7 +294,7 @@ namespace {
             score += RookOnKingRing;
 
         else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
-            kingAttackersWeight[Us] += KingAttackWeights[Pt] / 2, score += BishopOnKingRing;
+            score += BishopOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
 
