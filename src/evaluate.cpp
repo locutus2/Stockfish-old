@@ -143,6 +143,7 @@ namespace {
   constexpr Score ReachableOutpost    = S( 31, 22);
   constexpr Score PassedFile          = S( 11,  8);
   constexpr Score PawnlessFlank       = S( 17, 95);
+  constexpr Score QueenOnKingRing     = S( 24,  0);
   constexpr Score RestrictedPiece     = S(  7,  7);
   constexpr Score RookOnKingRing      = S( 16,  0);
   constexpr Score RookOnQueenFile     = S(  5,  9);
@@ -295,6 +296,9 @@ namespace {
 
         else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
             score += BishopOnKingRing;
+
+        else if (Pt == QUEEN && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
+            score += QueenOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
 
