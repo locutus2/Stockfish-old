@@ -291,7 +291,7 @@ namespace {
         }
 
         else if (Pt == ROOK && (bb = (file_bb(s) & kingRing[Them])))
-            score += RookOnKingRing[bool(bb & attacks_bb<ROOK>(s, pos.pieces(Us, PAWN)))];
+            score += RookOnKingRing[bool(bb & attacks_bb<ROOK>(s, pos.pieces(PAWN)))];
 
         int mob = popcount(b & mobilityArea[Us]);
 
