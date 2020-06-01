@@ -143,7 +143,6 @@ namespace {
   constexpr Score PassedFile          = S( 11,  8);
   constexpr Score PawnlessFlank       = S( 17, 95);
   constexpr Score RestrictedPiece     = S(  7,  7);
-  constexpr Score RookOnKingRing      = S( 16,  0);
   constexpr Score RookOnQueenFile     = S(  5,  9);
   constexpr Score SliderOnQueen       = S( 59, 18);
   constexpr Score ThreatByKing        = S( 24, 89);
@@ -152,6 +151,8 @@ namespace {
   constexpr Score TrappedRook         = S( 55, 13);
   constexpr Score WeakQueen           = S( 51, 14);
   constexpr Score WeakQueenProtection = S( 15,  0);
+
+  constexpr Score RookOnKingRing[2] = { S(13, 0), S( 28,  0) };
 
 #undef S
 
@@ -289,8 +290,8 @@ namespace {
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
-        else if (Pt == ROOK && (file_bb(s) & attacks_bb<ROOK>(s, pos.pieces(Us, PAWN)) & kingRing[Them]))
-            score += RookOnKingRing;
+        else if (Pt == ROOK && (bb = (file_bb(s) & kingRing[Them])))
+            score += RookOnKingRing[bool(bb & attacks_bb<ROOK>(s, pos.pieces(Us, PAWN)))];
 
         int mob = popcount(b & mobilityArea[Us]);
 
