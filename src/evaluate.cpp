@@ -327,13 +327,29 @@ namespace {
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
-        else if (Pt == ROOK && ((file_bb(s) | attacks_bb<ROOK>(s, pos.pieces(PAWN))) & kingRing[Them]))
+        else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
 		{
-			bool c = /*file_bb(s) &*/ kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(PAWN));
+			bool c = file_bb(s) & kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(PAWN));
+			double p = 0.11;
+			
+			/*
 			Score PRookOnKingRing = make_score(Tuning::getParam(IRookOnKingRing[c][0]), Tuning::getParam(IRookOnKingRing[c][1]));
             score += PRookOnKingRing;
 			Tuning::updateGradient(Us, IRookOnKingRing[c][0], 1.0 * phase / PHASE_MIDGAME);
 			Tuning::updateGradient(Us, IRookOnKingRing[c][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+			*/
+			
+			//dbg_hit_on(c);
+			double A = (16 - p*Tuning::getParam(IRookOnKingRing[0][0])) / (1-p);
+			double B = (0 - p*Tuning::getParam(IRookOnKingRing[0][1])) / (1-p);
+			Score PRookOnKingRing = make_score(c*Tuning::getParam(IRookOnKingRing[0][0]+!c*A),
+			                                   c*Tuning::getParam(IRookOnKingRing[0][1]+!c*B));
+			double grad = c - !c * p / (1-p);
+			
+            score += PRookOnKingRing;
+			Tuning::updateGradient(Us, IRookOnKingRing[0][0], grad * phase / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IRookOnKingRing[0][1], grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
 		}
 		else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
 		{
@@ -1131,8 +1147,8 @@ void Eval::init() {
 		
 		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), true, 0);
 		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), true, 0);
-		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), true, 0);
-		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), true, 0);
+		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), false, 0);
+		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), false, 0);
 
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
