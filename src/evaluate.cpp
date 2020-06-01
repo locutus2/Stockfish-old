@@ -293,7 +293,7 @@ namespace {
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
             score += RookOnKingRing;
 
-        else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(Them, PAWN) | (pos.pieces(Us, PAWN) & shift<Down>(pos.pieces()) & ~attackedBy[Them][PAWN])) & kingRing[Them]))
+        else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(Us, PAWN) | (pos.pieces(Them, PAWN) & attackedBy[Them][PAWN])) & kingRing[Them]))
             score += BishopOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
