@@ -327,9 +327,9 @@ namespace {
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
-        else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
+        else if (Pt == ROOK && ((file_bb(s) | attacks_bb<ROOK>(s, pos.pieces(PAWN))) & kingRing[Them]))
 		{
-			bool c = file_bb(s) & kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(PAWN));
+			bool c = /*file_bb(s) &*/ kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(PAWN));
 			Score PRookOnKingRing = make_score(Tuning::getParam(IRookOnKingRing[c][0]), Tuning::getParam(IRookOnKingRing[c][1]));
             score += PRookOnKingRing;
 			Tuning::updateGradient(Us, IRookOnKingRing[c][0], 1.0 * phase / PHASE_MIDGAME);
