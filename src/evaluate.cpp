@@ -293,8 +293,8 @@ namespace {
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
             score += RookOnKingRing;
 
-        else if (Pt == BISHOP && (bb = (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them])))
-            score += BishopOnKingRing * 1 / std::max(1, popcount(between_bb(s, frontmost_sq(Them, bb)) & pos.pieces()));
+        else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
+            score += BishopOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
 
