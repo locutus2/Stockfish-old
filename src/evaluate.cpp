@@ -327,6 +327,7 @@ namespace {
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
+
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
 		{
 			bool c = file_bb(s) & kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(PAWN));
@@ -360,6 +361,9 @@ namespace {
 		
 		}
 
+
+        else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
+            score += BishopOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
 
