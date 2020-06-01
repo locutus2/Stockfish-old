@@ -329,7 +329,7 @@ namespace {
         }
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
 		{
-			bool c = file_bb(s) & kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(Us, PAWN));
+			bool c = file_bb(s) & kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(PAWN));
 			Score PRookOnKingRing = make_score(Tuning::getParam(IRookOnKingRing[c][0]), Tuning::getParam(IRookOnKingRing[c][1]));
             score += PRookOnKingRing;
 			Tuning::updateGradient(Us, IRookOnKingRing[c][0], 1.0 * phase / PHASE_MIDGAME);
@@ -1126,13 +1126,13 @@ void Eval::init() {
 		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
 		
-		IBishopOnKingRing[0] = Tuning::addParam(mg_value(BishopOnKingRing), true);
-		IBishopOnKingRing[1] = Tuning::addParam(eg_value(BishopOnKingRing), true);
+		IBishopOnKingRing[0] = Tuning::addParam(mg_value(BishopOnKingRing), false, 0);
+		IBishopOnKingRing[1] = Tuning::addParam(eg_value(BishopOnKingRing), false, 0);
 		
-		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), false);
-		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), false);
-		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), false);
-		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), false);
+		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), true, 0);
+		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), true, 0);
+		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), true, 0);
+		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), true, 0);
 
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
