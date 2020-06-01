@@ -152,7 +152,7 @@ namespace {
   constexpr Score WeakQueen           = S( 51, 14);
   constexpr Score WeakQueenProtection = S( 15,  0);
 
-  constexpr Score RookOnKingRing[2] = { S(18, 0), S( 0, 18) };
+  constexpr Score RookOnKingRing[2] = { S(16, 0), S( 16, 16) };
 
 #undef S
 
