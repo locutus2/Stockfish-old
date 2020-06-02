@@ -1170,7 +1170,7 @@ moves_loop: // When in check, search starts from here
       // re-searched at full depth.
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
-          && (!rootNode || (  (type_of(movedPiece) != PAWN  || pawnMovesSearched > 0)
+          && (!rootNode || (  (type_of(movedPiece) != PAWN || pawnMovesSearched > 1)
                             && thisThread->best_move_count(move) == 0))
           && (  !captureOrPromotion
               || moveCountPruning
