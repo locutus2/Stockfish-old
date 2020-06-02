@@ -1171,7 +1171,6 @@ moves_loop: // When in check, search starts from here
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
           && (!rootNode || thisThread->best_move_count(move) == 0)
-          && (type_of(movedPiece) != PAWN  || pawnMovesSearched > 0)
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
@@ -1202,6 +1201,10 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if ttMove has been singularly extended (~3 Elo)
           if (singularLMR)
               r -= 1 + formerPv;
+
+          // Decrease reduction for first pawn move
+          if (type_of(movedPiece) == PAWN  && pawnMovesSearched == 0)
+              r--;
 
           if (!captureOrPromotion)
           {
