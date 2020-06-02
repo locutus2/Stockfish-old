@@ -632,7 +632,7 @@ namespace {
     bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture, singularLMR;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, pawnMovesSearched;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -973,6 +973,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue;
     singularLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+    pawnMovesSearched = 0;
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1169,7 +1170,8 @@ moves_loop: // When in check, search starts from here
       // re-searched at full depth.
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
-          && (!rootNode || (type_of(movedPiece) != PAWN && thisThread->best_move_count(move) == 0))
+          && (!rootNode || (  (type_of(movedPiece) != PAWN  || pawnMovesSearched > 0)
+                            && thisThread->best_move_count(move) == 0))
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
@@ -1260,6 +1262,9 @@ moves_loop: // When in check, search starts from here
 
           didLMR = false;
       }
+
+      if (type_of(movedPiece) == PAWN)
+          pawnMovesSearched++;
 
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch)
