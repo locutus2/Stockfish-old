@@ -1030,7 +1030,8 @@ moves_loop: // When in check, search starts from here
               // Countermoves based pruning (~20 Elo)
               if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
-                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
+                  && !(untriedPieces & from_sq(move)))
                   continue;
 
               // Futility pruning: parent node (~5 Elo)
@@ -1202,10 +1203,6 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if ttMove has been singularly extended (~3 Elo)
           if (singularLMR)
               r -= 1 + formerPv;
-
-          // Decrease reduction for first move of a piece
-          if (untriedPieces & from_sq(move))
-              r--;
 
           if (!captureOrPromotion)
           {
