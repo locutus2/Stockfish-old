@@ -629,7 +629,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture;
+    bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture, pruneMoves;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture, singularLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -973,6 +973,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue;
     singularLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+    pruneMoves = false;
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1029,7 +1030,11 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-                  continue;
+              {
+                  if (pruneMoves)
+                      continue;
+                  pruneMoves = true;
+              }
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 6
