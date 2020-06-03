@@ -1205,7 +1205,7 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction for first move of a piece
           if (untriedPieces & from_sq(move))
-              untriedPieces ^= from_sq(move), r--;
+              r--;
 
           if (!captureOrPromotion)
           {
@@ -1297,6 +1297,8 @@ moves_loop: // When in check, search starts from here
 
       // Step 18. Undo move
       pos.undo_move(move);
+
+      untriedPieces &= ~square_bb(from_sq(move));
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
