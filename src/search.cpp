@@ -1043,11 +1043,7 @@ moves_loop: // When in check, search starts from here
 
               // Prune moves with negative SEE (~20 Elo)
               if (!pos.see_ge(move, Value(-(32 - std::min(lmrDepth, 18)) * lmrDepth * lmrDepth)))
-              {
-                  if (pruneMoves)
-                      continue;
-                  pruneMoves = true;
-              }
+                  continue;
           }
           else
           {
@@ -1055,7 +1051,11 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
-                  continue;
+              {
+                  if (pruneMoves)
+                      continue;
+                  pruneMoves = true;
+              }
 
               // Futility pruning for captures
               if (   !givesCheck
