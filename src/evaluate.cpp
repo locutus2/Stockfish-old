@@ -782,7 +782,7 @@ namespace {
             else
                 sf = 22 + 3 * pos.count<ALL_PIECES>(strongSide);
 
-            sf -= 8 * !(pos.pieces(~strongSide, PAWN) & ~(attackedBy[~strongSide][PAWN] | attackedBy[~strongSide][BISHOP]));
+            sf -= 2 * !(pos.pieces(~strongSide, PAWN) & ~(attackedBy[~strongSide][PAWN] | attackedBy[~strongSide][BISHOP]));
         }
         else
             sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
