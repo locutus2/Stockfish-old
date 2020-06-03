@@ -49,6 +49,7 @@ struct Stack {
   Value staticEval;
   int statScore;
   int moveCount;
+  int pathMoveCount;
   bool inCheck;
 };
 
