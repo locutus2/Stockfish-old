@@ -1051,11 +1051,7 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
-              {
-                  if (pruneMoves)
-                      continue;
-                  pruneMoves = true;
-              }
+                  continue;
 
               // Futility pruning for captures
               if (   !givesCheck
@@ -1063,7 +1059,11 @@ moves_loop: // When in check, search starts from here
                   && !(PvNode && abs(bestValue) < 2)
                   && !ss->inCheck
                   && ss->staticEval + 270 + 384 * lmrDepth + PieceValue[MG][type_of(pos.piece_on(to_sq(move)))] <= alpha)
-                  continue;
+              {
+                  if (pruneMoves)
+                      continue;
+                  pruneMoves = true;
+              }
 
               // See based pruning
               if (!pos.see_ge(move, Value(-194) * depth)) // (~25 Elo)
