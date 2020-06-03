@@ -633,6 +633,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture, singularLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
+    Bitboard untriedPieces;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -973,6 +974,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue;
     singularLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+    untriedPieces = pos.pieces(us);
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1200,6 +1202,10 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if ttMove has been singularly extended (~3 Elo)
           if (singularLMR)
               r -= 1 + formerPv;
+
+          // Decrease reduction for first move of a piece
+          if (untriedPieces & from_sq(move))
+              untriedPieces ^= from_sq(move), r--;
 
           if (!captureOrPromotion)
           {
