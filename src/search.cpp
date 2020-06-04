@@ -1181,7 +1181,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Decrease reduction total move count along the move sequence to root is high
-          if (ss->pathMoveCount > 200 + ss->ply)
+          if (ss->pathMoveCount > 175 + ss->ply)
               r--;
 
           // Decrease reduction if the ttHit running average is large
