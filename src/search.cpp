@@ -1204,9 +1204,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Less reduction if pawn push release tension
+              // Less reduction if pawn push induce tension
               if (   type_of(movedPiece) == PAWN
-                  && (pawn_attacks_bb(us, from_sq(move)) & pos.pieces(~us, PAWN)))
+                  && (pawn_attacks_bb(us, to_sq(move)) & pos.pieces(~us, PAWN)))
                   r--;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
