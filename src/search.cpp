@@ -1133,10 +1133,11 @@ moves_loop: // When in check, search starts from here
                && pos.non_pawn_material() <= 2 * RookValueMg)
           extension = 1;
 
-      // Induce pawn tension extension
-      else if (   type_of(movedPiece) == PAWN
+      // Release pawn tension extension at PV nodes
+      else if (   PvNode
+               && type_of(movedPiece) == PAWN
                && !captureOrPromotion
-               && (pawn_attacks_bb(us, to_sq(move)) & pos.pieces(~us, PAWN)))
+               && (pawn_attacks_bb(us, from_sq(move)) & pos.pieces(~us, PAWN)))
           extension = 1;
 
       // Castling extension
