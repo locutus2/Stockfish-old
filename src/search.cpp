@@ -629,11 +629,11 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture, pruneMoves;
+    bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, prunedMoves;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -974,7 +974,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
-    pruneMoves = false;
+    prunedMoves = 0;
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1060,15 +1060,15 @@ moves_loop: // When in check, search starts from here
                   && !(PvNode && abs(bestValue) < 2)
                   && !ss->inCheck
                   && ss->staticEval + 270 + 384 * lmrDepth + PieceValue[MG][type_of(pos.piece_on(to_sq(move)))] <= alpha)
-                  continue;
+              {
+                  if (prunedMoves > 1)
+                      continue;
+                  prunedMoves++;
+              }
 
               // See based pruning
               if (!pos.see_ge(move, Value(-194) * depth)) // (~25 Elo)
-              {
-                  if (pruneMoves)
-                      continue;
-                  pruneMoves = true;
-              }
+                  continue;
           }
       }
 
