@@ -1180,8 +1180,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction at PV nodes if total move count along the move sequence to root is high
-          if (PvNode && ss->pathMoveCount > 100+ss->ply)
+          // Decrease reduction if total move count along the move sequence to root is high
+          if (ss->pathMoveCount > 16 * thisThread->rootDepth + ss->ply)
               r--;
 
           // Decrease reduction if the ttHit running average is large
