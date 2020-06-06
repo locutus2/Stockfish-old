@@ -107,6 +107,7 @@ namespace {
  int IMobilityBonusSmooth[4][32][2];
 
  int IUnopposedBishop[2][2];
+ int IKnightOutpost[2][2];
 
 
   // Threshold for lazy and space evaluation
@@ -408,9 +409,23 @@ namespace {
         if (Pt == BISHOP || Pt == KNIGHT)
         {
             // Bonus if piece is on an outpost square or can reach one
-            bb = OutpostRanks & attackedBy[Us][PAWN] & ~pe->pawn_attacks_span(Them);
+			bb = OutpostRanks & attackedBy[Us][PAWN] & ~pe->pawn_attacks_span(Them);
             if (bb & s)
-                score += (Pt == KNIGHT) ? KnightOutpost : BishopOutpost;
+			{
+				//bool fareKnightOoutpost = distance<File>(s, pos.square<KING>(Them)) > 3;
+				bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 3;
+				//bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 4;
+				Score PKnightOutpost = make_score(Tuning::getParam(IKnightOutpost[fareKnightOoutpost][0]),Tuning::getParam(IKnightOutpost[fareKnightOoutpost][1]));
+            
+                score += (Pt == KNIGHT) ? PKnightOutpost : BishopOutpost;
+				
+				if(Pt == KNIGHT)
+				{
+					dbg_hit_on(fareKnightOoutpost);
+					Tuning::updateGradient(Us, IKnightOutpost[fareKnightOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IKnightOutpost[fareKnightOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+				}
+			}
             else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
                 score += ReachableOutpost;
 
@@ -1146,11 +1161,18 @@ void Eval::init() {
 		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
 		
+		IKnightOutpost[0][0] = Tuning::addParam(mg_value(KnightOutpost), true);
+		IKnightOutpost[0][1] = Tuning::addParam(eg_value(KnightOutpost), true);
+		IKnightOutpost[1][0] = Tuning::addParam(mg_value(KnightOutpost), true);
+		IKnightOutpost[1][1] = Tuning::addParam(eg_value(KnightOutpost), true);
+		
+		
+		
 		IBishopOnKingRing[0] = Tuning::addParam(mg_value(BishopOnKingRing), false, 0);
 		IBishopOnKingRing[1] = Tuning::addParam(eg_value(BishopOnKingRing), false, 0);
 		
-		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), true, 0);
-		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), true, 0);
+		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), false, 0);
+		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), false, 0);
 		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), false, 0);
 		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), false, 0);
 
