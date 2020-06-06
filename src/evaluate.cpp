@@ -108,6 +108,7 @@ namespace {
 
  int IUnopposedBishop[2][2];
  int IKnightOutpost[2][2];
+ int IBishopOutpost[2][2];
 
 
   // Threshold for lazy and space evaluation
@@ -413,17 +414,25 @@ namespace {
             if (bb & s)
 			{
 				//bool fareKnightOoutpost = distance<File>(s, pos.square<KING>(Them)) > 3;
-				bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 3;
+				bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) < 4;
+				bool fareBishopOoutpost = distance(s, pos.square<KING>(Them)) < 4;
 				//bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 4;
 				Score PKnightOutpost = make_score(Tuning::getParam(IKnightOutpost[fareKnightOoutpost][0]),Tuning::getParam(IKnightOutpost[fareKnightOoutpost][1]));
+				Score PBishopOutpost = make_score(Tuning::getParam(IBishopOutpost[fareBishopOoutpost][0]),Tuning::getParam(IBishopOutpost[fareBishopOoutpost][1]));
             
-                score += (Pt == KNIGHT) ? PKnightOutpost : BishopOutpost;
+                score += (Pt == KNIGHT) ? PKnightOutpost : PBishopOutpost;
 				
 				if(Pt == KNIGHT)
 				{
-					dbg_hit_on(fareKnightOoutpost);
+					//dbg_hit_on(fareKnightOoutpost);
 					Tuning::updateGradient(Us, IKnightOutpost[fareKnightOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
 					Tuning::updateGradient(Us, IKnightOutpost[fareKnightOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+				}
+				if(Pt == BISHOP)
+				{
+					//dbg_hit_on(fareBishopOoutpost);
+					Tuning::updateGradient(Us, IBishopOutpost[fareBishopOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IBishopOutpost[fareBishopOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 				}
 			}
             else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
@@ -1161,10 +1170,15 @@ void Eval::init() {
 		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
 		
-		IKnightOutpost[0][0] = Tuning::addParam(mg_value(KnightOutpost), true);
-		IKnightOutpost[0][1] = Tuning::addParam(eg_value(KnightOutpost), true);
-		IKnightOutpost[1][0] = Tuning::addParam(mg_value(KnightOutpost), true);
-		IKnightOutpost[1][1] = Tuning::addParam(eg_value(KnightOutpost), true);
+		IKnightOutpost[0][0] = Tuning::addParam(mg_value(KnightOutpost), false);
+		IKnightOutpost[0][1] = Tuning::addParam(eg_value(KnightOutpost), false);
+		IKnightOutpost[1][0] = Tuning::addParam(mg_value(KnightOutpost), false);
+		IKnightOutpost[1][1] = Tuning::addParam(eg_value(KnightOutpost), false);
+		
+		IBishopOutpost[0][0] = Tuning::addParam(mg_value(BishopOutpost), true);
+		IBishopOutpost[0][1] = Tuning::addParam(eg_value(BishopOutpost), true);
+		IBishopOutpost[1][0] = Tuning::addParam(mg_value(BishopOutpost), true);
+		IBishopOutpost[1][1] = Tuning::addParam(eg_value(BishopOutpost), true);
 		
 		
 		
