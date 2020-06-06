@@ -1245,6 +1245,10 @@ moves_loop: // When in check, search starts from here
             if (   !givesCheck
                 && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 200 * depth <= alpha)
                 r++;
+
+            // Less reduction for recapture
+            if (priorCapture && prevSq == to_sq(move))
+                r--;
           }
 
           Depth d = Utility::clamp(newDepth - r, 1, newDepth);
