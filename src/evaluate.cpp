@@ -414,25 +414,25 @@ namespace {
             if (bb & s)
 			{
 				//bool fareKnightOoutpost = distance<File>(s, pos.square<KING>(Them)) > 3;
-				bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) < 4;
-				bool fareBishopOoutpost = distance(s, pos.square<KING>(Them)) < 4;
+				bool nearKnightOoutpost = distance(s, pos.square<KING>(Them)) < 4;
+				bool nearBishopOoutpost = distance(s, pos.square<KING>(Them)) < 4;
 				//bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 4;
-				Score PKnightOutpost = make_score(Tuning::getParam(IKnightOutpost[fareKnightOoutpost][0]),Tuning::getParam(IKnightOutpost[fareKnightOoutpost][1]));
-				Score PBishopOutpost = make_score(Tuning::getParam(IBishopOutpost[fareBishopOoutpost][0]),Tuning::getParam(IBishopOutpost[fareBishopOoutpost][1]));
+				Score PKnightOutpost = make_score(Tuning::getParam(IKnightOutpost[nearKnightOoutpost][0]),Tuning::getParam(IKnightOutpost[nearKnightOoutpost][1]));
+				Score PBishopOutpost = make_score(Tuning::getParam(IBishopOutpost[nearBishopOoutpost][0]),Tuning::getParam(IBishopOutpost[nearBishopOoutpost][1]));
             
                 score += (Pt == KNIGHT) ? PKnightOutpost : PBishopOutpost;
 				
 				if(Pt == KNIGHT)
 				{
-					//dbg_hit_on(fareKnightOoutpost);
-					Tuning::updateGradient(Us, IKnightOutpost[fareKnightOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
-					Tuning::updateGradient(Us, IKnightOutpost[fareKnightOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					//dbg_hit_on(nearKnightOoutpost);
+					Tuning::updateGradient(Us, IKnightOutpost[nearKnightOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IKnightOutpost[nearKnightOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 				}
 				if(Pt == BISHOP)
 				{
-					//dbg_hit_on(fareBishopOoutpost);
-					Tuning::updateGradient(Us, IBishopOutpost[fareBishopOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
-					Tuning::updateGradient(Us, IBishopOutpost[fareBishopOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					//dbg_hit_on(nearBishopOoutpost);
+					Tuning::updateGradient(Us, IBishopOutpost[nearBishopOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IBishopOutpost[nearBishopOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 				}
 			}
             else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
