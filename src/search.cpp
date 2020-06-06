@@ -1246,8 +1246,8 @@ moves_loop: // When in check, search starts from here
                 && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 200 * depth <= alpha)
                 r++;
 
-            // Less reduction for recapture
-            if (priorCapture && prevSq == to_sq(move))
+            // Less reduction for pawn recapture
+            if (priorCapture && type_of(movedPiece) == PAWN && prevSq == to_sq(move))
                 r--;
           }
 
