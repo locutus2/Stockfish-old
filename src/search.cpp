@@ -1045,7 +1045,7 @@ moves_loop: // When in check, search starts from here
               if (!pos.see_ge(move, Value(-(32 - std::min(lmrDepth, 18)) * lmrDepth * lmrDepth)))
                   continue;
           }
-          else if (!priorCapture || prevSq != to_sq(move))
+          else if (!priorCapture || type_of(movedPiece) != PAWN || prevSq != to_sq(move))
           {
               // Capture history based pruning when the move doesn't give check
               if (   !givesCheck
