@@ -126,7 +126,7 @@ namespace {
     S(0, 0), S(10, 28), S(17, 33), S(15, 41), S(62, 72), S(168, 177), S(276, 260)
   };
 
-  constexpr int A = 50;
+  constexpr int A = 25;
   #define W(o,n) ((o) + ((n)-(o)) * A /100)
   
   // KnightOutpost[fare/near] contains a outpost bonus for knights dependent if fare or near to enemy king.
