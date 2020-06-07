@@ -126,7 +126,7 @@ namespace {
     S(0, 0), S(10, 28), S(17, 33), S(15, 41), S(62, 72), S(168, 177), S(276, 260)
   };
 
-  constexpr int A = 50;
+  constexpr int A = 25;
   #define W(o,n) ((o) + ((n)-(o)) * A /100)
 
   // KnightOutpost[fare/near] contains a outpost bonus for knights dependent if fare or near to enemy king.
@@ -145,7 +145,7 @@ namespace {
   constexpr Score LongDiagonalBishop  = S( 45,  0);
   constexpr Score MinorBehindPawn     = S( 18,  3);
   constexpr Score BishopOutpost       = S( 30, 23);
-  constexpr Score ReachableOutpost    = S( 22, 13);
+  constexpr Score ReachableOutpost    = S( 31, 22);
   constexpr Score PassedFile          = S( 11,  8);
   constexpr Score PawnlessFlank       = S( 17, 95);
   constexpr Score RestrictedPiece     = S(  7,  7);
