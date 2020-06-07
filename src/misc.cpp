@@ -535,6 +535,7 @@ namespace Tuning {
 	constexpr bool USE_LOGIT = true;
 	constexpr bool SCALE_TO_MSE = false;
 	constexpr double MSE_BASE = 0.0001;
+	constexpr double GAMMA = 0.99;
 
 	std::vector<double> param;
 	std::vector<double> minParam;
@@ -629,6 +630,8 @@ namespace Tuning {
 			}
 			firstUpdate = false;
 		}
+		else
+			ALPHA *= GAMMA;
 		
 		for(int i = 0; i < n;  ++i)
 		{

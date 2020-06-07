@@ -415,7 +415,7 @@ namespace {
             if (bb & s)
 			{
 				//bool fareKnightOoutpost = distance<File>(s, pos.square<KING>(Them)) > 3;
-				bool nearKnightOoutpost = true;//distance(s, pos.square<KING>(Them)) < 4;
+				bool nearKnightOoutpost = distance(s, pos.square<KING>(Them)) < 4;
 				bool nearBishopOoutpost = distance(s, pos.square<KING>(Them)) < 4;
 				//bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 4;
 				Score PKnightOutpost = make_score(Tuning::getParam(IKnightOutpost[nearKnightOoutpost][0]),Tuning::getParam(IKnightOutpost[nearKnightOoutpost][1]));
@@ -1178,10 +1178,10 @@ void Eval::init() {
 		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
 		
-		IKnightOutpost[0][0] = Tuning::addParam(mg_value(KnightOutpost), false);
-		IKnightOutpost[0][1] = Tuning::addParam(eg_value(KnightOutpost), false);
-		IKnightOutpost[1][0] = Tuning::addParam(mg_value(KnightOutpost), false);
-		IKnightOutpost[1][1] = Tuning::addParam(eg_value(KnightOutpost), false);
+		IKnightOutpost[0][0] = Tuning::addParam(mg_value(KnightOutpost), true);
+		IKnightOutpost[0][1] = Tuning::addParam(eg_value(KnightOutpost), true);
+		IKnightOutpost[1][0] = Tuning::addParam(mg_value(KnightOutpost), true);
+		IKnightOutpost[1][1] = Tuning::addParam(eg_value(KnightOutpost), true);
 		
 		IReachableOutpost[0] = Tuning::addParam(mg_value(ReachableOutpost), true);
 		IReachableOutpost[1] = Tuning::addParam(eg_value(ReachableOutpost), true);
