@@ -125,6 +125,10 @@ namespace WinProcGroup {
 namespace Tuning {
   extern double ALPHA;
   constexpr double INF = std::numeric_limits<double>().max();
+  constexpr double MAX_VALUE = PawnValueEg;
+  
+  double cp2p(double x);
+  double p2cp(double x);
 	
   double totalError();
   void clearGradients();
