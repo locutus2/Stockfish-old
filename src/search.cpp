@@ -633,7 +633,7 @@ namespace {
     Value bestValue, value, ttValue, eval, maxValue;
     bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
-         ttCapture, singularQuietLMR;
+         ttCapture, singularQuietLMR, ttFailHigh;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
 
@@ -645,6 +645,7 @@ namespace {
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
+    ttFailHigh = false;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -819,6 +820,8 @@ namespace {
         if (    ttValue != VALUE_NONE
             && (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER)))
             eval = ttValue;
+
+        ttFailHigh = ttValue != VALUE_NONE && ttValue >= beta && (tte->bound() & BOUND_LOWER);
     }
     else
     {
@@ -1210,8 +1213,8 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r++;
 
-              // Increase reduction for cut nodes (~10 Elo)
-              if (cutNode)
+              // Increase reduction for cut node or tt predicted fail high
+              if (cutNode || ttFailHigh)
                   r += 2;
 
               // Decrease reduction for moves that escape a capture. Filter out
