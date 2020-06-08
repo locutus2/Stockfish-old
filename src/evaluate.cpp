@@ -1178,8 +1178,8 @@ void Eval::init() {
 		IKDBishopAttack = Tuning::addParam(0, false, 0);
 		IKDBishopPin = Tuning::addParam(0, false, 0);
                 IKDWeakPawnBlocker = Tuning::addParam(0, false);
-                IKDMobility = Tuning::addParam(64, true);
-                IKDMobilityEG = Tuning::addParam(0, true);
+                IKDMobility = Tuning::addParam(64, false);
+                IKDMobilityEG = Tuning::addParam(0, false);
 
 		IUnopposedBishop[0][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[0][1] = Tuning::addParam(0, false);
@@ -1195,10 +1195,10 @@ void Eval::init() {
 		IReachableOutpost[1] = Tuning::addParam(eg_value(ReachableOutpost), false);
 		
 		
-		IBishopOutpost[0][0] = Tuning::addParam(mg_value(BishopOutpost), true);
-		IBishopOutpost[0][1] = Tuning::addParam(eg_value(BishopOutpost), true);
-		IBishopOutpost[1][0] = Tuning::addParam(mg_value(BishopOutpost), true);
-		IBishopOutpost[1][1] = Tuning::addParam(eg_value(BishopOutpost), true);
+		IBishopOutpost[0][0] = Tuning::addParam(mg_value(BishopOutpost), false);
+		IBishopOutpost[0][1] = Tuning::addParam(eg_value(BishopOutpost), false);
+		IBishopOutpost[1][0] = Tuning::addParam(mg_value(BishopOutpost), false);
+		IBishopOutpost[1][1] = Tuning::addParam(eg_value(BishopOutpost), false);
 		
 		
 		
