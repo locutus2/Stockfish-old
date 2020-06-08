@@ -111,6 +111,7 @@ namespace {
  int IUnopposedBishop[2][2];
  int IKnightOutpost[2][2];
  int IBishopOutpost[2][2];
+ int IReachableOutpost[2];
 
 
   // Threshold for lazy and space evaluation
@@ -416,11 +417,13 @@ namespace {
             if (bb & s)
 			{
 				//bool fareKnightOoutpost = distance<File>(s, pos.square<KING>(Them)) > 3;
+				Bitboard squares = DarkSquares & s ? DarkSquares : ~DarkSquares;
 				bool nearKnightOoutpost = distance(s, pos.square<KING>(Them)) < 4;
-				bool nearBishopOoutpost = distance(s, pos.square<KING>(Them)) < 4;
+				bool nearBishopOoutpost = squares & pos.pieces(Them, BISHOP); //distance(s, pos.square<KING>(Them)) < 4;
 				//bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 4;
 				Score PKnightOutpost = make_score(Tuning::getParam(IKnightOutpost[nearKnightOoutpost][0]),Tuning::getParam(IKnightOutpost[nearKnightOoutpost][1]));
 				Score PBishopOutpost = make_score(Tuning::getParam(IBishopOutpost[nearBishopOoutpost][0]),Tuning::getParam(IBishopOutpost[nearBishopOoutpost][1]));
+				
             
                 score += (Pt == KNIGHT) ? PKnightOutpost : PBishopOutpost;
 				
@@ -438,7 +441,13 @@ namespace {
 				}
 			}
             else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
-                score += ReachableOutpost;
+			{
+				Score PReachableOutpost = make_score(Tuning::getParam(IReachableOutpost[0]),Tuning::getParam(IReachableOutpost[1]));
+                score += PReachableOutpost;
+				Tuning::updateGradient(Us, IReachableOutpost[0], 1.0 * phase / PHASE_MIDGAME);
+				Tuning::updateGradient(Us, IReachableOutpost[1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+				
+			}
 
             // Bonus for a knight or bishop shielded by pawn
             if (shift<Down>(pos.pieces(PAWN)) & s)
@@ -1181,6 +1190,10 @@ void Eval::init() {
 		IKnightOutpost[0][1] = Tuning::addParam(eg_value(KnightOutpost), false);
 		IKnightOutpost[1][0] = Tuning::addParam(mg_value(KnightOutpost), false);
 		IKnightOutpost[1][1] = Tuning::addParam(eg_value(KnightOutpost), false);
+		
+		IReachableOutpost[0] = Tuning::addParam(mg_value(ReachableOutpost), false);
+		IReachableOutpost[1] = Tuning::addParam(eg_value(ReachableOutpost), false);
+		
 		
 		IBishopOutpost[0][0] = Tuning::addParam(mg_value(BishopOutpost), true);
 		IBishopOutpost[0][1] = Tuning::addParam(eg_value(BishopOutpost), true);

@@ -535,6 +535,7 @@ namespace Tuning {
 	constexpr bool USE_LOGIT = true;
 	constexpr bool SCALE_TO_MSE = false;
 	constexpr double MSE_BASE = 0.0001;
+	constexpr double GAMMA = 0.99;
 
 	std::vector<double> param;
 	std::vector<double> minParam;
@@ -547,6 +548,10 @@ namespace Tuning {
 	bool firstUpdate = true;
 	double mse = 0;
 
+    double powp(double x) { return std::pow(10.0, -x/4/PawnValueEg); };
+    double cp2p(double x) { return 1.0/(1.0 + powp(x)); };
+	double p2cp(double x) { (int)PawnValueEg * 4 * std::log(x/(1-x)) / std::log(10); };
+	
 	void clearGradients() {
 		for(auto &x : gradient)
 			x = 0;
@@ -625,6 +630,8 @@ namespace Tuning {
 			}
 			firstUpdate = false;
 		}
+		else
+			ALPHA *= GAMMA;
 		
 		for(int i = 0; i < n;  ++i)
 		{
@@ -642,8 +649,6 @@ namespace Tuning {
 
 		if(USE_LOGIT)
 		{
-		   auto powp = [](double x)->double { return std::pow(10.0, -x/4/PawnValueEg); };
-		   auto cp2p = [&powp](double x)->double { return 1.0/(1.0 + powp(x)); };
 		   double valueP = cp2p(value);
 		   double targetValueP = cp2p(targetValue);
 	           diff = valueP - targetValueP;

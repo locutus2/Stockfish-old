@@ -253,7 +253,6 @@ namespace {
     constexpr bool DEBUG = false;
     constexpr bool USE_SCORE = false;
     constexpr bool USE_RESULT = true;
-    constexpr double MAX_VALUE = PawnValueEg;
     constexpr Depth depth = 0;
 
     double mse = std::numeric_limits<double>().max() / 2;
@@ -307,7 +306,7 @@ namespace {
 			if(pos.side_to_move() == BLACK)
 			    value = -value;
 
-		        if(std::abs(value) < MAX_VALUE)
+		        if(std::abs(value) < Tuning::MAX_VALUE)
 		        {
 		       	       
 			       if(USE_SCORE && score != VALUE_NONE)
@@ -326,7 +325,9 @@ namespace {
 			       {
 				       constexpr double LAMBDA = 0.9;
 				       double p = (1 + gameResult * LAMBDA) / 2;
-                                double pscore = (int)PawnValueEg * 4 * std::log(p/(1-p)) / std::log(10);
+                       double pscore = (int)PawnValueEg * 4 * std::log(p/(1-p)) / std::log(10);
+						//double pscore = std::max(-Tuning::MAX_VALUE, std::min(Tuning::MAX_VALUE, Tuning::p2cp(p)));
+						pscore = std::max(-Tuning::MAX_VALUE, std::min(Tuning::MAX_VALUE, pscore));
 		        	++n;
 				double error = Tuning::updateTotalGradients(value, pscore);
 				mse += error;
