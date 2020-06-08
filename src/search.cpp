@@ -631,11 +631,11 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue;
-    bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture;
+    bool ttHit, formerPv, givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, ttPv;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -701,7 +701,7 @@ namespace {
     ttValue = ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ttHit    ? tte->move() : MOVE_NONE;
-    ttPv = PvNode || (ttHit && tte->is_pv());
+    ttPv = PvNode ? MAX_TT_PV : (ttHit && tte->is_pv() ? tte->is_pv() - 1 : 0);
     formerPv = ttPv && !PvNode;
 
     if (ttPv && depth > 12 && ss->ply - 1 < MAX_LPH && !pos.captured_piece() && is_ok((ss-1)->currentMove))
@@ -856,7 +856,7 @@ namespace {
         && (ss-1)->statScore < 23397
         &&  eval >= beta
         &&  eval >= ss->staticEval
-        &&  ss->staticEval >= beta - 32 * depth - 30 * improving + 120 * ttPv + 292
+        &&  ss->staticEval >= beta - 32 * depth - 30 * improving + 120 * bool(ttPv) + 292
         && !excludedMove
         &&  pos.non_pawn_material(us)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
@@ -1219,7 +1219,7 @@ moves_loop: // When in check, search starts from here
               // hence break make_move(). (~2 Elo)
               else if (    type_of(move) == NORMAL
                        && !pos.see_ge(reverse_move(move)))
-                  r -= 2 + ttPv;
+                  r -= 2 + bool(ttPv);
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]

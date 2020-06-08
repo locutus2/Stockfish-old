@@ -103,6 +103,7 @@ typedef uint64_t Bitboard;
 
 constexpr int MAX_MOVES = 256;
 constexpr int MAX_PLY   = 246;
+constexpr int MAX_TT_PV = 3;
 
 /// A move needs 16 bits to be stored
 ///
