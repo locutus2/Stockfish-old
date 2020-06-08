@@ -98,6 +98,9 @@ namespace {
   int IKingDistanceUsBlockMG;
   int IKingDistanceThemProm;
   int IKingDistanceUsProm;
+  
+  int IRookOnKingRing[2][2];
+  int IBishopOnKingRing[2];
 
   constexpr bool USE_FOR_TUNING = false;
 
@@ -106,6 +109,8 @@ namespace {
  int IMobilityBonusSmooth[4][32][2];
 
  int IUnopposedBishop[2][2];
+ int IKnightOutpost[2][2];
+ int IBishopOutpost[2][2];
 
 
   // Threshold for lazy and space evaluation
@@ -163,6 +168,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns         = S(  3,  7);
+  constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopXRayPawns     = S(  4,  5);
   constexpr Score CorneredBishop      = S( 50, 50);
   constexpr Score FlankAttacks        = S(  8,  0);
@@ -270,7 +276,7 @@ namespace {
     mobilityArea[Us] = ~(b | pos.pieces(Us, KING, QUEEN) | pos.blockers_for_king(Us) | pe->pawn_attacks(Them));
 
     // Initialize attackedBy[] for king and pawns
-    attackedBy[Us][KING] = pos.attacks_from<KING>(ksq);
+    attackedBy[Us][KING] = attacks_bb<KING>(ksq);
     attackedBy[Us][PAWN] = pe->pawn_attacks(Us);
     attackedBy[Us][ALL_PIECES] = attackedBy[Us][KING] | attackedBy[Us][PAWN];
     attackedBy2[Us] = dblAttackByPawn | (attackedBy[Us][KING] & attackedBy[Us][PAWN]);
@@ -278,7 +284,7 @@ namespace {
     // Init our king safety tables
     Square s = make_square(Utility::clamp(file_of(ksq), FILE_B, FILE_G),
                            Utility::clamp(rank_of(ksq), RANK_2, RANK_7));
-    kingRing[Us] = PseudoAttacks[KING][s] | s;
+    kingRing[Us] = attacks_bb<KING>(s) | s;
 
     kingAttackersCount[Them] = popcount(kingRing[Us] & pe->pawn_attacks(Them));
     kingAttacksCount[Them] = kingAttackersWeight[Them] = 0;
@@ -310,7 +316,7 @@ namespace {
         // Find attacked squares, including x-ray attacks for bishops and rooks
         b = Pt == BISHOP ? attacks_bb<BISHOP>(s, pos.pieces() ^ pos.pieces(QUEEN))
           : Pt ==   ROOK ? attacks_bb<  ROOK>(s, pos.pieces() ^ pos.pieces(QUEEN) ^ pos.pieces(Us, ROOK))
-                         : pos.attacks_from<Pt>(s);
+                         : attacks_bb<Pt>(s, pos.pieces());
 
         if (pos.blockers_for_king(Us) & s)
             b &= LineBB[pos.square<KING>(Us)][s];
@@ -325,8 +331,43 @@ namespace {
             kingAttackersWeight[Us] += KingAttackWeights[Pt];
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
+
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
-            score += RookOnKingRing;
+		{
+			bool c = file_bb(s) & kingRing[Them] & attacks_bb<ROOK>(s, pos.pieces(PAWN));
+			double p = 0.11;
+			
+			/*
+			Score PRookOnKingRing = make_score(Tuning::getParam(IRookOnKingRing[c][0]), Tuning::getParam(IRookOnKingRing[c][1]));
+            score += PRookOnKingRing;
+			Tuning::updateGradient(Us, IRookOnKingRing[c][0], 1.0 * phase / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IRookOnKingRing[c][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+			*/
+			
+			//dbg_hit_on(c);
+			double A = (16 - p*Tuning::getParam(IRookOnKingRing[0][0])) / (1-p);
+			double B = (0 - p*Tuning::getParam(IRookOnKingRing[0][1])) / (1-p);
+			Score PRookOnKingRing = make_score(c*Tuning::getParam(IRookOnKingRing[0][0]+!c*A),
+			                                   c*Tuning::getParam(IRookOnKingRing[0][1]+!c*B));
+			double grad = c - !c * p / (1-p);
+			
+            score += PRookOnKingRing;
+			Tuning::updateGradient(Us, IRookOnKingRing[0][0], grad * phase / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IRookOnKingRing[0][1], grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
+		}
+		else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
+		{
+			Score PBishopOnKingRing = make_score(Tuning::getParam(IBishopOnKingRing[0]), Tuning::getParam(IBishopOnKingRing[1]));
+            score += PBishopOnKingRing;
+			Tuning::updateGradient(Us, IBishopOnKingRing[0], 1.0 * phase / PHASE_MIDGAME);
+			Tuning::updateGradient(Us, IBishopOnKingRing[1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		
+		}
+
+
+        else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
+            score += BishopOnKingRing;
 
         int mob = popcount(b & mobilityArea[Us]);
 
@@ -371,9 +412,31 @@ namespace {
         if (Pt == BISHOP || Pt == KNIGHT)
         {
             // Bonus if piece is on an outpost square or can reach one
-            bb = OutpostRanks & attackedBy[Us][PAWN] & ~pe->pawn_attacks_span(Them);
+			bb = OutpostRanks & attackedBy[Us][PAWN] & ~pe->pawn_attacks_span(Them);
             if (bb & s)
-                score += (Pt == KNIGHT) ? KnightOutpost : BishopOutpost;
+			{
+				//bool fareKnightOoutpost = distance<File>(s, pos.square<KING>(Them)) > 3;
+				bool nearKnightOoutpost = distance(s, pos.square<KING>(Them)) < 4;
+				bool nearBishopOoutpost = distance(s, pos.square<KING>(Them)) < 4;
+				//bool fareKnightOoutpost = distance(s, pos.square<KING>(Them)) > 4;
+				Score PKnightOutpost = make_score(Tuning::getParam(IKnightOutpost[nearKnightOoutpost][0]),Tuning::getParam(IKnightOutpost[nearKnightOoutpost][1]));
+				Score PBishopOutpost = make_score(Tuning::getParam(IBishopOutpost[nearBishopOoutpost][0]),Tuning::getParam(IBishopOutpost[nearBishopOoutpost][1]));
+            
+                score += (Pt == KNIGHT) ? PKnightOutpost : PBishopOutpost;
+				
+				if(Pt == KNIGHT)
+				{
+					//dbg_hit_on(nearKnightOoutpost);
+					Tuning::updateGradient(Us, IKnightOutpost[nearKnightOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IKnightOutpost[nearKnightOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+				}
+				if(Pt == BISHOP)
+				{
+					//dbg_hit_on(nearBishopOoutpost);
+					Tuning::updateGradient(Us, IBishopOutpost[nearBishopOoutpost][0], 1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IBishopOutpost[nearBishopOoutpost][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+				}
+			}
             else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
                 score += ReachableOutpost;
 
@@ -405,7 +468,7 @@ namespace {
 		Score PBishopXRayPawns = make_score(Tuning::getParam(IBishopXRayPawnsMG),
 				                Tuning::getParam(IBishopXRayPawnsEG));
                 //score -= BishopXRayPawns * popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
-                grad = popcount(PseudoAttacks[BISHOP][s] & pos.pieces(Them, PAWN));
+                grad = popcount(attacks_bb<BISHOP>(s) & pos.pieces(Them, PAWN));
                 score -= PBishopXRayPawns * (int)grad;
 		Tuning::updateGradient(Us, IBishopXRayPawnsMG, -grad * phase / PHASE_MIDGAME);
 		Tuning::updateGradient(Us, IBishopXRayPawnsEG, -grad * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
@@ -541,7 +604,7 @@ namespace {
         unsafeChecks |= b2 & attackedBy[Them][BISHOP];
 
     // Enemy knights checks
-    knightChecks = pos.attacks_from<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
+    knightChecks = attacks_bb<KNIGHT>(ksq) & attackedBy[Them][KNIGHT];
     if (knightChecks & safe)
         kingDanger += more_than_one(knightChecks & safe) ? KnightSafeCheck * 162/100
                                                          : KnightSafeCheck;
@@ -577,7 +640,7 @@ namespace {
 	    b3 = attacks_bb<BISHOP>(ksq, (pos.pieces() ^ b1) & ~b2);
 	       kingDanger += Tuning::getParam(IKDBishopAttack) * bool(b3 & pos.pieces(Them, BISHOP)); 
 
-	 b1 = pos.attacks_from<BISHOP>(ksq) & pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]); 
+	 b1 = attacks_bb<BISHOP>(ksq, pos.pieces()) & pos.pieces(Us, PAWN) & pawn_attacks_bb<Them>(pos.pieces(Us) & attackedBy[Them][ALL_PIECES] & ~attackedBy2[Us]); 
 	 b2 = attacks_bb<BISHOP>(ksq, pos.pieces() ^ b1) & pos.pieces(Them, BISHOP);
 	
 	 if(b2)
@@ -721,12 +784,12 @@ namespace {
         Square s = pos.square<QUEEN>(Them);
         safe = mobilityArea[Us] & ~stronglyProtected;
 
-        b = attackedBy[Us][KNIGHT] & pos.attacks_from<KNIGHT>(s);
+        b = attackedBy[Us][KNIGHT] & attacks_bb<KNIGHT>(s);
 
         score += KnightOnQueen * popcount(b & safe);
 
-        b =  (attackedBy[Us][BISHOP] & pos.attacks_from<BISHOP>(s))
-           | (attackedBy[Us][ROOK  ] & pos.attacks_from<ROOK  >(s));
+        b =  (attackedBy[Us][BISHOP] & attacks_bb<BISHOP>(s, pos.pieces()))
+           | (attackedBy[Us][ROOK  ] & attacks_bb<ROOK  >(s, pos.pieces()));
 
         score += SliderOnQueen * popcount(b & safe & attackedBy2[Us]);
     }
@@ -1113,6 +1176,27 @@ void Eval::init() {
 		IUnopposedBishop[0][1] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][0] = Tuning::addParam(0, false);
 		IUnopposedBishop[1][1] = Tuning::addParam(0, false);
+		
+		IKnightOutpost[0][0] = Tuning::addParam(mg_value(KnightOutpost), false);
+		IKnightOutpost[0][1] = Tuning::addParam(eg_value(KnightOutpost), false);
+		IKnightOutpost[1][0] = Tuning::addParam(mg_value(KnightOutpost), false);
+		IKnightOutpost[1][1] = Tuning::addParam(eg_value(KnightOutpost), false);
+		
+		IBishopOutpost[0][0] = Tuning::addParam(mg_value(BishopOutpost), true);
+		IBishopOutpost[0][1] = Tuning::addParam(eg_value(BishopOutpost), true);
+		IBishopOutpost[1][0] = Tuning::addParam(mg_value(BishopOutpost), true);
+		IBishopOutpost[1][1] = Tuning::addParam(eg_value(BishopOutpost), true);
+		
+		
+		
+		IBishopOnKingRing[0] = Tuning::addParam(mg_value(BishopOnKingRing), false, 0);
+		IBishopOnKingRing[1] = Tuning::addParam(eg_value(BishopOnKingRing), false, 0);
+		
+		IRookOnKingRing[0][0] = Tuning::addParam(mg_value(RookOnKingRing), false, 0);
+		IRookOnKingRing[0][1] = Tuning::addParam(eg_value(RookOnKingRing), false, 0);
+		IRookOnKingRing[1][0] = Tuning::addParam(mg_value(RookOnKingRing), false, 0);
+		IRookOnKingRing[1][1] = Tuning::addParam(eg_value(RookOnKingRing), false, 0);
+
 
         IKingDistanceThemBlockMG = Tuning::addParam(0, false);
         IKingDistanceUsBlockMG = Tuning::addParam(0, false);

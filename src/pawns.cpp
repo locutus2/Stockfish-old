@@ -201,8 +201,8 @@ namespace {
         opposed    = theirPawns & forward_file_bb(Us, s);
         blocked    = theirPawns & (s + Up);
         stoppers   = theirPawns & passed_pawn_span(Us, s);
-        lever      = theirPawns & PawnAttacks[Us][s];
-        leverPush  = theirPawns & PawnAttacks[Us][s + Up];
+        lever      = theirPawns & pawn_attacks_bb(Us, s);
+        leverPush  = theirPawns & pawn_attacks_bb(Us, s + Up);
         doubled    = ourPawns   & (s - Up);
 		doubled2    = ourPawns   & forward_file_bb(Them, s);
         neighbours = ourPawns   & adjacent_files_bb(s);
@@ -311,39 +311,11 @@ namespace {
         }
 
         else if (!neighbours)
-	{
-	    Score PIsolatedR = make_score(Tuning::getParam(IIsolatedRMG[r]), Tuning::getParam(IIsolatedREG[r]));
-	    Score PIsolatedLin[2] =  { make_score(Tuning::getParam(IIsolatedLinMG[0]), Tuning::getParam(IIsolatedLinEG[0]))
-	                             , make_score(Tuning::getParam(IIsolatedLinMG[1]), Tuning::getParam(IIsolatedLinEG[1])) };
-	    Score PIsolatedGD[3] =  { make_score(Tuning::getParam(IIsolatedGDMG[r-1]), Tuning::getParam(IIsolatedGDEG[r-1]))
-	                             , make_score(Tuning::getParam(IIsolatedGDMG[r]), Tuning::getParam(IIsolatedGDEG[r]))
-	                             , make_score(Tuning::getParam(IIsolatedGDMG[r+1]), Tuning::getParam(IIsolatedGDEG[r+1])) };
-            score -=   PIsolated
-            //score -=   PIsolatedR
-            //score -=   (PIsolatedLin[0] + PIsolatedLin[1] * r)
-            //score -=   (PIsolatedGD[0] + PIsolatedGD[1] + PIsolatedGD[2]) / 3
-                     + PWeakUnopposed * !opposed;
-   		Tuning::updateGradient(Us, IIsolatedMG, -1.0 * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IIsolatedEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-   		Tuning::updateGradient(Us, IWeakUnopposedMG, -1.0 * !opposed * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IWeakUnopposedEG, -1.0 * !opposed * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-   		Tuning::updateGradient(Us, IIsolatedRMG[r], -1.0 * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IIsolatedREG[r], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-   		Tuning::updateGradient(Us, IIsolatedLinMG[0], -1.0 * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IIsolatedLinEG[0], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-   		Tuning::updateGradient(Us, IIsolatedLinMG[1], -1.0 * r * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IIsolatedLinEG[1], -1.0 * r * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-
-   		Tuning::updateGradient(Us, IIsolatedGDMG[r-1], -1.0 / 3 * phase / PHASE_MIDGAME);
-   		Tuning::updateGradient(Us, IIsolatedGDMG[r], -1.0 / 3 * phase / PHASE_MIDGAME);
-   		Tuning::updateGradient(Us, IIsolatedGDMG[r+1], -1.0 / 3 * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IIsolatedGDEG[r-1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IIsolatedGDEG[r], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IIsolatedGDEG[r+1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		{
 	
 
-            if (   (ourPawns & forward_file_bb(Them, s))
-                && popcount(opposed) == 1
+            if (   opposed
+				&& (ourPawns & forward_file_bb(Them, s))
                 && !(theirPawns & adjacent_files_bb(s)))
 				{
                 //score -= DoubledIsolated;			
@@ -363,7 +335,37 @@ namespace {
 					 //}
 
 				}
-	
+				else{
+					Score PIsolatedR = make_score(Tuning::getParam(IIsolatedRMG[r]), Tuning::getParam(IIsolatedREG[r]));
+					Score PIsolatedLin[2] =  { make_score(Tuning::getParam(IIsolatedLinMG[0]), Tuning::getParam(IIsolatedLinEG[0]))
+											 , make_score(Tuning::getParam(IIsolatedLinMG[1]), Tuning::getParam(IIsolatedLinEG[1])) };
+					Score PIsolatedGD[3] =  { make_score(Tuning::getParam(IIsolatedGDMG[r-1]), Tuning::getParam(IIsolatedGDEG[r-1]))
+											 , make_score(Tuning::getParam(IIsolatedGDMG[r]), Tuning::getParam(IIsolatedGDEG[r]))
+											 , make_score(Tuning::getParam(IIsolatedGDMG[r+1]), Tuning::getParam(IIsolatedGDEG[r+1])) };
+						score -=   PIsolated
+						//score -=   PIsolatedR
+						//score -=   (PIsolatedLin[0] + PIsolatedLin[1] * r)
+						//score -=   (PIsolatedGD[0] + PIsolatedGD[1] + PIsolatedGD[2]) / 3
+								 + PWeakUnopposed * !opposed;
+					Tuning::updateGradient(Us, IIsolatedMG, -1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedEG, -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IWeakUnopposedMG, -1.0 * !opposed * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IWeakUnopposedEG, -1.0 * !opposed * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedRMG[r], -1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedREG[r], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedLinMG[0], -1.0 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedLinEG[0], -1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedLinMG[1], -1.0 * r * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedLinEG[1], -1.0 * r * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+
+					Tuning::updateGradient(Us, IIsolatedGDMG[r-1], -1.0 / 3 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedGDMG[r], -1.0 / 3 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedGDMG[r+1], -1.0 / 3 * phase / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedGDEG[r-1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedGDEG[r], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+					Tuning::updateGradient(Us, IIsolatedGDEG[r+1], -1.0 / 3 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+				
+				}
         }
         else if (backward)
 	{
@@ -643,7 +645,7 @@ Score Entry::do_king_safety(const Position& pos) {
   Bitboard pawns = pos.pieces(Us, PAWN);
   int minPawnDist = 6;
 
-  if (pawns & PseudoAttacks[KING][ksq])
+  if (pawns & attacks_bb<KING>(ksq))
       minPawnDist = 1;
   else while (pawns)
       minPawnDist = std::min(minPawnDist, distance(ksq, pop_lsb(&pawns)));
