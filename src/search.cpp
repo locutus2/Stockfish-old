@@ -1394,7 +1394,8 @@ moves_loop: // When in check, search starts from here
              && !priorCapture)
     {
         update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
-        ttPv = false;
+        if (ss->ply & 1)
+            ttPv = false;
     }
 
     if (PvNode)
