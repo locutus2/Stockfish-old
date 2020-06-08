@@ -821,7 +821,7 @@ namespace {
             && (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER)))
             eval = ttValue;
 
-	ttFailHigh = ttValue != VALUE_NONE && ttValue >= beta && (tte->bound() & BOUND_LOWER);
+        ttFailHigh = ttValue != VALUE_NONE && ttValue >= beta && (tte->bound() & BOUND_LOWER);
     }
     else
     {
@@ -1208,7 +1208,7 @@ moves_loop: // When in check, search starts from here
               r -= 1 + formerPv;
 
           // Increase reduction if tt predicts a fail high but until late moves note found yet
-          if (!PvNode && ttFailHigh && moveCount > 40)
+          if (!PvNode && ttFailHigh && moveCount > 5)
               r--;
 
           if (!captureOrPromotion)
