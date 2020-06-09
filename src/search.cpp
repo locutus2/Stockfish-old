@@ -1208,7 +1208,7 @@ moves_loop: // When in check, search starts from here
               r -= 1 + formerPv;
 
           // Decrease reduction if tt predicts a fail high but until late moves note found yet
-          if (cutNode && ttFailHigh && moveCount > 10)
+          if (!PvNode && !cutNode && ttFailHigh && moveCount > 10)
               r--;
 
           if (!captureOrPromotion)
