@@ -1168,6 +1168,7 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
       // Step 16. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1181,6 +1182,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+	  CC = true;
+	  C = cutNode;
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 500 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1332,6 +1335,14 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      dbg_hit_on(!C, value > alpha, 0);
+	      dbg_hit_on(!C, value > alpha, depth);
+	      dbg_hit_on(C, value > alpha, 100);
+	      dbg_hit_on(C, value > alpha, 100 + depth);
       }
 
       if (value > bestValue)

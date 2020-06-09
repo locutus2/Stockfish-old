@@ -2,7 +2,7 @@
   Stockfish, a UCI chess playing engine derived from Glaurung 2.1
   Copyright (C) 2004-2008 Tord Romstad (Glaurung author)
   Copyright (C) 2008-2015 Marco Costalba, Joona Kiiski, Tord Romstad
-  Copyright (C) 2015-2020 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
+  Copyright (C) 2015-2019 Marco Costalba, Joona Kiiski, Gary Linscott, Tord Romstad
 
   Stockfish is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -36,9 +36,13 @@ void start_logger(const std::string& fname);
 void* aligned_ttmem_alloc(size_t size, void*& mem);
 void aligned_ttmem_free(void* mem); // nop if mem == nullptr
 
-void dbg_hit_on(bool b);
-void dbg_hit_on(bool c, bool b);
-void dbg_mean_of(int v);
+void dbg_hit_on(bool b, int n = 0);
+void dbg_hit_on(bool c, bool b, int n = 0);
+void dbg_mean_of(int v, int n = 0);
+void dbg_std_of(int v, int n = 0);
+void dbg_cov_of(int v, int w, int n = 0);
+void dbg_corr_of(int v, int w, int n = 0);
+void dbg_cramer_of(bool v, bool w, int n = 0);
 void dbg_print();
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
