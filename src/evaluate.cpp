@@ -102,6 +102,10 @@ namespace {
   int IRookOnKingRing[2][2];
   int IBishopOnKingRing[2];
 
+  int IThreatByMinor[PIECE_TYPE_NB][2];
+  int IThreatByRook[PIECE_TYPE_NB][2];
+  int IThreatByKing[2];
+
   constexpr bool USE_FOR_TUNING = false;
 
   int IMobilityBonus[4][28][2];
@@ -725,6 +729,7 @@ namespace {
 
     Bitboard b, weak, defended, nonPawnEnemies, stronglyProtected, safe;
     Score score = SCORE_ZERO;
+    Phase phase = me->game_phase();
 
     // Non-pawn enemies
     nonPawnEnemies = pos.pieces(Them) & ~pos.pieces(PAWN);
@@ -745,14 +750,31 @@ namespace {
     {
         b = (defended | weak) & (attackedBy[Us][KNIGHT] | attackedBy[Us][BISHOP]);
         while (b)
-            score += ThreatByMinor[type_of(pos.piece_on(pop_lsb(&b)))];
+	{
+	    PieceType pt = type_of(pos.piece_on(pop_lsb(&b)));
+            score += make_score(Tuning::getParam(IThreatByMinor[pt][0]),
+                                Tuning::getParam(IThreatByMinor[pt][1]));
+	    Tuning::updateGradient(Us, IThreatByMinor[pt][0], 1.0 * phase / PHASE_MIDGAME);
+	    Tuning::updateGradient(Us, IThreatByMinor[pt][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	}
 
         b = weak & attackedBy[Us][ROOK];
         while (b)
-            score += ThreatByRook[type_of(pos.piece_on(pop_lsb(&b)))];
+	{
+	    PieceType pt = type_of(pos.piece_on(pop_lsb(&b)));
+            score += make_score(Tuning::getParam(IThreatByRook[pt][0]),
+                                Tuning::getParam(IThreatByRook[pt][1]));
+	    Tuning::updateGradient(Us, IThreatByRook[pt][0], 1.0 * phase / PHASE_MIDGAME);
+	    Tuning::updateGradient(Us, IThreatByRook[pt][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	}
 
         if (weak & attackedBy[Us][KING])
+	{
+            Score PThreatByKing = make_score(Tuning::getParam(IThreatByKing[0]), Tuning::getParam(IThreatByKing[1]));
             score += ThreatByKing;
+	    Tuning::updateGradient(Us, IThreatByKing[0], 1.0 * phase / PHASE_MIDGAME);
+	    Tuning::updateGradient(Us, IThreatByKing[1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+	}
 
         b =  ~attackedBy[Them][ALL_PIECES]
            | (nonPawnEnemies & attackedBy2[Us]);
@@ -1217,6 +1239,16 @@ void Eval::init() {
         IKingDistanceUsBlock = Tuning::addParam(8, false);
         IKingDistanceThemProm = Tuning::addParam(0, false);
         IKingDistanceUsProm = Tuning::addParam(0, false);
+
+  for(int pt = PAWN; pt <= QUEEN; pt++)
+  {
+        IThreatByMinor[pt][0] = Tuning::addParam(mg_value(ThreatByMinor[pt]), true);
+        IThreatByMinor[pt][1] = Tuning::addParam(eg_value(ThreatByMinor[pt]), true);
+        IThreatByRook[pt][0] = Tuning::addParam(mg_value(ThreatByRook[pt]), true);
+        IThreatByRook[pt][1] = Tuning::addParam(eg_value(ThreatByRook[pt]), true);
+  }
+  IThreatByKing[0] = Tuning::addParam(mg_value(ThreatByKing), true);
+  IThreatByKing[1] = Tuning::addParam(eg_value(ThreatByKing), true);
 }
 
 

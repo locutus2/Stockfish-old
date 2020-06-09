@@ -749,10 +749,10 @@ IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
 
 	}
 
-	IPawnChainLin[0][0] = Tuning::addParam(mg_value(PawnChain), true);
-	IPawnChainLin[0][1] = Tuning::addParam(eg_value(PawnChain), true);
-	IPawnChainLin[1][0] = Tuning::addParam(0, true);
-	IPawnChainLin[1][1] = Tuning::addParam(0, true);
+	IPawnChainLin[0][0] = Tuning::addParam(mg_value(PawnChain), false);
+	IPawnChainLin[0][1] = Tuning::addParam(eg_value(PawnChain), false);
+	IPawnChainLin[1][0] = Tuning::addParam(0, false);
+	IPawnChainLin[1][1] = Tuning::addParam(0, false);
 
 	for(Rank r = RANK_3; r < RANK_8; ++r)
 	{
