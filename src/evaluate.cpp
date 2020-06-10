@@ -82,6 +82,7 @@ namespace {
 
   int ISFbase;
   int ISFpassed;
+  int ISFpawns;
 
   int IKDbase;
   int IKDweak;
@@ -1068,13 +1069,15 @@ namespace {
         else
 	{
             int pp = bool(pe->passed_pawns(strongSide));
+	    int p = pos.count<PAWN>(strongSide);
 	    int sf_old = sf;
-            sf = std::min(sf, int(Tuning::getParam(ISFbase) + 7 * pos.count<PAWN>(strongSide) + pp * Tuning::getParam(ISFpassed)));
+            sf = std::min(sf, int(Tuning::getParam(ISFbase) + p * Tuning::getParam(ISFpawns)  + pp * Tuning::getParam(ISFpassed)));
 	    if(sf < sf_old)
 	    {
 		    double grad = double(eg) / int(SCALE_FACTOR_NORMAL) * int(PHASE_MIDGAME - me->game_phase()) / PHASE_MIDGAME;
-		    Tuning::updateGradient(WHITE, ISFpassed, grad * pp);
 		    Tuning::updateGradient(WHITE, ISFbase, grad);
+		    Tuning::updateGradient(WHITE, ISFpassed, grad * pp);
+		    Tuning::updateGradient(WHITE, ISFpawns, grad * p);
 	    }
 	}
     }
@@ -1263,8 +1266,9 @@ void Eval::init() {
   IThreatByKing[0] = Tuning::addParam(mg_value(ThreatByKing), false);
   IThreatByKing[1] = Tuning::addParam(eg_value(ThreatByKing), false);
 
-  ISFbase = Tuning::addParam(36, true);
+  ISFbase = Tuning::addParam(36, false);
   ISFpassed = Tuning::addParam(0, false);
+  ISFpawns = Tuning::addParam(7, true);
 }
 
 
