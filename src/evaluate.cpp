@@ -80,6 +80,8 @@ namespace {
   int IPawnlessFlankMG;
   int IPawnlessFlankEG;
 
+  int ISFpassed;
+
   int IKDbase;
   int IKDweak;
   int IKDweakEG;
@@ -1063,7 +1065,16 @@ namespace {
                 sf = 22 + 3 * pos.count<ALL_PIECES>(strongSide);
         }
         else
-            sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
+	{
+            int pp = bool(pe->passed_pawns(strongSide));
+	    int sf_old = sf;
+            sf = std::min(sf, int(36 + 7 * pos.count<PAWN>(strongSide) + pp * Tuning::getParam(ISFpassed)));
+	    if(sf < sf_old)
+	    {
+		    double grad = double(pp) * int(eg) / SCALE_FACTOR_NORMAL;
+		    Tuning::updateGradient(strongSide, ISFpassed, grad * int(PHASE_MIDGAME - me->game_phase()) / PHASE_MIDGAME);
+	    }
+	}
     }
 
     // Interpolate between the middlegame and (scaled by 'sf') endgame score
@@ -1242,13 +1253,15 @@ void Eval::init() {
 
   for(int pt = PAWN; pt <= QUEEN; pt++)
   {
-        IThreatByMinor[pt][0] = Tuning::addParam(mg_value(ThreatByMinor[pt]), true);
-        IThreatByMinor[pt][1] = Tuning::addParam(eg_value(ThreatByMinor[pt]), true);
-        IThreatByRook[pt][0] = Tuning::addParam(mg_value(ThreatByRook[pt]), true);
-        IThreatByRook[pt][1] = Tuning::addParam(eg_value(ThreatByRook[pt]), true);
+        IThreatByMinor[pt][0] = Tuning::addParam(mg_value(ThreatByMinor[pt]), false);
+        IThreatByMinor[pt][1] = Tuning::addParam(eg_value(ThreatByMinor[pt]), false);
+        IThreatByRook[pt][0] = Tuning::addParam(mg_value(ThreatByRook[pt]), false);
+        IThreatByRook[pt][1] = Tuning::addParam(eg_value(ThreatByRook[pt]), false);
   }
-  IThreatByKing[0] = Tuning::addParam(mg_value(ThreatByKing), true);
-  IThreatByKing[1] = Tuning::addParam(eg_value(ThreatByKing), true);
+  IThreatByKing[0] = Tuning::addParam(mg_value(ThreatByKing), false);
+  IThreatByKing[1] = Tuning::addParam(eg_value(ThreatByKing), false);
+
+  ISFpassed = Tuning::addParam(0, true);
 }
 
 
