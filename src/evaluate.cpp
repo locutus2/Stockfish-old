@@ -128,6 +128,7 @@ namespace {
 
   // Assorted bonuses and penalties
   constexpr Score BishopPawns         = S(  3,  7);
+  constexpr Score BishopNoKingAttack  = S( 24,  0);
   constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopXRayPawns     = S(  4,  5);
   constexpr Score CorneredBishop      = S( 50, 50);
@@ -292,8 +293,38 @@ namespace {
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
             score += RookOnKingRing;
 
-        else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
-            score += BishopOnKingRing;
+        else if (Pt == BISHOP)
+        {
+            if (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them])
+                score += BishopOnKingRing;
+            else if(false)
+            {
+                Bitboard blocker =  pos.pieces(Us, PAWN) & ~attackedBy[Them][PAWN] & shift<Down>(pos.pieces(Them, PAWN))
+                                  & (DarkSquares & s ? DarkSquares : ~DarkSquares);
+
+                if (popcount(blocker) >= 4)
+				{
+				    Bitboard allowed = ~(blocker | attackedBy[Them][PAWN]);
+                    bb = square_bb(s);
+                    Bitboard b1 = bb;
+
+                    while (b1)
+                    {
+                        Square sq = pop_lsb(&b1);
+                        b1 |= attacks_bb<BISHOP>(sq, blocker);
+
+                        if (b1 & kingRing[Them])
+                            break;
+
+                        bb |= sq;
+                        b1 &= allowed & ~bb;
+                    }
+
+                    if (!b1)
+                        score -= BishopNoKingAttack;
+                }
+            }
+        }
 
         int mob = popcount(b & mobilityArea[Us]);
 
