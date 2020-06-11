@@ -297,7 +297,8 @@ namespace {
         {
             if (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them])
                 score += BishopOnKingRing;
-            else if(false)
+
+            else
             {
                 Bitboard blocker =  pos.pieces(Us, PAWN) & ~attackedBy[Them][PAWN] & shift<Down>(pos.pieces(Them, PAWN))
                                   & (DarkSquares & s ? DarkSquares : ~DarkSquares);
