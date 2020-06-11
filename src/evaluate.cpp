@@ -319,12 +319,11 @@ namespace {
             if (Pt == BISHOP)
             {
                 // Penalty according to the number of our pawns on the same color square as the
-                // bishop, bigger when the center files are blocked with pawns and smaller
-                // when the bishop is outside the pawn chain.
+                // bishop, bigger when the center files are blocked with pawns.
                 Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces());
 
                 score -= BishopPawns * pos.pawns_on_same_color_squares(Us, s)
-                                     * (bool(attackedBy[Us][PAWN] & s) + popcount(blocked & CenterFiles));
+                                     * (1 + popcount(blocked & CenterFiles));
 
                 // Penalty for all enemy pawns x-rayed
                 score -= BishopXRayPawns * popcount(attacks_bb<BISHOP>(s) & pos.pieces(Them, PAWN));
