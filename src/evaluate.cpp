@@ -127,7 +127,7 @@ namespace {
   };
 
   // Assorted bonuses and penalties
-  constexpr Score BishopPawns         = S(  4,  9);
+  constexpr Score BishopPawns         = S(  3,  7);
   constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopXRayPawns     = S(  4,  5);
   constexpr Score CorneredBishop      = S( 50, 50);
@@ -321,7 +321,8 @@ namespace {
                 // Penalty according to the number of our pawns on the same color square as the
                 // bishop, bigger when the center files are blocked with pawns and smaller
                 // when the bishop is outside the pawn chain.
-                Bitboard blocked = pos.pieces(Us, PAWN) & shift<Down>(pos.pieces()) & (DarkSquares & s ? DarkSquares : ~DarkSquares);
+                Bitboard blocked =  (pos.pieces(Us  , PAWN) & shift<Down>(pos.pieces()))
+                                  | (pos.pieces(Them, PAWN) & attackedBy[Them][PAWN]);
 
                 score -= BishopPawns * pos.pawns_on_same_color_squares(Us, s)
                                      * (!(attackedBy[Us][PAWN] & s) + popcount(blocked & CenterFiles));
