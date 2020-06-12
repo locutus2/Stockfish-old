@@ -1071,8 +1071,8 @@ namespace {
             int pp = bool(pe->passed_pawns(strongSide));
 	    int p = pos.count<PAWN>(strongSide);
 	    int sf_old = sf;
-            sf = std::min(sf, int(Tuning::getParam(ISFbase) + p * Tuning::getParam(ISFpawns)  + pp * Tuning::getParam(ISFpassed)));
-	    if(sf < sf_old)
+            sf = std::max(0, std::min(sf, int(Tuning::getParam(ISFbase) + p * Tuning::getParam(ISFpawns)  + pp * Tuning::getParam(ISFpassed))));
+	    if(sf < sf_old && sf > 0)
 	    {
 		    double grad = double(eg) / int(SCALE_FACTOR_NORMAL) * int(PHASE_MIDGAME - me->game_phase()) / PHASE_MIDGAME;
                     grad *= (100.0 - pos.rule50_count()) / 100.0;
