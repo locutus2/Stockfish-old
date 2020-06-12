@@ -1269,7 +1269,7 @@ void Eval::init() {
 
   ISFbase = Tuning::addParam(36, true);
   ISFpassed = Tuning::addParam(0, false);
-  ISFpawns = Tuning::addParam(7, false);
+  ISFpawns = Tuning::addParam(7, true);
 }
 
 
