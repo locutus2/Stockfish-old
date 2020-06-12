@@ -321,7 +321,8 @@ namespace {
                 		if(DEBUG) cerr << "SCORE: eval=" << value << " error=" << error << endl;
 			       }
 
-		       	       if(USE_RESULT && gameResult != VALUE_NONE)
+		       	       if(USE_RESULT && gameResult != VALUE_NONE
+				  && (!Tuning::SKIP_DRAWS || gameResult != VALUE_DRAW))
 			       {
 				       constexpr double LAMBDA = 0.9;
 				       double p = (1 + gameResult * LAMBDA) / 2;

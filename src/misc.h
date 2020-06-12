@@ -126,6 +126,7 @@ namespace Tuning {
   extern double ALPHA;
   constexpr double INF = std::numeric_limits<double>().max();
   constexpr double MAX_VALUE = PawnValueEg;
+  constexpr bool SKIP_DRAWS = true;
   
   double cp2p(double x);
   double p2cp(double x);
