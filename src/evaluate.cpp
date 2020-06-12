@@ -1075,6 +1075,7 @@ namespace {
 	    if(sf < sf_old)
 	    {
 		    double grad = double(eg) / int(SCALE_FACTOR_NORMAL) * int(PHASE_MIDGAME - me->game_phase()) / PHASE_MIDGAME;
+                    grad *= (100.0 - pos.rule50_count()) / 100.0;
 		    Tuning::updateGradient(WHITE, ISFbase, grad);
 		    Tuning::updateGradient(WHITE, ISFpassed, grad * pp);
 		    Tuning::updateGradient(WHITE, ISFpawns, grad * p);
