@@ -176,13 +176,12 @@ top:
 
       // Prepare the pointers to loop over the refutations array
       cur = std::begin(refutations);
-      endMoves = std::end(refutations);
+      endMoves = std::end(refutations) - 1;
 
-      // If the countermove is the same as a killer, skip it
-      if (   refutations[0].move == refutations[3].move
-          || refutations[1].move == refutations[3].move
-          || refutations[2].move == refutations[3].move)
-          --endMoves;
+      // If the countermove is different as the first two killers, use them instead of the third killer
+      if (   refutations[0].move != refutations[3].move
+          && refutations[1].move != refutations[3].move)
+          refutations[2].move = refutations[3].move;
 
       ++stage;
       /* fallthrough */
@@ -212,8 +211,7 @@ top:
       if (   !skipQuiets
           && select<Next>([&](){return   *cur != refutations[0].move
                                       && *cur != refutations[1].move
-                                      && *cur != refutations[2].move
-                                      && *cur != refutations[3].move;}))
+                                      && *cur != refutations[2].move;}))
           return *(cur - 1);
 
       // Prepare the pointers to loop over the bad captures
