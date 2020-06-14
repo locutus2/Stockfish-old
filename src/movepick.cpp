@@ -180,7 +180,8 @@ top:
 
       // If the countermove is different as the first two killers, use them instead of the third killer
       if (   refutations[0].move != refutations[3].move
-          && refutations[1].move != refutations[3].move)
+          && refutations[1].move != refutations[3].move
+          && refutations[3].move)
           refutations[2].move = refutations[3].move;
 
       ++stage;
