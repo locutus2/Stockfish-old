@@ -645,7 +645,7 @@ namespace {
 
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
-    (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
+    (ss+2)->killers[0] = (ss+2)->killers[1] = (ss+2)->killers[2] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
     // Initialize statScore to zero for the grandchildren of the current position.
@@ -1706,6 +1706,11 @@ moves_loop: // When in check, search starts from here
 
     if (ss->killers[0] != move)
     {
+        if (ss->killers[1] != move)
+            ss->killers[2] = ss->killers[1];
+        else
+            ss->killers[2] = MOVE_NONE;
+
         ss->killers[1] = ss->killers[0];
         ss->killers[0] = move;
     }
