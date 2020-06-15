@@ -87,7 +87,7 @@ namespace {
     e->passedPawns[Us] = 0;
     e->kingSquares[Us] = SQ_NONE;
     e->pawnAttacks[Us] = e->pawnAttacksSpan[Us] = pawn_attacks_bb<Us>(ourPawns);
-    e->blockedCount += popcount(shift<Up>(ourPawns) & (theirPawns | doubleAttackThem));
+    e->blockedCount += popcount(shift<Up>(ourPawns & ~pawn_attacks_bb<Them>(theirPawns)) & (theirPawns | doubleAttackThem));
 
     // Loop through all pawns of the current color and score each pawn
     while ((s = *pl++) != SQ_NONE)
