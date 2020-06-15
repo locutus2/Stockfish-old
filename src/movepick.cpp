@@ -178,12 +178,19 @@ top:
       cur = std::begin(refutations);
       endMoves = std::end(refutations);
 
-      // If last move was a capture skip killers
+      // If last move was a capture skip second killer
       if (pos.captured_piece())
       {
-          refutations[0].move = refutations[2].move;
-		  refutations[1].move = MOVE_NONE;
-          endMoves -= 2;
+          if (refutations[0].move == refutations[2].move)
+          {
+              refutations[1].move = refutations[2].move = MOVE_NONE;
+              endMoves -= 2;
+          }
+          else
+          {
+              refutations[1].move = refutations[2].move;
+              --endMoves;
+          }
       }
 
       // If the countermove is the same as a killer, skip it
