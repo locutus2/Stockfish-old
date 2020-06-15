@@ -182,6 +182,7 @@ top:
       if (pos.captured_piece())
       {
           refutations[0].move = refutations[2].move;
+		  refutations[1].move = MOVE_NONE;
           endMoves -= 2;
       }
 
