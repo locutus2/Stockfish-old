@@ -929,7 +929,7 @@ moves_loop: // When in check, search starts from here
                                           nullptr                   , (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
 
-    Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())];
+    Move countermove = thisThread->counterMoves[(ss-1)->moveCount > 1][pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->lowPlyHistory,
@@ -1721,7 +1721,7 @@ moves_loop: // When in check, search starts from here
     if (is_ok((ss-1)->currentMove))
     {
         Square prevSq = to_sq((ss-1)->currentMove);
-        thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] = move;
+        thisThread->counterMoves[(ss-1)->moveCount > 1][pos.piece_on(prevSq)][prevSq] = move;
     }
 
     if (depth > 11 && ss->ply < MAX_LPH)
