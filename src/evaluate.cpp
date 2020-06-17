@@ -1270,9 +1270,9 @@ void Eval::init() {
   IThreatByKing[0] = Tuning::addParam(mg_value(ThreatByKing), false);
   IThreatByKing[1] = Tuning::addParam(eg_value(ThreatByKing), false);
 
-  ISFbase = Tuning::addParam(36, true);
+  ISFbase = Tuning::addParam(36, false);
   ISFpassed = Tuning::addParam(0, false);
-  ISFpawns = Tuning::addParam(7, true);
+  ISFpawns = Tuning::addParam(7, false);
 }
 
 
