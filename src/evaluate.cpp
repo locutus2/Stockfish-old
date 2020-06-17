@@ -1161,6 +1161,9 @@ namespace {
         Trace::add(MOBILITY, mobility[WHITE], mobility[BLACK]);
     }
 
+    // Evaluation grain
+    v = (v / 16) * 16;
+
     // Side to move point of view
     v = (pos.side_to_move() == WHITE ? v : -v) + Tempo;
 
