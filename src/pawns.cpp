@@ -474,7 +474,7 @@ namespace {
 
 	auto f = [](double x)->double { return 1.0 / (1.0 + std::exp(-x)); };
 	auto fd = [&](double x)->double { return f(x) * (1.0 - f(x)); };
-	constexpr double A = 100;
+	constexpr double A = 20;
 
 	bool C[10] = {bool(support), bool(phalanx), bool(neighbours), bool(backward), bool(doubled),
 		               bool(blocked), bool(opposed), bool(stoppers), bool(lever), bool(leverPush)};
