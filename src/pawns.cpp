@@ -188,8 +188,8 @@ namespace {
                 + 1.847156  * bool(lever)
                 + 1.094608  * bool(leverPush);
 
-        valMg = 100 * (1 / (1 + std::exp(-valMg)) - 0.5);
-        valEg = 100 * (1 / (1 + std::exp(-valEg)) - 0.5);
+        valMg = 10 * (1 / (1 + std::exp(-valMg)) - 0.5);
+        valEg = 10 * (1 / (1 + std::exp(-valEg)) - 0.5);
 
         score += make_score(valMg, valEg);
     }
