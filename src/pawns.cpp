@@ -161,6 +161,9 @@ namespace {
         if (!support)
             score -=   Doubled * doubled
                      + WeakLever * more_than_one(lever);
+
+        else if(stoppers)
+            score += make_score(20, 6);
     }
 
     return score;
