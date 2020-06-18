@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 
 #include "bitboard.h"
 #include "pawns.h"
@@ -74,6 +75,7 @@ namespace {
 
     Bitboard neighbours, stoppers, support, phalanx, opposed;
     Bitboard lever, leverPush, blocked;
+    double valMg, valEg;
     Square s;
     bool backward, passed, doubled;
     Score score = SCORE_ZERO;
@@ -161,6 +163,35 @@ namespace {
         if (!support)
             score -=   Doubled * doubled
                      + WeakLever * more_than_one(lever);
+
+        valMg =  11.43293
+               - 11.25325   * bool(support)
+               -  6.1322    * bool(phalanx)
+               -  5.97175   * bool(neighbours)
+               -  6.14486   * bool(backward)
+               +  0.571737  * bool(doubled)
+               -  3.35108   * bool(blocked)
+               +  1.361689  * bool(opposed)
+               +  1.0058117 * bool(stoppers)
+               -  1.692446  * bool(lever)
+               -  2.412003  * bool(leverPush);
+
+        valEg = - 4.6227795
+                - 1.456448  * bool(support)
+                - 1.4407    * bool(phalanx)
+                - 0.3585414 * bool(neighbours)
+                + 1.726314  * bool(backward)
+                + 0.6884119 * bool(doubled)
+                - 0.6346581 * bool(blocked)
+                + 0.05017   * bool(opposed)
+                + 1.412876  * bool(stoppers)
+                + 1.847156  * bool(lever)
+                + 1.094608  * bool(leverPush);
+
+        valMg = 100 * (1 / (1 + std::exp(-valMg)) - 0.5);
+        valEg = 100 * (1 / (1 + std::exp(-valEg)) - 0.5);
+
+        score += make_score(valMg, valEg);
     }
 
     return score;
