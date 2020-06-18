@@ -141,6 +141,9 @@ namespace {
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
+
+            if (phalanx && leverPush)
+                score -= make_score(13, 2);
         }
 
         else if (!neighbours)
