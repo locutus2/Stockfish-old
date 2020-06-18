@@ -35,7 +35,8 @@ namespace {
   int IDoubledIsolated[2];
   int IDoubledIsolatedOpposed[2];
 
-  int IPweight[21][2];
+  //int IPweight[21][2];
+  int IPweight[12][2];
   
   int IBackwardMG;
   int IBackwardEG;
@@ -476,18 +477,20 @@ namespace {
 	auto fd = [&](double x)->double { return f(x) * (1.0 - f(x)); };
 	constexpr double A = 20;
 
-	bool C[10] = {bool(support), bool(phalanx), bool(neighbours), bool(backward), bool(doubled),
-		               bool(blocked), bool(opposed), bool(stoppers), bool(lever), bool(leverPush)};
+	bool C[11] = {bool(support), bool(phalanx), bool(neighbours), bool(backward), bool(doubled),
+		               bool(blocked), bool(opposed), bool(stoppers), bool(lever), bool(leverPush), bool(passed)};
 	double sum0 = Tuning::getParam(IPweight[0][0]);
 	double sum1 = Tuning::getParam(IPweight[0][1]);
 	//Tuning::updateGradient(Us, IPweight[0][0], 1.0 * phase / PHASE_MIDGAME);
 	//Tuning::updateGradient(Us, IPweight[0][1], 1.0 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-	for(int i = 0; i < 10; ++i)
+	for(int i = 0; i < 11; ++i)
 	{
-		sum0 += C[i] * Tuning::getParam(IPweight[1+2*i][0]);
-		sum0 += !C[i] * Tuning::getParam(IPweight[2+2*i][0]);
-		sum1 += C[i] * Tuning::getParam(IPweight[1+2*i][1]);
-		sum1 += !C[i] * Tuning::getParam(IPweight[2+2*i][1]);
+		sum0 += C[i] * Tuning::getParam(IPweight[1+i][0]);
+		sum1 += C[i] * Tuning::getParam(IPweight[1+i][1]);
+		//sum0 += C[i] * Tuning::getParam(IPweight[1+2*i][0]);
+		//sum0 += !C[i] * Tuning::getParam(IPweight[2+2*i][0]);
+		//sum1 += C[i] * Tuning::getParam(IPweight[1+2*i][1]);
+		//sum1 += !C[i] * Tuning::getParam(IPweight[2+2*i][1]);
 		//Tuning::updateGradient(Us, IPweight[1+2*i][0], 1.0 * C[i] * phase / PHASE_MIDGAME);
 		//Tuning::updateGradient(Us, IPweight[1+2*i][1], 1.0 * C[i] * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 		//Tuning::updateGradient(Us, IPweight[2+2*i][0], 1.0 * !C[i] * phase / PHASE_MIDGAME);
@@ -499,12 +502,14 @@ namespace {
 	double grad1 = A * fd(sum1);
 	Tuning::updateGradient(Us, IPweight[0][0], grad0 * phase / PHASE_MIDGAME);
 	Tuning::updateGradient(Us, IPweight[0][1], grad1 * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-	for(int i = 0; i < 10; ++i)
+	for(int i = 0; i < 11; ++i)
 	{
-		Tuning::updateGradient(Us, IPweight[1+2*i][0], grad0 * C[i] * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IPweight[1+2*i][1], grad1 * C[i] * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IPweight[2+2*i][0], grad0 * !C[i] * phase / PHASE_MIDGAME);
-		Tuning::updateGradient(Us, IPweight[2+2*i][1], grad1 * !C[i] * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IPweight[1+i][0], grad0 * C[i] * phase / PHASE_MIDGAME);
+		Tuning::updateGradient(Us, IPweight[1+i][1], grad1 * C[i] * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		//Tuning::updateGradient(Us, IPweight[1+2*i][0], grad0 * C[i] * phase / PHASE_MIDGAME);
+		//Tuning::updateGradient(Us, IPweight[1+2*i][1], grad1 * C[i] * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
+		//Tuning::updateGradient(Us, IPweight[2+2*i][0], grad0 * !C[i] * phase / PHASE_MIDGAME);
+		//Tuning::updateGradient(Us, IPweight[2+2*i][1], grad1 * !C[i] * (PHASE_MIDGAME - phase) / PHASE_MIDGAME);
 	}
 
 	sum0 = A * (f(sum0)-0.5);
@@ -854,7 +859,14 @@ IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
 	IConnectedPHPoly[0] = Tuning::addParam(2, false);
 	IConnectedPHPoly[1] = Tuning::addParam(0, false);
 
+	/*
 	for(int i = 0; i < 21; ++i)
+	{
+			IPweight[i][0] = Tuning::addParam(0, true);
+			IPweight[i][1] = Tuning::addParam(0, true);
+	}
+	*/
+	for(int i = 0; i < 12; ++i)
 	{
 			IPweight[i][0] = Tuning::addParam(0, true);
 			IPweight[i][1] = Tuning::addParam(0, true);
