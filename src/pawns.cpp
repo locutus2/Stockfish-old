@@ -163,7 +163,7 @@ namespace {
                      + WeakLever * more_than_one(lever);
 
         else if(stoppers)
-            score += make_score(20, 6);
+            score += make_score(10, 3);
     }
 
     return score;
