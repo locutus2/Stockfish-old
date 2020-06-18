@@ -162,7 +162,7 @@ namespace {
             score -=   Doubled * doubled
                      + WeakLever * more_than_one(lever);
 
-        else if(stoppers)
+        else
             score -= make_score(10, 3);
     }
 
