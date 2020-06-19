@@ -36,6 +36,7 @@ namespace {
   constexpr Score Doubled       = S(11, 56);
   constexpr Score Isolated      = S( 5, 15);
   constexpr Score WeakLever     = S( 0, 56);
+  constexpr Score WeakPhalanx   = S(13,  2);
   constexpr Score WeakUnopposed = S(13, 27);
 
   constexpr Score BlockedStorm[RANK_NB]  = {S( 0, 0), S( 0, 0), S( 76, 78), S(-10, 15), S(-7, 10), S(-4, 6), S(-1, 2)};
@@ -141,6 +142,9 @@ namespace {
                    + 21 * popcount(support);
 
             score += make_score(v, v * (r - 2) / 4);
+
+            if (phalanx && leverPush)
+                score -= WeakPhalanx;
         }
 
         else if (!neighbours)
