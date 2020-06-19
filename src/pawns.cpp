@@ -143,7 +143,7 @@ namespace {
             score += make_score(v, v * (r - 2) / 4);
 
             if (phalanx && leverPush)
-                score -= make_score(13, 2);
+                score -= make_score(6, 1);
         }
 
         else if (!neighbours)
