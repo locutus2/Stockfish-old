@@ -297,6 +297,9 @@ namespace {
 
         int mob = popcount(b & mobilityArea[Us]);
 
+        if(mob == 1 && !(b & mobilityArea[Us] & ~pos.pieces(Us)))
+            mob--;
+
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         if (Pt == BISHOP || Pt == KNIGHT)
