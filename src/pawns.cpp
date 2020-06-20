@@ -156,6 +156,7 @@ namespace {
 
         else if (backward)
             score -=   Backward
+                     + make_score(10,2) * bool(neighbours)
                      + WeakUnopposed * !opposed;
 
         if (!support)
