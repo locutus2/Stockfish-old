@@ -777,10 +777,14 @@ namespace {
             else
                 sf = 22 + 3 * pos.count<ALL_PIECES>(strongSide);
         }
+        else if(   pos.non_pawn_material(WHITE) == RookValueMg
+                && pos.non_pawn_material(BLACK) == RookValueMg
+                && !pe->passed_pawns(strongSide)
+                && pos.count<PAWN>(strongSide) - pos.count<PAWN>(~strongSide) <= 1
+                && bool(KingSide & pos.pieces(strongSide, PAWN)) != bool(QueenSide & pos.pieces(strongSide, PAWN)))
+            sf = std::min(sf, 36);
         else
-            sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide)
-                                 - 7 * (   !pe->passed_pawns(strongSide)
-                                        && pos.count<PAWN>(strongSide) - pos.count<PAWN>(~strongSide) <= 1));
+            sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
     }
 
     // Interpolate between the middlegame and (scaled by 'sf') endgame score
