@@ -778,7 +778,9 @@ namespace {
                 sf = 22 + 3 * pos.count<ALL_PIECES>(strongSide);
         }
         else
-            sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
+            sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide)
+                                 - 7 * (   !pe->passed_pawns(strongSide)
+                                        && pos.count<PAWN>(strongSide) - pos.count<PAWN>(~strongSide) <= 1));
     }
 
     // Interpolate between the middlegame and (scaled by 'sf') endgame score
