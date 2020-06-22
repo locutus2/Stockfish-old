@@ -49,7 +49,7 @@ namespace {
     {   9,   63,   0                    }, // Knight      OUR PIECES
     {  59,   65,  42,     0             }, // Bishop
     {  46,   39,  24,   -24,    0       }, // Rook
-    { -53,  100,-192,   137,  268,    0 }  // Queen
+    {  -3,  100,-142,   137,  268,    0 }  // Queen
   };
 
   // Endgame evaluation and scaling functions are accessed directly and not through
