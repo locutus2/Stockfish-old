@@ -153,7 +153,7 @@ namespace {
             passed &= !(forward_file_bb(Us, s + Up) & ourPawns);
 
             if (passed)
-                e->passedPawns[Us] |= s;
+                score += make_score(5,5);
         }
 
         // Score this pawn
