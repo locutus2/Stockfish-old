@@ -291,7 +291,7 @@ namespace {
         }
 
         else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
-            score += RookOnKingRing * (1 + bool(attacks_bb<ROOK>(s, pos.pieces(PAWN)) & kingRing[Them]));
+            score += RookOnKingRing * (2 + bool(attacks_bb<ROOK>(s, pos.pieces(PAWN)) & kingRing[Them])) / 2;
 
         else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
             score += BishopOnKingRing;
