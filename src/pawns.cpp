@@ -134,6 +134,28 @@ namespace {
         if (passed)
             e->passedPawns[Us] |= s;
 
+        else if (r < RANK_7 && !blocked)
+        {
+            // Check if the pawn is passed after push
+            Bitboard blocked2    = theirPawns & (s + 2 * Up);
+            Bitboard stoppers2   = theirPawns & passed_pawn_span(Us, s + Up);
+            Bitboard lever2      = theirPawns & pawn_attacks_bb(Us, s + Up);
+            Bitboard leverPush2  = theirPawns & pawn_attacks_bb(Us, s + 2 * Up);
+            Bitboard phalanx2    = neighbours & rank_bb(s + Up);
+            Bitboard support2    = neighbours & rank_bb(s);
+
+            passed =   !(stoppers2 ^ lever2)
+                    || (   !(stoppers2 ^ leverPush2)
+                        && popcount(phalanx2) >= popcount(leverPush2))
+                    || (   stoppers2 == blocked2 && r >= RANK_4
+                        && (shift<Up>(support2) & ~(theirPawns | doubleAttackThem)));
+
+            passed &= !(forward_file_bb(Us, s + Up) & ourPawns);
+
+            if (passed)
+                e->passedPawns[Us] |= s;
+        }
+
         // Score this pawn
         if (support | phalanx)
         {
