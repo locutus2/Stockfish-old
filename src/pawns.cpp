@@ -125,7 +125,10 @@ namespace {
                 || (   !(stoppers ^ leverPush)
                     && popcount(phalanx) >= popcount(leverPush))
                 || (   stoppers == blocked && r >= RANK_5
-                    && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)));
+                    && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)))
+                || (   r < RANK_7
+                    && stoppers == (theirPawns & (s + 2 * Up)) && r >= RANK_4
+                    && (shift<Up>(phalanx) & ~(theirPawns | doubleAttackThem)));
 
         passed &= !(forward_file_bb(Us, s) & ourPawns);
 
