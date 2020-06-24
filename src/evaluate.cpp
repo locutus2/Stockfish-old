@@ -300,7 +300,7 @@ namespace {
             score += BishopOnKingRing;
 
         int mob;
-        if (Pt == QUEEN)
+        if (Pt == QUEEN && pos.count<QUEEN>(Them) == 0)
             mob = popcount(b & mobilityArea[Us] & ~(attackedBy[Them][KNIGHT] | attackedBy[Them][BISHOP]));
         else
             mob = popcount(b & mobilityArea[Us]);
