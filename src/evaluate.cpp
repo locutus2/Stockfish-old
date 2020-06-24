@@ -299,7 +299,11 @@ namespace {
         else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
             score += BishopOnKingRing;
 
-        int mob = popcount(b & mobilityArea[Us]);
+        int mob;
+        if (Pt == QUEEN)
+            mob = popcount(b & mobilityArea[Us] & ~(attackedBy[Them][KNIGHT] | attackedBy[Them][BISHOP]));
+        else
+            mob = popcount(b & mobilityArea[Us]);
 
         mobility[Us] += MobilityBonus[Pt - 2][mob];
 
@@ -840,8 +844,8 @@ namespace {
     // Note that the order of evaluation of the terms is left unspecified.
     score +=  pieces<WHITE, KNIGHT>() - pieces<BLACK, KNIGHT>()
             + pieces<WHITE, BISHOP>() - pieces<BLACK, BISHOP>()
-            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >()
-            + pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
+            + pieces<WHITE, ROOK  >() - pieces<BLACK, ROOK  >();
+    score +=  pieces<WHITE, QUEEN >() - pieces<BLACK, QUEEN >();
 
     score += mobility[WHITE] - mobility[BLACK];
 
