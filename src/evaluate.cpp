@@ -844,8 +844,13 @@ namespace {
     // More complex interactions that require fully populated attack bitboards
     score +=  king<   WHITE>() - king<   BLACK>()
             + threats<WHITE>() - threats<BLACK>()
-            + passed< WHITE>() - passed< BLACK>()
-            + space<  WHITE>() - space<  BLACK>();
+            + passed< WHITE>() - passed< BLACK>();
+
+    Score spaceScore = space<WHITE>() - space<BLACK>();
+    int spaceWeight = std::abs(mg_value(spaceScore));
+    int scoreWeight = std::abs(mg_value(score));
+    int spaceDominance = 64 * (scoreWeight + spaceWeight + 1) / (scoreWeight + 1);
+    score += spaceScore * 64 / spaceDominance;
 
     // Derive single value from mg and eg parts of score
     v = winnable(score);
