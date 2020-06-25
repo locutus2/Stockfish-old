@@ -88,6 +88,9 @@ namespace {
 
 #define S(mg, eg) make_score(mg, eg)
 
+  constexpr int A = 0;
+#define W(o,n) ((o)  + ((n) - (o)) * A / 100)
+
   // MobilityBonus[PieceType-2][attacked] contains bonuses for middle and end game,
   // indexed by piece type and number of attacked squares in the mobility area.
   constexpr Score MobilityBonus[][32] = {
@@ -99,10 +102,10 @@ namespace {
     { S(-60,-78), S(-20,-17), S(  2, 23), S(  3, 39), S(  3, 70), S( 11, 99), // Rook
       S( 22,103), S( 31,121), S( 40,134), S( 40,139), S( 41,158), S( 48,164),
       S( 57,168), S( 57,169), S( 62,172) },
-    { S(-30,-48), S(-12,-30), S( -8, -7), S( -9, 19), S( 20, 40), S( 23, 55), // Queen
-      S( 23, 59), S( 35, 75), S( 38, 78), S( 53, 96), S( 64, 96), S( 65,100),
-      S( 65,121), S( 66,127), S( 67,131), S( 67,133), S( 72,136), S( 72,141),
-      S( 77,147), S( 79,150), S( 93,151), S(108,168), S(108,168), S(108,171),
+    { S(W(-30,-15),W(-48,-24)), S(W(-12,-7),W(-30,-10)), S(W(-8,5), W(-7,23)), S(W(-9,20),W(19,51)), S(W( 20,31),W( 40,66)), S(W( 23,36),W( 55,74)), // Queen
+      S(W( 23,42),W( 59,81)), S( W(35,49), W(75,89)), S(W( 38,54),W( 78,95)), S(W( 53,61),W( 96,103)), S(W( 64,65),W( 96,109)), S(W( 65,66),W(100,117)),
+      S(W( 65,67),W(121,127)), S(W( 66,68),W(127,131)), S(W( 67,69),W(131,135)), S(W( 67,71),W(133,137)), S(W( 72,75),W(136,140)), S(W( 72,76),W(141,145)),
+      S(W( 77,81),W(147,149)), S(W( 79,84),W(150,152)), S(W( 93,95),W(151,154)), S(108,168), S(108,W(168,169)), S(108,171),
       S(110,182), S(114,182), S(114,192), S(116,219) }
   };
 
@@ -301,15 +304,11 @@ namespace {
 
         int mob;
         if (Pt == QUEEN)
-        {
             mob = popcount(b & mobilityArea[Us] & ~(attackedBy[Them][KNIGHT] | attackedBy[Them][BISHOP]));
-            mobility[Us] += MobilityBonus[Pt - 2][mob] + make_score(10, 10);
-        }
         else
-        {
             mob = popcount(b & mobilityArea[Us]);
-            mobility[Us] += MobilityBonus[Pt - 2][mob];
-        }
+
+        mobility[Us] += MobilityBonus[Pt - 2][mob];
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
