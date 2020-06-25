@@ -303,7 +303,7 @@ namespace {
         if (Pt == QUEEN)
         {
             mob = popcount(b & mobilityArea[Us] & ~(attackedBy[Them][KNIGHT] | attackedBy[Them][BISHOP]));
-            mobility[Us] += MobilityBonus[Pt - 2][mob] * 9 / 8;
+            mobility[Us] += MobilityBonus[Pt - 2][mob] + make_score(10, 10);
         }
         else
         {
