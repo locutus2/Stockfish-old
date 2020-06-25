@@ -301,7 +301,7 @@ namespace {
 
         int mob;
         if (Pt == QUEEN)
-            mob = popcount(b & mobilityArea[Us] & ~(attackedBy[Them][KNIGHT] | attackedBy[Them][BISHOP]));
+            mob = (popcount(b & mobilityArea[Us]) + popcount(b & mobilityArea[Us] & ~(attackedBy[Them][KNIGHT] | attackedBy[Them][BISHOP]))) / 2;
         else
             mob = popcount(b & mobilityArea[Us]);
 
