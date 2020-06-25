@@ -300,14 +300,16 @@ namespace {
             score += BishopOnKingRing;
 
         int mob;
-        if (   Pt == QUEEN
-            && pos.count<QUEEN>(Them) == 0
-            && pos.count<KNIGHT>(Them) + pos.count<BISHOP>(Them) >= pos.count<KNIGHT>(Us) + pos.count<BISHOP>(Us) + 3)
+        if (Pt == QUEEN)
+        {
             mob = popcount(b & mobilityArea[Us] & ~(attackedBy[Them][KNIGHT] | attackedBy[Them][BISHOP]));
+            mobility[Us] += MobilityBonus[Pt - 2][mob] * 9 / 8;
+        }
         else
+        {
             mob = popcount(b & mobilityArea[Us]);
-
-        mobility[Us] += MobilityBonus[Pt - 2][mob];
+            mobility[Us] += MobilityBonus[Pt - 2][mob];
+        }
 
         if (Pt == BISHOP || Pt == KNIGHT)
         {
