@@ -466,7 +466,7 @@ void Thread::search() {
               }
               else
               {
-                  rootMoves[pvIdx].bestMoveCount += 16;
+                  rootMoves[pvIdx].bestMoveCount += 4;
                   break;
               }
 
