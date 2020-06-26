@@ -1110,7 +1110,7 @@ moves_loop: // When in check, search starts from here
           extension = 1;
 
       // tt move extension at former PV nodes for low depth
-      else if (formerPv && move == ttMove && depth <= 1)
+      else if (formerPv && move == ttMove && depth < ss->ply)
           extension = 1;
 
       // Late irreversible move extension
