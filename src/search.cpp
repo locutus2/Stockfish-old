@@ -1109,8 +1109,8 @@ moves_loop: // When in check, search starts from here
       if (type_of(move) == CASTLING)
           extension = 1;
 
-      // tt move extension at PV nodes for low depth
-      else if (PvNode && move == ttMove && depth <= 1)
+      // tt move extension at former PV nodes for low depth
+      else if (formerPv && move == ttMove && depth <= 1)
           extension = 1;
 
       // Late irreversible move extension
