@@ -786,8 +786,9 @@ namespace {
                 && pos.non_pawn_material(BLACK) == RookValueMg
                 && !pe->passed_pawns(strongSide)
                 && pos.count<PAWN>(strongSide) - pos.count<PAWN>(~strongSide) <= 1
-                && bool(KingSide & pos.pieces(strongSide, PAWN)) != bool(QueenSide & pos.pieces(strongSide, PAWN)))
-            sf = 43;
+                && bool(KingSide & pos.pieces(strongSide, PAWN)) != bool(QueenSide & pos.pieces(strongSide, PAWN))
+                && !(pos.pieces(~strongSide, PAWN) & ~attackedBy[~strongSide][ALL_PIECES]))
+            sf = 36;
         else
             sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
     }
