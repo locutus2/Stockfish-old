@@ -786,7 +786,7 @@ namespace {
                 && pos.non_pawn_material(BLACK) == RookValueMg
                 && !pe->passed_pawns(strongSide)
                 && pos.count<PAWN>(strongSide) - pos.count<PAWN>(~strongSide) <= 1
-                && bool(KingSide & pos.pieces(strongSide, PAWN)) != bool(QueenSide & pos.pieces(strongSide, PAWN))
+                && bool(KingSide & pos.pieces(PAWN)) != bool(QueenSide & pos.pieces(PAWN))
                 && (attacks_bb<KING>(pos.square<KING>(~strongSide)) & pos.pieces(~strongSide, PAWN)))
             sf = 36;
         else
