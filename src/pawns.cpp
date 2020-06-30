@@ -66,6 +66,94 @@ namespace {
   #undef S
   #undef V
 
+  template<Color Us>
+  Score evaluate_pawn(const Position& pos, Pawns::Entry* e, Square s, bool &passed) {
+
+    constexpr Color     Them = ~Us;
+    constexpr Direction Up   = pawn_push(Us);
+
+    Bitboard neighbours, stoppers, support, phalanx, opposed;
+    Bitboard lever, leverPush, blocked;
+    bool backward, doubled;
+    Score score = SCORE_ZERO;
+
+    Bitboard ourPawns   = pos.pieces(  Us, PAWN);
+    Bitboard theirPawns = pos.pieces(Them, PAWN);
+
+    Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
+
+    Rank r = relative_rank(Us, s);
+
+    // Flag the pawn
+    opposed    = theirPawns & forward_file_bb(Us, s);
+    blocked    = theirPawns & (s + Up);
+    stoppers   = theirPawns & passed_pawn_span(Us, s);
+    lever      = theirPawns & pawn_attacks_bb(Us, s);
+    leverPush  = theirPawns & pawn_attacks_bb(Us, s + Up);
+    doubled    = ourPawns   & (s - Up);
+    neighbours = ourPawns   & adjacent_files_bb(s);
+    phalanx    = neighbours & rank_bb(s);
+    support    = neighbours & rank_bb(s - Up);
+
+    // A pawn is backward when it is behind all pawns of the same color on
+    // the adjacent files and cannot safely advance.
+    backward =  !(neighbours & forward_ranks_bb(Them, s + Up))
+              && (leverPush | blocked);
+
+    // Compute additional span if pawn is not backward nor blocked
+    if (!backward && !blocked)
+        e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
+
+    // A pawn is passed if one of the three following conditions is true:
+    // (a) there is no stoppers except some levers
+    // (b) the only stoppers are the leverPush, but we outnumber them
+    // (c) there is only one front stopper which can be levered.
+    //     (Refined in Evaluation::passed)
+    passed =   !(stoppers ^ lever)
+            || (   !(stoppers ^ leverPush)
+                && popcount(phalanx) >= popcount(leverPush))
+            || (   stoppers == blocked && r >= RANK_5
+                && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)));
+
+    passed &= !(forward_file_bb(Us, s) & ourPawns);
+
+    // Score this pawn
+    if (support | phalanx)
+    {
+        int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
+               + 21 * popcount(support);
+
+        score += make_score(v, v * (r - 2) / 4);
+    }
+
+    else if (!neighbours)
+    {
+        if (     opposed
+            &&  (ourPawns & forward_file_bb(Them, s))
+            && !(theirPawns & adjacent_files_bb(s)))
+            score -= Doubled;
+        else
+            score -=  Isolated
+                    + WeakUnopposed * !opposed;
+    }
+
+    else if (backward)
+        score -=  Backward
+                + WeakUnopposed * !opposed;
+
+    if (!support)
+        score -=  Doubled * doubled
+                + WeakLever * more_than_one(lever);
+
+    return score;
+  }
+
+} // namespace
+
+namespace Pawns {
+
+
+/// Pawns::probe() looks up the current position's pawns configuration in
 
   /// evaluate() calculates a score for the static pawn structure of the given position.
   /// We cannot use the location of pieces or king in this function, as the evaluation
@@ -78,11 +166,9 @@ namespace {
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
 
-    Bitboard neighbours, stoppers, support, phalanx, opposed;
-    Bitboard lever, leverPush, blocked;
     Square s;
-    bool backward, passed, doubled;
-    Score score = SCORE_ZERO;
+    bool passed;
+    Score score = SCORE_ZERO, singleScore;
     const Square* pl = pos.squares<PAWN>(Us);
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
@@ -100,73 +186,14 @@ namespace {
     {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
-        Rank r = relative_rank(Us, s);
-
-        // Flag the pawn
-        opposed    = theirPawns & forward_file_bb(Us, s);
-        blocked    = theirPawns & (s + Up);
-        stoppers   = theirPawns & passed_pawn_span(Us, s);
-        lever      = theirPawns & pawn_attacks_bb(Us, s);
-        leverPush  = theirPawns & pawn_attacks_bb(Us, s + Up);
-        doubled    = ourPawns   & (s - Up);
-        neighbours = ourPawns   & adjacent_files_bb(s);
-        phalanx    = neighbours & rank_bb(s);
-        support    = neighbours & rank_bb(s - Up);
-
-        // A pawn is backward when it is behind all pawns of the same color on
-        // the adjacent files and cannot safely advance.
-        backward =  !(neighbours & forward_ranks_bb(Them, s + Up))
-                  && (leverPush | blocked);
-
-        // Compute additional span if pawn is not backward nor blocked
-        if (!backward && !blocked)
-            e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
-
-        // A pawn is passed if one of the three following conditions is true:
-        // (a) there is no stoppers except some levers
-        // (b) the only stoppers are the leverPush, but we outnumber them
-        // (c) there is only one front stopper which can be levered.
-        //     (Refined in Evaluation::passed)
-        passed =   !(stoppers ^ lever)
-                || (   !(stoppers ^ leverPush)
-                    && popcount(phalanx) >= popcount(leverPush))
-                || (   stoppers == blocked && r >= RANK_5
-                    && (shift<Up>(support) & ~(theirPawns | doubleAttackThem)));
-
-        passed &= !(forward_file_bb(Us, s) & ourPawns);
+	singleScore = evaluate_pawn<Us>(pos, e, s, passed);
 
         // Passed pawns will be properly scored later in evaluation when we have
         // full attack info.
         if (passed)
             e->passedPawns[Us] |= s;
 
-        // Score this pawn
-        if (support | phalanx)
-        {
-            int v =  Connected[r] * (4 + 2 * bool(phalanx) - 2 * bool(opposed) - bool(blocked)) / 2
-                   + 21 * popcount(support);
-
-            score += make_score(v, v * (r - 2) / 4);
-        }
-
-        else if (!neighbours)
-        {
-            if (     opposed
-                &&  (ourPawns & forward_file_bb(Them, s))
-                && !(theirPawns & adjacent_files_bb(s)))
-                score -= Doubled;
-            else
-                score -=  Isolated
-                        + WeakUnopposed * !opposed;
-        }
-
-        else if (backward)
-            score -=  Backward
-                    + WeakUnopposed * !opposed;
-
-        if (!support)
-            score -=  Doubled * doubled
-                    + WeakLever * more_than_one(lever);
+        score += singleScore;
     }
 
     return score;
