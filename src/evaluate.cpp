@@ -882,7 +882,7 @@ namespace {
     int rule50 = 100 - pos.rule50_count();
 
     if (pos.opposite_bishops())
-        rule50 = rule50 * rule50 / 100;
+        rule50 = rule50 * rule50 * rule50 / 10000;
 
     v = v * rule50 / 100;
 
