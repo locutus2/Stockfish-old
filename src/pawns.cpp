@@ -166,9 +166,10 @@ namespace Pawns {
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
 
+    Bitboard lever;
     Square s;
     bool passed;
-    Score score = SCORE_ZERO, singleScore;
+    Score score = SCORE_ZERO, pawnScore;
     const Square* pl = pos.squares<PAWN>(Us);
 
     Bitboard ourPawns   = pos.pieces(  Us, PAWN);
@@ -186,14 +187,25 @@ namespace Pawns {
     {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
-	singleScore = evaluate_pawn<Us>(pos, e, s, passed);
+	pawnScore = evaluate_pawn<Us>(pos, e, s, passed);
 
         // Passed pawns will be properly scored later in evaluation when we have
         // full attack info.
         if (passed)
             e->passedPawns[Us] |= s;
 
-        score += singleScore;
+        lever = theirPawns & pawn_attacks_bb(Us, s);
+
+	while (lever)
+        {
+            Square sq = pop_lsb(&lever);
+	    Score score2 = evaluate_pawn<Us>(pos, e, sq, passed);
+
+            if (mg_value(pawnScore) < mg_value(score2))
+                score += (score2 - pawnScore) / 2;
+        }
+
+        score += pawnScore;
     }
 
     return score;
