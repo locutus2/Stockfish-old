@@ -879,7 +879,7 @@ namespace {
     v = (pos.side_to_move() == WHITE ? v : -v) + Tempo;
 
     // Damp down the evaluation linearly when shuffling
-    v = v * (100 - pos.rule50_count()) * (PHASE_MIDGAME + me->game_phase()) / (200 * PHASE_MIDGAME);
+    v = v * (100 - pos.rule50_count()) * (3 * PHASE_MIDGAME + me->game_phase()) / (400 * PHASE_MIDGAME);
 
     return v;
   }
