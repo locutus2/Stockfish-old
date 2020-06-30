@@ -164,7 +164,7 @@ namespace Pawns {
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
 
-    Bitboard lever;
+    Bitboard b;
     Square s;
     bool passed;
     Score score = SCORE_ZERO, pawnScore;
@@ -192,11 +192,12 @@ namespace Pawns {
         if (passed)
             e->passedPawns[Us] |= s;
 
-        lever = theirPawns & pawn_attacks_bb(Us, s);
+        b =  (theirPawns & pawn_attacks_bb(Us, s))
+           | (~(theirPawns | ourPawns) & (s + Up));
 
-	while (lever)
+	while (b)
         {
-            Square sq = pop_lsb(&lever);
+            Square sq = pop_lsb(&b);
 	    Score score2 = evaluate_pawn<Us>(pos, e, sq, passed);
 
             if (mg_value(pawnScore) < mg_value(score2))
