@@ -185,7 +185,7 @@ namespace Pawns {
     {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
-	pawnScore = evaluate_pawn<Us>(pos, e, s, passed);
+        pawnScore = evaluate_pawn<Us>(pos, e, s, passed);
 
         // Passed pawns will be properly scored later in evaluation when we have
         // full attack info.
@@ -194,10 +194,10 @@ namespace Pawns {
 
         lever = theirPawns & pawn_attacks_bb(Us, s);
 
-	while (lever)
+        while (lever)
         {
             Square sq = pop_lsb(&lever);
-	    Score score2 = evaluate_pawn<Us>(pos, e, sq, passed);
+            Score score2 = evaluate_pawn<Us>(pos, e, sq, passed);
 
             if (mg_value(pawnScore) < mg_value(score2))
                 score += (score2 - pawnScore) / 2;
