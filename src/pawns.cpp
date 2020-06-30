@@ -67,7 +67,7 @@ namespace {
   #undef V
 
   template<Color Us>
-  Score evaluate_pawn(const Position& pos, Pawns::Entry* e, Square s, bool &passed) {
+  Score evaluate_pawn(const Position& pos, Pawns::Entry* e, Square s, Bitboard ourPawns, bool &passed) {
 
     constexpr Color     Them = ~Us;
     constexpr Direction Up   = pawn_push(Us);
@@ -77,7 +77,6 @@ namespace {
     bool backward, doubled;
     Score score = SCORE_ZERO;
 
-    Bitboard ourPawns   = pos.pieces(  Us, PAWN);
     Bitboard theirPawns = pos.pieces(Them, PAWN);
 
     Bitboard doubleAttackThem = pawn_double_attacks_bb<Them>(theirPawns);
@@ -185,7 +184,7 @@ namespace Pawns {
     {
         assert(pos.piece_on(s) == make_piece(Us, PAWN));
 
-        pawnScore = evaluate_pawn<Us>(pos, e, s, passed);
+        pawnScore = evaluate_pawn<Us>(pos, e, s, ourPawns, passed);
 
         // Passed pawns will be properly scored later in evaluation when we have
         // full attack info.
@@ -197,7 +196,7 @@ namespace Pawns {
         while (lever)
         {
             Square sq = pop_lsb(&lever);
-            Score score2 = evaluate_pawn<Us>(pos, e, sq, passed);
+            Score score2 = evaluate_pawn<Us>(pos, e, sq, ourPawns ^ s, passed);
             score += (score2 - pawnScore) / 4;
         }
 
