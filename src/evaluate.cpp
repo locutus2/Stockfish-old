@@ -789,7 +789,8 @@ namespace {
                 && (attacks_bb<KING>(pos.square<KING>(~strongSide)) & pos.pieces(~strongSide, PAWN)))
             sf = 36;
         else if (pos.count<QUEEN>() == 1)
-            sf = 37 + 3 * (pos.count<QUEEN>(~strongSide) == 1 ? pos.count<BISHOP>(strongSide) + pos.count<KNIGHT>(strongSide) : 0);
+            sf = 37 + 3 * (pos.count<QUEEN>(strongSide) == 1 ? -(pos.count<BISHOP>(~strongSide) + pos.count<KNIGHT>(~strongSide))
+                                                             :   pos.count<BISHOP>( strongSide) + pos.count<KNIGHT>( strongSide));
         else
             sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
     }
