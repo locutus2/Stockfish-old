@@ -879,7 +879,8 @@ namespace {
     v = (pos.side_to_move() == WHITE ? v : -v) + Tempo;
 
     // Damp down the evaluation linearly when shuffling
-    v = v * (100 - pos.rule50_count()) / 100;
+    int rule50 = pos.rule50_count() * (1 + pos.opposite_bishops());
+    v = v * std::max(100 - rule50, 0) / 100;
 
     return v;
   }
