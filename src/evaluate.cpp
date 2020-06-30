@@ -881,8 +881,8 @@ namespace {
     // Damp down the evaluation linearly when shuffling
     int rule50 = 100 - pos.rule50_count();
 
-    if (pos.opposite_bishops())
-        rule50 = rule50 * rule50 * rule50 / 10000;
+    if (pos.opposite_bishops() && pos.non_pawn_material() == 2 * BishopValueMg)
+        rule50 = rule50 * rule50/ 100;
 
     v = v * rule50 / 100;
 
