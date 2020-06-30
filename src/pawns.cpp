@@ -153,8 +153,6 @@ namespace {
 namespace Pawns {
 
 
-/// Pawns::probe() looks up the current position's pawns configuration in
-
   /// evaluate() calculates a score for the static pawn structure of the given position.
   /// We cannot use the location of pieces or king in this function, as the evaluation
   /// of the pawn structure will be stored in a small cache for speed reasons, and will
