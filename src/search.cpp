@@ -1092,7 +1092,7 @@ moves_loop: // When in check, search starts from here
       // Check extension (~2 Elo)
       else if (    givesCheck
                && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move))
-               && ss->ply < 2 * depth)
+               && depth >= 5)
           extension = 1;
 
       // Passed pawn extension
