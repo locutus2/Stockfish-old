@@ -197,7 +197,7 @@ namespace Pawns {
         {
             Square sq = pop_lsb(&lever);
             Score score2 = evaluate_pawn<Us>(pos, e, sq, ourPawns ^ s, passed);
-            score += (score2 - pawnScore) / 2;
+            score += (score2 - pawnScore) / 8;
         }
 
         score += pawnScore;
