@@ -340,7 +340,7 @@ namespace {
 
                 Bitboard squaresOfBishop = DarkSquares & s ? DarkSquares : ~DarkSquares;
                 if (!(squaresOfBishop & pos.pieces(Them, BISHOP)))
-                    score += BishopDominance * popcount(b & attackedBy[Us][PAWN]);
+                    score += BishopDominance * popcount((b | s) & attackedBy[Us][PAWN]);
 
                 // An important Chess960 pattern: a cornered bishop blocked by a friendly
                 // pawn diagonally in front of it is a very serious problem, especially
