@@ -149,6 +149,12 @@ namespace {
   #undef S
   #undef V
 
+
+  /// evaluate() calculates a score for the static pawn structure of the given position.
+  /// We cannot use the location of pieces or king in this function, as the evaluation
+  /// of the pawn structure will be stored in a small cache for speed reasons, and will
+  /// be re-used even when the pieces have moved.
+
   template<Color Us>
   Score evaluate(const Position& pos, Pawns::Entry* e) {
 
@@ -328,7 +334,7 @@ namespace {
 	
 
             if (   opposed
-				&& (ourPawns & forward_file_bb(Them, s))
+		&& (ourPawns & forward_file_bb(Them, s))
                 && !(theirPawns & adjacent_files_bb(s)))
 				{
                 //score -= DoubledIsolated;			
@@ -533,6 +539,7 @@ namespace {
 
 namespace Pawns {
 
+
 /// Pawns::probe() looks up the current position's pawns configuration in
 /// the pawns hash table. It returns a pointer to the Entry if the position
 /// is found. Otherwise a new Entry is computed and stored there, so we don't
@@ -564,7 +571,7 @@ int blockedstormf_mg[4];
 int blockedstormf_eg[4];
 
 template<Color Us>
-Score Entry::evaluate_shelter(const Position& pos, Square ksq) {
+Score Entry::evaluate_shelter(const Position& pos, Square ksq) const {
 
   constexpr Color Them = ~Us;
 
