@@ -39,6 +39,7 @@ namespace {
   constexpr Score WeakUnopposed = S(13, 27);
 
   constexpr Score BlockedStorm[RANK_NB]  = {S( 0, 0), S( 0, 0), S( 76, 78), S(-10, 15), S(-7, 10), S(-4, 6), S(-1, 2)};
+  constexpr Score BlockedPawn[RANK_NB]   = {S( 0, 0), S( -5, -5), S( -3, -3), S(-1, -1), S(1, 1), S(3, 3), S(5, 5)};
 
   // Connected pawn bonus
   constexpr int Connected[RANK_NB] = { 0, 7, 8, 12, 29, 48, 86 };
@@ -139,6 +140,9 @@ namespace {
         // full attack info.
         if (passed)
             e->passedPawns[Us] |= s;
+
+        if (blocked)
+            score += BlockedPawn[r];
 
         // Score this pawn
         if (support | phalanx)
