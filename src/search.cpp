@@ -1177,9 +1177,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction if not in check and non-castling king move although castling is possible
+              // Decrease reduction if not in check and non-castling king move although castling is possible
               if (type_of(movedPiece) == KING && canCastle && type_of(move) != CASTLING && !ss->inCheck)
-                  r++;
+                  r--;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
