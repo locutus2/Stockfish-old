@@ -943,6 +943,7 @@ moves_loop: // When in check, search starts from here
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+    bool canCastle = pos.castling_rights(us);
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
@@ -1176,6 +1177,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Increase reduction if not in check and non-castling king move although castling is possible
+              if (type_of(movedPiece) == KING && canCastle && type_of(move) != CASTLING && !ss->inCheck)
+                  r++;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
