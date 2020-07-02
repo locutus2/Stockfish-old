@@ -127,6 +127,7 @@ namespace {
   };
 
   // Assorted bonuses and penalties
+  constexpr Score BishopDominance     = S( 10, 10);
   constexpr Score BishopKingProtector = S(  6,  9);
   constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopOutpost       = S( 30, 23);
@@ -336,6 +337,10 @@ namespace {
                 // Bonus for bishop on a long diagonal which can "see" both center squares
                 if (more_than_one(attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & Center))
                     score += LongDiagonalBishop;
+
+                Bitboard squaresOfBishop = DarkSquares & s ? DarkSquares : ~DarkSquares;
+                if (!(squaresOfBishop & pos.pieces(Them, BISHOP)))
+                    score += BishopDominance * popcount(b & attackedBy[Us][PAWN]);
 
                 // An important Chess960 pattern: a cornered bishop blocked by a friendly
                 // pawn diagonally in front of it is a very serious problem, especially
