@@ -140,6 +140,8 @@ namespace Tuning {
   constexpr double INF = std::numeric_limits<double>().max();
   constexpr double MAX_VALUE = PawnValueEg;
   constexpr bool SKIP_DRAWS = false;
+
+  extern bool DoUpdate;
   
   double cp2p(double x);
   double p2cp(double x);

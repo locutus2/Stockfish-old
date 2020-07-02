@@ -540,6 +540,8 @@ namespace Tuning {
 	constexpr double MSE_BASE = 0.0001;
 	constexpr double GAMMA = 0.99;
 
+	bool DoUpdate = false;
+
 	std::vector<double> param;
 	std::vector<double> minParam;
 	std::vector<double> maxParam;
@@ -582,7 +584,8 @@ namespace Tuning {
 	}
 
 	void updateGradient(Color c, int index, double value) {
-		gradient[index] += (c == WHITE ? value : -value);
+		if (DoUpdate)
+		    gradient[index] += (c == WHITE ? value : -value);
 	}
 
 	void updateParams() {

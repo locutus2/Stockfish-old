@@ -253,8 +253,9 @@ namespace {
 
     constexpr bool DEBUG = false;
     constexpr bool USE_SCORE = false;
-    constexpr bool USE_RESULT = true;
-    constexpr Depth depth = 0;
+    constexpr bool USE_RESULT = false;
+    constexpr bool USE_SEARCH_EVAL = true;
+    constexpr Depth depth = 5;
 
     double mse = std::numeric_limits<double>().max() / 2;
     double last_mse = 0;
@@ -309,6 +310,20 @@ namespace {
 
 		        if(std::abs(value) < Tuning::MAX_VALUE)
 		        {
+			       if (USE_SEARCH_EVAL)
+			       {
+				  Tuning::DoUpdate = true;
+		                  Value rootValue = Eval::evaluate(pos);
+				  Tuning::DoUpdate = false;
+			          if(pos.side_to_move() == BLACK)
+			              rootValue = -rootValue;
+		        	  ++n;
+				  double error = Tuning::updateTotalGradients(rootValue, value);
+				  mse += error;
+                		   if(DEBUG) cerr << "SEARCH_VAL: eval=" << value << " error=" << error << endl;
+			       } 
+			       else
+			       {
 		       	       
 			       if(USE_SCORE && score != VALUE_NONE)
 			       {
@@ -335,6 +350,7 @@ namespace {
 				mse += error;
                 		if(DEBUG) cerr << "SCORE: eval=" << value << " error=" << error << endl;
 			      }
+			      } 
 		        }
 		}
 	}

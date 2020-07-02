@@ -742,16 +742,16 @@ IDoubledIsolated[0] = Tuning::addParam(mg_value(DoubledIsolated), false);
 IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
 //IDoubledIsolatedOpposed[0] = Tuning::addParam(15, false);
 //IDoubledIsolatedOpposed[1] = Tuning::addParam(57, false);
-	IBackwardMG = Tuning::addParam(mg_value(Backward), false, 0);
-	IBackwardEG = Tuning::addParam(eg_value(Backward), false, 0);
-	IDoubledMG = Tuning::addParam(mg_value(Doubled), false);
-	IDoubledEG = Tuning::addParam(eg_value(Doubled), false);
-	IIsolatedMG = Tuning::addParam(mg_value(Isolated), false, 0);
-	IIsolatedEG = Tuning::addParam(eg_value(Isolated), false, 0);
-	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), false);
-	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), false);
-	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), false, 0);
-	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), false, 0);
+	IBackwardMG = Tuning::addParam(mg_value(Backward), true, 0);
+	IBackwardEG = Tuning::addParam(eg_value(Backward), true, 0);
+	IDoubledMG = Tuning::addParam(mg_value(Doubled), true, 0);
+	IDoubledEG = Tuning::addParam(eg_value(Doubled), true, 0);
+	IIsolatedMG = Tuning::addParam(mg_value(Isolated), true, 0);
+	IIsolatedEG = Tuning::addParam(eg_value(Isolated), true, 0);
+	IWeakLeverMG = Tuning::addParam(mg_value(WeakLever), true, 0);
+	IWeakLeverEG = Tuning::addParam(eg_value(WeakLever), true, 0);
+	IWeakUnopposedMG = Tuning::addParam(mg_value(WeakUnopposed), true, 0);
+	IWeakUnopposedEG = Tuning::addParam(eg_value(WeakUnopposed), true, 0);
 	ISupported = Tuning::addParam(21, false);
 	for(Rank r = RANK_2; r < RANK_8; ++r)
 		IConnected[r] = Tuning::addParam(Connected[r], false);
@@ -890,8 +890,8 @@ IDoubledIsolated[1] = Tuning::addParam(eg_value(DoubledIsolated), false);
 	*/
 	for(int i = 0; i < 1+NPweight+NPweight*(NPweight-1)/2; ++i)
 	{
-			IPweight[i][0] = Tuning::addParam(0, true);
-			IPweight[i][1] = Tuning::addParam(0, true);
+			IPweight[i][0] = Tuning::addParam(0, false);
+			IPweight[i][1] = Tuning::addParam(0, false);
 	}
 }
 
