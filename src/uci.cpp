@@ -248,14 +248,15 @@ namespace {
     vector<string> list = setup_bench(pos, args, true);
     int num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
 
-    TimePoint elapsed = now();
+    TimePoint start = now();
+    TimePoint elapsed;
     int gameResult = VALUE_NONE, score = VALUE_NONE;
 
     constexpr bool DEBUG = false;
     constexpr bool USE_SCORE = false;
     constexpr bool USE_RESULT = false;
     constexpr bool USE_SEARCH_EVAL = true;
-    constexpr Depth depth = 5;
+    constexpr Depth depth = 1;
 
     double mse = std::numeric_limits<double>().max() / 2;
     double last_mse = 0;
@@ -293,7 +294,8 @@ namespace {
 		{
 			Tuning::clearGradients();
 			int value;
-			if (depth > 0)
+			Tuning::DoUpdate = true;
+			if (!USE_SEARCH_EVAL && depth > 0)
 			{
                             go(pos, depth, states);
                             Threads.main()->wait_for_search_finished();
@@ -304,6 +306,7 @@ namespace {
 			{
 		            value = Eval::evaluate(pos);
 			}
+			Tuning::DoUpdate = false;
 
 			if(pos.side_to_move() == BLACK)
 			    value = -value;
@@ -312,15 +315,19 @@ namespace {
 		        {
 			       if (USE_SEARCH_EVAL)
 			       {
-				  Tuning::DoUpdate = true;
-		                  Value rootValue = Eval::evaluate(pos);
-				  Tuning::DoUpdate = false;
-			          if(pos.side_to_move() == BLACK)
-			              rootValue = -rootValue;
-		        	  ++n;
-				  double error = Tuning::updateTotalGradients(rootValue, value);
-				  mse += error;
-                		   if(DEBUG) cerr << "SEARCH_VAL: eval=" << value << " error=" << error << endl;
+                                  go(pos, depth, states);
+                                  Threads.main()->wait_for_search_finished();
+                                  nodes += Threads.nodes_searched();
+			          Value searchValue = Threads.main()->bestPreviousScore;
+		                  if(std::abs(searchValue) < Tuning::MAX_VALUE)
+				  {
+			              if(pos.side_to_move() == BLACK)
+			                  searchValue = -searchValue;
+		        	      ++n;
+				      double error = Tuning::updateTotalGradients(value, searchValue);
+				      mse += error;
+                		      if(DEBUG) cerr << "SEARCH_VAL: eval=" << value << " error=" << error << endl;
+				  }
 			       } 
 			       else
 			       {
@@ -379,11 +386,12 @@ namespace {
     Tuning::updateParams();
     lastErr = err;
     err = Tuning::totalError();
-    cerr << "Iteration=" << it << " n=" << n << " mse=" << mse << " error=" << err << " alpha=" << Tuning::ALPHA << endl << std::flush;
+    elapsed = now() - start + 1; // Ensure positivity to avoid a 'divide by zero'
+    cerr << "Iteration=" << it << " n=" << n << " mse=" << mse << " error=" << err 
+	 << " alpha=" << Tuning::ALPHA
+	 << " time=" << elapsed/1000 << " s" << endl << std::flush;
     Tuning::printParams(cerr);
     }
-
-    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
 
     dbg_print(); // Just before exiting
 

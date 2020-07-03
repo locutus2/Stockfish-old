@@ -535,7 +535,7 @@ namespace Tuning {
 	constexpr double RESCALE_BASE = 1;
 	constexpr bool FIXED = false;
 	constexpr bool RESCALE_EVERYTIME = false;
-	constexpr bool USE_LOGIT = true;
+	constexpr bool USE_LOGIT = false;
 	constexpr bool SCALE_TO_MSE = false;
 	constexpr double MSE_BASE = 0.0001;
 	constexpr double GAMMA = 0.99;

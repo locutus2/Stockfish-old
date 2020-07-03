@@ -138,7 +138,7 @@ namespace WinProcGroup {
 namespace Tuning {
   extern double ALPHA;
   constexpr double INF = std::numeric_limits<double>().max();
-  constexpr double MAX_VALUE = PawnValueEg;
+  constexpr double MAX_VALUE = 2 * PawnValueEg;
   constexpr bool SKIP_DRAWS = false;
 
   extern bool DoUpdate;
