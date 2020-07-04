@@ -38,6 +38,8 @@ namespace {
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
 
+  constexpr Score BlockedPawn[2] = { S(2, -2), S(7, 2) };
+
   constexpr Score BlockedStorm[RANK_NB] = {
     S(0, 0), S(0, 0), S(76, 78), S(-10, 15), S(-7, 10), S(-4, 6), S(-1, 2)
   };
@@ -169,6 +171,9 @@ namespace {
         if (!support)
             score -=  Doubled * doubled
                     + WeakLever * more_than_one(lever);
+
+        if (r < RANK_4)
+            score += BlockedPawn[r-1];
     }
 
     return score;
