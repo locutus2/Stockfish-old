@@ -122,7 +122,12 @@ namespace {
 
         // Compute additional span if pawn is not backward nor blocked
         if (!backward && !blocked)
-            e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
+        {
+            if (opposed)
+                e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s) & pawn_attack_span(Them, frontmost_sq(Them, opposed) + Up);
+            else
+                e->pawnAttacksSpan[Us] |= pawn_attack_span(Us, s);
+        }
 
         // A pawn is passed if one of the three following conditions is true:
         // (a) there is no stoppers except some levers
