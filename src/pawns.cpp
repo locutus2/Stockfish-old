@@ -38,7 +38,7 @@ namespace {
   constexpr Score WeakLever     = S( 0, 56);
   constexpr Score WeakUnopposed = S(13, 27);
 
-  constexpr Score BlockedPawn[2] = { S(2, -2), S(7, 2) };
+  constexpr Score BlockedPawn[2] = { S(4, -4), S(14, 4) };
 
   constexpr Score BlockedStorm[RANK_NB] = {
     S(0, 0), S(0, 0), S(76, 78), S(-10, 15), S(-7, 10), S(-4, 6), S(-1, 2)
