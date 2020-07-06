@@ -1151,10 +1151,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Increase reduction if last move was a capture
-          if (priorCapture)
-              r++;
-
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 473 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1165,7 +1161,7 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if position is or has been on the PV (~10 Elo)
           if (ttPv)
-              r -= 2;
+              r -= 2 - (formerPv && priorCapture);
 
           if (moveCountPruning && !formerPv)
               r++;
