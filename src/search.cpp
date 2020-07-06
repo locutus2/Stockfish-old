@@ -37,6 +37,9 @@
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
+int LMRWeight[20];
+TUNE(SetRange(-100, 100), LMRWeight);
+
 namespace Search {
 
   LimitsType Limits;
@@ -1150,6 +1153,31 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 415 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          int LMRvalue =  LMRWeight[ 0]
+                        + LMRWeight[ 1] * (type_of(movedPiece) == PAWN)
+                        + LMRWeight[ 2] * (type_of(movedPiece) == KNIGHT)
+                        + LMRWeight[ 3] * (type_of(movedPiece) == BISHOP)
+                        + LMRWeight[ 4] * (type_of(movedPiece) == ROOK)
+                        + LMRWeight[ 5] * (type_of(movedPiece) == QUEEN)
+                        + LMRWeight[ 6] * (type_of(movedPiece) == KING)
+                        + LMRWeight[ 7] * PvNode
+                        + LMRWeight[ 8] * cutNode
+                        + LMRWeight[ 9] * ss->inCheck
+                        + LMRWeight[10] * givesCheck
+                        + LMRWeight[11] * captureOrPromotion
+                        + LMRWeight[12] * moveCountPruning
+                        + LMRWeight[13] * moveCount / 64
+                        + LMRWeight[14] * depth / 16
+                        + LMRWeight[15] * ttCapture
+                        + LMRWeight[16] * formerPv
+                        + LMRWeight[17] * singularQuietLMR
+                        + LMRWeight[18] * priorCapture
+                        + LMRWeight[19] * ttHit;
+
+          // Increase reduction if LMR value is negative
+          if (LMRvalue < 0)
+              r++;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 473 * TtHitAverageResolution * TtHitAverageWindow / 1024)
