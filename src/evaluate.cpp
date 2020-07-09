@@ -302,7 +302,8 @@ namespace {
             if (file_bb(s) & kingRing[Them])
                 score += RookOnKingRing;
 
-            else if (file_bb(pos.square<KING>(Them)) & b & ~(attackedBy[Them][PAWN] | pos.pieces(Us)))
+            else if (b & (file_bb(pos.square<KING>(Them)) | adjacent_files_bb(pos.square<KING>(Them)))
+                       & ~(attackedBy[Them][PAWN] | pos.pieces(Us)))
                 score += RookOnKingThreat;
         }
 
