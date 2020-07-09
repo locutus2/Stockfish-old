@@ -149,6 +149,7 @@ namespace {
   constexpr Score ReachableOutpost    = S( 31, 22);
   constexpr Score RestrictedPiece     = S(  7,  7);
   constexpr Score RookOnKingRing      = S( 16,  0);
+  constexpr Score RookOnKingThreat    = S(  8,  0);
   constexpr Score RookOnQueenFile     = S(  6, 11);
   constexpr Score SliderOnQueen       = S( 60, 18);
   constexpr Score ThreatByKing        = S( 24, 89);
@@ -296,8 +297,14 @@ namespace {
             kingAttacksCount[Us] += popcount(b & attackedBy[Them][KING]);
         }
 
-        else if (Pt == ROOK && (file_bb(s) & kingRing[Them]))
-            score += RookOnKingRing;
+        else if (Pt == ROOK)
+        {
+            if (file_bb(s) & kingRing[Them])
+                score += RookOnKingRing;
+
+            else if (file_bb(pos.square<KING>(Them)) & b & ~(attackedBy[Them][PAWN] | pos.pieces(Us)))
+                score += RookOnKingThreat;
+        }
 
         else if (Pt == BISHOP && (attacks_bb<BISHOP>(s, pos.pieces(PAWN)) & kingRing[Them]))
             score += BishopOnKingRing;
