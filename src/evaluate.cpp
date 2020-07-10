@@ -149,7 +149,7 @@ namespace {
   constexpr Score ReachableOutpost    = S( 31, 22);
   constexpr Score RestrictedPiece     = S(  7,  7);
   constexpr Score RookOnKingRing      = S( 16,  0);
-  constexpr Score RookOnKingThreat    = S(  8,  0);
+  constexpr Score RookOnKingThreat    = S(  4,  0);
   constexpr Score RookOnQueenFile     = S(  6, 11);
   constexpr Score SliderOnQueen       = S( 60, 18);
   constexpr Score ThreatByKing        = S( 24, 89);
@@ -302,7 +302,7 @@ namespace {
             if (file_bb(s) & kingRing[Them])
                 score += RookOnKingRing;
 
-            else if (b & (file_bb(pos.square<KING>(Them)) | adjacent_files_bb(pos.square<KING>(Them)))
+            else if (b & file_bb(pos.square<KING>(Them))
                        & ~(attackedBy[Them][PAWN] | pos.pieces(Us)))
                 score += RookOnKingThreat;
         }
