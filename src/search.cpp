@@ -1155,6 +1155,28 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          int LMRvalue =  25 * (type_of(movedPiece) == PAWN)
+                        + 12 * (type_of(movedPiece) == KNIGHT)
+                        + 16 * (type_of(movedPiece) == BISHOP)
+                        +  6 * (type_of(movedPiece) == ROOK)
+                        +  7 * (type_of(movedPiece) == QUEEN)
+                        + 17 * (type_of(movedPiece) == KING)
+                        + 19 * ss->inCheck
+                        +  2 * givesCheck
+                        -  6 * captureOrPromotion
+                        - 11 * moveCountPruning
+                        + 15 * moveCount / 64
+                        -  5 * depth / 16
+                        +  5 * ttCapture
+                        +  6 * formerPv
+                        +  6 * singularQuietLMR
+                        -  9 * priorCapture
+                        + 31 * ttHit;
+
+          // Increase reduction if LMR value is bad
+          if (LMRvalue < -14)
+              r++;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 473 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
