@@ -475,7 +475,7 @@ namespace {
                  +  37;
 
     // Transform the kingDanger units into a Score, and subtract it from the evaluation
-    if (kingDanger > 100)
+    if (kingDanger > 0)
     {
         kingDanger += std::max(400 - kingDanger, 0) / 2;
         score -= make_score(kingDanger * kingDanger / 4096, kingDanger / 16);
