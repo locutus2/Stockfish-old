@@ -1003,8 +1003,6 @@ moves_loop: // When in check, search starts from here
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
-          && (   type_of(movedPiece) != PAWN
-              || !(passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING)))
           && bestValue > VALUE_TB_LOSS_IN_MAX_PLY)
       {
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
@@ -1014,7 +1012,9 @@ moves_loop: // When in check, search starts from here
           int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount), 0);
 
           if (   !captureOrPromotion
-              && !givesCheck)
+              && !givesCheck
+              && (   type_of(movedPiece) != PAWN
+                  || !(passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING))))
           {
               // Countermoves based pruning (~20 Elo)
               if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
