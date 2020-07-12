@@ -1121,6 +1121,7 @@ moves_loop: // When in check, search starts from here
 
       // Pawn move to opponent king extension
       else if (   type_of(movedPiece) == PAWN
+               && !captureOrPromotion
                && (passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING)))
           extension = 1;
 
