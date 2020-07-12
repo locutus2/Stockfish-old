@@ -314,8 +314,8 @@ namespace {
             if (   Pt == KNIGHT
                 && bb & s & ~CenterFiles
                 && !(b & pos.pieces(Them) & ~pos.pieces(PAWN))
-                && !conditional_more_than_two(
-                      pos.pieces(Them) & ~pos.pieces(PAWN) & (s & QueenSide ? QueenSide : KingSide)))
+                && !more_than_one(  pos.pieces(Them) & ~pos.pieces(PAWN)
+                                  & (s & QueenSide ? QueenSide ^ FileDBB : KingSide ^ FileEBB)))
                 score += BadOutpost;
             else if (bb & s)
                 score += Outpost[Pt == BISHOP];
