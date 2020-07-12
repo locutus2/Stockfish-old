@@ -1173,7 +1173,7 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction for pawn move to opponent king if queen can support the attack
           if (   type_of(movedPiece) == PAWN
               && (passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING))
-			  && pos.pieces(us, QUEEN))
+              && pos.non_pawn_material(us) >= QueenValueMg + 2 * RookValueMg + KnightValueMg)
               r--;
 
           // Decrease reduction if the ttHit running average is large
