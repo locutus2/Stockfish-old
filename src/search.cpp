@@ -1170,11 +1170,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction for pawn move to opponent king
-          if (   type_of(movedPiece) == PAWN
-              && (passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING)))
-              r--;
-
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 473 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1200,6 +1195,11 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Decrease reduction for pawn move to opponent king
+              if (   type_of(movedPiece) == PAWN
+                  && (passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING)))
+                  r--;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
