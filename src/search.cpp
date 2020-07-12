@@ -1003,6 +1003,8 @@ moves_loop: // When in check, search starts from here
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
+          && (   type_of(movedPiece) != PAWN
+              || !(passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING)))
           && bestValue > VALUE_TB_LOSS_IN_MAX_PLY)
       {
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
@@ -1169,11 +1171,6 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 415 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
-
-          // Decrease reduction for pawn move to opponent king
-          if (   type_of(movedPiece) == PAWN
-              && (passed_pawn_span(us, to_sq(move)) & pos.pieces(~us, KING)))
-              r--;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 473 * TtHitAverageResolution * TtHitAverageWindow / 1024)
