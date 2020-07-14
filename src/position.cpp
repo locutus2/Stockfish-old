@@ -213,7 +213,7 @@ Position& Position::set(const string& fenStr, bool isChess960, StateInfo* si, Th
 
       else if ((idx = PieceToChar.find(token)) != string::npos)
       {
-          put_piece(Piece(idx), sq);
+          setup_put_piece(Piece(idx), sq);
           ++sq;
       }
   }
@@ -282,6 +282,8 @@ Position& Position::set(const string& fenStr, bool isChess960, StateInfo* si, Th
   chess960 = isChess960;
   thisThread = th;
   set_state(st);
+
+  init_pksq();
 
   assert(pos_is_ok());
 
@@ -939,8 +941,8 @@ void Position::do_castling(Color us, Square from, Square& to, Square& rfrom, Squ
   to = relative_square(us, kingSide ? SQ_G1 : SQ_C1);
 
   // Remove both pieces first since squares could overlap in Chess960
-  remove_piece(Do ? from : to);
   remove_piece(Do ? rfrom : rto);
+  remove_piece(Do ? from : to);
   board[Do ? from : to] = board[Do ? rfrom : rto] = NO_PIECE; // Since remove_piece doesn't do this for us
   put_piece(make_piece(us, KING), Do ? to : from);
   put_piece(make_piece(us, ROOK), Do ? rto : rfrom);
@@ -1296,4 +1298,17 @@ bool Position::pos_is_ok() const {
       }
 
   return true;
+}
+
+void Position::init_pksq() {
+
+    Square whiteKing = square<KING>(WHITE);
+    Square blackKing = square<KING>(BLACK);
+
+    Bitboard b = pieces() ^ pieces(KING);
+    while (b)
+    {
+        Square sq = pop_lsb(&b);
+        psq += PSQT::pksq(*this, whiteKing, blackKing, piece_on(sq), sq);
+    }
 }

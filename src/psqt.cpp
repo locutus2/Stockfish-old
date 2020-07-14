@@ -22,6 +22,7 @@
 
 #include "types.h"
 #include "bitboard.h"
+#include "position.h"
 
 namespace PSQT {
 
@@ -99,8 +100,61 @@ constexpr Score PBonus[RANK_NB][FILE_NB] =
 
 #undef S
 
+Score BonusOwnKing[SQUARE_NB][PIECE_NB - 3][SQUARE_NB];
+Score BonusOppKing[SQUARE_NB][PIECE_NB - 3][SQUARE_NB];
+
+TUNE(SetRange(-200,200), BonusOwnKing, BonusOppKing);
+
 Score psq[PIECE_NB][SQUARE_NB];
 
+Score pksq_non_king(Square whiteKing, Square blackKing, Piece pc, Square sq) {
+
+    Color c = color_of(pc);
+    PieceType pt = type_of(pc);
+
+    assert(pt != KING);
+
+    return c == WHITE ?  BonusOwnKing[whiteKing][pt-1][sq]
+                       + BonusOppKing[blackKing][pt-1][sq]
+                      :  BonusOwnKing[flip_rank(blackKing)][pt-1][flip_rank(sq)]
+                       + BonusOppKing[flip_rank(whiteKing)][pt-1][flip_rank(sq)];
+}
+
+Score pksq_king(const Position& pos, Piece pc, Square ksq) {
+
+    Color c = color_of(pc);
+    Score score = SCORE_ZERO;
+
+    assert(type_of(pc) == KING);
+
+    Square whiteKing = c == WHITE ? ksq : pos.square<KING>(WHITE);
+    Square blackKing = c == BLACK ? ksq : pos.square<KING>(BLACK);
+
+    Bitboard b = pos.pieces(WHITE) ^ pos.pieces(WHITE, KING);
+    while (b)
+    {
+        Square sq = pop_lsb(&b);
+        PieceType pt = type_of(pos.piece_on(sq));
+        score +=  c == WHITE ? BonusOwnKing[whiteKing][pt-1][sq]
+                             : BonusOppKing[blackKing][pt-1][sq];
+    }
+
+    b = pos.pieces(BLACK) ^ pos.pieces(BLACK, KING);
+    while (b)
+    {
+        Square sq = pop_lsb(&b);
+        PieceType pt = type_of(pos.piece_on(sq));
+        score -=  c == BLACK ? BonusOwnKing[flip_rank(blackKing)][pt-1][flip_rank(sq)]
+                             : BonusOppKing[flip_rank(whiteKing)][pt-1][flip_rank(sq)];
+    }
+
+    return c == WHITE ? score : -score;
+}
+
+Score pksq(const Position& pos, Square whiteKing, Square blackKing, Piece pc, Square sq) {
+
+    return type_of(pc) == KING ? pksq_king(pos, pc, sq) : pksq_non_king(whiteKing, blackKing, pc, sq);
+}
 
 // PSQT::init() initializes piece-square tables: the white halves of the tables are
 // copied from Bonus[] and PBonus[], adding the piece value, then the black halves of

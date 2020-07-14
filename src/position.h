@@ -171,10 +171,12 @@ private:
 
   // Other helpers
   void put_piece(Piece pc, Square s);
+  void setup_put_piece(Piece pc, Square s);
   void remove_piece(Square s);
   void move_piece(Square from, Square to);
   template<bool Do>
   void do_castling(Color us, Square from, Square& to, Square& rfrom, Square& rto);
+  void init_pksq();
 
   // Data members
   Piece board[SQUARE_NB];
@@ -196,6 +198,7 @@ private:
 
 namespace PSQT {
   extern Score psq[PIECE_NB][SQUARE_NB];
+  Score pksq(const Position& pos, Square whiteKing, Square blackKing, Piece pc, Square sq);
 }
 
 extern std::ostream& operator<<(std::ostream& os, const Position& pos);
@@ -376,7 +379,7 @@ inline Thread* Position::this_thread() const {
   return thisThread;
 }
 
-inline void Position::put_piece(Piece pc, Square s) {
+inline void Position::setup_put_piece(Piece pc, Square s) {
 
   board[s] = pc;
   byTypeBB[ALL_PIECES] |= byTypeBB[type_of(pc)] |= s;
@@ -387,12 +390,22 @@ inline void Position::put_piece(Piece pc, Square s) {
   psq += PSQT::psq[pc][s];
 }
 
+inline void Position::put_piece(Piece pc, Square s) {
+
+  setup_put_piece(pc, s);
+  Square whiteKing = square<KING>(WHITE);
+  Square blackKing = square<KING>(BLACK);
+  psq += PSQT::pksq(*this, whiteKing, blackKing, pc, s);
+}
+
 inline void Position::remove_piece(Square s) {
 
   // WARNING: This is not a reversible operation. If we remove a piece in
   // do_move() and then replace it in undo_move() we will put it at the end of
   // the list and not in its original place, it means index[] and pieceList[]
   // are not invariant to a do_move() + undo_move() sequence.
+  Square whiteKing = square<KING>(WHITE);
+  Square blackKing = square<KING>(BLACK);
   Piece pc = board[s];
   byTypeBB[ALL_PIECES] ^= s;
   byTypeBB[type_of(pc)] ^= s;
@@ -404,12 +417,15 @@ inline void Position::remove_piece(Square s) {
   pieceList[pc][pieceCount[pc]] = SQ_NONE;
   pieceCount[make_piece(color_of(pc), ALL_PIECES)]--;
   psq -= PSQT::psq[pc][s];
+  psq -= PSQT::pksq(*this, whiteKing, blackKing, pc, s);
 }
 
 inline void Position::move_piece(Square from, Square to) {
 
   // index[from] is not updated and becomes stale. This works as long as index[]
   // is accessed just by known occupied squares.
+  Square whiteKing = square<KING>(WHITE);
+  Square blackKing = square<KING>(BLACK);
   Piece pc = board[from];
   Bitboard fromTo = from | to;
   byTypeBB[ALL_PIECES] ^= fromTo;
@@ -420,6 +436,7 @@ inline void Position::move_piece(Square from, Square to) {
   index[to] = index[from];
   pieceList[pc][index[to]] = to;
   psq += PSQT::psq[pc][to] - PSQT::psq[pc][from];
+  psq += PSQT::pksq(*this, whiteKing, blackKing, pc, to) - PSQT::pksq(*this, whiteKing, blackKing, pc, from);
 }
 
 inline void Position::do_move(Move m, StateInfo& newSt) {
