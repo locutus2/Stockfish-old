@@ -1382,10 +1382,12 @@ moves_loop: // When in check, search starts from here
     else if (   (depth >= 3 || PvNode)
              && !priorCapture)
     {
-        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
+        int bonus = stat_bonus(depth);
+        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, bonus);
 
-        if ((ss-1)->currentMove == MOVE_NULL && quietCount > 0)
-            update_continuation_histories(ss, pos.moved_piece(quietsSearched[0]), to_sq(quietsSearched[0]), -stat_bonus(depth));
+        if ((ss-1)->currentMove == MOVE_NULL)
+            for (int i = 0; i < quietCount; i++)
+                update_continuation_histories(ss, pos.moved_piece(quietsSearched[i]), to_sq(quietsSearched[i]), -bonus);
     }
 
     if (PvNode)
