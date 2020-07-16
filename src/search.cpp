@@ -1352,7 +1352,7 @@ moves_loop: // When in check, search starts from here
 
           else if (!captureOrPromotion && quietCount < 64)
           {
-              if (quietCount == 0)
+              if (quietCount == 0 && depth >= 8)
                   update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), -stat_bonus(depth) / 2);
 
               quietsSearched[quietCount++] = move;
