@@ -109,9 +109,28 @@ namespace {
   // KingProtector[knight/bishop] contains penalty for each distance unit to own king
   constexpr Score KingProtector[] = { S(8, 9), S(6, 9) };
 
-  // Outpost[knight/bishop] contains bonuses for each knight or bishop occupying a
-  // pawn protected square on rank 4 to 6 which is also safe from a pawn attack.
-  constexpr Score Outpost[] = { S(56, 36), S(30, 23) };
+  // Outpost[knight/bishop][RANK_4,RANK_5,RANK_6][edge file distance] contains bonuses
+  // for each knight or bishop occupying a pawn protected square on rank 4 to 6 which
+  // is also safe from a pawn attack.
+  Score Outpost[][3][FILE_NB / 2] = {
+      // knight outposts
+      { { S(56, 36), S(56, 36), S(56, 36), S(56, 36) },   // rank 4
+        { S(56, 36), S(56, 36), S(56, 36), S(56, 36) },   // rank 5
+        { S(56, 36), S(56, 36), S(56, 36), S(56, 36) } }, // rank 6
+      // bishop outposts
+      { { S(30, 23), S(30, 23), S(30, 23), S(30, 23) },   // rank 4
+        { S(30, 23), S(30, 23), S(30, 23), S(30, 23) },   // rank 5
+        { S(30, 23), S(30, 23), S(30, 23), S(30, 23) } }  // rank 6
+  };
+
+
+  // BadOutpost[RANK_4,RANK_5,RANK_6][edge file distance] contains bonuses
+  // for each bad knight outpost.
+  Score BadOutpost[3][FILE_NB / 2] = {
+        { S(-7, 36), S(-7, 36), S(-7, 36), S(-7, 36) }, // rank 4
+        { S(-7, 36), S(-7, 36), S(-7, 36), S(-7, 36) }, // rank 5
+        { S(-7, 36), S(-7, 36), S(-7, 36), S(-7, 36) }  // rank 6
+  };
 
   // PassedRank[Rank] contains a bonus according to the rank of a passed pawn
   constexpr Score PassedRank[RANK_NB] = {
@@ -134,7 +153,6 @@ namespace {
   };
 
   // Assorted bonuses and penalties
-  constexpr Score BadOutpost          = S( -7, 36);
   constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopPawns         = S(  3,  7);
   constexpr Score BishopXRayPawns     = S(  4,  5);
@@ -147,7 +165,7 @@ namespace {
   constexpr Score PassedFile          = S( 11,  8);
   constexpr Score PawnlessFlank       = S( 17, 95);
   constexpr Score QueenInfiltration   = S( -2, 14);
-  constexpr Score ReachableOutpost    = S( 31, 22);
+  Score ReachableOutpost    = S( 31, 22);
   constexpr Score RestrictedPiece     = S(  7,  7);
   constexpr Score RookOnKingRing      = S( 16,  0);
   constexpr Score RookOnQueenFile     = S(  6, 11);
