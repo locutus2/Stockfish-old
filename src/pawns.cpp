@@ -174,7 +174,7 @@ namespace {
                     + WeakLever * more_than_one(lever);
 
         if (blocked && r > RANK_4)
-            score += BlockedPawn[r-4];
+            score += BlockedPawn[r-4] * (1 + !neighbours);
     }
 
     return score;
