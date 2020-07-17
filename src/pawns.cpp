@@ -173,7 +173,7 @@ namespace {
             score -=  Doubled * doubled
                     + WeakLever * more_than_one(lever);
 
-        if (r > RANK_4 && (blocked || (doubleAttackThem & (s + Up))))
+        if (r > RANK_4 && (blocked || (!phalanx && (doubleAttackThem & (s + Up)))))
             score += BlockedPawn[r-4];
     }
 
