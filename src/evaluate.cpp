@@ -177,6 +177,9 @@ namespace {
   constexpr Score WeakQueenProtection = S( 14,  0);
   constexpr Score WeakQueen           = S( 56, 15);
 
+  Range centerRange(int v) { return Range(v - 80, v + 80); }
+
+  TUNE(SetRange(centerRange), Outpost, BadOutpost, ReachableOutpost);
 
 #undef S
 
@@ -334,9 +337,9 @@ namespace {
                 && !(b & pos.pieces(Them) & ~pos.pieces(PAWN))
                 && !conditional_more_than_two(
                       pos.pieces(Them) & ~pos.pieces(PAWN) & (s & QueenSide ? QueenSide : KingSide)))
-                score += BadOutpost;
+                score += BadOutpost[relative_rank(Us, s) - RANK_4][edge_distance(file_of(s))];
             else if (bb & s)
-                score += Outpost[Pt == BISHOP];
+                score += Outpost[Pt == BISHOP][relative_rank(Us, s) - RANK_4][edge_distance(file_of(s))];
             else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
                 score += ReachableOutpost;
 
