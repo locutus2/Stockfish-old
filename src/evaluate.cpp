@@ -177,7 +177,7 @@ namespace {
   constexpr Score WeakQueenProtection = S( 14,  0);
   constexpr Score WeakQueen           = S( 56, 15);
 
-  Range centerRange(int v) { return Range(v - 80, v + 80); }
+  Range centerRange(int v) { return Range(v - 50, v + 50); }
 
   TUNE(SetRange(centerRange), Outpost, BadOutpost, ReachableOutpost);
 
