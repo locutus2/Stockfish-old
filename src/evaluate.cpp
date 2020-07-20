@@ -110,9 +110,27 @@ namespace {
   // KingProtector[knight/bishop] contains penalty for each distance unit to own king
   constexpr Score KingProtector[] = { S(8, 9), S(6, 9) };
 
-  // Outpost[knight/bishop] contains bonuses for each knight or bishop occupying a
-  // pawn protected square on rank 4 to 6 which is also safe from a pawn attack.
-  constexpr Score Outpost[] = { S(56, 36), S(30, 23) };
+  // Outpost[knight/bishop][RANK_4,RANK_5,RANK_6][edge file distance] contains bonuses
+  // for each knight or bishop occupying a pawn protected square on rank 4 to 6 which
+  // is also safe from a pawn attack.
+  constexpr Score Outpost[][3][FILE_NB / 2] = {
+      // knight outposts
+      { { S(58, 35), S(63, 40), S(49, 28), S(56, 26) },   // rank 4
+        { S(54, 35), S(59, 30), S(54, 38), S(57, 35) },   // rank 5
+        { S(53, 38), S(63, 39), S(59, 33), S(50, 39) } }, // rank 6
+      // bishop outposts
+      { { S(36, 25), S(37, 26), S(24, 15), S(32, 19) },   // rank 4
+        { S(31, 24), S(32, 18), S(28, 30), S(26, 15) },   // rank 5
+        { S(35, 27), S(26, 24), S(30, 23), S(26, 26) } }  // rank 6
+  };
+
+  // BadOutpost[RANK_4,RANK_5,RANK_6][FILE_AH,FILE_BG] contains bonuses
+  // for each bad knight outpost.
+  constexpr Score BadOutpost[3][2] = {
+        { S(-11, 38), S(-16, 31) }, // rank 4
+        { S( -9, 35), S(-10, 37) }, // rank 5
+        { S(-10, 42), S(  5, 39) }  // rank 6
+  };
 
   // PassedRank[Rank] contains a bonus according to the rank of a passed pawn
   constexpr Score PassedRank[RANK_NB] = {
@@ -135,7 +153,6 @@ namespace {
   };
 
   // Assorted bonuses and penalties
-  constexpr Score BadOutpost          = S( -7, 36);
   constexpr Score BishopOnKingRing    = S( 24,  0);
   constexpr Score BishopPawns         = S(  3,  7);
   constexpr Score BishopXRayPawns     = S(  4,  5);
@@ -148,7 +165,7 @@ namespace {
   constexpr Score PassedFile          = S( 11,  8);
   constexpr Score PawnlessFlank       = S( 17, 95);
   constexpr Score QueenInfiltration   = S( -2, 14);
-  constexpr Score ReachableOutpost    = S( 31, 22);
+  constexpr Score ReachableOutpost    = S( 34, 22);
   constexpr Score RestrictedPiece     = S(  7,  7);
   constexpr Score RookOnKingRing      = S( 16,  0);
   constexpr Score RookOnQueenFile     = S(  6, 11);
@@ -159,7 +176,6 @@ namespace {
   constexpr Score TrappedRook         = S( 55, 13);
   constexpr Score WeakQueenProtection = S( 14,  0);
   constexpr Score WeakQueen           = S( 56, 15);
-
 
 #undef S
 
@@ -317,9 +333,9 @@ namespace {
                 && !(b & pos.pieces(Them) & ~pos.pieces(PAWN))
                 && !conditional_more_than_two(
                       pos.pieces(Them) & ~pos.pieces(PAWN) & (s & QueenSide ? QueenSide : KingSide)))
-                score += BadOutpost;
+                score += BadOutpost[relative_rank(Us, s) - RANK_4][edge_distance(file_of(s))];
             else if (bb & s)
-                score += Outpost[Pt == BISHOP];
+                score += Outpost[Pt == BISHOP][relative_rank(Us, s) - RANK_4][edge_distance(file_of(s))];
             else if (Pt == KNIGHT && bb & b & ~pos.pieces(Us))
                 score += ReachableOutpost;
 
