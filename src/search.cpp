@@ -1362,13 +1362,21 @@ moves_loop: // When in check, search starts from here
 		std::cerr << std::endl;
 	}
 	*/
+	      // LESS reduction
 	      //C = !moveCountPruning && cutNode;
 	      //C = type_of(movedPiece) != BISHOP && type_of(movedPiece) != PAWN && extension
 	//	     && givesCheck && !moveCountPruning && !ttCapture && !cutNode; 
 	      //C = extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode; 
 	      //C = PvNode && singularQuietLMR && type_of(movedPiece) != PAWN 
 	//	      && !extension && !givesCheck && !moveCountPruning && !ttCapture;  
-              C = PvNode && ss->inCheck && !formerPv && !singularQuietLMR && type_of(movedPiece) != PAWN && !extension && !givesCheck && !moveCountPruning && !ttCapture;
+              //C = PvNode && ss->inCheck && !formerPv && !singularQuietLMR && type_of(movedPiece) != PAWN && !extension && !givesCheck && !moveCountPruning && !ttCapture;
+	      ////-------------------
+	      //// MORE reduction
+	      //C = moveCountPruning && cutNode;
+	      //C = ttCapture && !cutNode;
+	      //C = moveCountPruning && !ttCapture && !cutNode;
+	      //C = type_of(movedPiece) == PAWN && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
+	      C = type_of(movedPiece) == BISHOP && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
 	      dbg_hit_on(value > alpha);
               if(C) dbg_mean_of(100*(value > alpha));
       }
