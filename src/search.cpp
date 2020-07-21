@@ -1160,6 +1160,7 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
       // Step 16. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1248,6 +1249,8 @@ moves_loop: // When in check, search starts from here
           doFullDepthSearch = value > alpha && d != newDepth;
 
           didLMR = true;
+	  CC = true;
+	  C = true;
       }
       else
       {
@@ -1324,6 +1327,50 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if (CC)
+      {
+	      /*
+	const bool F[] = {type_of(movedPiece) == PAWN,
+	            type_of(movedPiece) == KNIGHT,
+	            type_of(movedPiece) == BISHOP,
+	            type_of(movedPiece) == ROOK,
+	            type_of(movedPiece) == QUEEN,
+	            type_of(movedPiece) == KING,
+		    PvNode, 
+		    cutNode, 
+		    !PvNode&&!cutNode, 
+		    captureOrPromotion, 
+		    ss->inCheck, 
+		    givesCheck,
+	            ttCapture,
+	            singularQuietLMR,
+	            moveCountPruning,
+	            bool(extension),
+		    formerPv
+	};
+	//constexpr int N = sizeof(F) / sizeof(bool);
+	bool good = value > alpha;
+	if(C)
+	{
+		std::cerr << int(good);
+		for(bool f : F)
+		{
+			std::cerr << ';' << int(f); 
+		}
+		std::cerr << std::endl;
+	}
+	*/
+	      //C = !moveCountPruning && cutNode;
+	      //C = type_of(movedPiece) != BISHOP && type_of(movedPiece) != PAWN && extension
+	//	     && givesCheck && !moveCountPruning && !ttCapture && !cutNode; 
+	      //C = extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode; 
+	      //C = PvNode && singularQuietLMR && type_of(movedPiece) != PAWN 
+	//	      && !extension && !givesCheck && !moveCountPruning && !ttCapture;  
+              C = PvNode && ss->inCheck && !formerPv && !singularQuietLMR && type_of(movedPiece) != PAWN && !extension && !givesCheck && !moveCountPruning && !ttCapture;
+	      dbg_hit_on(value > alpha);
+              if(C) dbg_mean_of(100*(value > alpha));
       }
 
       if (value > bestValue)
