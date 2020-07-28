@@ -1173,8 +1173,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction at non-check cut nodes for second move
-          if (cutNode && moveCount <= 2 && !ss->inCheck)
+          // Decrease reduction for extended checks at low depth and not at an expected ALL node
+          if (extension && givesCheck && depth <= 8 && (PvNode || cutNode))
               r--;
 
           // Decrease reduction if the ttHit running average is large
