@@ -1332,6 +1332,7 @@ moves_loop: // When in check, search starts from here
 
       if (CC)
       {
+	constexpr bool TEST = true;
 	const int F[] = {type_of(movedPiece) == PAWN,
 	            type_of(movedPiece) == KNIGHT,
 	            type_of(movedPiece) == BISHOP,
@@ -1355,6 +1356,8 @@ moves_loop: // When in check, search starts from here
 	bool good = value > alpha;
 	if(C)
 	{
+		if(!TEST)
+		{
 		if(firstLearn)
 		{
 			const std::string Fname[] = {
@@ -1396,7 +1399,10 @@ moves_loop: // When in check, search starts from here
 		}
 		std::cerr << std::endl;
 		}
+		}
 	}
+	if(TEST)
+	{
 	      // LESS reduction
 	      //C = !moveCountPruning && cutNode;
 	      //C = type_of(movedPiece) != BISHOP && type_of(movedPiece) != PAWN && extension
@@ -1411,11 +1417,10 @@ moves_loop: // When in check, search starts from here
 	      //C = ttCapture && !cutNode;
 	      //C = moveCountPruning && !ttCapture && !cutNode;
 	      //C = type_of(movedPiece) == PAWN && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
-	      /*
-	      C = type_of(movedPiece) == BISHOP && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
+	      C = depth <= 8 && moveCount <= 2 && !ss->inCheck && cutNode;
 	      dbg_hit_on(value > alpha);
               if(C) dbg_mean_of(100*(value > alpha));
-	      */
+	}
       }
 
       if (value > bestValue)
