@@ -1387,12 +1387,15 @@ moves_loop: // When in check, search starts from here
 			firstLearn = false;
 		}
 
+		if(good || !((thisThread->nodes + posKey + move) % 16))
+		{
 		std::cerr << (good ? 'P' : 'N');
 		for(auto f : F)
 		{
 			std::cerr << ';' << int(f); 
 		}
 		std::cerr << std::endl;
+		}
 	}
 	      // LESS reduction
 	      //C = !moveCountPruning && cutNode;
