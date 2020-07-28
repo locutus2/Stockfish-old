@@ -1173,6 +1173,10 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Increase reduction if not extended late move
+          if (moveCount > 13 && !extension)
+              r++;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 473 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
