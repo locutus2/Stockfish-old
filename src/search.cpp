@@ -561,6 +561,7 @@ void Thread::search() {
 
 namespace {
 
+  bool firstLearn = true;
   // search<>() is the main search function for both PV and non-PV nodes
 
   template <NodeType NT>
@@ -1331,8 +1332,7 @@ moves_loop: // When in check, search starts from here
 
       if (CC)
       {
-	      /*
-	const bool F[] = {type_of(movedPiece) == PAWN,
+	const int F[] = {type_of(movedPiece) == PAWN,
 	            type_of(movedPiece) == KNIGHT,
 	            type_of(movedPiece) == BISHOP,
 	            type_of(movedPiece) == ROOK,
@@ -1348,20 +1348,52 @@ moves_loop: // When in check, search starts from here
 	            singularQuietLMR,
 	            moveCountPruning,
 	            bool(extension),
-		    formerPv
+		    formerPv,
+		    depth,
+		    moveCount
 	};
-	//constexpr int N = sizeof(F) / sizeof(bool);
 	bool good = value > alpha;
 	if(C)
 	{
-		std::cerr << int(good);
-		for(bool f : F)
+		if(firstLearn)
+		{
+			const std::string Fname[] = {
+				"PAWN",
+				"KNIGHT",
+				"BISHOP",
+				"ROOK",
+				"QUEEN",
+				"KING",
+				"PvNode",
+				"cutNode",
+				"allNode",
+				"capOrProm",
+				"incheck",
+				"givescheck",
+				"ttcapture",
+				"singularLMR",
+				"moveCountPruning",
+				"extension",
+				"formerPv",
+				"depth",
+				"moveCount"
+			};
+			std::cerr << "good";
+		        for(auto f : Fname)
+			{
+				std::cerr << ";" << f;
+			}
+			std::cerr << std::endl;
+			firstLearn = false;
+		}
+
+		std::cerr << (good ? 'P' : 'N');
+		for(auto f : F)
 		{
 			std::cerr << ';' << int(f); 
 		}
 		std::cerr << std::endl;
 	}
-	*/
 	      // LESS reduction
 	      //C = !moveCountPruning && cutNode;
 	      //C = type_of(movedPiece) != BISHOP && type_of(movedPiece) != PAWN && extension
@@ -1376,9 +1408,11 @@ moves_loop: // When in check, search starts from here
 	      //C = ttCapture && !cutNode;
 	      //C = moveCountPruning && !ttCapture && !cutNode;
 	      //C = type_of(movedPiece) == PAWN && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
+	      /*
 	      C = type_of(movedPiece) == BISHOP && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
 	      dbg_hit_on(value > alpha);
               if(C) dbg_mean_of(100*(value > alpha));
+	      */
       }
 
       if (value > bestValue)
