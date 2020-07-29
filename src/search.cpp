@@ -1417,9 +1417,9 @@ moves_loop: // When in check, search starts from here
 	      //C = ttCapture && !cutNode;
 	      //C = moveCountPruning && !ttCapture && !cutNode;
 	      //C = type_of(movedPiece) == PAWN && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
-	      //C = depth <= 8 && moveCount <= 2 && !ss->inCheck && cutNode;
+	      C = cutNode && depth <= 6 && moveCount <= 2 && !ss->inCheck;
 	      //C = moveCount > 13 && !extension;
-	      C = cutNode && depth > 8 && moveCount <= 13;
+	      //C = cutNode && depth > 8 && moveCount <= 13;
 	      dbg_hit_on(value > alpha);
               if(C) dbg_mean_of(100*(value > alpha));
 	}
