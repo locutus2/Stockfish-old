@@ -157,7 +157,7 @@ namespace {
   constexpr Score ThreatByPawnPush    = S( 48, 39);
   constexpr Score ThreatBySafePawn    = S(173, 94);
   constexpr Score TrappedRook         = S( 55, 13);
-  constexpr Score WeakQueenProtection = S( 14,  0);
+  constexpr Score WeakQueenProtection = S(  7,  0);
   constexpr Score WeakQueen           = S( 56, 15);
 
 
@@ -548,8 +548,8 @@ namespace {
         score += Hanging * popcount(weak & b);
 
         // Additional bonus if weak piece is only protected by a queen
-        int n = popcount(weak & attackedBy[Them][QUEEN] & ~attackedBy2[Them]);
-        score += WeakQueenProtection * (n * (n - 1) + popcount(weak & attackedBy[Them][QUEEN]));
+        score += WeakQueenProtection * ( 2 * popcount(weak & attackedBy[Them][QUEEN])
+                                        +    popcount(weak & attackedBy[Them][QUEEN] & ~attackedBy2[Them]));
     }
 
     // Bonus for restricting their piece moves
