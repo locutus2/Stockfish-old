@@ -548,7 +548,8 @@ namespace {
         score += Hanging * popcount(weak & b);
 
         // Additional bonus if weak piece is only protected by a queen
-        score += WeakQueenProtection * popcount(weak & attackedBy[Them][QUEEN] & ~attackedBy2[Them]);
+        score += WeakQueenProtection * (  popcount(weak & attackedBy[Them][QUEEN])
+                                        + popcount(weak & attackedBy[Them][QUEEN] & ~attackedBy2[Them]));
     }
 
     // Bonus for restricting their piece moves
