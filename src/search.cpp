@@ -1003,6 +1003,7 @@ moves_loop: // When in check, search starts from here
 
       // Calculate new depth for this move
       newDepth = depth - 1;
+      bool CC = false, C = false;
 
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
@@ -1022,7 +1023,11 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-                  continue;
+		{
+	  		CC = true;
+	  		C = true;
+                  if(!C) continue;
+		}
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 6
@@ -1155,7 +1160,6 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
-      bool CC = false, C = false;
       // Step 16. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1251,8 +1255,6 @@ moves_loop: // When in check, search starts from here
           doFullDepthSearch = value > alpha && d != newDepth;
 
           didLMR = true;
-	  CC = true;
-	  C = true;
       }
       else
       {
@@ -1404,23 +1406,10 @@ moves_loop: // When in check, search starts from here
 	}
 	if(TEST)
 	{
-	      // LESS reduction
-	      //C = !moveCountPruning && cutNode;
-	      //C = type_of(movedPiece) != BISHOP && type_of(movedPiece) != PAWN && extension
-	//	     && givesCheck && !moveCountPruning && !ttCapture && !cutNode; 
-	      //C = extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode; 
-	      //C = PvNode && singularQuietLMR && type_of(movedPiece) != PAWN 
-	//	      && !extension && !givesCheck && !moveCountPruning && !ttCapture;  
-              //C = PvNode && ss->inCheck && !formerPv && !singularQuietLMR && type_of(movedPiece) != PAWN && !extension && !givesCheck && !moveCountPruning && !ttCapture;
-	      ////-------------------
-	      //// MORE reduction
-	      //C = moveCountPruning && cutNode;
-	      //C = ttCapture && !cutNode;
-	      //C = moveCountPruning && !ttCapture && !cutNode;
-	      //C = type_of(movedPiece) == PAWN && extension && givesCheck && !moveCountPruning && !ttCapture && !cutNode;
-	      C = cutNode && depth <= 6 && moveCount <= 2 && !ss->inCheck;
-	      //C = moveCount > 13 && !extension;
-	      //C = cutNode && depth > 8 && moveCount <= 13;
+	      //C = !ss->inCheck && depth <= 5 && (PvNode || cutNode) && moveCount <= 3;
+		//Total 28348869 Hits 810557 hit rate (%) 2
+		//Total 2128771 Mean 12.5749
+	      C = !ss->inCheck && depth <= 5 && (PvNode || cutNode) && moveCount <= 3;
 	      dbg_hit_on(value > alpha);
               if(C) dbg_mean_of(100*(value > alpha));
 	}
