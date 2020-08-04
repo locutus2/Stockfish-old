@@ -1409,7 +1409,9 @@ moves_loop: // When in check, search starts from here
 	      //C = !ss->inCheck && depth <= 5 && (PvNode || cutNode) && moveCount <= 3;
 		//Total 28348869 Hits 810557 hit rate (%) 2
 		//Total 2128771 Mean 12.5749
-	      C = !ss->inCheck && depth <= 5 && (PvNode || cutNode) && moveCount <= 3;
+	      //C = !ss->inCheck && !moveCountPruning && depth == 2 && (!PvNode && !cutNode) && moveCount <= 3;
+	      // Total 28348869 Hits 810557 hit rate (%) 2
+	      // Total 554940 Mean 8.6813
 	      dbg_hit_on(value > alpha);
               if(C) dbg_mean_of(100*(value > alpha));
 	}
