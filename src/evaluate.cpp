@@ -943,8 +943,8 @@ Value Eval::evaluate(const Position& pos) {
   if (Eval::useNNUE)
   {
       Phase phase = Material::probe(pos)->game_phase();
-	  return (  NNUE::evaluate(pos)               * int(phase)
-              + Evaluation<NO_TRACE>(pos).value() * int(PHASE_MIDGAME - phase)) / PHASE_MIDGAME;
+      return (  NNUE::evaluate(pos)               * int(PHASE_MIDGAME + phase)
+              + Evaluation<NO_TRACE>(pos).value() * int(PHASE_MIDGAME - phase)) / (2 * PHASE_MIDGAME);
   }
   else
       return Evaluation<NO_TRACE>(pos).value();
