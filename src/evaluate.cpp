@@ -941,7 +941,7 @@ make_v:
 Value Eval::evaluate(const Position& pos) {
 
   if (Eval::useNNUE)
-      return NNUE::evaluate(pos);
+      return (NNUE::evaluate(pos) + Evaluation<NO_TRACE>(pos).value()) / 2;
   else
       return Evaluation<NO_TRACE>(pos).value();
 }
