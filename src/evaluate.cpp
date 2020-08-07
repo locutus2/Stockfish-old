@@ -206,6 +206,7 @@ namespace {
     explicit Evaluation(const Position& p) : pos(p) {}
     Evaluation& operator=(const Evaluation&) = delete;
     Value value();
+	Value nnue_winnable(Value value);
 
   private:
     template<Color Us> void initialize();
@@ -850,6 +851,79 @@ namespace {
     return Value(v);
   }
 
+  template<Tracing T>
+  Value Evaluation<T>::nnue_winnable(Value value) {
+
+    pe = Pawns::probe(pos);
+    me = Material::probe(pos);
+
+    int outflanking =  distance<File>(pos.square<KING>(WHITE), pos.square<KING>(BLACK))
+                     - distance<Rank>(pos.square<KING>(WHITE), pos.square<KING>(BLACK));
+
+    bool pawnsOnBothFlanks =   (pos.pieces(PAWN) & QueenSide)
+                            && (pos.pieces(PAWN) & KingSide);
+
+    bool almostUnwinnable =   outflanking < 0
+                           && !pawnsOnBothFlanks;
+
+    bool infiltration =   rank_of(pos.square<KING>(WHITE)) > RANK_4
+                       || rank_of(pos.square<KING>(BLACK)) < RANK_5;
+
+    // Compute the initiative bonus for the attacking side
+    int complexity =   9 * pe->passed_count()
+                    + 12 * pos.count<PAWN>()
+                    +  9 * outflanking
+                    + 21 * pawnsOnBothFlanks
+                    + 24 * infiltration
+                    + 51 * !pos.non_pawn_material()
+                    - 43 * almostUnwinnable
+                    -110 ;
+
+    // Now apply the bonus: note that we find the attacking side by extracting the
+    // sign of the value, and that we carefully cap the bonus
+    // so that the score do not change sign after the bonus.
+    int u = ((value > 0) - (value < 0)) * Utility::clamp(complexity + 50, -abs(value), 0);
+    int v = ((value > 0) - (value < 0)) * std::max(complexity, -abs(value));
+
+    Value mg = value + u;
+    Value eg = value + v;
+
+    // Compute the scale factor for the winning side
+    Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
+    int sf = me->scale_factor(pos, strongSide);
+
+    // If scale factor is not already specific, scale down via general heuristics
+    if (sf == SCALE_FACTOR_NORMAL)
+    {
+        if (pos.opposite_bishops())
+        {
+            if (   pos.non_pawn_material(WHITE) == BishopValueMg
+                && pos.non_pawn_material(BLACK) == BishopValueMg)
+                sf = 18 + 4 * popcount(pe->passed_pawns(strongSide));
+            else
+                sf = 22 + 3 * pos.count<ALL_PIECES>(strongSide);
+        }
+        else if (  pos.non_pawn_material(WHITE) == RookValueMg
+                && pos.non_pawn_material(BLACK) == RookValueMg
+                && pos.count<PAWN>(strongSide) - pos.count<PAWN>(~strongSide) <= 1
+                && bool(KingSide & pos.pieces(strongSide, PAWN)) != bool(QueenSide & pos.pieces(strongSide, PAWN))
+                && (attacks_bb<KING>(pos.square<KING>(~strongSide)) & pos.pieces(~strongSide, PAWN)))
+            sf = 36;
+        else if (pos.count<QUEEN>() == 1)
+            sf = 37 + 3 * (pos.count<QUEEN>(WHITE) == 1 ? pos.count<BISHOP>(BLACK) + pos.count<KNIGHT>(BLACK)
+                                                        : pos.count<BISHOP>(WHITE) + pos.count<KNIGHT>(WHITE));
+        else
+            sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
+    }
+
+    // Interpolate between the middlegame and (scaled by 'sf') endgame score
+    v =  mg * int(me->game_phase())
+       + eg * int(PHASE_MIDGAME - me->game_phase()) * ScaleFactor(sf) / SCALE_FACTOR_NORMAL;
+    v /= PHASE_MIDGAME;
+
+    return Value(v);
+  }
+
 
   // Evaluation::value() is the main function of the class. It computes the various
   // parts of the evaluation and returns the value of the position from the point
@@ -947,7 +1021,7 @@ Value Eval::evaluate(const Position& pos) {
       balance += 200 * (pos.count<PAWN>(WHITE) - pos.count<PAWN>(BLACK));
       // Take NNUE eval only on balanced positions
       if (abs(balance) < NNUEThreshold)
-         return NNUE::evaluate(pos) + Tempo;
+         return Evaluation<NO_TRACE>(pos).nnue_winnable(NNUE::evaluate(pos)) + Tempo;
   }
   return Evaluation<NO_TRACE>(pos).value();
 }
