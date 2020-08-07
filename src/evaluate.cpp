@@ -942,7 +942,10 @@ Value Eval::evaluate(const Position& pos) {
       balance += 200 * (pos.count<PAWN>(WHITE) - pos.count<PAWN>(BLACK));
       // Take NNUE eval only on balanced positions
       if (abs(balance) < NNUEThreshold)
-         return NNUE::evaluate(pos) + Tempo;
+      {
+         Value contempt = mg_value(pos.this_thread()->contempt);
+         return NNUE::evaluate(pos) + Tempo + (pos.side_to_move() == WHITE ? contempt : -contempt);
+      }
   }
   return Evaluation<NO_TRACE>(pos).value();
 }
