@@ -947,7 +947,17 @@ Value Eval::evaluate(const Position& pos) {
       balance += 200 * (pos.count<PAWN>(WHITE) - pos.count<PAWN>(BLACK));
       // Take NNUE eval only on balanced positions
       if (abs(balance) < NNUEThreshold)
-         return NNUE::evaluate(pos) + Tempo;
+      {
+          // Probe the material hash table
+          auto me = Material::probe(pos);
+
+          // If we have a specialized evaluation function for the current material
+          // configuration, call it and return.
+          if (me->specialized_eval_exists())
+             return me->evaluate(pos);
+          else
+             return NNUE::evaluate(pos) + Tempo;
+      }
   }
   return Evaluation<NO_TRACE>(pos).value();
 }
