@@ -948,7 +948,7 @@ Value Eval::evaluate(const Position& pos) {
       if (abs(v) < NNUEThreshold)
       {
          Phase phase = Material::probe(pos)->game_phase();
-         Value contempt = mg_value(pos.this_thread()->contempt) * int(phase) / PHASE_MIDGAME;
+         Value contempt = pos.this_thread()->staticContempt * int(phase) / PHASE_MIDGAME;
          return NNUE::evaluate(pos) + Tempo + (pos.side_to_move() == WHITE ? contempt : -contempt);
       }
   }
