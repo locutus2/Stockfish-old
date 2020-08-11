@@ -602,6 +602,7 @@ namespace {
          ttCapture, singularQuietLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
+	ExtensionType extensionType;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1007,6 +1008,7 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = nullptr;
 
       extension = 0;
+	  extensionType = NO_EXTENSION;
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
@@ -1097,6 +1099,7 @@ moves_loop: // When in check, search starts from here
           if (value < singularBeta)
           {
               extension = 1;
+			  extensionType = EXTENSION_SINGULAR;
               singularQuietLMR = !ttCapture;
           }
 
@@ -1124,29 +1127,29 @@ moves_loop: // When in check, search starts from here
       // Check extension (~2 Elo)
       else if (    givesCheck
                && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
-          extension = 1;
+          extensionType = EXTENSION_CHECK, extension = 1;
 
       // Passed pawn extension
       else if (   move == ss->killers[0]
                && pos.advanced_pawn_push(move)
                && pos.pawn_passed(us, to_sq(move)))
-          extension = 1;
+          extensionType = EXTENSION_PASSED, extension = 1;
 
       // Last captures extension
       else if (   PieceValue[EG][pos.captured_piece()] > PawnValueEg
                && pos.non_pawn_material() <= 2 * RookValueMg)
-          extension = 1;
+          extensionType = EXTENSION_LAST_CAPTURE, extension = 1;
 
       // Castling extension
       if (   type_of(move) == CASTLING
           && popcount(pos.pieces(us) & ~pos.pieces(PAWN) & (to_sq(move) & KingSide ? KingSide : QueenSide)) <= 2)
-          extension = 1;
+          extensionType = EXTENSION_CASTLING, extension = 1;
 
       // Late irreversible move extension
       if (   move == ttMove
           && pos.rule50_count() > 80
           && (captureOrPromotion || type_of(movedPiece) == PAWN))
-          extension = 2;
+          extensionType = EXTENSION_IRREVERSIBLE, extension = 2;
 
       // Add extension to new depth
       newDepth += extension;
