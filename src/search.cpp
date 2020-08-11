@@ -157,8 +157,8 @@ namespace {
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, int depth);
   void update_all_stats(const Position& pos, Stack* ss, Move bestMove, Value bestValue, Value beta, Square prevSq,
                         Move* quietsSearched, int quietCount, Move* capturesSearched, int captureCount, Depth depth);
-  void update_extension_stats(const Position& pos, Move bestExtensionMove, ExtensionType bestExtensionType,
-                              Move* extensionsSearched, ExtensionType* extensionTypesSearched, int extensionCount, Depth depth);
+  void update_extension_stats(const Position& pos, Move bestExtensionMove,
+                              Move* extensionsSearched, int extensionCount, Depth depth);
 
   // perft() is our utility to verify move generation. All the leaf nodes up
   // to the given depth are generated and counted, and the sum is returned.
@@ -604,8 +604,6 @@ namespace {
          ttCapture, singularQuietLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, extensionCount;
-    ExtensionType extensionType;
-    ExtensionType bestExtensionType, extensionTypesSearched[16];
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -649,7 +647,6 @@ namespace {
 
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->excludedMove = bestMove = bestExtensionMove = MOVE_NONE;
-    bestExtensionType = EXTENSION_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -1102,7 +1099,6 @@ moves_loop: // When in check, search starts from here
           if (value < singularBeta)
           {
               extension = 1;
-              extensionType = EXTENSION_SINGULAR;
               singularQuietLMR = !ttCapture;
           }
 
@@ -1130,31 +1126,31 @@ moves_loop: // When in check, search starts from here
       // Check extension (~2 Elo)
       else if (    givesCheck
                && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
-          extensionType = EXTENSION_CHECK, extension = 1;
+          extension = 1;
 
       // Passed pawn extension
       else if (   move == ss->killers[0]
                && pos.advanced_pawn_push(move)
                && pos.pawn_passed(us, to_sq(move)))
-          extensionType = EXTENSION_PASSED, extension = 1;
+          extension = 1;
 
       // Last captures extension
       else if (   PieceValue[EG][pos.captured_piece()] > PawnValueEg
                && pos.non_pawn_material() <= 2 * RookValueMg)
-          extensionType = EXTENSION_LAST_CAPTURE, extension = 1;
+          extension = 1;
 
       // Castling extension
       if (   type_of(move) == CASTLING
           && popcount(pos.pieces(us) & ~pos.pieces(PAWN) & (to_sq(move) & KingSide ? KingSide : QueenSide)) <= 2)
-          extensionType = EXTENSION_CASTLING, extension = 1;
+          extension = 1;
 
       // Late irreversible move extension
       if (   move == ttMove
           && pos.rule50_count() > 80
           && (captureOrPromotion || type_of(movedPiece) == PAWN))
-          extensionType = EXTENSION_IRREVERSIBLE, extension = 2;
+          extension = 2;
 
-      if (extension && thisThread->extensionHistory[extensionType][us][from_to(move)] < -8000)
+      if (extension && thisThread->extensionHistory[us][from_to(move)] < -8000)
           extension = 0;
 
       // Add extension to new depth
@@ -1355,10 +1351,7 @@ moves_loop: // When in check, search starts from here
               bestMove = move;
 
               if (extension)
-              {
                   bestExtensionMove = move;
-                  bestExtensionType = extensionType;
-              }
 
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
@@ -1383,10 +1376,7 @@ moves_loop: // When in check, search starts from here
               quietsSearched[quietCount++] = move;
 
           if (extension && extensionCount < 16)
-          {
-              extensionsSearched[extensionCount] = move;
-              extensionTypesSearched[extensionCount++] = extensionType;
-          }
+              extensionsSearched[extensionCount++] = move;
       }
     }
 
@@ -1415,8 +1405,7 @@ moves_loop: // When in check, search starts from here
                          quietsSearched, quietCount, capturesSearched, captureCount, depth);
 
         if (bestExtensionMove)
-            update_extension_stats(pos, bestExtensionMove, bestExtensionType,
-                                   extensionsSearched, extensionTypesSearched, extensionCount, depth);
+            update_extension_stats(pos, bestExtensionMove, extensionsSearched, extensionCount, depth);
     }
 
     // Bonus for prior countermove that caused the fail low
@@ -1702,18 +1691,18 @@ moves_loop: // When in check, search starts from here
   }
 
   // update_extension_stats() updates extension stats at the end of search() when a bestExtensionMove is found
-  void update_extension_stats(const Position& pos, Move bestExtensionMove, ExtensionType bestExtensionType,
-                              Move* extensionsSearched, ExtensionType* extensionTypesSearched, int extensionCount, Depth depth) {
+  void update_extension_stats(const Position& pos, Move bestExtensionMove,
+                              Move* extensionsSearched, int extensionCount, Depth depth) {
 
     int bonus = stat_bonus(depth);
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
 
-    thisThread->extensionHistory[bestExtensionType][us][from_to(bestExtensionMove)] << bonus;
+    thisThread->extensionHistory[us][from_to(bestExtensionMove)] << bonus;
 
     // Decrease all the non-best extension moves
     for (int i = 0; i < extensionCount; ++i)
-        thisThread->extensionHistory[extensionTypesSearched[i]][us][from_to(extensionsSearched[i])] << -bonus;
+        thisThread->extensionHistory[us][from_to(extensionsSearched[i])] << -bonus;
   }
 
 
