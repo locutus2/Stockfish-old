@@ -602,7 +602,7 @@ namespace {
          ttCapture, singularQuietLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
-	ExtensionType extensionType;
+    ExtensionType extensionType;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -1008,7 +1008,6 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = nullptr;
 
       extension = 0;
-	  extensionType = NO_EXTENSION;
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
@@ -1099,7 +1098,7 @@ moves_loop: // When in check, search starts from here
           if (value < singularBeta)
           {
               extension = 1;
-			  extensionType = EXTENSION_SINGULAR;
+              extensionType = EXTENSION_SINGULAR;
               singularQuietLMR = !ttCapture;
           }
 
@@ -1150,6 +1149,9 @@ moves_loop: // When in check, search starts from here
           && pos.rule50_count() > 80
           && (captureOrPromotion || type_of(movedPiece) == PAWN))
           extensionType = EXTENSION_IRREVERSIBLE, extension = 2;
+
+      if (extension && thisThread->extensionHistory[extensionType][us][from_to(move)] < -10000)
+          extension = 0;
 
       // Add extension to new depth
       newDepth += extension;
@@ -1338,6 +1340,12 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if (extension)
+      {
+          int bonus = value > alpha ? stat_bonus(depth) : -stat_bonus(depth);
+          thisThread->extensionHistory[extensionType][us][from_to(move)] << bonus;
       }
 
       if (value > bestValue)
