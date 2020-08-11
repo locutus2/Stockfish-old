@@ -1150,7 +1150,7 @@ moves_loop: // When in check, search starts from here
           && (captureOrPromotion || type_of(movedPiece) == PAWN))
           extension = 2;
 
-      if (extension && thisThread->extensionHistory[us][from_to(move)] < -7000)
+      if (extension && !captureOrPromotion && thisThread->extensionHistory[us][from_to(move)] < -7000)
           extension = 0;
 
       // Add extension to new depth
@@ -1350,7 +1350,7 @@ moves_loop: // When in check, search starts from here
           {
               bestMove = move;
 
-              if (extension)
+              if (extension && !captureOrPromotion)
                   bestExtensionMove = move;
 
               if (PvNode && !rootNode) // Update pv even in fail-high case
@@ -1375,7 +1375,7 @@ moves_loop: // When in check, search starts from here
           else if (!captureOrPromotion && quietCount < 64)
               quietsSearched[quietCount++] = move;
 
-          if (extension && extensionCount < 16)
+          if (extension && !captureOrPromotion && extensionCount < 16)
               extensionsSearched[extensionCount++] = move;
       }
     }
