@@ -243,7 +243,8 @@ enum ExtensionType : int {
   EXTENSION_CASTLING,
   EXTENSION_IRREVERSIBLE,
 
-  EXTENSION_TYPE_NB = 6
+  EXTENSION_TYPE_NB = 6,
+  EXTENSION_NONE = -1
 };
 
 enum Square : int {
