@@ -941,7 +941,7 @@ make_v:
 
 Value Eval::evaluate(const Position& pos) {
 
-  if (Eval::useNNUE && pos.this_thread()->id() % 8 == 0)
+  if (Eval::useNNUE && pos.this_thread()->id() % 8 != 7)
   {
       Value v = eg_value(pos.psq_score());
       // Take NNUE eval only on balanced positions
