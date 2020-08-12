@@ -1044,9 +1044,11 @@ moves_loop: // When in check, search starts from here
                     + (*contHist[5])[movedPiece][to_sq(move)] / 2 < 27376)
                   continue;
 
-              if (   lmrDepth < 2
+              if (   !PvNode
+                  && lmrDepth < 2
                   && type_of(movedPiece) == KING
-                  && ttCapture
+                  && !cutNode
+                  && type_of(move) == NORMAL
                   && !ss->inCheck)
                   continue;
 
