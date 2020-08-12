@@ -1045,9 +1045,9 @@ moves_loop: // When in check, search starts from here
                   continue;
 
               if (   lmrDepth < 2
-                  && !ss->inCheck
-                  && type_of(pos.moved_piece(ttMove)) != KING
-                  && type_of(movedPiece) == KING)
+                  && type_of(movedPiece) == KING
+                  && ttCapture
+                  && !ss->inCheck)
                   continue;
 
               // Prune moves with negative SEE (~20 Elo)
