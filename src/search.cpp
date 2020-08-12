@@ -1045,7 +1045,7 @@ moves_loop: // When in check, search starts from here
                   continue;
 
               if (   lmrDepth < 2
-                  && cutNode
+                  && pos.non_pawn_material(us)
                   && !ss->inCheck
                   && type_of(movedPiece) == KING)
                   continue;
