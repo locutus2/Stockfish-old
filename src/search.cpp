@@ -1150,7 +1150,7 @@ moves_loop: // When in check, search starts from here
           && (captureOrPromotion || type_of(movedPiece) == PAWN))
           extension = 2;
 
-      if (extension && !captureOrPromotion && thisThread->extensionHistory[us][from_to(move)] < -6000)
+      if (extension && !captureOrPromotion && thisThread->extensionHistory[movedPiece][to_sq(move)] < -6000)
           extension = 0;
 
       // Add extension to new depth
@@ -1695,14 +1695,13 @@ moves_loop: // When in check, search starts from here
                               Move* extensionsSearched, int extensionCount, Depth depth) {
 
     int bonus = stat_bonus(depth);
-    Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
 
-    thisThread->extensionHistory[us][from_to(bestExtensionMove)] << bonus;
+    thisThread->extensionHistory[pos.moved_piece(bestExtensionMove)][to_sq(bestExtensionMove)] << bonus;
 
     // Decrease all the non-best extension moves
     for (int i = 0; i < extensionCount; ++i)
-        thisThread->extensionHistory[us][from_to(extensionsSearched[i])] << -bonus;
+        thisThread->extensionHistory[pos.moved_piece(extensionsSearched[i])][to_sq(extensionsSearched[i])] << -bonus;
   }
 
 
