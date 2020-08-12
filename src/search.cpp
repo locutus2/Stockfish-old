@@ -1150,7 +1150,7 @@ moves_loop: // When in check, search starts from here
           && (captureOrPromotion || type_of(movedPiece) == PAWN))
           extension = 2;
 
-      if (extension && !captureOrPromotion && thisThread->extensionHistory[us][from_to(move)] < -7000)
+      if (extension && !captureOrPromotion && thisThread->extensionHistory[us][from_to(move)] < -6000)
           extension = 0;
 
       // Add extension to new depth
