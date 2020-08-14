@@ -1046,7 +1046,7 @@ moves_loop: // When in check, search starts from here
 
               if (   lmrDepth < 2
                   && type_of(movedPiece) == KING
-                  && priorCapture
+                  && eval <= alpha
                   && !ss->inCheck)
                   continue;
 
