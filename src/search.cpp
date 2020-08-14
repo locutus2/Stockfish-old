@@ -1044,9 +1044,9 @@ moves_loop: // When in check, search starts from here
                     + (*contHist[5])[movedPiece][to_sq(move)] / 2 < 27376)
                   continue;
 
-              if (   depth < 2
+              if (   lmrDepth < 1
                   && type_of(movedPiece) == KING
-                  && type_of(move) == NORMAL
+                  && eval <= alpha
                   && !ss->inCheck)
                   continue;
 
