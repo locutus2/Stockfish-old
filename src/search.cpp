@@ -1122,6 +1122,13 @@ moves_loop: // When in check, search starts from here
                && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
           extension = 1;
 
+      // Passed pawn extension (randomly for half of moves)
+      else if (   (thisThread->nodes & 1)
+               && move == ss->killers[0]
+               && pos.advanced_pawn_push(move)
+               && pos.pawn_passed(us, to_sq(move)))
+          extension = 1;
+
       // Castling extension
       if (   type_of(move) == CASTLING
           && popcount(pos.pieces(us) & ~pos.pieces(PAWN) & (to_sq(move) & KingSide ? KingSide : QueenSide)) <= 2)
