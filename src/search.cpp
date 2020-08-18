@@ -598,7 +598,7 @@ namespace {
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool ttHit, ttPv, formerPv, givesCheck, improving, didLMR, priorCapture;
-    bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
+    bool advancedPawnPush, captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
@@ -1006,6 +1006,7 @@ moves_loop: // When in check, search starts from here
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
+      advancedPawnPush = pos.advanced_pawn_push(move);
 
       // Calculate new depth for this move
       newDepth = depth - 1;
@@ -1161,6 +1162,13 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 427 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Decrease reduction for passed pawn move
+          if (   !extension
+              && move == ss->killers[0]
+              && advancedPawnPush
+              && pos.pawn_passed(us, to_sq(move)))
+              r--;
 
           // Decrease reduction at non-check cut nodes for second move at low depths
           if (   cutNode
