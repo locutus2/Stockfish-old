@@ -24,7 +24,7 @@ namespace {
 
   enum Stages {
     MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
-    EVASION_TT, EVASION_INIT, EVASION,
+    EVASION_TT, REFUTATION_EVASION_INIT, REFUTATION_EVASION, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
     QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
   };
@@ -222,7 +222,27 @@ top:
   case BAD_CAPTURE:
       return select<Next>([](){ return true; });
 
-  case EVASION_INIT:
+  case REFUTATION_EVASION_INIT:
+
+      // Prepare the pointers to loop over the refutations array
+      cur = std::begin(refutations);
+      endMoves = std::end(refutations);
+
+      // If the countermove is the same as a killer, skip it
+      if (   refutations[0].move == refutations[2].move
+          || refutations[1].move == refutations[2].move)
+          --endMoves;
+
+      ++stage;
+      /* fallthrough */
+
+  case REFUTATION_EVASION:
+
+      if (select<Next>([&](){ return    *cur != MOVE_NONE
+                                    && !pos.capture(*cur)
+                                    &&  pos.pseudo_legal(*cur); }))
+          return *(cur - 1);
+
       cur = moves;
       endMoves = generate<EVASIONS>(pos, cur);
 
@@ -231,7 +251,9 @@ top:
       /* fallthrough */
 
   case EVASION:
-      return select<Best>([](){ return true; });
+      return select<Best>([&](){ return  *cur != refutations[0].move
+                                      && *cur != refutations[1].move
+                                      && *cur != refutations[2].move; });
 
   case PROBCUT:
       return select<Best>([&](){ return pos.see_ge(*cur, threshold); });
