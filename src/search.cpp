@@ -645,7 +645,8 @@ namespace {
 
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
-    (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
+    (ss+2)->killers[0][0] = (ss+2)->killers[0][1] = MOVE_NONE;
+    (ss+2)->killers[1][0] = (ss+2)->killers[1][1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
     // Initialize statScore to zero for the grandchildren of the current position.
@@ -962,7 +963,7 @@ moves_loop: // When in check, search starts from here
                                       &captureHistory,
                                       contHist,
                                       countermove,
-                                      ss->killers,
+                                      ss->killers[ss->inCheck],
                                       ss->ply);
 
     value = bestValue;
@@ -1262,7 +1263,7 @@ moves_loop: // When in check, search starts from here
               int bonus = value > alpha ?  stat_bonus(newDepth)
                                         : -stat_bonus(newDepth);
 
-              if (move == ss->killers[0])
+              if (move == ss->killers[ss->inCheck][0])
                   bonus += bonus / 4;
 
               update_continuation_histories(ss, movedPiece, to_sq(move), bonus);
@@ -1692,7 +1693,7 @@ moves_loop: // When in check, search starts from here
         captureHistory[moved_piece][to_sq(bestMove)][captured] << bonus1;
 
     // Extra penalty for a quiet TT or main killer move in previous ply when it gets refuted
-    if (   ((ss-1)->moveCount == 1 || ((ss-1)->currentMove == (ss-1)->killers[0]))
+    if (   ((ss-1)->moveCount == 1 || ((ss-1)->currentMove == (ss-1)->killers[(ss-1)->inCheck][0]))
         && !pos.captured_piece())
             update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -bonus1);
 
@@ -1725,10 +1726,10 @@ moves_loop: // When in check, search starts from here
 
   void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, int depth) {
 
-    if (ss->killers[0] != move)
+    if (ss->killers[ss->inCheck][0] != move)
     {
-        ss->killers[1] = ss->killers[0];
-        ss->killers[0] = move;
+        ss->killers[ss->inCheck][1] = ss->killers[ss->inCheck][0];
+        ss->killers[ss->inCheck][0] = move;
     }
 
     Color us = pos.side_to_move();
