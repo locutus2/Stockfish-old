@@ -252,9 +252,10 @@ top:
       /* fallthrough */
 
   case EVASION:
-      return select<Best>([&](){ return  *cur != refutations[0].move
-                                      && *cur != refutations[1].move
-                                      && *cur != refutations[2].move; });
+      return select<Best>([&](){ return   pos.capture(*cur)
+                                       || (   *cur != refutations[0].move
+                                           && *cur != refutations[1].move
+                                           && *cur != refutations[2].move); });
 
   case PROBCUT:
       return select<Best>([&](){ return pos.see_ge(*cur, threshold); });
