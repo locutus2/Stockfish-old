@@ -940,15 +940,11 @@ namespace {
             }
     }
 
-    // Step 11. Internal iterative deepening (~1 Elo)
-    if (depth >= 7 && !ttMove)
-    {
-        search<NT>(pos, ss, alpha, beta, depth - 7, cutNode);
-
-        tte = TT.probe(posKey, ttHit);
-        ttValue = ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
-        ttMove = ttHit ? tte->move() : MOVE_NONE;
-    }
+    // Step 11. If the position is not in TT, decrease depth by 2
+    if (   PvNode
+        && depth >= 6
+        && !ttMove)
+        depth -= 2;
 
 moves_loop: // When in check, search starts from here
 
@@ -1121,6 +1117,11 @@ moves_loop: // When in check, search starts from here
       // Check extension (~2 Elo)
       else if (    givesCheck
                && (pos.is_discovery_check_on_king(~us, move) || pos.see_ge(move)))
+          extension = 1;
+
+      // Last captures extension
+      else if (   PieceValue[EG][pos.captured_piece()] > PawnValueEg
+               && pos.non_pawn_material() <= 2 * RookValueMg)
           extension = 1;
 
       // Castling extension
