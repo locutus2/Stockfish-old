@@ -940,7 +940,7 @@ namespace {
     }
 
     // Step 11. If the position is not in TT, decrease depth by 2
-    if (   PvNode
+    if (   !PvNode
         && depth >= 6
         && !ttMove)
         depth -= 2;
