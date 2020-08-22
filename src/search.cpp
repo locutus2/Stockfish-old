@@ -939,12 +939,6 @@ namespace {
             }
     }
 
-    // Step 11. If the position is not in TT, decrease depth by 2
-    if (   PvNode
-        && depth >= 6
-        && !ttMove)
-        depth -= 2;
-
 moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
@@ -1162,6 +1156,13 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 427 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Increase reduction at PV nodes if no tt move found
+          if (   PvNode
+              && depth >= 6
+              && !ss->inCheck
+              && !ttMove)
+              r += 2;
 
           // Decrease reduction at non-check cut nodes for second move at low depths
           if (   cutNode
