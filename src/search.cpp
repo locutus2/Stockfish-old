@@ -1164,6 +1164,10 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Increase reduction after prior capture if last move count == 0 (so last move is a probcut move)
+          if (priorCapture && (ss-1)->moveCount == 0)
+              r++;
+
           // Decrease reduction at non-check cut nodes for second move at low depths
           if (   cutNode
               && depth <= 10
