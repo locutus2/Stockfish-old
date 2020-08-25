@@ -941,9 +941,9 @@ namespace {
     }
 
     // Step 11. Internal iterative deepening (~1 Elo)
-    if (depth >= 8 && !ttMove && !ttHit && cutNode && eval <= alpha)
+    if (depth >= 6 && !ttMove && !ttHit && cutNode && eval <= alpha)
     {
-        search<NT>(pos, ss, alpha, beta, depth - 7, cutNode);
+        search<NT>(pos, ss, alpha, beta, depth - 6, cutNode);
 
         tte = TT.probe(posKey, ttHit);
         ttValue = ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
