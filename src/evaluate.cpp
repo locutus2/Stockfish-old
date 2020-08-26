@@ -945,6 +945,16 @@ Value Eval::evaluate(const Position& pos) {
   Value v = classical ? Evaluation<NO_TRACE>(pos).value()
                       : NNUE::evaluate(pos) * 5 / 4 + Tempo;
 
+  if (classical && Eval::useNNUE && abs(v) * 16 >= NNUEThreshold2 * (16 + pos.rule50_count()))
+  {
+	  bool C = pos.count<PAWN>() == 11;
+	  if(C)
+	  {
+      		Value v2 = NNUE::evaluate(pos) * 5 / 4 + Tempo;
+		dbg_mean_of(abs(v2-v));
+	  }
+  }
+
   if (classical && Eval::useNNUE && abs(v) * 16 < NNUEThreshold2 * (16 + pos.rule50_count()))
       v = NNUE::evaluate(pos) * 5 / 4 + Tempo;
 
