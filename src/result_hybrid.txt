@@ -1,0 +1,17 @@
+pawn count =  0: Total 240231 Mean 4790.5
+pawn count =  1: Total 207059 Mean 2014.26
+pawn count =  2: Total 322792 Mean 1636.54
+pawn count =  3: Total 459861 Mean 1571.29
+pawn count =  4: Total 456997 Mean 1595.55
+pawn count =  5: Total 456574 Mean 1427.76
+pawn count =  6: Total 256718 Mean 1401.14
+pawn count =  7: Total 271178 Mean 1252.49
+pawn count =  8: Total 346301 Mean 1136.76
+pawn count =  9: Total 460561 Mean 870.833
+pawn count = 10: Total 515178 Mean 736.581
+pawn count = 11: Total 564569 Mean 593.191
+pawn count = 12: Total 541746 Mean 561.549
+pawn count = 13: Total 342402 Mean 498.926
+pawn count = 14: Total 290706 Mean 507.3
+pawn count = 15: Total 54791 Mean 399.057
+pawn count = 16: Total 59992 Mean 498.883
