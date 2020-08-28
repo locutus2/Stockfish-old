@@ -35,8 +35,6 @@
 
 using namespace std;
 
-extern vector<string> setup_bench(const Position&, istream&);
-
 namespace {
 
   // FEN string of the initial position, normal chess
@@ -136,52 +134,6 @@ namespace {
   }
 
 
-  // bench() is called when engine receives the "bench" command. Firstly
-  // a list of UCI commands is setup according to bench parameters, then
-  // it is run one by one printing a summary at the end.
-
-  void bench(Position& pos, istream& args, StateListPtr& states) {
-
-    string token;
-    uint64_t num, nodes = 0, cnt = 1;
-
-    vector<string> list = setup_bench(pos, args);
-    num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
-
-    TimePoint elapsed = now();
-
-    for (const auto& cmd : list)
-    {
-        istringstream is(cmd);
-        is >> skipws >> token;
-
-        if (token == "go" || token == "eval")
-        {
-            cerr << "\nPosition: " << cnt++ << '/' << num << endl;
-            if (token == "go")
-            {
-               go(pos, is, states);
-               Threads.main()->wait_for_search_finished();
-               nodes += Threads.nodes_searched();
-            }
-            else
-               sync_cout << "\n" << Eval::trace(pos) << sync_endl;
-        }
-        else if (token == "setoption")  setoption(is);
-        else if (token == "position")   position(pos, is, states);
-        else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
-    }
-
-    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
-
-    dbg_print(); // Just before exiting
-
-    cerr << "\n==========================="
-         << "\nTotal time (ms) : " << elapsed
-         << "\nNodes searched  : " << nodes
-         << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
-  }
-
   // The win rate model returns the probability (per mille) of winning given an eval
   // and a game-ply. The model fits rather accurately the LTC fishtest statistics.
   int win_rate_model(Value v, int ply) {
@@ -258,7 +210,6 @@ void UCI::loop(int argc, char* argv[]) {
       // Additional custom non-UCI commands, mainly for debugging.
       // Do not use these commands during a search!
       else if (token == "flip")     pos.flip();
-      else if (token == "bench")    bench(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
       else if (token == "eval")     sync_cout << Eval::trace(pos) << sync_endl;
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;
