@@ -156,14 +156,7 @@ Value Endgame<KPK>::operator()(const Position& pos) const {
   assert(verify_material(pos, weakSide, VALUE_ZERO, 0));
 
   // Assume strongSide is white and the pawn is on files A-D
-  Square strongKing = normalize(pos, strongSide, pos.square<KING>(strongSide));
   Square strongPawn = normalize(pos, strongSide, pos.square<PAWN>(strongSide));
-  Square weakKing   = normalize(pos, strongSide, pos.square<KING>(weakSide));
-
-  Color us = strongSide == pos.side_to_move() ? WHITE : BLACK;
-
-  if (!Bitbases::probe(strongKing, strongPawn, weakKing, us))
-      return VALUE_DRAW;
 
   Value result = VALUE_KNOWN_WIN + PawnValueEg + Value(rank_of(strongPawn));
 
@@ -728,11 +721,7 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
   assert(verify_material(pos, weakSide,   VALUE_ZERO, 1));
 
   // Assume strongSide is white and the pawn is on files A-D
-  Square strongKing = normalize(pos, strongSide, pos.square<KING>(strongSide));
-  Square weakKing   = normalize(pos, strongSide, pos.square<KING>(weakSide));
   Square strongPawn = normalize(pos, strongSide, pos.square<PAWN>(strongSide));
-
-  Color us = strongSide == pos.side_to_move() ? WHITE : BLACK;
 
   // If the pawn has advanced to the fifth rank or further, and is not a
   // rook pawn, it's too dangerous to assume that it's at least a draw.
@@ -741,5 +730,5 @@ ScaleFactor Endgame<KPKP>::operator()(const Position& pos) const {
 
   // Probe the KPK bitbase with the weakest side's pawn removed. If it's a draw,
   // it's probably at least a draw even with the pawn.
-  return Bitbases::probe(strongKing, strongPawn, weakKing, us) ? SCALE_FACTOR_NONE : SCALE_FACTOR_DRAW;
+  return SCALE_FACTOR_NONE;
 }

@@ -40,7 +40,6 @@ int main(int argc, char* argv[]) {
   PSQT::init();
   Bitboards::init();
   Position::init();
-  Bitbases::init();
   Endgames::init();
   Threads.set(size_t(Options["Threads"]));
   Search::clear(); // After threads are up
