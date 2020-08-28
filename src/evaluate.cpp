@@ -26,7 +26,6 @@
 
 #include "bitboard.h"
 #include "evaluate.h"
-#include "material.h"
 #include "pawns.h"
 #include "thread.h"
 
@@ -183,7 +182,6 @@ namespace {
     Value winnable(Score score) const;
 
     const Position& pos;
-    Material::Entry* me;
     Pawns::Entry* pe;
     Bitboard mobilityArea[COLOR_NB];
     Score mobility[COLOR_NB] = { SCORE_ZERO, SCORE_ZERO };
@@ -799,8 +797,12 @@ namespace {
         sf = std::min(sf, 36 + 7 * pos.count<PAWN>(strongSide));
 
     // Interpolate between the middlegame and (scaled by 'sf') endgame score
-    v =  mg * int(me->game_phase())
-       + eg * int(PHASE_MIDGAME - me->game_phase()) * ScaleFactor(sf) / SCALE_FACTOR_NORMAL;
+    Value npm   = Utility::clamp(pos.non_pawn_material(), EndgameLimit, MidgameLimit);
+    // Map total non-pawn material into [PHASE_ENDGAME, PHASE_MIDGAME]
+    Phase phase = Phase(((npm - EndgameLimit) * PHASE_MIDGAME) / (MidgameLimit - EndgameLimit));
+
+    v =  mg * int(phase)
+       + eg * int(PHASE_MIDGAME - phase) * ScaleFactor(sf) / SCALE_FACTOR_NORMAL;
     v /= PHASE_MIDGAME;
 
     if (T)
@@ -822,13 +824,10 @@ namespace {
 
     assert(!pos.checkers());
 
-    // Probe the material hash table
-    me = Material::probe(pos);
-
     // Initialize score by reading the incrementally updated scores included in
     // the position object (material + piece square tables) and the material
     // imbalance. Score is computed internally from the white point of view.
-    Score score = pos.psq_score() + me->imbalance() + pos.this_thread()->contempt;
+    Score score = pos.psq_score() + pos.this_thread()->contempt;
 
     // Probe the pawn hash table
     pe = Pawns::probe(pos);
@@ -873,7 +872,6 @@ make_v:
     if (T)
     {
         Trace::add(MATERIAL, pos.psq_score());
-        Trace::add(IMBALANCE, me->imbalance());
         Trace::add(PAWN, pe->pawn_score(WHITE), pe->pawn_score(BLACK));
         Trace::add(MOBILITY, mobility[WHITE], mobility[BLACK]);
     }

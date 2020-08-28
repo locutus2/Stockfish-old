@@ -27,7 +27,6 @@
 #include <thread>
 #include <vector>
 
-#include "material.h"
 #include "movepick.h"
 #include "pawns.h"
 #include "position.h"
@@ -59,7 +58,6 @@ public:
   int best_move_count(Move move) const;
 
   Pawns::Table pawnsTable;
-  Material::Table materialTable;
   size_t pvIdx, pvLast;
   uint64_t ttHitAverage;
   int selDepth, nmpMinPly;
