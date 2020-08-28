@@ -21,7 +21,6 @@
 #include <iostream>
 
 #include "bitboard.h"
-#include "endgame.h"
 #include "position.h"
 #include "search.h"
 #include "thread.h"
@@ -40,7 +39,6 @@ int main(int argc, char* argv[]) {
   PSQT::init();
   Bitboards::init();
   Position::init();
-  Endgames::init();
   Threads.set(size_t(Options["Threads"]));
   Search::clear(); // After threads are up
 
