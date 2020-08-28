@@ -941,7 +941,7 @@ make_v:
 Value Eval::evaluate(const Position& pos) {
 
   bool classical = !Eval::useNNUE
-                || (   pos.count<PAWN>() > 1
+                || (   pos.count<PAWN>() > 2
                     && abs(eg_value(pos.psq_score())) * 16 > NNUEThreshold1 * (16 + pos.rule50_count()));
   Value v = classical ? Evaluation<NO_TRACE>(pos).value()
                       : NNUE::evaluate(pos) * 5 / 4 + Tempo;
