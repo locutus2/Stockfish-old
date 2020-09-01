@@ -366,8 +366,8 @@ void Thread::search() {
   int searchAgainCounter = 0;
   Key posKey2 = 0;
 
-  if (previousCompletedDepth > 3 && previousCompletedDepthKey == rootPos.key())
-      rootDepth = previousCompletedDepth - 3;
+  if (previousCompletedDepth > 4 && previousCompletedDepthKey == rootPos.key())
+      rootDepth = previousCompletedDepth - 4;
 
   // Iterative deepening loop until requested to stop or the target depth is reached
   while (   ++rootDepth < MAX_PLY
