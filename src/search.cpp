@@ -364,6 +364,10 @@ void Thread::search() {
                           : -make_score(ct, ct / 2));
 
   int searchAgainCounter = 0;
+  Key posKey2 = 0;
+
+  if (previousCompletedDepth > 3 && previousCompletedDepthKey == rootPos.key())
+      rootDepth = previousCompletedDepth - 3;
 
   // Iterative deepening loop until requested to stop or the target depth is reached
   while (   ++rootDepth < MAX_PLY
@@ -481,7 +485,21 @@ void Thread::search() {
       }
 
       if (!Threads.stop)
+      {
           completedDepth = rootDepth;
+
+          if (rootMoves[0].pv.size() >= 2)
+          {
+              StateInfo st[2];
+              rootPos.do_move(rootMoves[0].pv[0], st[0]);
+              rootPos.do_move(rootMoves[0].pv[1], st[1]);
+              posKey2 = rootPos.key();
+              rootPos.undo_move(rootMoves[0].pv[1]);
+              rootPos.undo_move(rootMoves[0].pv[0]);
+          }
+          else
+              posKey2 = 0;
+      }
 
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
@@ -546,6 +564,9 @@ void Thread::search() {
       mainThread->iterValue[iterIdx] = bestValue;
       iterIdx = (iterIdx + 1) & 3;
   }
+
+  previousCompletedDepth = completedDepth;
+  previousCompletedDepthKey = posKey2;
 
   if (!mainThread)
       return;

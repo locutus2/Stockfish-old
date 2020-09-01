@@ -55,6 +55,9 @@ Thread::~Thread() {
 
 void Thread::clear() {
 
+  previousCompletedDepth = 0;
+  previousCompletedDepthKey = 0;
+
   counterMoves.fill(MOVE_NONE);
   mainHistory.fill(0);
   lowPlyHistory.fill(0);
