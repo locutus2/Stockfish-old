@@ -1712,10 +1712,14 @@ moves_loop: // When in check, search starts from here
     else
         captureHistory[moved_piece][to_sq(bestMove)][captured] << bonus1;
 
-    // Extra penalty for a quiet TT or main killer move in previous ply when it gets refuted
-    if (   ((ss-1)->moveCount == 1 + (ss-1)->ttHitt || ((ss-1)->currentMove == (ss-1)->killers[0]))
-        && !pos.captured_piece())
+    // Extra penalty for a TT or main killer move in previous ply when it gets refuted
+    if ((ss-1)->moveCount == 1 + (ss-1)->ttHitt || (ss-1)->currentMove == (ss-1)->killers[0])
+    {
+        if (pos.captured_piece())
+            captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] << -bonus1;
+        else
             update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -bonus1);
+    }
 
     // Decrease all the non-best capture moves
     for (int i = 0; i < captureCount; ++i)
