@@ -1168,10 +1168,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction if the second check in a row
-          if (givesCheck && (ss-1)->inCheck)
-              r--;
-
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 509 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1197,6 +1193,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Decrease reduction if now and two moves earlier in check
+              if (ss->inCheck && (ss-2)->inCheck)
+                  r--;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
