@@ -1193,7 +1193,7 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              if (!ss->ttPv && (ss-1)->ttPv && ss->ttHit && (ss-1)->ttHit)
+              if (!ss->ttPv && (ss-1)->ttPv)
                   --r;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
