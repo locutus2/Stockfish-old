@@ -141,6 +141,14 @@ namespace Eval {
     else
         sync_cout << "info string classical evaluation enabled" << sync_endl;
   }
+
+  inline Value contempt(const Position& pos) {
+
+      int gamePhase = Material::probe(pos)->game_phase();
+      Value v = mg_value(pos.this_thread()->staticContempt) * gamePhase / PHASE_MIDGAME;
+      return pos.side_to_move() ? v : -v;
+  }
+
 }
 
 namespace Trace {
@@ -1009,7 +1017,6 @@ make_v:
 
 } // namespace
 
-
 /// evaluate() is the evaluator for the outer world. It returns a static
 /// evaluation of the position from the point of view of the side to move.
 
@@ -1019,13 +1026,14 @@ Value Eval::evaluate(const Position& pos) {
   bool classical = !Eval::useNNUE
                 ||  useClassical
                 || (abs(eg_value(pos.psq_score())) > PawnValueMg / 8 && !(pos.this_thread()->nodes & 0xF));
+
   Value v = classical ? Evaluation<NO_TRACE>(pos).value()
-                      : NNUE::evaluate(pos) * 5 / 4 + Tempo;
+                      : NNUE::evaluate(pos) * 5 / 4 + Tempo + contempt(pos);
 
   if (   useClassical 
       && Eval::useNNUE 
       && abs(v) * 16 < NNUEThreshold2 * (16 + pos.rule50_count()))
-      v = NNUE::evaluate(pos) * 5 / 4 + Tempo;
+      v = NNUE::evaluate(pos) * 5 / 4 + Tempo + contempt(pos);
 
   // Damp down the evaluation linearly when shuffling
   v = v * (100 - pos.rule50_count()) / 100;
