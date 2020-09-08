@@ -1015,7 +1015,8 @@ make_v:
 
 Value Eval::evaluate(const Position& pos) {
 
-  Value v = Value(abs(eg_value(pos.psq_score() + Material::probe(pos)->imbalance())));
+  Pawns::Entry *pe = Pawns::probe(pos);
+  Value v = Value(abs(eg_value(pos.psq_score() + pe->pawn_score(WHITE) - pe->pawn_score(BLACK))));
   bool useClassical = v * 16 > NNUEThreshold1 * (16 + pos.rule50_count());
   bool classical = !Eval::useNNUE
                 ||  useClassical
