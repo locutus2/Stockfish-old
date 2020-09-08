@@ -1180,6 +1180,9 @@ moves_loop: // When in check, search starts from here
           if (ss->ttPv)
               r -= 2;
 
+          else if ((ss-1)->ttPv)
+              --r;
+
           if (moveCountPruning && !formerPv)
               r++;
 
@@ -1193,9 +1196,6 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              if (!ss->ttPv && (ss-1)->ttPv)
-                  --r;
-
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
