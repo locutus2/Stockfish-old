@@ -146,7 +146,7 @@ namespace Eval {
 
       int gamePhase = Material::probe(pos)->game_phase();
       Value v = mg_value(pos.this_thread()->staticContempt) * gamePhase / PHASE_MIDGAME;
-      return pos.side_to_move() ? v : -v;
+      return pos.side_to_move() == WHITE ? v : -v;
   }
 
 }
