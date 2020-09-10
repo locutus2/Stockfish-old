@@ -1019,7 +1019,7 @@ Value Eval::evaluate(const Position& pos) {
   // If there is a moderate imbalance, use classical eval with probability (1/8),
   // as derived from the node counter.
   Pawns::Entry *pe = Pawns::probe(pos);
-  Value v = Value(abs(eg_value(pos.psq_score()) + 0*mg_value(pe->king_safety<WHITE>(pos) - pe->king_safety<BLACK>(pos))));
+  Value v = Value(abs(eg_value(pos.psq_score()) + mg_value(pe->king_safety<WHITE>(pos) - pe->king_safety<BLACK>(pos))));
   bool useClassical = v * 16 > NNUEThreshold1 * (16 + pos.rule50_count());
   bool classical = !Eval::useNNUE
                 ||  useClassical
