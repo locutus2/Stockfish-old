@@ -568,6 +568,7 @@ namespace {
 
     constexpr bool PvNode = NT == PV;
     const bool rootNode = PvNode && ss->ply == 0;
+    ss->averageEval = VALUE_NONE;
 
     // Check if we have an upcoming move which draws by repetition, or
     // if the opponent had an alternative move earlier to this position.
@@ -601,7 +602,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, evalSum, evalSumCount;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -967,6 +968,7 @@ moves_loop: // When in check, search starts from here
                                       ss->killers,
                                       ss->ply);
 
+    evalSum = evalSumCount = 0;
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
@@ -1282,6 +1284,12 @@ moves_loop: // When in check, search starts from here
       // Step 18. Undo move
       pos.undo_move(move);
 
+      if ((ss+1)->averageEval != VALUE_NONE)
+      {
+          evalSum += (ss+1)->averageEval;
+          evalSumCount++;
+      }
+
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
       // Step 19. Check for a new best move
@@ -1368,6 +1376,9 @@ moves_loop: // When in check, search starts from here
 
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
 
+    if (evalSumCount > 0)
+        ss->averageEval = evalSum / evalSumCount;
+
     if (!moveCount)
         bestValue = excludedMove ? alpha
                    :     ss->inCheck ? mated_in(ss->ply) : VALUE_DRAW;
@@ -1424,7 +1435,7 @@ moves_loop: // When in check, search starts from here
     Depth ttDepth;
     Value bestValue, value, ttValue, futilityValue, futilityBase, oldAlpha;
     bool pvHit, givesCheck, captureOrPromotion;
-    int moveCount;
+    int moveCount, evalSum, evalSumCount;
 
     if (PvNode)
     {
@@ -1438,6 +1449,7 @@ moves_loop: // When in check, search starts from here
     bestMove = MOVE_NONE;
     ss->inCheck = pos.checkers();
     moveCount = 0;
+    ss->averageEval = VALUE_NONE;
 
     // Check for an immediate draw or maximum ply reached
     if (   pos.is_draw(ss->ply)
@@ -1497,6 +1509,7 @@ moves_loop: // When in check, search starts from here
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), false, BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval);
 
+            ss->averageEval = bestValue;
             return bestValue;
         }
 
@@ -1509,6 +1522,8 @@ moves_loop: // When in check, search starts from here
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
                                           nullptr                   , (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
+
+    evalSum = evalSumCount = 0;
 
     // Initialize a MovePicker object for the current position, and prepare
     // to search the moves. Because the depth is <= 0 here, only captures,
@@ -1589,6 +1604,12 @@ moves_loop: // When in check, search starts from here
       value = -qsearch<NT>(pos, ss+1, -beta, -alpha, depth - 1);
       pos.undo_move(move);
 
+      if ((ss+1)->averageEval != VALUE_NONE)
+      {
+          evalSum += (ss+1)->averageEval;
+          evalSumCount++;
+      }
+
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
       // Check for a new best move
@@ -1615,6 +1636,9 @@ moves_loop: // When in check, search starts from here
     // and no legal moves were found, it is checkmate.
     if (ss->inCheck && bestValue == -VALUE_INFINITE)
         return mated_in(ss->ply); // Plies to mate from the root
+
+    if (evalSumCount > 0)
+        ss->averageEval = evalSum / evalSumCount;
 
     tte->save(posKey, value_to_tt(bestValue, ss->ply), pvHit,
               bestValue >= beta ? BOUND_LOWER :
