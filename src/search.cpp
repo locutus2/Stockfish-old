@@ -1193,9 +1193,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction if average eval in search tree is low
-              if (evalSumCount > 0 && evalSum / evalSumCount <= alpha - 200)
-                  r++;
+              // Decrease reduction if average eval in search tree is high
+              if (evalSumCount > 0 && evalSum / evalSumCount >= beta + 100)
+                  r--;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
