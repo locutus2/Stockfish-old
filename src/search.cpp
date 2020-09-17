@@ -1194,7 +1194,7 @@ moves_loop: // When in check, search starts from here
           if (!captureOrPromotion)
           {
               // Decrease reduction if average eval in search tree is high at the root
-              if (rootNode && evalSumCount > 0 && evalSum / evalSumCount >= beta + 100)
+              if (rootNode && evalSumCount > 0 && evalSum / evalSumCount >= beta + 200)
                   r--;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
