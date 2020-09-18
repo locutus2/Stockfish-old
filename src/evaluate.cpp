@@ -190,7 +190,7 @@ namespace {
   constexpr Value LazyThreshold1 =  Value(1400);
   constexpr Value LazyThreshold2 =  Value(1300);
   constexpr Value SpaceThreshold = Value(12222);
-  constexpr Value NNUEThreshold1 =   Value(550);
+  constexpr Value NNUEThreshold1 =   Value(750);
   constexpr Value NNUEThreshold2 =   Value(150);
 
   // KingAttackWeights[PieceType] contains king attack weights by piece type
@@ -1018,7 +1018,7 @@ Value Eval::evaluate(const Position& pos) {
   // Use classical eval if there is a large imbalance
   // If there is a moderate imbalance, use classical eval with probability (1/8),
   // as derived from the node counter.
-  bool useClassical = abs(eg_value(pos.psq_score())) * 16 > (NNUEThreshold1 + pos.non_pawn_material() / 64) * (16 + pos.rule50_count());
+  bool useClassical = abs(eg_value(pos.psq_score())) * 16 > (NNUEThreshold1 - pos.non_pawn_material() / 64) * (16 + pos.rule50_count());
   bool classical = !Eval::useNNUE
                 ||  useClassical
                 || (abs(eg_value(pos.psq_score())) > PawnValueMg / 4 && !(pos.this_thread()->nodes & 0xB));
