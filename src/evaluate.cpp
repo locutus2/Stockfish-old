@@ -1026,15 +1026,15 @@ Value Eval::evaluate(const Position& pos) {
 
       // if there is PSQ imbalance use classical eval, with small probability if it is small
       Value psq = Value(abs(eg_value(pos.psq_score())));
-      int   r50 = 16 + pos.rule50_count();
-      bool  largePsq = psq * 16 > (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50;
+      int   r50 = 32 + pos.rule50_count();
+      bool  largePsq = psq * 32 > (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50;
       bool  classical = largePsq || (psq > PawnValueMg / 4 && !(pos.this_thread()->nodes & 0xB));
 
       v = classical ? Evaluation<NO_TRACE>(pos).value() : adjusted_NNUE();
 
       // if the classical eval is small and imbalance large, use NNUE nevertheless.
-      if (   classical
-          && abs(v) * 16 < NNUEThreshold2 * r50)
+      if (   largePsq
+          && abs(v) * 32 < NNUEThreshold2 * r50)
           v = adjusted_NNUE();
   }
 
