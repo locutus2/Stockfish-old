@@ -1033,8 +1033,8 @@ Value Eval::evaluate(const Position& pos) {
       v = classical ? Evaluation<NO_TRACE>(pos).value() : adjusted_NNUE();
 
       // if the classical eval is small and imbalance large, use NNUE nevertheless.
-      if (   largePsq
-          && abs(v) * 16 < (NNUEThreshold2 + pos.non_pawn_material() / 128) * r50)
+      if (   classical
+          && abs(v) * 16 < NNUEThreshold2 * r50)
           v = adjusted_NNUE();
   }
 
