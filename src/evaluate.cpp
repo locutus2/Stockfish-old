@@ -1040,7 +1040,19 @@ Value Eval::evaluate(const Position& pos) {
           || (   pos.opposite_bishops() 
               && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
               && !(pos.this_thread()->nodes & 0xB))))
+      {
           v = adjusted_NNUE();
+      }
+      else if(classical)
+      {
+	  bool C = pos.count<QUEEN>() == 1;
+	  if(C) 
+	  {
+          	Value v1 = adjusted_NNUE();
+		dbg_mean_of(abs(v - v1));
+	  }
+      }
+
   }
 
   // Damp down the evaluation linearly when shuffling
