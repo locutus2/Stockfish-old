@@ -1043,9 +1043,9 @@ Value Eval::evaluate(const Position& pos) {
       {
           v = adjusted_NNUE();
       }
-      else if(classical)
+      else if(largePsq)
       {
-	  bool C = pos.count<QUEEN>() == 1;
+	  bool C = pos.count<BISHOP>(WHITE) != pos.count<BISHOP>(BLACK);
 	  if(C) 
 	  {
           	Value v1 = adjusted_NNUE();
