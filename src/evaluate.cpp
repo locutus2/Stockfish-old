@@ -1037,10 +1037,10 @@ Value Eval::evaluate(const Position& pos) {
       // small probability if the classical eval is less than the threshold.
       if (   largePsq
           && (abs(v) * 16 < NNUEThreshold2 * r50
-          || pos.count<ROOK>(WHITE) != pos.count<ROOK>(BLACK)
-          || (   pos.opposite_bishops() 
-              && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
-              && !(pos.this_thread()->nodes & 0xB))))
+          || (   abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
+              && !(pos.this_thread()->nodes & 0xB)
+              && (   pos.opposite_bishops()
+                  || Pawns::probe(pos)->passed_count() >= 3))))
           v = adjusted_NNUE();
   }
 
