@@ -1040,7 +1040,7 @@ Value Eval::evaluate(const Position& pos) {
           || (   abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
               && !(pos.this_thread()->nodes & 0xB)
               && (   pos.opposite_bishops()
-                  || Pawns::probe(pos)->passed_count() >= 4))))
+                  || Pawns::probe(pos)->passed_count() == 0))))
           v = adjusted_NNUE();
   }
 
