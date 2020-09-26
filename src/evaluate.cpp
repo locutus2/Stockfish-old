@@ -1026,7 +1026,7 @@ Value Eval::evaluate(const Position& pos) {
 
       // If there is PSQ imbalance use classical eval, with small probability if it is small
       Value psq = Value(abs(eg_value(pos.psq_score())));
-      int   r50Base = pos.this_thread()->rootDepth;
+      int   r50Base = pos.this_thread()->rootDepth / 2;
       int   r50 = r50Base + pos.rule50_count();
       bool  largePsq = psq * r50Base > (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50;
       bool  classical = largePsq || (psq > PawnValueMg / 4 && !(pos.this_thread()->nodes & 0xB));
