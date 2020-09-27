@@ -69,10 +69,11 @@ namespace {
   }
 
   // Reductions lookup table, initialized at startup
-  int Reductions[MAX_MOVES]; // [depth or moveNumber]
+  int DReductions[MAX_MOVES]; // [depth]
+  int MReductions[MAX_MOVES]; // [moveNumber]
 
   Depth reduction(bool i, Depth d, int mn) {
-    int r = Reductions[d] * Reductions[mn];
+    int r = DReductions[d] * MReductions[mn];
     return (r + 509) / 1024 + (!i && r > 894);
   }
 
@@ -192,7 +193,10 @@ namespace {
 void Search::init() {
 
   for (int i = 1; i < MAX_MOVES; ++i)
-      Reductions[i] = int((22.0 + 2 * std::log(Threads.size())) * std::log(i));
+  {
+      DReductions[i] = int((22.0 + 2 * std::log(Threads.size())) * std::log(i));
+      MReductions[i] = int((21.7 + 2 * std::log(Threads.size())) * std::log(i));
+  }
 }
 
 
