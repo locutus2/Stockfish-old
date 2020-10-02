@@ -1158,7 +1158,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Decrease reduction if plies are greate than selective depth
-          if (ss->ply > thisThread->selDepth)
+          if (formerPv && ss->ply > thisThread->selDepth)
               r--;
 
           // Decrease reduction if the ttHit running average is large
