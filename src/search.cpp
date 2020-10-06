@@ -1148,6 +1148,10 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Decrease reduction at PV nodes if search goes deeper than longest found PV line
+          if (PvNode && thisThread->rootDepth > thisThread->selDepth)
+              r--;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 509 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
