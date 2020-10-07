@@ -664,7 +664,10 @@ namespace {
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     if (!excludedMove)
-        ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
+        ss->ttPv =   PvNode
+                  || (ss->ttHit && tte->is_pv())
+                  || ((ss-1)->moveCount == 1 && (ss-2)->moveCount == 1 && (ss-3)->moveCount == 1);
+
     formerPv = ss->ttPv && !PvNode;
 
     if (   ss->ttPv
@@ -965,9 +968,6 @@ moves_loop: // When in check, search starts from here
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
-
-    if ((ss-1)->moveCount == 1 && (ss-2)->moveCount == 1 && (ss-3)->moveCount == 1)
-        ss->ttPv = true;
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
