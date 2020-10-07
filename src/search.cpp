@@ -606,7 +606,7 @@ namespace {
     priorCapture = pos.captured_piece();
     Color us = pos.side_to_move();
     moveCount = captureCount = quietCount = ss->moveCount = 0;
-	ss->moveCountTotal = (ss-1)->moveCountTotal + (ss-1)->moveCount;
+    ss->moveCountTotal = (ss-1)->moveCountTotal + (rootNode || (ss-1)->moveCount > 0 ? (ss-1)->moveCount : MAX_MOVES);
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
 
