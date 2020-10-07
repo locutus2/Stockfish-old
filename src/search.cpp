@@ -966,6 +966,9 @@ moves_loop: // When in check, search starts from here
     singularQuietLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
+    if ((ss-1)->moveCount == 1 && (ss-2)->moveCount == 1 && (ss-3)->moveCount == 1)
+        ss->ttPv = true;
+
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
 
