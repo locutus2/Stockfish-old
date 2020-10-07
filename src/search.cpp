@@ -606,6 +606,7 @@ namespace {
     priorCapture = pos.captured_piece();
     Color us = pos.side_to_move();
     moveCount = captureCount = quietCount = ss->moveCount = 0;
+	ss->moveCountTotal = (ss-1)->moveCountTotal + (ss-1)->moveCount;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
 
@@ -666,7 +667,7 @@ namespace {
     if (!excludedMove)
         ss->ttPv =   PvNode
                   || (ss->ttHit && tte->is_pv())
-                  || ((ss-1)->moveCount == 1 && (ss-2)->moveCount == 1 && (ss-3)->moveCount == 1);
+                  || ss->moveCountTotal <= ss->ply;
 
     formerPv = ss->ttPv && !PvNode;
 
