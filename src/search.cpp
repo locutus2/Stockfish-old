@@ -517,7 +517,7 @@ void Thread::search() {
               totBestMoveChanges += th->bestMoveChanges;
               th->bestMoveChanges = 0;
           }
-          double threadsFactor = 1 + 1 / (1 + 0.2 * std::log(Threads.size()));
+          double threadsFactor = 1 + 1 / (1 + std::log(Threads.size()));
           double bestMoveInstability = 1 + threadsFactor * totBestMoveChanges / Threads.size();
 
           double totalTime = rootMoves.size() == 1 ? 0 :
