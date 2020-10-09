@@ -298,6 +298,7 @@ void Thread::search() {
   Move  pv[MAX_PLY+1];
   Value bestValue, alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
+  double lastBestMoveTime = 0;
   Depth lastBestMoveDepth = 0;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1, totBestMoveChanges = 0;
@@ -483,6 +484,7 @@ void Thread::search() {
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
+         lastBestMoveTime = Time.elapsed();
       }
 
       // Have we found a "mate in x"?
@@ -531,6 +533,19 @@ void Thread::search() {
                   mainThread->stopOnPonderhit = true;
               else
                   Threads.stop = true;
+
+              if (rootMoves.size() > 1 && lastBestMove && totalTime > 0)
+              {
+		      bool CC = true;
+		      bool C = rootPos.capture_or_promotion(lastBestMove);
+                      double factor = lastBestMoveTime / totalTime;
+
+                      if(CC)
+                      {
+                          dbg_mean_of(1000 * factor, 0);
+                          dbg_mean_of(1000 * factor, 10+C);
+                      }
+              }
           }
           else if (   Threads.increaseDepth
                    && !mainThread->ponder
