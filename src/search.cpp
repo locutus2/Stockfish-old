@@ -537,7 +537,7 @@ void Thread::search() {
               if (rootMoves.size() > 1 && lastBestMove && totalTime > 0)
               {
 		      bool CC = true;
-		      bool C = rootPos.capture_or_promotion(lastBestMove);
+		      bool C = type_of(rootPos.moved_piece(lastBestMove)) == PAWN;
                       double factor = lastBestMoveTime / totalTime;
 
                       if(CC)
