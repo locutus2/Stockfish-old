@@ -117,8 +117,11 @@ vector<string> setup_bench(const Position& current, istream& is) {
   string fenFile   = (is >> token) ? token : "default";
   string limitType = (is >> token) ? token : "depth";
   string evalType  = (is >> token) ? token : "mixed";
+  string incTime   = (is >> token) ? token : "0";
 
-  go = limitType == "eval" ? "eval" : "go " + limitType + " " + limit;
+  go = limitType == "eval"    ? "eval" :
+       limitType == "inctime" ? "go wtime " + limit + " btime " + limit + " winc " + incTime + " binc " + incTime
+                              : "go " + limitType + " " + limit;
 
   if (fenFile == "default")
       fens = Defaults;
