@@ -537,7 +537,7 @@ void Thread::search() {
               if (rootMoves.size() > 1 && lastBestMove && totalTime > 0)
               {
 		      bool CC = true;
-		      int C = rootPos.count<PAWN>() > 8;
+		      int C = rootPos.gives_check(lastBestMove);
                       double factor = lastBestMoveTime / totalTime;
 
                       if(CC)
