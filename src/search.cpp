@@ -517,7 +517,7 @@ void Thread::search() {
               totBestMoveChanges += th->bestMoveChanges;
               th->bestMoveChanges = 0;
           }
-          double moveFactor = rootPos.capture_or_promotion(lastBestMove) ? 1.8 : 2.0;
+          double moveFactor = rootPos.capture_or_promotion(lastBestMove) ? 1.6 : 2.0;
           double bestMoveInstability = 1 + moveFactor * totBestMoveChanges / Threads.size();
 
           double totalTime = rootMoves.size() == 1 ? 0 :
