@@ -1213,12 +1213,9 @@ moves_loop: // When in check, search starts from here
 
               // Unless giving check, this capture is likely bad
               if (   !givesCheck
+                  && !extension
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 213 * depth <= alpha)
                   r++;
-
-              // Decrease reduction for check move if not extended
-              if (!extension && givesCheck)
-                  r--;
           }
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
