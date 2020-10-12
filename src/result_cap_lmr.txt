@@ -33,6 +33,24 @@ C = !PvNode&&!cutNode
 [0] Total 2171295 Hits 107098 hit rate (%) 4.93245
 [10] Total 973740 Hits 84067 hit rate (%) 8.63341
 [11] Total 1197555 Hits 23031 hit rate (%) 1.92317
+
+C=extension
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 2091732 Hits 96842 hit rate (%) 4.62975
+[11] Total 79563 Hits 10256 hit rate (%) 12.8904
+
+-------------------
+CC=captureOrPromotion && (depth < 8 && moveCount > 2)
+C=extension
+[0] Total 1513330 Hits 32726 hit rate (%) 2.16252
+[10] Total 1467228 Hits 30012 hit rate (%) 2.04549
+[11] Total 46102 Hits 2714 hit rate (%) 5.88695
+
+CC=captureOrPromotion && (!givesCheck && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 213 * depth <= alpha)
+C=extension
+[0] Total 166070 Hits 478 hit rate (%) 0.28783
+[10] Total 160544 Hits 425 hit rate (%) 0.264725
+[11] Total 5526 Hits 53 hit rate (%) 0.959102
 -------------------------------------------
 CC=!captureOrPromotion
 C=!ttCapture
@@ -59,6 +77,14 @@ C=!(ss->statScore >= -106 && (ss-1)->statScore < -104) && !((ss-1)->statScore >=
 [0] Total 22570978 Hits 1120659 hit rate (%) 4.96504
 [10] Total 13668105 Hits 627563 hit rate (%) 4.59144
 [11] Total 8902873 Hits 493096 hit rate (%) 5.53862
+
+C=extension
+[0] Total 22570978 Hits 1120659 hit rate (%) 4.96504
+[10] Total 20551580 Hits 956015 hit rate (%) 4.65178
+[11] Total 2019398 Hits 164644 hit rate (%) 8.15312
+
+
+
 ----------------------------------
 CC=true
 C=!(thisThread->ttHitAverage > 509 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -75,3 +101,19 @@ C=!(moveCountPruning && !formerPv)
 [0] Total 24742273 Hits 1227757 hit rate (%) 4.96218
 [10] Total 1838124 Hits 44325 hit rate (%) 2.41143
 [11] Total 22904149 Hits 1183432 hit rate (%) 5.16689
+
+C=!((ss-1)->moveCount > 13)
+[0] Total 24742273 Hits 1227757 hit rate (%) 4.96218
+[10] Total 2145917 Hits 135218 hit rate (%) 6.30118
+[11] Total 22596356 Hits 1092539 hit rate (%) 4.83502
+
+C=!singularQuietLMR
+[0] Total 24742273 Hits 1227757 hit rate (%) 4.96218
+[10] Total 654155 Hits 14169 hit rate (%) 2.166
+[11] Total 24088118 Hits 1213588 hit rate (%) 5.03812
+
+C=extension
+[0] Total 24742273 Hits 1227757 hit rate (%) 4.96218
+[10] Total 22643312 Hits 1052857 hit rate (%) 4.64975
+[11] Total 2098961 Hits 174900 hit rate (%) 8.33269
+
