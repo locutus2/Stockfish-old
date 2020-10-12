@@ -1136,6 +1136,8 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
+
       // Step 16. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1149,6 +1151,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
 
+	      CC = true;
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 509 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1163,6 +1166,7 @@ moves_loop: // When in check, search starts from here
 
           if (moveCountPruning && !formerPv)
               r++;
+              else C = true;
 
           // Decrease reduction if opponent's move count is high (~5 Elo)
           if ((ss-1)->moveCount > 13)
@@ -1207,6 +1211,13 @@ moves_loop: // When in check, search starts from here
           }
           else
           {
+	      //CC = true;
+	      //C = ss->inCheck;
+	      //C = givesCheck; 
+	      //C = cutNode; 
+	      //C = PvNode;
+	      //C = !PvNode&&!cutNode;
+
               // Increase reduction for captures/promotions if late move and at low depth
               if (depth < 8 && moveCount > 2)
                   r++;
@@ -1215,10 +1226,6 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 213 * depth <= alpha)
                   r++;
-
-              // Decrease reduction for check move if not extended
-              if (!extension && givesCheck)
-                  r--;
           }
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
@@ -1304,6 +1311,13 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if (CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      dbg_hit_on(T, 10+C);
       }
 
       if (value > bestValue)

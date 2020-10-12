@@ -1,0 +1,77 @@
+CC=captureOrPromotion
+C=inCheck
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 2154872 Hits 103100 hit rate (%) 4.78451
+[11] Total 16423 Hits 3998 hit rate (%) 24.3439
+
+C=givesCheck
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 1963856 Hits 95278 hit rate (%) 4.85158
+[11] Total 207439 Hits 11820 hit rate (%) 5.69806
+
+C=cutNode
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 1335236 Hits 24903 hit rate (%) 1.86506
+[11] Total 836059 Hits 82195 hit rate (%) 9.83124
+
+C=PvNode
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 2033614 Hits 105226 hit rate (%) 5.17433
+[11] Total 137681 Hits 1872 hit rate (%) 1.35966
+
+C=!(depth < 8 && moveCount > 2)
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 1513330 Hits 32726 hit rate (%) 2.16252
+[11] Total 657965 Hits 74372 hit rate (%) 11.3033
+
+C=!(!givesCheck && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 213 * depth <= alpha)
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 166070 Hits 478 hit rate (%) 0.28783
+[11] Total 2005225 Hits 106620 hit rate (%) 5.31711
+
+C = !PvNode&&!cutNode
+[0] Total 2171295 Hits 107098 hit rate (%) 4.93245
+[10] Total 973740 Hits 84067 hit rate (%) 8.63341
+[11] Total 1197555 Hits 23031 hit rate (%) 1.92317
+-------------------------------------------
+CC=!captureOrPromotion
+C=!ttCapture
+[0] Total 22570978 Hits 1120659 hit rate (%) 4.96504
+[10] Total 1644431 Hits 43814 hit rate (%) 2.66439
+[11] Total 20926547 Hits 1076845 hit rate (%) 5.14583
+
+C=!cutNode
+[0] Total 22570978 Hits 1120659 hit rate (%) 4.96504
+[10] Total 7692319 Hits 648128 hit rate (%) 8.42565
+[11] Total 14878659 Hits 472531 hit rate (%) 3.1759
+
+C=!cutNode && !(type_of(move) == NORMAL && !pos.see_ge(reverse_move(move)))
+[0] Total 22570978 Hits 1120659 hit rate (%) 4.96504
+[10] Total 8694045 Hits 712894 hit rate (%) 8.1998
+[11] Total 13876933 Hits 407765 hit rate (%) 2.93844
+
+C=!(ss->statScore >= -106 && (ss-1)->statScore < -104)
+[0] Total 22570978 Hits 1120659 hit rate (%) 4.96504
+[10] Total 1751863 Hits 336274 hit rate (%) 19.1952
+[11] Total 20819115 Hits 784385 hit rate (%) 3.76762
+
+C=!(ss->statScore >= -106 && (ss-1)->statScore < -104) && !((ss-1)->statScore >= -119 && ss->statScore < -140)
+[0] Total 22570978 Hits 1120659 hit rate (%) 4.96504
+[10] Total 13668105 Hits 627563 hit rate (%) 4.59144
+[11] Total 8902873 Hits 493096 hit rate (%) 5.53862
+----------------------------------
+CC=true
+C=!(thisThread->ttHitAverage > 509 * TtHitAverageResolution * TtHitAverageWindow / 1024)
+[0] Total 24742273 Hits 1227757 hit rate (%) 4.96218
+[10] Total 12575672 Hits 630630 hit rate (%) 5.01468
+[11] Total 12166601 Hits 597127 hit rate (%) 4.90792
+
+C=!(ss->ttPv)
+[0] Total 24742273 Hits 1227757 hit rate (%) 4.96218
+[10] Total 6271885 Hits 183013 hit rate (%) 2.91799
+[11] Total 18470388 Hits 1044744 hit rate (%) 5.65632
+
+C=!(moveCountPruning && !formerPv)
+[0] Total 24742273 Hits 1227757 hit rate (%) 4.96218
+[10] Total 1838124 Hits 44325 hit rate (%) 2.41143
+[11] Total 22904149 Hits 1183432 hit rate (%) 5.16689
