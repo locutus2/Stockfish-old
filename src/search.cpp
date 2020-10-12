@@ -1148,8 +1148,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction for check move if not extended
-          if (!extension && givesCheck)
+          // Decrease reduction for pawn move if not extended
+          if (!extension && type_of(movedPiece) == PAWN)
               r--;
 
           // Decrease reduction if the ttHit running average is large
