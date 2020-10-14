@@ -1163,7 +1163,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Decrese reduction if move matches any move of same color in current PV
-          if (findPvMove(thisThread, us, move))
+          if (PvNode && findPvMove(thisThread, us, move))
               r--;
 
           // Decrease reduction if the ttHit running average is large
