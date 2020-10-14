@@ -1311,7 +1311,7 @@ moves_loop: // When in check, search starts from here
               for (Move* m = (ss+1)->pv; *m != MOVE_NONE; ++m)
               {
                   rm.pv.push_back(*m);
-                  col = ~us;
+                  col = ~col;
                   addPvMove(thisThread, col, *m);
               }
 
