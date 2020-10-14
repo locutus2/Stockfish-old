@@ -1149,8 +1149,8 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction if move matches current PV move at same ply (only at non-PV nodes)
-          if (!PvNode && move == pvMove)
+          // Decrease reduction if move matches current PV move at same ply
+          if (move == pvMove)
               r--;
 
           // Decrease reduction if the ttHit running average is large
