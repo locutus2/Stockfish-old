@@ -1150,8 +1150,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-
-	      
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 509 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1176,10 +1174,6 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 		  
-		  
-		  
-		  
-
           if (!captureOrPromotion)
           {
 			  
@@ -1231,8 +1225,13 @@ moves_loop: // When in check, search starts from here
               // Unless giving check, this capture is likely bad
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 213 * depth <= alpha)
-                  r++, CC = true, C = extension;
+                  r++;
           }
+	  CC = !extension;
+	  //C = captureOrPromotion;
+	  //C = ss->inCheck;
+	  //C = givesCheck;
+	  C = type_of(movedPiece) == PAWN;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 

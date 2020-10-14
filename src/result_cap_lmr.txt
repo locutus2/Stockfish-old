@@ -1,3 +1,23 @@
+CC=!extension
+
+C=captureOrPromotion
+[0] Total 22875637 Hits 1056793 hit rate (%) 4.61973
+[10] Total 20659774 Hits 955329 hit rate (%) 4.6241
+[11] Total 2215863 Hits 101464 hit rate (%) 4.57898
+
+C=ss->inCheck
+[0] Total 22875637 Hits 1056793 hit rate (%) 4.61973
+[10] Total 21694025 Hits 975671 hit rate (%) 4.49742
+[11] Total 1181612 Hits 81122 hit rate (%) 6.86537
+
+C=givesCheck
+[0] Total 22875637 Hits 1056793 hit rate (%) 4.61973
+[10] Total 22216433 Hits 1050395 hit rate (%) 4.72801
+[11] Total 659204 Hits 6398 hit rate (%) 0.970564
+
+C=type_of(movedPiece) == PAWN
+
+##################
 CC=captureOrPromotion
 C=inCheck
 [0] Total 2171295 Hits 107098 hit rate (%) 4.93245
