@@ -59,6 +59,8 @@ void Thread::clear() {
   mainHistory.fill(0);
   lowPlyHistory.fill(0);
   captureHistory.fill(0);
+  moveTable[WHITE].clear();
+  moveTable[BLACK].clear();
 
   for (bool inCheck : { false, true })
       for (StatsType c : { NoCaptures, Captures })

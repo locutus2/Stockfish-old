@@ -38,6 +38,20 @@
 namespace Search {
 
   LimitsType Limits;
+
+  void addPvMove(Thread *th, Color c, Move move) {
+
+    MoveTable& table = th->moveTable[c];
+
+    table.insert(move);
+  }
+
+  bool findPvMove(const Thread *th, Color c, Move move) {
+
+    const MoveTable& table = th->moveTable[c];
+
+    return table.find(move) != table.end();
+  }
 }
 
 namespace Tablebases {
@@ -1148,6 +1162,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          if (findPvMove(thisThread, us, move))
+              r--;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 509 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1279,14 +1296,23 @@ moves_loop: // When in check, search starts from here
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
           {
+              thisThread->moveTable[WHITE].clear();
+              thisThread->moveTable[BLACK].clear();
+
+              Color col = us;
               rm.score = value;
               rm.selDepth = thisThread->selDepth;
               rm.pv.resize(1);
+              addPvMove(thisThread, col, move);
 
               assert((ss+1)->pv);
 
               for (Move* m = (ss+1)->pv; *m != MOVE_NONE; ++m)
+              {
                   rm.pv.push_back(*m);
+                  col = ~us;
+                  addPvMove(thisThread, col, *m);
+              }
 
               // We record how often the best move has been changed in each
               // iteration. This information is used for time management: when

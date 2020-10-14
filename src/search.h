@@ -20,6 +20,7 @@
 #define SEARCH_H_INCLUDED
 
 #include <vector>
+#include <unordered_set>
 
 #include "misc.h"
 #include "movepick.h"
@@ -28,6 +29,8 @@
 class Position;
 
 namespace Search {
+
+typedef std::unordered_set<Move> MoveTable;
 
 /// Threshold used for countermoves based pruning
 constexpr int CounterMovePruneThreshold = 0;
