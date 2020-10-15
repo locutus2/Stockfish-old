@@ -1231,7 +1231,14 @@ moves_loop: // When in check, search starts from here
 	  //C = captureOrPromotion;
 	  //C = ss->inCheck;
 	  //C = givesCheck;
-	  C = type_of(movedPiece) == PAWN;
+	  //C = type_of(movedPiece) == PAWN;
+	  //C = cutNode;
+	  //C = PvNode;
+	  //C = !PvNode && !cutNode;
+	  //C = ss->inCheck && cutNode;
+	  //C = ss->inCheck && !cutNode;
+	  //C = !ss->inCheck && cutNode;
+	  C = !ss->inCheck && !cutNode;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
