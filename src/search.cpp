@@ -35,6 +35,9 @@
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
+int Winit = false;
+std::vector<double> W;
+
 namespace Search {
 
   LimitsType Limits;
@@ -281,6 +284,11 @@ void MainThread::search() {
       std::cout << " ponder " << UCI::move(bestThread->rootMoves[0].pv[1], rootPos.is_chess960());
 
   std::cout << sync_endl;
+
+  std::cerr << "W:";
+  for(int i = 0; i < (int)W.size(); ++i)
+    std::cerr << " " << W[i];
+  std::cerr << std::endl;
 }
 
 
@@ -1137,6 +1145,7 @@ moves_loop: // When in check, search starts from here
       pos.do_move(move, st, givesCheck);
 
       bool CC = false, C = false;
+      std::vector<bool> CV;
 
       // Step 16. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
@@ -1227,7 +1236,7 @@ moves_loop: // When in check, search starts from here
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 213 * depth <= alpha)
                   r++;
           }
-	  CC = !extension;
+	  CC = true;
 	  //C = captureOrPromotion;
 	  //C = ss->inCheck;
 	  //C = givesCheck;
@@ -1238,7 +1247,17 @@ moves_loop: // When in check, search starts from here
 	  //C = ss->inCheck && cutNode;
 	  //C = ss->inCheck && !cutNode;
 	  //C = !ss->inCheck && cutNode;
-	  C = !ss->inCheck && !cutNode;
+	  CV = { PvNode, cutNode, !PvNode && !cutNode,
+	         ss->inCheck, !ss->inCheck,
+	         givesCheck, !givesCheck,
+	         captureOrPromotion, !captureOrPromotion,
+	         type_of(movedPiece) == PAWN,
+	         type_of(movedPiece) == KNIGHT,
+	         type_of(movedPiece) == BISHOP,
+	         type_of(movedPiece) == ROOK,
+	         type_of(movedPiece) == QUEEN,
+	         type_of(movedPiece) == KING
+	  };
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
@@ -1328,8 +1347,27 @@ moves_loop: // When in check, search starts from here
       if (CC)
       {
 	      bool T = value > alpha;
-	      dbg_hit_on(T, 0);
-	      dbg_hit_on(T, 10+C);
+	      //dbg_hit_on(T, 0);
+	      //dbg_hit_on(T, 10+C);
+
+	      int N = 0;
+	      if(!Winit)
+	      {
+		      N = (int)CV.size();
+		      W = std::vector<double>(N, 0);
+		      Winit = true;
+		      std::cerr << "INIT" << std::endl;
+	      }
+
+	      double sum = 0;
+	      for(int i = 0; i < N; ++i)
+		      	sum += W[i] * CV[i];
+
+              double err = sum - (T ? 1 : -1);
+
+	      constexpr double ALPHA = 0.1; 
+	      for(int i = 0; i < N; ++i)
+		      W[i] -= ALPHA * err * CV[i];
       }
 
       if (value > bestValue)
