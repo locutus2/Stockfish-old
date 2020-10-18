@@ -36,7 +36,16 @@
 #include "syzygy/tbprobe.h"
 
 int Winit = false;
+double Werr = 0.5;
 std::vector<double> W;
+
+void printW(std::ostream &out = std::cerr)
+{
+  out << "Err=" << Werr << " W:";
+  for(int i = 0; i < (int)W.size(); ++i)
+    out << " " << W[i];
+  out << std::endl;
+}
 
 namespace Search {
 
@@ -285,10 +294,8 @@ void MainThread::search() {
 
   std::cout << sync_endl;
 
-  std::cerr << "W:";
-  for(int i = 0; i < (int)W.size(); ++i)
-    std::cerr << " " << W[i];
-  std::cerr << std::endl;
+  printW();
+  
 }
 
 
@@ -1247,7 +1254,8 @@ moves_loop: // When in check, search starts from here
 	  //C = ss->inCheck && cutNode;
 	  //C = ss->inCheck && !cutNode;
 	  //C = !ss->inCheck && cutNode;
-	  CV = { PvNode, cutNode, !PvNode && !cutNode,
+	  CV = { true,
+	         PvNode, cutNode, !PvNode && !cutNode,
 	         ss->inCheck, !ss->inCheck,
 	         givesCheck, !givesCheck,
 	         captureOrPromotion, !captureOrPromotion,
@@ -1363,11 +1371,17 @@ moves_loop: // When in check, search starts from here
 	      for(int i = 0; i < N; ++i)
 		      	sum += W[i] * CV[i];
 
-              double err = sum - (T ? 1 : -1);
+          sum = 1 / (1 + std::exp(-sum));
+          double err = sum - (T ? 1 : 0);
+		  
+		  const int LAMBDA = 0.1;
+		  Werr = (1-LAMBDA)*Werr + LAMBDA*std::abs(err);
 
-	      constexpr double ALPHA = 0.1; 
+	      constexpr double ALPHA = 0.0001;
+		  double w = (T ? 19 : 1);
+		  dbg_hit_on(T);
 	      for(int i = 0; i < N; ++i)
-		      W[i] -= ALPHA * err * CV[i];
+		      W[i] += ALPHA * err * sum * (1 - sum) * CV[i] * w;
       }
 
       if (value > bestValue)
