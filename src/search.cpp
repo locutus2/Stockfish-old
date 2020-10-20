@@ -35,9 +35,11 @@
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
+constexpr bool WLEARN = true;
 int Winit = false;
 double Werr = 0.5;
 std::vector<double> W;
+std::vector<double> Wstart = { 1.51066, 1.51066, 0, 0, 0.0498019, 1.46086, 0.13241, 1.37826, 0.13548, 1.37518, 0.24448, 0.206988, 0.240224, 0.38752, 0.192303, 0.239148 };
 
 void printW(std::ostream &out = std::cerr)
 {
@@ -1361,11 +1363,14 @@ moves_loop: // When in check, search starts from here
 	      //dbg_hit_on(T, 0);
 	      //dbg_hit_on(T, 10+C);
 
-	      int N = 0;
+	      static int N = 0;
 	      if(!Winit)
 	      {
 		      N = (int)CV.size();
-		      W = std::vector<double>(N, 0);
+		      if((int)W.size() == N)
+			W = Wstart;
+		      else
+		      	W = std::vector<double>(N, 0);
 		      Winit = true;
 		      std::cerr << "INIT" << std::endl;
 	      }
@@ -1374,17 +1379,25 @@ moves_loop: // When in check, search starts from here
 	      for(int i = 0; i < N; ++i)
 		      	sum += W[i] * CV[i];
 
-          sum = 1 / (1 + std::exp(-sum));
-          double err = sum - (T ? 1 : 0);
-		  
-		  const int LAMBDA = 0.1;
-		  Werr = (1-LAMBDA)*Werr + LAMBDA*std::abs(err);
+              sum = 1 / (1 + std::exp(-sum));
+              double err = sum - (T ? 1 : 0);
+	      //std::cerr << "=> T=" << T << std::endl;		  
+	      //std::cerr << "=> sum=" << sum << std::endl;		  
+	      //std::cerr << "=> err=" << err << std::endl;		  
+	      const int LAMBDA = 0.1;
+	      Werr = (1-LAMBDA)*Werr + LAMBDA*std::abs(err);
 
 	      constexpr double ALPHA = 0.0001;
-		  double w = (T ? 19 : 1);
-		  dbg_hit_on(T);
+	      double w = (T ? 19 : 1);
+	      //std::cerr << "=> w=" << w << std::endl;		  
+	      dbg_hit_on(T);
 	      for(int i = 0; i < N; ++i)
+	      {
+	      //	std::cerr << "===> C=" << CV[i] << " delta=" << ALPHA * err * sum * (1 - sum) * CV[i] * w << std::endl;
 		      W[i] += ALPHA * err * sum * (1 - sum) * CV[i] * w;
+	      }
+	      //printW();
+	      //std::exit(0);
       }
 
       if (value > bestValue)
