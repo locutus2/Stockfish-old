@@ -1398,10 +1398,11 @@ moves_loop: // When in check, search starts from here
 	      //std::cerr << "=> sum=" << sum << std::endl;		  
 	      //std::cerr << "=> err=" << err << std::endl;		  
 	      const double LAMBDA = 0.0001;
+		  double loss = err*err + WL * sumL;
 		  if(Werr < 0)
-			Werr = err*err + WL * sumL;
+			Werr = loss;
 		  else
-	        Werr = (1-LAMBDA)*Werr + LAMBDA*(err*err + WL * sumL);
+	        Werr = (1-LAMBDA)*Werr + LAMBDA*loss;
 
 	      constexpr double ALPHA = 0.0001;
 	      double w = (T ? 19 : 1);
