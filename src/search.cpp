@@ -35,6 +35,8 @@
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
+constexpr double WALPHA = 0.00001;
+const double WLAMBDA = 0.0001;
 constexpr bool WSIGMOID = true;
 constexpr double WL = 0;
 constexpr bool WLEARN = true;
@@ -1386,7 +1388,7 @@ moves_loop: // When in check, search starts from here
 		   {
               sum = 1 / (1 + std::exp(-sum));
 			  target = (T ? 1 : 0);
-			  grad = -sum * (1 - sum);
+			  grad = sum * (1 - sum);
 		   }
 		   
 		   double sumL = 0;
@@ -1397,21 +1399,21 @@ moves_loop: // When in check, search starts from here
 	      //std::cerr << "=> T=" << T << std::endl;		  
 	      //std::cerr << "=> sum=" << sum << std::endl;		  
 	      //std::cerr << "=> err=" << err << std::endl;		  
-	      const double LAMBDA = 0.0001;
+	      
 		  double loss = err*err + WL * sumL;
 		  if(Werr < 0)
 			Werr = loss;
 		  else
-	        Werr = (1-LAMBDA)*Werr + LAMBDA*loss;
+	        Werr = (1-WLAMBDA)*Werr + WLAMBDA*loss;
 
-	      constexpr double ALPHA = 0.0001;
+	      
 	      double w = (T ? 19 : 1);
 	      //std::cerr << "=> w=" << w << std::endl;		  
 	      dbg_hit_on(T);
 		  if (WLEARN)
 	      for(int i = 0; i < N; ++i)
 	      {
-			  double delta = ALPHA * w * (  err * grad * CV[i] + WL * W[i]);
+			  double delta = WALPHA * w * (  err * grad * CV[i] + WL * W[i]);
 	      //	std::cerr << "===> C=" << CV[i] << " delta=" << delta << std::endl;
 		      W[i] -= delta;
 	      }
