@@ -40,9 +40,13 @@ const double WLAMBDA = 0.0001;
 constexpr bool WSIGMOID = true;
 constexpr double WL = 0;
 constexpr bool WLEARN = true;
+int Wcount = 0;
+
+constexpr int WBatchsize = 1000;
+
 int Winit = false;
 double Werr = -1;
-std::vector<double> W;
+std::vector<double> W, Wdelta;
 std::vector<double> Wstart;// = { 1.51066, 1.51066, 0, 0, 0.0498019, 1.46086, 0.13241, 1.37826, 0.13548, 1.37518, 0.24448, 0.206988, 0.240224, 0.38752, 0.192303, 0.239148 };
 
 void printW(std::ostream &out = std::cerr)
@@ -52,6 +56,77 @@ void printW(std::ostream &out = std::cerr)
     out << " " << W[i];
   out << std::endl;
 }
+
+void learn(bool T, const std::vector<bool> &CV)
+{
+	  int N = (int)CV.size();
+	      if(!Winit)
+	      {
+		      Wdelta.resize(N, 0);
+
+			  W = Wstart;
+			  W.resize(N, 0);
+		      Winit = true;
+		      std::cerr << "INIT" << std::endl;
+			  printW();
+	      }
+
+	      double sum = 0;
+	      for(int i = 0; i < N; ++i)
+		      	sum += W[i] * CV[i];
+
+          double grad = 1;
+		  int target = (T ? 1 : -1);
+		   if(WSIGMOID)
+		   {
+              sum = 1 / (1 + std::exp(-sum));
+			  target = (T ? 1 : 0);
+			  grad = sum * (1 - sum);
+		   }
+		   
+		   double sumL = 0;
+		   for(int i = 0; i < N; ++i)
+		      	sumL += W[i] * W[i];
+
+              double err = sum - target;
+	      //std::cerr << "=> T=" << T << std::endl;		  
+	      //std::cerr << "=> sum=" << sum << std::endl;		  
+	      //std::cerr << "=> err=" << err << std::endl;		  
+	      
+		  double loss = err*err + WL * sumL;
+		  if(Werr < 0)
+			Werr = loss;
+		  else
+	        Werr = (1-WLAMBDA)*Werr + WLAMBDA*loss;
+
+	      
+	      double w = (T ? 19 : 1);
+	      //std::cerr << "=> w=" << w << std::endl;		  
+	      dbg_hit_on(T);
+		  if (WLEARN)
+		  {
+			  Wcount++;
+			  
+			  if(Wcount >= WBatchsize)
+			  {
+				  for(int i = 0; i < N; ++i)
+				  {
+					  
+					  W[i] -= WALPHA * Wdelta[i];
+				  }
+				  Wcount = 0;
+			  }
+			   else
+				   for(int i = 0; i < N; ++i)
+				  {
+					  double delta = w * (  err * grad * CV[i] + WL * W[i]);
+				  //	std::cerr << "===> C=" << CV[i] << " delta=" << delta << std::endl;
+					  Wdelta[i] += delta;
+				  }
+		  }
+	      //printW();
+}
+
 
 namespace Search {
 
@@ -1367,57 +1442,7 @@ moves_loop: // When in check, search starts from here
 	      //dbg_hit_on(T, 0);
 	      //dbg_hit_on(T, 10+C);
 
-	      int N = (int)CV.size();
-	      if(!Winit)
-	      {
-		   
-			  W = Wstart;
-			  W.resize(N, 0);
-		      Winit = true;
-		      std::cerr << "INIT" << std::endl;
-			  printW();
-	      }
-
-	      double sum = 0;
-	      for(int i = 0; i < N; ++i)
-		      	sum += W[i] * CV[i];
-
-          double grad = 1;
-		  int target = (T ? 1 : -1);
-		   if(WSIGMOID)
-		   {
-              sum = 1 / (1 + std::exp(-sum));
-			  target = (T ? 1 : 0);
-			  grad = sum * (1 - sum);
-		   }
-		   
-		   double sumL = 0;
-		   for(int i = 0; i < N; ++i)
-		      	sumL += W[i] * W[i];
-
-              double err = sum - target;
-	      //std::cerr << "=> T=" << T << std::endl;		  
-	      //std::cerr << "=> sum=" << sum << std::endl;		  
-	      //std::cerr << "=> err=" << err << std::endl;		  
-	      
-		  double loss = err*err + WL * sumL;
-		  if(Werr < 0)
-			Werr = loss;
-		  else
-	        Werr = (1-WLAMBDA)*Werr + WLAMBDA*loss;
-
-	      
-	      double w = (T ? 19 : 1);
-	      //std::cerr << "=> w=" << w << std::endl;		  
-	      dbg_hit_on(T);
-		  if (WLEARN)
-	      for(int i = 0; i < N; ++i)
-	      {
-			  double delta = WALPHA * w * (  err * grad * CV[i] + WL * W[i]);
-	      //	std::cerr << "===> C=" << CV[i] << " delta=" << delta << std::endl;
-		      W[i] -= delta;
-	      }
-	      //printW();
+	      learn(T, CV);
 	      //std::exit(0);
       }
 
