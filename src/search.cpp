@@ -41,7 +41,7 @@ constexpr bool WSIGMOID = true;
 constexpr double WL = 0;
 constexpr bool WLEARN = true;
 int Winit = false;
-double Werr = -1;
+double Werr = 1;
 std::vector<double> W;
 std::vector<double> Wstart;// = { 1.51066, 1.51066, 0, 0, 0.0498019, 1.46086, 0.13241, 1.37826, 0.13548, 1.37518, 0.24448, 0.206988, 0.240224, 0.38752, 0.192303, 0.239148 };
 
