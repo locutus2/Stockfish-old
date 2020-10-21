@@ -38,22 +38,36 @@
 constexpr double WALPHA = 0.00001;
 const double WLAMBDA = 0.0001;
 constexpr bool WSIGMOID = true;
-constexpr double WL = 0;
+constexpr double WL = 0.1;
 constexpr bool WLEARN = true;
 int Wcount = 0;
+int64_t WerrCount = 0;
+constexpr double Ppos = 0.5;
+constexpr double PosTH = 0.7;
 
-constexpr int WBatchsize = 1000;
+constexpr int WBatchsize = 100000;
 
 int Winit = false;
 double Werr = -1;
 std::vector<double> W, Wdelta;
-std::vector<double> Wstart;// = { 1.51066, 1.51066, 0, 0, 0.0498019, 1.46086, 0.13241, 1.37826, 0.13548, 1.37518, 0.24448, 0.206988, 0.240224, 0.38752, 0.192303, 0.239148 };
+std::vector<double> Wstart;
+//= {-9.17033, -1.49207, -0.100875, -7.57739, -10.2255, 1.05521, -5.71395, -3.45638, -7.74983, -1.4205, 3.49766, -1.43974, -1.21755, -1.60131, 1.32532, -9.73471};
+//----------
+//= {-14.0049, -3.27152, -6.07602, -4.65736, 1.40023, -15.4051, -0.549254, -13.4557, -0.631538, -13.3734, -0.218403, -4.69159, -3.94681, 1.23343, -3.83868, -2.54285};
+//----------------------
+//= {0.0747875, 0.0356405, -0.307749, 0.346896, 0.343408, -0.268621, -0.266895, 0.341682, -0.156367, 0.231155, 0.11755, -0.27437, 0.359477, -0.556383, 0.217111, 0.211403};
+//---------------
+//= {-1.58479, -0.215938, -0.555465, -0.813391, -0.375073, -1.20972, -0.379, -1.20579, -0.11328, -1.47151, 0.00105155, 0.0174349, 0.012042, -0.0636271, -0.824694, -0.727001};
+//-------------
+//= {-0.463155, -0.459613, 0.0639804, -0.0675213, 0.156006, -0.61916, -0.187203, -0.275952, 0.182726, -0.645881, 0.194319, -0.318726, 0.407237, -1.25525, 0.0236648, 0.485599};
+// = { -1.84405, -0.796934, -0.255846, -0.791268, 0.040413, -1.88446, 0.338091, -2.18214, -0.557599, -1.28645, -0.294855, -0.217669, -0.664971, 0.25971, -0.513579, -0.412683};
+;// = { 1.51066, 1.51066, 0, 0, 0.0498019, 1.46086, 0.13241, 1.37826, 0.13548, 1.37518, 0.24448, 0.206988, 0.240224, 0.38752, 0.192303, 0.239148 };
 
 void printW(std::ostream &out = std::cerr)
 {
-  out << "Err=" << Werr << " W:";
+  out << "Err=" << Werr/WerrCount << " W:";
   for(int i = 0; i < (int)W.size(); ++i)
-    out << " " << W[i];
+    out << ", " << W[i];
   out << std::endl;
 }
 
@@ -77,12 +91,17 @@ void learn(bool T, const std::vector<bool> &CV)
 
           double grad = 1;
 		  int target = (T ? 1 : -1);
+		  bool predict = sum > PosTH;
 		   if(WSIGMOID)
 		   {
               sum = 1 / (1 + std::exp(-sum));
 			  target = (T ? 1 : 0);
 			  grad = sum * (1 - sum);
+			  predict = sum > PosTH;
 		   }
+		   
+		   dbg_hit_on(T, 10+predict);
+		   dbg_hit_on(T == predict, 100);
 		   
 		   double sumL = 0;
 		   for(int i = 0; i < N; ++i)
@@ -93,14 +112,20 @@ void learn(bool T, const std::vector<bool> &CV)
 	      //std::cerr << "=> sum=" << sum << std::endl;		  
 	      //std::cerr << "=> err=" << err << std::endl;		  
 	      
-		  double loss = err*err + WL * sumL;
+		  double loss = err*err + 0 * WL/N * sumL;
+		  /*
 		  if(Werr < 0)
 			Werr = loss;
 		  else
 	        Werr = (1-WLAMBDA)*Werr + WLAMBDA*loss;
+		*/
+		Werr += loss;
+		WerrCount++;
 
 	      
-	      double w = (T ? 19 : 1);
+	      double w1 = 0.5 / (T ? Ppos : 1 - Ppos);
+		  double w2 = (predict ? 1/Ppos : 0);
+		  double w = w1;// * 0.05 + w2 * 0.95;
 	      //std::cerr << "=> w=" << w << std::endl;		  
 	      dbg_hit_on(T);
 		  if (WLEARN)
@@ -119,7 +144,7 @@ void learn(bool T, const std::vector<bool> &CV)
 			   else
 				   for(int i = 0; i < N; ++i)
 				  {
-					  double delta = w * (  err * grad * CV[i] + WL * W[i]);
+					  double delta = w * (  err * grad * CV[i] + 2*WL/N * W[i]);
 				  //	std::cerr << "===> C=" << CV[i] << " delta=" << delta << std::endl;
 					  Wdelta[i] += delta;
 				  }
@@ -1348,7 +1373,9 @@ moves_loop: // When in check, search starts from here
 	         type_of(movedPiece) == BISHOP,
 	         type_of(movedPiece) == ROOK,
 	         type_of(movedPiece) == QUEEN,
-	         type_of(movedPiece) == KING
+	         type_of(movedPiece) == KING //,
+			 //bool(extension), !extension
+			 
 	  };
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
