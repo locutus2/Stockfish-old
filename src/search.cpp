@@ -1007,7 +1007,7 @@ moves_loop: // When in check, search starts from here
 
       // Calculate new depth for this move
       newDepth = depth - 1;
-
+bool CC = false, C = false;
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1027,6 +1027,39 @@ moves_loop: // When in check, search starts from here
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
                   continue;
+
+				if (   lmrDepth < 5 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
+                  && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
+                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+				  {
+						CC = true; // 1.41 /D16 1.03 R= 1.37
+						//C = eval <= alpha; // C 1.10 /D16 C 0.79 R=1.39
+						//C = (ss-1)->currentMove == MOVE_NULL; // NaN						
+						//C = type_of(movedPiece) == PAWN; // C 1.25 /D16 C0.91 R=1.37
+						//C = type_of(movedPiece) == QUEEN; // !C 1.41
+						//C = type_of(movedPiece) == KING; // !C 1.38
+						//C = ss->inCheck;  // !C 1.33
+						//C = (ss-1)->inCheck; // C 1.09 /D16 C 0.82 R= 1.33
+						//C = (ss-2)->inCheck; // !C 1.37
+						//C = (ss-3)->inCheck; // C 1.22
+						//C = (ss-4)->inCheck; // !C 1.38
+						//C = PvNode; // C 1.22 /D16 C 1.02 R=1.20
+						//C = !PvNode; //# C 1.46 /D16 C 1.03 R=1.42
+						//C = cutNode; // !C 1.12 /D16 !C 0.78 R=1.44
+						//C = !PvNode && !cutNode; // C 1.07 /D16 C 0.74 R=1.45
+					
+						//C = (ss-1)->ttPv; // C 1.22
+						//C = (ss-2)->ttPv; // C 1.14 /D16 C 0.79 R=1.44
+						
+						//C = (ss-3)->ttPv; //C 1.31
+						//C = !PvNode && (ss-1)->ttPv; // C 1.22
+						//C = !PvNode && (ss-2)->ttPv; // C 1.15 /D16 C 0.76 R=1.51
+						
+						//C = !PvNode && (ss-3)->ttPv; // C 1.35
+						//C = !ss->ttPv && (ss-1)->ttPv; // !C 1.39
+						C = !(ss-1)->ttPv && (ss-2)->ttPv; // C 1.28 /D16 C 0.74 R=1.73
+						//C = !(ss-2)->ttPv && (ss-3)->ttPv; // !C 1.33
+                  }
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 7
@@ -1305,6 +1338,15 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
+	  
+	  if(CC)
+	  {
+		  bool T = value > alpha;
+		  dbg_hit_on(T, 0);
+		  dbg_hit_on(T, depth);
+		  dbg_hit_on(T, 100 + C);
+		  dbg_hit_on(T, 100 + 10 * depth + C);
+	  }
 
       if (value > bestValue)
       {
