@@ -1023,11 +1023,30 @@ bool CC = false, C = false;
               && !givesCheck)
           {
               // Countermoves based pruning (~20 Elo)
-              if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
+              if (   lmrDepth < 4-1 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
                   continue;
+				  
+			  if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
+                  && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
+                  && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
+				  {
+						CC = true; // 1.38 
+						C = eval <= alpha; // 1.94/1.04 [legend=!C/C]
+						C = (ss-1)->inCheck; // 1.41/1.10
+						C = eval <= alpha - 100; // 1.68/0.60
+						C = eval <= alpha + 100; // 3.22/1.20
+						C = eval <= alpha - 200; // 1.54/0.47
+						C = eval <= alpha + 200; // 3.84/1.26
+						//C = eval <= alpha + 300; // 4.11/1.27
+						C = eval <= alpha + 400; // 4.31/1.28
+						C = excludedMove; // 1.34/2.74
+						C = ss->inCheck;  // 1.29/4.50
+						C = (ss-2)->inCheck;  // 1.34/2.37
+                  }
 
+/*
 				if (   lmrDepth < 5 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
@@ -1057,9 +1076,10 @@ bool CC = false, C = false;
 						
 						//C = !PvNode && (ss-3)->ttPv; // C 1.35
 						//C = !ss->ttPv && (ss-1)->ttPv; // !C 1.39
-						C = !(ss-1)->ttPv && (ss-2)->ttPv; // C 1.28 /D16 C 0.74 R=1.73
+						//C = !(ss-1)->ttPv && (ss-2)->ttPv; // C 1.28 /D16 C 0.74 R=1.73
 						//C = !(ss-2)->ttPv && (ss-3)->ttPv; // !C 1.33
                   }
+*/
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 7
