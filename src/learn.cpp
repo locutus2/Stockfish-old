@@ -22,7 +22,8 @@ constexpr bool WPrintData = false;
 int Winit = false;
 double Werr = -1;
 std::vector<double> W, Wdelta;
-std::vector<double> Wstart;
+std::vector<double> Wstart
+= {-0.493165, -0.121028, -0.133636, -0.238501, -0.025466, -0.467699, -0.108182, -0.0448424, -0.0651283, -0.136877, -0.0488468, -0.0892888};
 
 void printW(std::ostream &out = std::cerr)
 {
