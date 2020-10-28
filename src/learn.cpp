@@ -6,17 +6,17 @@
 #include <cstdlib>
 #include <cassert>
 
-constexpr double WALPHA = 0.000001;
+constexpr double WALPHA = 0.00000001;
 const double WLAMBDA = 0.0001;
 constexpr bool WSIGMOID = true;
 constexpr double WL = 0;
 constexpr bool WLEARN = true;
 int Wcount = 0;
 int64_t WerrCount = 0;
-constexpr double Ppos = 0.01367483420370993463713956354413;
+constexpr double Ppos = 0.5;//0.01367483420370993463713956354413;
 constexpr double PosTH = 0.5;
 
-constexpr int WBatchsize = 10000;
+constexpr int WBatchsize = 100000;
 constexpr bool WPrintData = false;
 constexpr bool USE_BATCH_ERROR = true;
 
@@ -130,9 +130,10 @@ void learn(std::vector<int>& labels, std::vector<std::vector<int>> &attrs, std::
 					  
 					  double loss = err*err + WL/K * sumL;
 					  
-					  		double w1 = 0.5 / (labels[ii] ? Ppos : 1 - Ppos);
-							double w2 = (predict ? 1/Ppos : 0);
-							double w = w1 * 1.00 + w2 * 0.00;
+					  double w1 = 0.5 / (labels[ii] ? Ppos : 1 - Ppos);
+					  double w2 = (predict ? 1/Ppos : 0);
+					  double w = w1 * 1.00 + w2 * 0.00;
+					  //double w = w1 * 0.1 + w2 * 0.9;
 							
 					  /*
 					  if(Werr < 0)
