@@ -43,7 +43,7 @@ constexpr bool WLEARN = false;
 int Wcount = 0;
 int64_t WerrCount = 0;
 constexpr double Ppos = 0.5;
-constexpr double PosTH = 0.7;
+constexpr double PosTH = 0.5;
 
 constexpr int WBatchsize = 100000;
 constexpr bool WPrintData = true;
@@ -1131,7 +1131,7 @@ moves_loop: // When in check, search starts from here
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
 
-      bool CC = false, C = false;
+      bool CC = false;
       std::vector<bool> CV;
       // Calculate new depth for this move
       newDepth = depth - 1;
@@ -1155,22 +1155,22 @@ moves_loop: // When in check, search starts from here
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
 	      {
-	  	CC = lmrDepth >= 4;
-	  	CV = { true,
-	         PvNode, cutNode, !PvNode && !cutNode,
-	         ss->inCheck, !ss->inCheck,
-	         //givesCheck, !givesCheck,
-	         //captureOrPromotion, !captureOrPromotion,
-	         type_of(movedPiece) == PAWN,
-	         type_of(movedPiece) == KNIGHT,
-	         type_of(movedPiece) == BISHOP,
-	         type_of(movedPiece) == ROOK,
-	         type_of(movedPiece) == QUEEN,
-	         type_of(movedPiece) == KING, 
-		 //bool(extension), !extension
-			 
-	  	};
-                  if(!CC) continue;
+				CC = (lmrDepth + 1 == 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1));
+				CV = { true,
+					 PvNode, cutNode, !PvNode && !cutNode,
+					 ss->inCheck, !ss->inCheck,
+					 //givesCheck, !givesCheck,
+					 //captureOrPromotion, !captureOrPromotion,
+					 type_of(movedPiece) == PAWN,
+					 type_of(movedPiece) == KNIGHT,
+					 type_of(movedPiece) == BISHOP,
+					 type_of(movedPiece) == ROOK,
+					 type_of(movedPiece) == QUEEN,
+					 type_of(movedPiece) == KING, 
+				 //bool(extension), !extension
+					 
+				};
+                 if(!CC) continue;
 	      }
 
               // Futility pruning: parent node (~5 Elo)
