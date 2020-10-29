@@ -1023,8 +1023,8 @@ moves_loop: // When in check, search starts from here
               && !givesCheck)
           {
               // Countermoves based pruning (~20 Elo)
-              if (   lmrDepth < 3 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
-                                  + (eval <= alpha + 100)
+              if (   lmrDepth < 2 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
+                                  + 2 * (eval <= alpha + 400)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
                   continue;
