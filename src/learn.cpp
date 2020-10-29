@@ -12,8 +12,8 @@ constexpr bool WSIGMOID = true;
 constexpr double WL = 0;
 constexpr bool WLEARN = true;
 int Wcount = 0;
-int64_t WerrCount = 0;
-constexpr double Ppos = 0.5;//0.01367483420370993463713956354413;
+//constexpr double Ppos = 0.01367483420370993463713956354413;
+constexpr double Ppos = 0.01355316532628514084606577998898;
 constexpr double PosTH = 0.5;
 
 constexpr int WBatchsize = 100000;
@@ -22,6 +22,9 @@ constexpr bool USE_BATCH_ERROR = true;
 
 int Winit = false;
 double Werr = 0;
+double WerrCount = 0;
+double WPerr = 0;
+double WPerrCount = 0;
 std::vector<double> W, Wdelta;
 std::vector<double> Wstart;
 //-----------------
@@ -31,7 +34,7 @@ std::vector<double> Wstart;
 
 void printW(std::ostream &out = std::cerr)
 {
-  out << "Err=" << Werr/WerrCount << " W:";
+  out << "Err=" << Werr/WerrCount << " PErr=" << WPerr/WPerrCount << " W:";
   for(int i = 0; i < (int)W.size(); ++i)
        out << ", " << W[i];
   out << std::endl;
@@ -85,6 +88,8 @@ void learn(std::vector<int>& labels, std::vector<std::vector<int>> &attrs, std::
 		  std::random_shuffle(index.begin(), index.end());
 		  Werr = 0;
 		  WerrCount = 0;
+		  WPerr = 0;
+		  WPerrCount = 0;
 		  
 		  for(int batch = 0; batch < N; batch += WBatchsize)
 		  {
@@ -97,6 +102,8 @@ void learn(std::vector<int>& labels, std::vector<std::vector<int>> &attrs, std::
 				{
 					Werr = 0;
 					WerrCount = 0;
+					WPerr = 0;
+					WPerrCount = 0;
 				}
 				
 				for(int j = batch; j < batch + count; ++j)
@@ -131,9 +138,13 @@ void learn(std::vector<int>& labels, std::vector<std::vector<int>> &attrs, std::
 					  double loss = err*err + WL/K * sumL;
 					  
 					  double w1 = 0.5 / (labels[ii] ? Ppos : 1 - Ppos);
-					  double w2 = (predict ? 1/Ppos : 0);
+					  //double w2 = (predict ? 1/Ppos : 0);
+					  double w2 = (labels[ii] ? 1/Ppos : 0);
 					  double w = w1 * 1.00 + w2 * 0.00;
+					  //double w = w1 * 0.50 + w2 * 0.50;
 					  //double w = w1 * 0.1 + w2 * 0.9;
+					  //double w = w1 * 0.00 + w2 * 1.00;
+					  //double w = (predict ? 1 : 0.001);
 							
 					  /*
 					  if(Werr < 0)
@@ -142,7 +153,16 @@ void learn(std::vector<int>& labels, std::vector<std::vector<int>> &attrs, std::
 						Werr = (1-WLAMBDA)*Werr + WLAMBDA*loss;
 					*/
 					Werr += w * loss;
-					WerrCount++;
+					WerrCount += w;
+					//if(labels[ii])
+					if(predict)
+					{
+					    //WPerr += w * loss;
+					    //WPerrCount += w;
+					    //WPerr += 1 * loss;
+					    WPerr += (predict != labels[ii]);
+					    WPerrCount += 1;
+					}
 					
 				  
 					  //std::cerr << "=> w=" << w << std::endl;		  

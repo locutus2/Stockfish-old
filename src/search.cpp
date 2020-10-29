@@ -53,6 +53,33 @@ double Werr = -1;
 std::vector<double> W, Wdelta;
 std::vector<double> Wstart;
 
+std::vector<bool> generateCV(const Position& pos, Move move)
+{
+    std::vector<bool> CV = {true};
+    Square toSq = to_sq(move);
+    /*
+    Color col = pos.side_to_move();
+    PieceType pt = type_of(pos.moved_piece(move));
+    Square ownKsq = pos.square<KING>(col);
+    Square oppKsq = pos.square<KING>(~col);
+
+    for(Square kSq : {ownKsq, oppKsq})
+        for(Square ks = SQ_A1; ks <= SQ_H8; ++ks)
+	    for(PieceType p = PAWN; p <= KING; ++p)
+	        for(Square s = SQ_A1; s <= SQ_H8; ++s)
+		{
+			bool v = ks == kSq && p == pt && s == toSq;
+			CV.push_back(v);
+		}
+		*/
+	        for(Square s = SQ_A1; s <= SQ_H8; ++s)
+		{
+			bool v = s == toSq;
+			CV.push_back(v);
+		}
+    return CV;
+}
+
 void printW(std::ostream &out = std::cerr)
 {
   out << "Err=" << Werr/WerrCount << " W:";
@@ -1155,7 +1182,10 @@ moves_loop: // When in check, search starts from here
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
 	      {
-				CC = (lmrDepth + 1 == 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1));
+		       CC = (lmrDepth + 1 == 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1));
+		       if(CC)
+		       {
+			       /*
 				CV = { true,
 					 PvNode, cutNode, !PvNode && !cutNode,
 					 ss->inCheck, !ss->inCheck,
@@ -1170,7 +1200,10 @@ moves_loop: // When in check, search starts from here
 				 //bool(extension), !extension
 					 
 				};
-                 if(!CC) continue;
+				*/
+		       	     CV = generateCV(pos, move);
+		        }
+                 	else continue;
 	      }
 
               // Futility pruning: parent node (~5 Elo)
