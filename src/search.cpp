@@ -1186,6 +1186,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Increase reduction for white/black knight move to A1/A8
+              if (relative_square(us, to_sq(move)) == SQ_A1 && type_of(movedPiece) == KNIGHT)
+                  r++;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
