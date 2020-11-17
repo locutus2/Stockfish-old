@@ -1218,7 +1218,7 @@ moves_loop: // When in check, search starts from here
                   r++;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              r -= (ss->statScore - 857) / 12334;
+              r -= (ss->statScore - 532) / 13454;
           }
           else
           {
