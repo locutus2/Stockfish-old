@@ -47,6 +47,8 @@ class Thread {
   NativeThread stdThread;
 
 public:
+  int get_id() const { return idx; }
+
   explicit Thread(size_t);
   virtual ~Thread();
   virtual void search();
