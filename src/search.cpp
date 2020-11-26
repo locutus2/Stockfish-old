@@ -1224,7 +1224,7 @@ moves_loop: // When in check, search starts from here
           {
               // Increase reduction for captures/promotions if late move and at low depth
               if (depth < 8 && moveCount > 2)
-                  r += 1 + (thisThread->nodes & 1);
+                  r += 2;
 
               // Unless giving check, this capture is likely bad
               if (   !givesCheck
