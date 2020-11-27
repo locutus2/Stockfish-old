@@ -1185,7 +1185,7 @@ moves_loop: // When in check, search starts from here
               r--;
 
           // Increase reduction if late move and at low depth
-          if (depth < 8 && moveCount > 16 - 14 * captureOrPromotion)
+          if (depth < 8 && moveCount > 14 - 12 * captureOrPromotion)
               r++;
 
           if (!captureOrPromotion)
