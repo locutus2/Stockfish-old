@@ -824,7 +824,7 @@ namespace {
                     0;
         thisThread->staticHistory[~us][from_to((ss-1)->currentMove)] << bonus;
 
-        if (bonus > 0)
+        if (bonus > 0 && (ss-1)->moveCount == 1)
 	    goodPrevMove = true;
     }
 
