@@ -603,7 +603,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool formerPv, givesCheck, improving, didLMR, priorCapture;
+    bool formerPv, givesCheck, goodPrevMove, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
@@ -617,6 +617,7 @@ namespace {
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
     maxValue = VALUE_INFINITE;
+    goodPrevMove = false;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -822,6 +823,9 @@ namespace {
                     ss->staticEval < -(ss-1)->staticEval + 2 * Tempo ? stat_bonus(depth) :
                     0;
         thisThread->staticHistory[~us][from_to((ss-1)->currentMove)] << bonus;
+
+        if (bonus > 0)
+	    goodPrevMove = true;
     }
 
     // Step 7. Razoring (~1 Elo)
@@ -1178,6 +1182,10 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Decrease reduction if last move was good
+          if (goodPrevMove)
+              r--;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
