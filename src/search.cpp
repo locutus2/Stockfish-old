@@ -824,7 +824,7 @@ namespace {
                     0;
         thisThread->staticHistory[~us][from_to((ss-1)->currentMove)] << bonus;
 
-        if (bonus > 0 && (ss-1)->moveCount == 1)
+        if (bonus > 0)
 	    goodPrevMove = true;
     }
 
@@ -1051,7 +1051,7 @@ moves_loop: // When in check, search starts from here
           moveCountPruning = moveCount >= futility_move_count(improving, depth);
 
           // Reduced depth of the next LMR search
-          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount), 0);
+          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount) + goodPrevMove, 0);
 
           if (   !captureOrPromotion
               && !givesCheck)
@@ -1182,10 +1182,6 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
-
-          // Decrease reduction if last move was good
-          if (goodPrevMove)
-              r--;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
