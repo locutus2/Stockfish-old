@@ -818,8 +818,8 @@ namespace {
     // Update static history for previous move
     if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorCapture)
     {
-        int bonus = ss->staticEval > -(ss-1)->staticEval + 2 * Tempo ? -stat_bonus((depth + 1) / 2) :
-                    ss->staticEval < -(ss-1)->staticEval + 2 * Tempo ?  stat_bonus((depth + 1) / 2) :
+        int bonus = ss->staticEval > -(ss-1)->staticEval + 2 * Tempo ? -stat_bonus((depth + 1) / 2) * 2 :
+                    ss->staticEval < -(ss-1)->staticEval + 2 * Tempo ?  stat_bonus((depth + 1) / 2) * 2 :
                     0;
         thisThread->staticHistory[~us][from_to((ss-1)->currentMove)] << bonus;
     }
