@@ -818,11 +818,11 @@ namespace {
     // Update static history for previous move
     if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorCapture)
     {
-        Value staticDiff = ss->staticEval + (ss-1)->staticEval - 2 * Tempo; 
+        Value staticDiff = ss->staticEval + (ss-1)->staticEval - 2 * Tempo;
         int bonus = staticDiff > 0 ? -stat_bonus(depth) :
                     staticDiff < 0 ?  stat_bonus(depth) :
                     0;
-        bonus = bonus * std::abs(staticDiff) / (std::abs(staticDiff) + 10);
+        bonus = bonus * 2 * std::abs(staticDiff) / (std::abs(staticDiff) + 200);
         thisThread->staticHistory[~us][from_to((ss-1)->currentMove)] << bonus;
     }
 
