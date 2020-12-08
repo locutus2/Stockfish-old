@@ -822,7 +822,7 @@ namespace {
         int bonus = staticDiff > 0 ? -stat_bonus(depth) :
                     staticDiff < 0 ?  stat_bonus(depth) :
                     0;
-        bonus = bonus * std::abs(staticDiff) / (std::abs(staticDiff) + 40);
+        bonus = bonus * std::abs(staticDiff) / (std::abs(staticDiff) + 10);
         thisThread->staticHistory[~us][from_to((ss-1)->currentMove)] << bonus;
     }
 
