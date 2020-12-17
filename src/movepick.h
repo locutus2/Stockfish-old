@@ -27,6 +27,8 @@
 #include "position.h"
 #include "types.h"
 
+constexpr int MAX_STAT_BONUS = 4481;
+
 /// StatsEntry stores the stat table value. It is usually a number but could
 /// be a move or even a nested history. We use a class instead of naked value
 /// to directly call history update operator<<() on the entry so to use stats
@@ -44,9 +46,10 @@ public:
 
   void operator<<(int bonus) {
     assert(abs(bonus) <= D); // Ensure range is [-D, D]
+    assert(abs(bonus) <= MAX_STAT_BONUS);
     static_assert(D <= std::numeric_limits<T>::max(), "D overflows T");
 
-    entry += bonus - entry * abs(bonus) / D;
+    entry += bonus - entry * bonus / D * bonus / MAX_STAT_BONUS;
 
     assert(abs(entry) <= D);
   }
