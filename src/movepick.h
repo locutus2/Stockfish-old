@@ -49,7 +49,7 @@ public:
     assert(abs(bonus) <= MAX_STAT_BONUS);
     static_assert(D <= std::numeric_limits<T>::max(), "D overflows T");
 
-    entry += bonus - entry * bonus / D * bonus / MAX_STAT_BONUS;
+    entry += bonus - entry * abs(bonus) / D * (MAX_STAT_BONUS + abs(bonus)) / (2 * MAX_STAT_BONUS);
 
     assert(abs(entry) <= D);
   }
