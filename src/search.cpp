@@ -825,7 +825,7 @@ namespace {
     // Step 7. Razoring (~1 Elo)
     if (   !rootNode // The required rootNode PV handling is not available in qsearch
         &&  depth <= 2
-        &&  eval <= alpha - RazorMargin * depth)
+        &&  eval <= alpha - RazorMargin * (2 * depth - 1))
         return qsearch<NT>(pos, ss, alpha, beta);
 
     // Set up improving flag that is used in various pruning heuristics
