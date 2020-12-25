@@ -1073,7 +1073,7 @@ Value Eval::evaluate(const Position& pos) {
       // small probability if the classical eval is less than the threshold.
       if (   largePsq && !strongClassical
           && (   abs(v) * 16 < NNUEThreshold2 * r50
-              || abs(v - eg_value(pos.psq_score())) < 53
+              || abs(v - eg_value(pos.psq_score())) < 106
               || (   pos.opposite_bishops()
                   && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
                   && !(pos.this_thread()->nodes & 0xB))))
