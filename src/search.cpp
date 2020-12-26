@@ -1075,7 +1075,7 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))]
-                                   [bool(pawn_attacks_bb(us, to_sq(move)) & pos.pieces(~us, PAWN))] < 0)
+                                   [capture_index(pos, move)] < 0)
                   continue;
 
               // SEE based pruning
@@ -1737,7 +1737,7 @@ moves_loop: // When in check, search starts from here
     else
         // Increase stats for the best move in case it was a capture move
         captureHistory[moved_piece][to_sq(bestMove)][captured]
-                      [bool(pawn_attacks_bb(us, to_sq(bestMove)) & pos.pieces(~us, PAWN))] << bonus1;
+                      [capture_index(pos, bestMove)] << bonus1;
 
     // Extra penalty for a quiet early move that was not a TT move or
     // main killer move in previous ply when it gets refuted.
@@ -1751,7 +1751,7 @@ moves_loop: // When in check, search starts from here
         moved_piece = pos.moved_piece(capturesSearched[i]);
         captured = type_of(pos.piece_on(to_sq(capturesSearched[i])));
         captureHistory[moved_piece][to_sq(capturesSearched[i])][captured]
-                      [bool(pawn_attacks_bb(us, to_sq(capturesSearched[i])) & pos.pieces(~us, PAWN))] << -bonus1;
+                      [capture_index(pos, capturesSearched[i])] << -bonus1;
     }
   }
 

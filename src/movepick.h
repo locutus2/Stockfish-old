@@ -107,6 +107,10 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
+inline int capture_index(const Position& pos, Move m) {
+  return bool(  pawn_attacks_bb(pos.side_to_move(), to_sq(m))
+              & pos.pieces(~pos.side_to_move(), PAWN));
+}
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
 /// current position. The most important method is next_move(), which returns a

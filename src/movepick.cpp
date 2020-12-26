@@ -104,7 +104,7 @@ void MovePicker::score() {
       if (Type == CAPTURES)
           m.value =  int(PieceValue[MG][pos.piece_on(to_sq(m))]) * 6
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))]
-                                      [bool(pawn_attacks_bb(us, to_sq(m)) & pos.pieces(~us, PAWN))];
+                                      [capture_index(pos, m)];
 
       else if (Type == QUIETS)
           m.value =      (*mainHistory)[us][from_to(m)]
