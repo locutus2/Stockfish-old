@@ -43,7 +43,7 @@ public:
   operator const T&() const { return entry; }
 
   void operator<<(int bonus) {
-    assert(abs(bonus) <= D); // Ensure range is [-D, D]
+    assert(abs(bonus) <= D * B / A); // Ensure range is [-D, D]
     static_assert(D <= std::numeric_limits<T>::max(), "D overflows T");
 
     entry += bonus * A / B - entry * abs(bonus) / (D * B / A);
@@ -97,7 +97,7 @@ typedef Stats<int16_t, 10692, 1, 1, MAX_LPH, int(SQUARE_NB) * int(SQUARE_NB)> Lo
 typedef Stats<Move, NOT_USED, NOT_USED, NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
 
 /// CapturePieceToHistory is addressed by a move's [piece][to][captured piece type]
-typedef Stats<int16_t, 10692, 21, 16, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB, 3> CapturePieceToHistory;
+typedef Stats<int16_t, 10692, 9, 8, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB, 3> CapturePieceToHistory;
 
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
 typedef Stats<int16_t, 29952, 1, 1, PIECE_NB, SQUARE_NB> PieceToHistory;
