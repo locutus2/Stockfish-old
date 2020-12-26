@@ -97,7 +97,7 @@ typedef Stats<int16_t, 10692, MAX_LPH, int(SQUARE_NB) * int(SQUARE_NB)> LowPlyHi
 typedef Stats<Move, NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
 
 /// CapturePieceToHistory is addressed by a move's [piece][to][captured piece type]
-typedef Stats<int16_t, 10692, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB, 3> CapturePieceToHistory;
+typedef Stats<int16_t, 10692, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB, 4> CapturePieceToHistory;
 
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
 typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
@@ -110,7 +110,9 @@ typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory
 inline int capture_index(const Position& pos, Move m) {
   return pawn_attacks_bb(pos.side_to_move(), to_sq(m)) & pos.pieces(~pos.side_to_move(), PAWN)     ? 1 :
             (attacks_bb<KNIGHT>(to_sq(m), pos.pieces()) & pos.pieces(~pos.side_to_move(), KNIGHT))
-         || (attacks_bb<BISHOP>(to_sq(m), pos.pieces()) & pos.pieces(~pos.side_to_move(), BISHOP)) ? 2 : 0;
+         || (attacks_bb<BISHOP>(to_sq(m), pos.pieces()) & pos.pieces(~pos.side_to_move(), BISHOP)) ? 2 :
+            (attacks_bb<ROOK >(to_sq(m), pos.pieces()) & pos.pieces(~pos.side_to_move(), ROOK ))
+         || (attacks_bb<QUEEN>(to_sq(m), pos.pieces()) & pos.pieces(~pos.side_to_move(), QUEEN))   ? 3 : 0;
 }
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
