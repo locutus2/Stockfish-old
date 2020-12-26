@@ -84,7 +84,7 @@ enum StatsType { NoCaptures, Captures };
 /// unsuccessful during the current search, and is used for reduction and move
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
-typedef Stats<int16_t, 10692, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
+typedef Stats<int16_t, 10692, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB), 3> ButterflyHistory;
 
 /// At higher depths LowPlyHistory records successful quiet moves near the root
 /// and quiet moves which are/were in the PV (ttPv). It is cleared with each new
@@ -97,7 +97,7 @@ typedef Stats<int16_t, 10692, MAX_LPH, int(SQUARE_NB) * int(SQUARE_NB)> LowPlyHi
 typedef Stats<Move, NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
 
 /// CapturePieceToHistory is addressed by a move's [piece][to][captured piece type]
-typedef Stats<int16_t, 10692, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB, 3> CapturePieceToHistory;
+typedef Stats<int16_t, 10692, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
 
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
 typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
@@ -107,10 +107,10 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
-inline int capture_index(const Position& pos, Move m) {
-  return pawn_attacks_bb(pos.side_to_move(), to_sq(m)) & pos.pieces(~pos.side_to_move(), PAWN)     ? 1 :
-            (attacks_bb<KNIGHT>(to_sq(m), pos.pieces()) & pos.pieces(~pos.side_to_move(), KNIGHT))
-         || (attacks_bb<BISHOP>(to_sq(m), pos.pieces()) & pos.pieces(~pos.side_to_move(), BISHOP)) ? 2 : 0;
+inline int attacked_index(Color us, const Position& pos, Move m) {
+  return pawn_attacks_bb(us, to_sq(m)) & pos.pieces(~us, PAWN)                     ? 1 :
+            (attacks_bb<KNIGHT>(to_sq(m), pos.pieces()) & pos.pieces(~us, KNIGHT))
+         || (attacks_bb<BISHOP>(to_sq(m), pos.pieces()) & pos.pieces(~us, BISHOP)) ? 2 : 0;
 }
 
 /// MovePicker class is used to pick one pseudo legal move at a time from the
