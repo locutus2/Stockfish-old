@@ -43,7 +43,7 @@ public:
   operator const T&() const { return entry; }
 
   void operator<<(int bonus) {
-    assert(abs(bonus) <= D * B / A); // Ensure range is [-D, D]
+    assert(abs(bonus) <= D * B / A); // Ensure range is [-D * B / A, D * B / A]
     static_assert(D <= std::numeric_limits<T>::max(), "D overflows T");
 
     entry += bonus * A / B - entry * abs(bonus) / (D * B / A);
@@ -54,8 +54,9 @@ public:
 
 /// Stats is a generic N-dimensional array used to store various statistics.
 /// The first template parameter T is the base type of the array, the second
-/// template parameter D limits the range of updates in [-D, D] when we update
-/// values with the << operator, while the last parameters (Size and Sizes)
+/// template parameter D limits the range of updates in [-D * B / A, D * B / A]
+/// when we update values with the << operator, the ratio of the third and fourth
+/// template parameter A/B gives the saturation speed, while the last parameters (Size and Sizes)
 /// encode the dimensions of the array.
 template <typename T, int D, int A, int B, int Size, int... Sizes>
 struct Stats : public std::array<Stats<T, D, A, B, Sizes...>, Size>
@@ -76,7 +77,7 @@ struct Stats : public std::array<Stats<T, D, A, B, Sizes...>, Size>
 template <typename T, int D, int A, int B, int Size>
 struct Stats<T, D, A, B, Size> : public std::array<StatsEntry<T, D, A, B>, Size> {};
 
-/// In stats table, D=0 means that the template parameter is not used
+/// In stats table, D/A/B=0 means that the template parameter is not used
 enum StatsParams { NOT_USED = 0 };
 enum StatsType { NoCaptures, Captures };
 
