@@ -85,7 +85,7 @@ enum StatsType { NoCaptures, Captures };
 /// unsuccessful during the current search, and is used for reduction and move
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
-typedef Stats<int16_t, 10692, 1, 1, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
+typedef Stats<int16_t, 10692, 17, 16, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
 
 /// At higher depths LowPlyHistory records successful quiet moves near the root
 /// and quiet moves which are/were in the PV (ttPv). It is cleared with each new
@@ -98,7 +98,7 @@ typedef Stats<int16_t, 10692, 1, 1, MAX_LPH, int(SQUARE_NB) * int(SQUARE_NB)> Lo
 typedef Stats<Move, NOT_USED, NOT_USED, NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
 
 /// CapturePieceToHistory is addressed by a move's [piece][to][captured piece type]
-typedef Stats<int16_t, 10692, 17, 16, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
+typedef Stats<int16_t, 10692, 1, 1, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
 
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
 typedef Stats<int16_t, 29952, 1, 1, PIECE_NB, SQUARE_NB> PieceToHistory;
