@@ -298,7 +298,7 @@ void Thread::search() {
   // The latter is needed for statScores and killer initialization.
   Stack stack[MAX_PLY+10], *ss = stack+7;
   Move  pv[MAX_PLY+1];
-  Value bestValue, alpha, beta, delta;
+  Value bestValue, alpha, beta, deltaMinus, deltaPlus;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = 0;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
@@ -312,7 +312,7 @@ void Thread::search() {
 
   ss->pv = pv;
 
-  bestValue = delta = alpha = -VALUE_INFINITE;
+  bestValue = deltaMinus = deltaPlus = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
 
   if (mainThread)
@@ -405,9 +405,10 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value prev = rootMoves[pvIdx].previousScore;
-              delta = Value(17);
-              alpha = std::max(prev - delta,-VALUE_INFINITE);
-              beta  = std::min(prev + delta, VALUE_INFINITE);
+              deltaPlus = Value(17);
+              deltaMinus = Value(34);
+              alpha = std::max(prev - deltaMinus,-VALUE_INFINITE);
+              beta  = std::min(prev + deltaPlus, VALUE_INFINITE);
 
               // Adjust contempt based on root move's previousScore (dynamic contempt)
               int dct = ct + (113 - ct / 2) * prev / (abs(prev) + 147);
@@ -452,7 +453,7 @@ void Thread::search() {
               if (bestValue <= alpha)
               {
                   beta = (alpha + beta) / 2;
-                  alpha = std::max(bestValue - delta, -VALUE_INFINITE);
+                  alpha = std::max(bestValue - deltaMinus, -VALUE_INFINITE);
 
                   failedHighCnt = 0;
                   if (mainThread)
@@ -460,13 +461,14 @@ void Thread::search() {
               }
               else if (bestValue >= beta)
               {
-                  beta = std::min(bestValue + delta, VALUE_INFINITE);
+                  beta = std::min(bestValue + deltaPlus, VALUE_INFINITE);
                   ++failedHighCnt;
               }
               else
                   break;
 
-              delta += delta / 4 + 5;
+              deltaPlus += deltaPlus / 4 + 5;
+              deltaMinus += deltaMinus / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
