@@ -305,6 +305,7 @@ void Thread::search() {
   double timeReduction = 1, totBestMoveChanges = 0;
   Color us = rootPos.side_to_move();
   int iterIdx = 0;
+  int64_t nodesLastIter = 0;
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
@@ -372,6 +373,8 @@ void Thread::search() {
          && !Threads.stop
          && !(Limits.depth && mainThread && rootDepth > Limits.depth))
   {
+      nodesLastIter = nodes;
+
       // Age out PV variability metric
       if (mainThread)
           totBestMoveChanges /= 2;
@@ -519,6 +522,12 @@ void Thread::search() {
               totBestMoveChanges += th->bestMoveChanges;
               th->bestMoveChanges = 0;
           }
+	  if(nodesLastIter)
+	  {
+		  double p = (double)nodes / (1.89 * (double)nodesLastIter);
+	  dbg_mean_of(p*1000);
+	  dbg_std_of(p*1000);
+	  }
           double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
 
           double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability;
