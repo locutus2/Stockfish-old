@@ -406,7 +406,7 @@ void Thread::search() {
           {
               Value prev = rootMoves[pvIdx].previousScore;
               deltaPlus = Value(17);
-              deltaMinus = Value(34);
+              deltaMinus = Value(25);
               alpha = std::max(prev - deltaMinus,-VALUE_INFINITE);
               beta  = std::min(prev + deltaPlus, VALUE_INFINITE);
 
