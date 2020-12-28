@@ -91,7 +91,7 @@ typedef Stats<int16_t, 10692, 1, 1, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> B
 /// and quiet moves which are/were in the PV (ttPv). It is cleared with each new
 /// search and filled during iterative deepening.
 constexpr int MAX_LPH = 4;
-typedef Stats<int16_t, 10692, 1, 1, MAX_LPH, int(SQUARE_NB) * int(SQUARE_NB)> LowPlyHistory;
+typedef Stats<int16_t, 10692, 15, 16, MAX_LPH, int(SQUARE_NB) * int(SQUARE_NB)> LowPlyHistory;
 
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
 /// move, see www.chessprogramming.org/Countermove_Heuristic
@@ -101,7 +101,7 @@ typedef Stats<Move, NOT_USED, NOT_USED, NOT_USED, PIECE_NB, SQUARE_NB> CounterMo
 typedef Stats<int16_t, 10692, 1, 1, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
 
 /// PieceToHistory is like ButterflyHistory but is addressed by a move's [piece][to]
-typedef Stats<int16_t, 29952, 17, 16, PIECE_NB, SQUARE_NB> PieceToHistory;
+typedef Stats<int16_t, 29952, 1, 1, PIECE_NB, SQUARE_NB> PieceToHistory;
 
 /// ContinuationHistory is the combined history of a given pair of moves, usually
 /// the current one given a previous one. The nested history table is based on
