@@ -1178,7 +1178,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Increase reduction if estimated reached search depth is greater than iteration depth
-          if (!PvNode && !formerPv && ss->ply + newDepth >= thisThread->rootDepth + 1)
+          if (!PvNode && !formerPv && ss->ply + newDepth >= thisThread->rootDepth + 2)
               r++;
 
           // Decrease reduction if the ttHit running average is large
