@@ -1177,6 +1177,10 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          // Increase reduction if estimated reached search depth is greater than iteration depth
+          if (ss->ply + newDepth >= thisThread->rootDepth)
+              r++;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
