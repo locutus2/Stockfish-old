@@ -1164,6 +1164,7 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
       // Step 16. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1173,7 +1174,6 @@ moves_loop: // When in check, search starts from here
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode
               || (!PvNode && !formerPv)
-              || thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < -8472
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
@@ -1260,6 +1260,13 @@ moves_loop: // When in check, search starts from here
       }
       else
       {
+          if (    depth >= 3
+              &&  moveCount > 1 + 2 * rootNode
+              && captureOrPromotion)
+	      //CC = true, C = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < -8472; 
+              if(depth < 11) std::cerr << "# " << thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] << std::endl;
+
+
           doFullDepthSearch = !PvNode || moveCount > 1;
 
           didLMR = false;
@@ -1331,6 +1338,12 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      dbg_hit_on(value > alpha);
+	      if(C) dbg_mean_of(100*(value > alpha));
       }
 
       if (value > bestValue)
