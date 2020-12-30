@@ -1181,10 +1181,10 @@ moves_loop: // When in check, search starts from here
           if ( captureOrPromotion && !(
                  moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
-              || cutNode
+              || (!PvNode && !formerPv)
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024
 				  )
-              && (!PvNode && !formerPv)
+              && cutNode
 			  )
 	      //CC = true, C = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < -8472; 
               std::cerr << "# " << thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] << std::endl;
