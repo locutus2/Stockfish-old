@@ -460,7 +460,7 @@ void Thread::search() {
               }
               else if (bestValue >= beta)
               {
-                  alpha += delta / 20;
+                  alpha += delta / 14;
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
                   ++failedHighCnt;
               }
