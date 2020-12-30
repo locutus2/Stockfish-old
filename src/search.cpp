@@ -1178,6 +1178,17 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          if ( captureOrPromotion && !(
+                 moveCountPruning
+              || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
+              || cutNode
+              || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024
+				  )
+              && (!PvNode && !formerPv)
+			  )
+	      //CC = true, C = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < -8472; 
+              std::cerr << "# " << thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] << std::endl;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1260,11 +1271,13 @@ moves_loop: // When in check, search starts from here
       }
       else
       {
+	      /*
           if (    depth >= 3
               &&  moveCount > 1 + 2 * rootNode
               && captureOrPromotion)
 	      //CC = true, C = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < -8472; 
               if(depth < 11) std::cerr << "# " << thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] << std::endl;
+	      */
 
 
           doFullDepthSearch = !PvNode || moveCount > 1;
