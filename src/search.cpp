@@ -451,7 +451,7 @@ void Thread::search() {
               // re-search, otherwise exit the loop.
               if (bestValue <= alpha)
               {
-                  beta = std::max((4 * alpha + betaMax) / 5, (alpha + beta) / 2);
+                  beta = (alpha + beta + (betaMax - beta) * 12 / rootDepth) / 2;
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
                   failedHighCnt = 0;
