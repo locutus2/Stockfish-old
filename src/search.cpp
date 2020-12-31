@@ -1169,9 +1169,9 @@ moves_loop: // When in check, search starts from here
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
           && (  !captureOrPromotion
-              || moveCountPruning
+              || (moveCountPruning && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 8274)
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
-              || (cutNode && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 10490)
+              || cutNode
               || (!PvNode && !formerPv && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 4506)
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
