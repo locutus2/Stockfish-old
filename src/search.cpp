@@ -1233,7 +1233,7 @@ moves_loop: // When in check, search starts from here
               // Unless giving check, this capture is likely bad
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha
-                  && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 8771)
+                  && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 9701)
                   r++;
           }
 
