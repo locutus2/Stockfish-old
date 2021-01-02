@@ -1157,7 +1157,7 @@ moves_loop: // When in check, search starts from here
           &&  moveCount > 1 + 2 * rootNode
           && (  !PvNode
               || captureOrPromotion
-              || thisThread->mainHistory[movedPiece][to_sq(move)] <= 0)
+              || thisThread->mainHistory[movedPiece][to_sq(move)] < 5785)
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
