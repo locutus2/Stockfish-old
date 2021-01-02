@@ -1194,7 +1194,7 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              if (PvNode)
+              if (!PvNode)
                   r += ((*contHist[0])[movedPiece][to_sq(move)] < 0 ? 1 : -1);
 
               // Increase reduction if ttMove is a capture (~5 Elo)
