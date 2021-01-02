@@ -1155,6 +1155,9 @@ moves_loop: // When in check, search starts from here
       // re-searched at full depth.
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
+          && (  !PvNode
+              || captureOrPromotion
+              || thisThread->mainHistory[movedPiece][to_sq(move)] <= 0)
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
