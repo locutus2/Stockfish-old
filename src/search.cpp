@@ -1194,10 +1194,6 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Increase reduction at non-PV nodes if continuation history is bad
-              if (!PvNode && (*contHist[0])[movedPiece][to_sq(move)] < -10913)
-                  r++;
-
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
@@ -1227,6 +1223,10 @@ moves_loop: // When in check, search starts from here
                   r--;
 
               else if ((ss-1)->statScore >= -122 && ss->statScore < -129)
+                  r++;
+
+              // Increase reduction if stat score is bad
+              if (ss->statScore < -49836)
                   r++;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
