@@ -1194,9 +1194,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              // Decrease reduction at non-PV nodes if continuation history is good
-              if (!PvNode && (*contHist[0])[movedPiece][to_sq(move)] > 19846)
-                  r--;
+              // Increase reduction at non-PV nodes if continuation history is bad
+              if (!PvNode && (*contHist[0])[movedPiece][to_sq(move)] < -17454)
+                  r++;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
