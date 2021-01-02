@@ -1155,9 +1155,6 @@ moves_loop: // When in check, search starts from here
       // re-searched at full depth.
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
-          && (  !PvNode
-              || captureOrPromotion
-              || (*contHist[0])[movedPiece][to_sq(move)] < 19181)
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
@@ -1197,6 +1194,10 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              // Decrease reduction at PV nodes if continuation history is good
+              if (PvNode && (*contHist[0])[movedPiece][to_sq(move)] > 14116)
+                  r--;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
