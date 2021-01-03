@@ -1226,7 +1226,7 @@ moves_loop: // When in check, search starts from here
                   r++;
 
               // Decrease reduction if stat score is good
-              if (ss->statScore > 33691)
+              if (ss->statScore > 16316)
                   r--;
 
               // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
