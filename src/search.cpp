@@ -1236,7 +1236,7 @@ moves_loop: // When in check, search starts from here
                   r++;
 
               // Decrease/increase reduction for moves with a good/bad capture history
-              r -= (thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] - 2501) / 4625;
+              r -= (thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] - 3548) / 5168;
           }
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
