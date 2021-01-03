@@ -1071,7 +1071,7 @@ moves_loop: // When in check, search starts from here
                   continue;
 
               // SEE based pruning
-              if (  (!PvNode || !captureOrPromotion || captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 9656)
+              if (  (!PvNode || !captureOrPromotion || captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 10325)
                   && !pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
                   continue;
           }
