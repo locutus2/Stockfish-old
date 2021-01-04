@@ -404,10 +404,10 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value prev = rootMoves[pvIdx].previousScore;
-              deltaPlus = Value(23);
-              deltaMinus = Value(23);
-              alpha = std::max(prev - deltaMinus,-VALUE_INFINITE);
-              beta  = std::min(prev + deltaPlus, VALUE_INFINITE);
+              deltaPlus = Value(20);
+              deltaMinus = Value(20);
+              alpha = std::max(prev - deltaMinus - 6,-VALUE_INFINITE);
+              beta  = std::min(prev + deltaPlus - 6, VALUE_INFINITE);
 
               // Adjust contempt based on root move's previousScore (dynamic contempt)
               int dct = ct + (113 - ct / 2) * prev / (abs(prev) + 147);
