@@ -404,8 +404,8 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value prev = rootMoves[pvIdx].previousScore;
-              deltaPlus = Value(20);
-              deltaMinus = Value(20);
+              deltaPlus = Value(17);
+              deltaMinus = Value(17);
               alpha = std::max(prev - deltaMinus,-VALUE_INFINITE);
               beta  = std::min(prev + deltaPlus, VALUE_INFINITE);
 
@@ -453,7 +453,7 @@ void Thread::search() {
               {
                   beta = (alpha + beta) / 2;
                   alpha = std::max(bestValue - deltaMinus, -VALUE_INFINITE);
-                  deltaMinus += deltaMinus / 4 + 5;
+                  deltaMinus += deltaMinus / 2 + 10;
 
                   failedHighCnt = 0;
                   if (mainThread)
@@ -463,7 +463,7 @@ void Thread::search() {
               {
                   beta = std::min(bestValue + deltaPlus, VALUE_INFINITE);
                   ++failedHighCnt;
-                  deltaPlus += deltaPlus / 4 + 5;
+                  deltaPlus += deltaPlus / 2 + 10;
               }
               else
                   break;
