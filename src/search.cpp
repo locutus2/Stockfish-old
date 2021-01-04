@@ -466,8 +466,8 @@ void Thread::search() {
               else
                   break;
 
-              deltaPlus += deltaPlus / 4 + 5;
-              deltaMinus += deltaMinus * 3 / 8 + 5;
+              deltaPlus += deltaPlus * 3 / 8 + 5;
+              deltaMinus += deltaMinus / 4 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
