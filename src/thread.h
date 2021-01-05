@@ -54,6 +54,7 @@ public:
   void idle_loop();
   void start_searching();
   void wait_for_search_finished();
+  Value initial_delta() const { return Value(17 + idx % 8); }
 
   Pawns::Table pawnsTable;
   Material::Table materialTable;
