@@ -1337,6 +1337,7 @@ moves_loop: // When in check, search starts from here
 		  int N = (int)C.size();
 		  bool T = value > alpha;
 		  
+		  /*
 		  for(int i = 0; i < N; ++i)
 		  {
 			dbg_hit_on(C[i], i);
@@ -1350,6 +1351,47 @@ moves_loop: // When in check, search starts from here
 				dbg_cramer_of(C[i], C[j], 100+10*i+j);
 				dbg_cramer_of(C[i]&& C[j], T, 200+10*i+j);
 			}
+		  }*/
+		  
+		  assert(N >= 6);
+		  constexpr int LOOP_START = 0;
+		  constexpr int LOOP_END = 2;
+		  std::vector s(N, LOOP_START);
+		  int i = 0;
+		  while(i >= 0)
+		  {
+			if(s[i] > LOOP_END) // loop end
+			{
+			    --i;
+                if(i >= 0) s[i]++;				
+			}			
+			else if (i < N) // iterate loop
+			{
+				i++;
+				if(i<N) s[i] = LOOP_START;
+			}	
+			else // innerst loop
+			{
+				int index = 0;
+				bool c = true;
+				for(int j = 0; j < N; ++j)
+				{
+					index = index * 3 + s[j];
+					if(s[j] == 1)
+					{
+						c = c && C[j];
+					}
+					else if(s[j] == 2)
+					{
+						c = c && !C[j];
+					}
+				}
+				dbg_hit_on(c, T, index);
+				dbg_cramer_of(c, T, index);
+				
+				--i;
+				s[i]++;
+			}				
 		  }
 	  }
 

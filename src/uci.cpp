@@ -188,11 +188,33 @@ namespace {
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
 
     dbg_print(); // Just before exiting
+	
+	// code table
+	cerr << "\n===========================" << endl;
+	cerr << "Code table:" << endl;
+	for(int index = 0; index < 729; ++ index)
+	{
+		int s[6];
+		int v = index;
+		for(int i = 0; i < 6; ++i)
+			s[5-i] = v%3, v /=3;
+		cerr << index << ":";
+		for(int i = 0; i < 6; ++i)
+		{
+			if(s[i] == 1)
+				cerr << " c" << i;
+			else if(s[i] == 2)
+				cerr << " !c" << i;
+		}
+		cerr << endl;
+	}
 
     cerr << "\n==========================="
          << "\nTotal time (ms) : " << elapsed
          << "\nNodes searched  : " << nodes
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+		 
+    
   }
 
   // The win rate model returns the probability (per mille) of winning given an eval
