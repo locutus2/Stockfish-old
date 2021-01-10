@@ -1151,6 +1151,8 @@ moves_loop: // When in check, search starts from here
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false;
+	  std::vector<bool> C(8, false);
       // Step 15. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1164,6 +1166,17 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          CC = true;
+		  C = {
+			  thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024,
+			  ss->ttPv,
+			  (ss-1)->moveCount > 13,
+			  singularQuietLMR,
+			  
+			  (rootNode || !PvNode) && thisThread->rootDepth > 10 && thisThread->bestMoveChanges <= 2,
+			  moveCountPruning && !formerPv
+		  };
+		  
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1318,6 +1331,27 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
+	  
+	  if(CC)
+	  {
+		  int N = (int)C.size();
+		  bool T = value > alpha;
+		  
+		  for(int i = 0; i < N; ++i)
+		  {
+			dbg_hit_on(C[i], i);
+			dbg_hit_on(C[i], T, 10 + i);
+			dbg_cramer_of(C[i], T, i);
+			
+			for(int j = 0; j < N; ++j)
+			{
+				dbg_hit_on(C[i]&&C[j], 100+10*i+j);
+				dbg_hit_on(C[i]&&C[j], T, 200+10*i+j);
+				dbg_cramer_of(C[i], C[j], 100+10*i+j);
+				dbg_cramer_of(C[i]&& C[j], T, 200+10*i+j);
+			}
+		  }
+	  }
 
       if (value > bestValue)
       {
