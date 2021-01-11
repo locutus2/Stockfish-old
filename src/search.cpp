@@ -1167,7 +1167,9 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           CC = true;
+		  /*
 		  C = {
+	
 			  thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024,
 			  ss->ttPv,
 			  (ss-1)->moveCount > 13,
@@ -1175,6 +1177,15 @@ moves_loop: // When in check, search starts from here
 			  
 			  (rootNode || !PvNode) && thisThread->rootDepth > 10 && thisThread->bestMoveChanges <= 2,
 			  moveCountPruning && !formerPv
+		  };
+		  */
+		  C = {
+			  PvNode,
+			  formerPv,
+			  cutNode,
+			  ss->inCheck,
+			  givesCheck,
+			  captureOrPromotion
 		  };
 		  
           // Decrease reduction if the ttHit running average is large
