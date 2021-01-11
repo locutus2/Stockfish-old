@@ -1199,9 +1199,9 @@ moves_loop: // When in check, search starts from here
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
 
-              // Less reduction for captures if in check
-              if (ss->inCheck)
-                  r--;
+              // More reduction for captures at former PV and non-cut node
+              if (formerPv && !cutNode)
+                  r++;
           }
           else
           {
