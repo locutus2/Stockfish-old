@@ -1165,8 +1165,9 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Decrease reduction if the ttHit running average is large
-          if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
-              r -= 1 + (!ss->ttPv && (ss-1)->moveCount > 13);
+          if (  (ss->ttPv || (ss-1)->moveCount < 14)
+              && thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
+              r--;
 
           // Increase reduction if other threads are searching this position
           if (th.marked())
