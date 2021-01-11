@@ -1165,8 +1165,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Decrease reduction if the ttHit running average is large
-          if (  (ss->ttPv || (ss-1)->moveCount < 14)
-              && thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
+          if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
 
           // Increase reduction if other threads are searching this position
@@ -1175,7 +1174,7 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if position is or has been on the PV (~10 Elo)
           if (ss->ttPv)
-              r -= 2;
+              r -= 2 + (ss->ply > depth);
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if ((rootNode || !PvNode) && thisThread->rootDepth > 10 && thisThread->bestMoveChanges <= 2)
