@@ -27,6 +27,8 @@
 
 class Position;
 
+constexpr int NC = 6;
+
 namespace Search {
 
 /// Threshold used for countermoves based pruning

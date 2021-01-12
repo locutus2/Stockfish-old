@@ -1179,6 +1179,7 @@ moves_loop: // When in check, search starts from here
 			  moveCountPruning && !formerPv
 		  };
 		  */
+		  /*
 		  C = {
 			  PvNode,
 			  formerPv,
@@ -1187,6 +1188,15 @@ moves_loop: // When in check, search starts from here
 			  givesCheck,
 			  captureOrPromotion
 		  };
+		  */
+		  C = {
+			  type_of(movedPiece) == PAWN,
+				type_of(movedPiece) == KNIGHT,
+				type_of(movedPiece) == BISHOP,
+				type_of(movedPiece) == ROOK,
+				type_of(movedPiece) == QUEEN,
+				type_of(movedPiece) == KING
+		};
 		  
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1370,7 +1380,9 @@ moves_loop: // When in check, search starts from here
 			}
 		  }*/
 		  
-		  assert(N >= 6);
+		  assert(N == NC);
+		  if(N != NC) std::exit(-1);
+		  
 		  constexpr int LOOP_START = 0;
 		  constexpr int LOOP_END = 2;
 		  std::vector s(N, LOOP_START);

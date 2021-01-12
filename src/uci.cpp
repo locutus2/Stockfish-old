@@ -190,16 +190,20 @@ namespace {
     dbg_print(); // Just before exiting
 	
 	// code table
+	int maxIndex = 1;
+	for(int i = 0; i < NC; ++i)
+		maxIndex *= 3;
+	
 	cerr << "\n===========================" << endl;
-	cerr << "Code table:" << endl;
-	for(int index = 0; index < 729; ++ index)
+	cerr << "Code table NC=" << NC << ":" << endl;
+	for(int index = 0; index < maxIndex; ++ index)
 	{
-		int s[6];
+		int s[NC];
 		int v = index;
-		for(int i = 0; i < 6; ++i)
-			s[5-i] = v%3, v /=3;
+		for(int i = 0; i < NC; ++i)
+			s[NC-1-i] = v%3, v /=3;
 		cerr << index << ":";
-		for(int i = 0; i < 6; ++i)
+		for(int i = 0; i < NC; ++i)
 		{
 			if(s[i] == 1)
 				cerr << " c" << i;
