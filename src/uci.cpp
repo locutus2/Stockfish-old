@@ -200,9 +200,10 @@ namespace {
 	{
 		int s[NC];
 		int v = index;
+		int terms = 0;
 		for(int i = 0; i < NC; ++i)
-			s[NC-1-i] = v%3, v /=3;
-		cerr << index << ":";
+			s[NC-1-i] = v%3, terms += (v%3 != 0), v /=3;
+		cerr << index << " [size=" << terms << "]:";
 		for(int i = 0; i < NC; ++i)
 		{
 			if(s[i] == 1)
