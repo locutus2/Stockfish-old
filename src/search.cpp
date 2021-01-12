@@ -1189,6 +1189,7 @@ moves_loop: // When in check, search starts from here
 			  captureOrPromotion
 		  };
 		  */
+		  /*
 		  C = {
 			  type_of(movedPiece) == PAWN,
 				type_of(movedPiece) == KNIGHT,
@@ -1196,6 +1197,16 @@ moves_loop: // When in check, search starts from here
 				type_of(movedPiece) == ROOK,
 				type_of(movedPiece) == QUEEN,
 				type_of(movedPiece) == KING
+		};
+		*/
+		C = {
+			depth <= 5,
+			moveCount <= 7,
+			distance(pos.square<KING>(~us), to_sq(move)) <= 4,
+			distance(pos.square<KING>(us), to_sq(move)) <= 2,
+			//distance(pos.square<KING>(~us), to_sq(move)) - distance(pos.square<KING>(us), to_sq(move)) <= 1,
+			type_of(movedPiece) == KING,
+			type_of(movedPiece) == PAWN
 		};
 		  
           // Decrease reduction if the ttHit running average is large
