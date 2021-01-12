@@ -1192,16 +1192,16 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
+         // Less reduction for checking move at non-PV nodes
+         if (!PvNode && givesCheck)
+             r--;
+
           if (captureOrPromotion)
           {
               // Unless giving check, this capture is likely bad
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
-
-              // Less reduction for captures at cut and not former PV nodes
-              if (cutNode && !formerPv)
-                  r--;
           }
           else
           {
