@@ -1192,10 +1192,6 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
-         // Less reduction for checking move at non-PV nodes
-         if (!PvNode && givesCheck)
-             r--;
-
           if (captureOrPromotion)
           {
               // Unless giving check, this capture is likely bad
@@ -1228,6 +1224,12 @@ moves_loop: // When in check, search starts from here
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
                              - 5287;
+
+              if (   thisThread->mainHistory[us][from_to(move)] > 0
+                  && (*contHist[0])[movedPiece][to_sq(move)] > 0
+                  && (*contHist[1])[movedPiece][to_sq(move)] > 0
+                  && (*contHist[3])[movedPiece][to_sq(move)] > 0)
+                  r--;
 
               // Decrease/increase reduction by comparing opponent's stat score (~10 Elo)
               if (ss->statScore >= -105 && (ss-1)->statScore < -103)
