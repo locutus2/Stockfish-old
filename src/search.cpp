@@ -1152,7 +1152,7 @@ moves_loop: // When in check, search starts from here
       pos.do_move(move, st, givesCheck);
 
       bool CC = false;
-	  std::vector<bool> C(8, false);
+      std::vector<bool> C(NC, false);
       // Step 15. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1166,7 +1166,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          CC = true;
+          //CC = true;
 		  /*
 		  C = {
 	
@@ -1199,6 +1199,7 @@ moves_loop: // When in check, search starts from here
 				type_of(movedPiece) == KING
 		};
 		*/
+	  /*
 		C = {
 			depth <= 5,
 			moveCount <= 7,
@@ -1208,6 +1209,7 @@ moves_loop: // When in check, search starts from here
 			type_of(movedPiece) == KING,
 			type_of(movedPiece) == PAWN
 		};
+		*/
 		  
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1286,6 +1288,17 @@ moves_loop: // When in check, search starts from here
               else
                   r -= ss->statScore / 14884;
           }
+
+	  CC = !captureOrPromotion;
+          //CC = true;
+	  C = {
+              		thisThread->mainHistory[us][from_to(move)] > 0,
+                        (*contHist[0])[movedPiece][to_sq(move)] > 0,
+                        (*contHist[1])[movedPiece][to_sq(move)] > 0,
+                        (*contHist[3])[movedPiece][to_sq(move)] > 0,
+                        (*contHist[5])[movedPiece][to_sq(move)] > 0,
+			ss->statScore > 0
+	  };
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
@@ -1369,7 +1382,7 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
-	  
+
 	  if(CC)
 	  {
 		  int N = (int)C.size();
@@ -1400,21 +1413,11 @@ moves_loop: // When in check, search starts from here
 		  int i = 0;
 		  while(i >= 0)
 		  {
-			if(s[i] > LOOP_END) // loop end
-			{
-			    --i;
-                if(i >= 0) s[i]++;				
-			}			
-			else if (i < N) // iterate loop
-			{
-				i++;
-				if(i<N) s[i] = LOOP_START;
-			}	
-			else // innerst loop
+			if (i >= N) // innerst loop
 			{
 				int index = 0;
 				bool c = true;
-				for(int j = 0; j < N; ++j)
+				for(int j = 0; c && j < N; ++j)
 				{
 					index = index * 3 + s[j];
 					if(s[j] == 1)
@@ -1432,6 +1435,16 @@ moves_loop: // When in check, search starts from here
 				--i;
 				s[i]++;
 			}				
+			else if(s[i] > LOOP_END) // loop end
+			{
+			    --i;
+                		if(i >= 0) s[i]++;				
+			}			
+			else //if (i < N) // iterate loop
+			{
+				i++;
+				if(i<N) s[i] = LOOP_START;
+			}			
 		  }
 	  }
 
