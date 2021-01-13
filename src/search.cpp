@@ -607,6 +607,8 @@ namespace {
          ttCapture, singularQuietLMR;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
+    bool CC = false;
+    std::vector<bool> C(NC, false);
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -854,6 +856,16 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
+
+	CC = true;
+	C = {
+		PvNode,
+		formerPv,
+		cutNode,
+		improving,
+		depth == 1,
+		depth == 2
+	};
 
         pos.do_null_move(st);
 
@@ -1151,8 +1163,6 @@ moves_loop: // When in check, search starts from here
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
 
-      bool CC = false;
-      std::vector<bool> C(NC, false);
       // Step 15. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1300,7 +1310,7 @@ moves_loop: // When in check, search starts from here
 		  << std::endl;
 		  */
           }
-
+/*
 	  CC = captureOrPromotion;
 	  C = {
               captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]  > 0,
@@ -1309,7 +1319,7 @@ moves_loop: // When in check, search starts from here
 					                         type_of(movedPiece) == BISHOP,
 								                           type_of(movedPiece) == ROOK,
 											                              type_of(movedPiece) == QUEEN
-	  };
+	  };*/
 
 	  //CC = !captureOrPromotion;
           //CC = true;
@@ -1417,70 +1427,6 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
-	  if(CC)
-	  {
-		  int N = (int)C.size();
-		  bool T = value > alpha;
-		  
-		  /*
-		  for(int i = 0; i < N; ++i)
-		  {
-			dbg_hit_on(C[i], i);
-			dbg_hit_on(C[i], T, 10 + i);
-			dbg_cramer_of(C[i], T, i);
-			
-			for(int j = 0; j < N; ++j)
-			{
-				dbg_hit_on(C[i]&&C[j], 100+10*i+j);
-				dbg_hit_on(C[i]&&C[j], T, 200+10*i+j);
-				dbg_cramer_of(C[i], C[j], 100+10*i+j);
-				dbg_cramer_of(C[i]&& C[j], T, 200+10*i+j);
-			}
-		  }*/
-		  
-		  assert(N == NC);
-		  if(N != NC) std::exit(-1);
-		  
-		  constexpr int LOOP_START = 0;
-		  constexpr int LOOP_END = 2;
-		  std::vector s(N, LOOP_START);
-		  int i = 0;
-		  while(i >= 0)
-		  {
-			if (i >= N) // innerst loop
-			{
-				int index = 0;
-				bool c = true;
-				for(int j = 0; c && j < N; ++j)
-				{
-					index = index * 3 + s[j];
-					if(s[j] == 1)
-					{
-						c = c && C[j];
-					}
-					else if(s[j] == 2)
-					{
-						c = c && !C[j];
-					}
-				}
-				dbg_hit_on(c, T, index);
-				dbg_cramer_of(c, T, index);
-				
-				--i;
-				s[i]++;
-			}				
-			else if(s[i] > LOOP_END) // loop end
-			{
-			    --i;
-                		if(i >= 0) s[i]++;				
-			}			
-			else //if (i < N) // iterate loop
-			{
-				i++;
-				if(i<N) s[i] = LOOP_START;
-			}			
-		  }
-	  }
 
       if (value > bestValue)
       {
@@ -1529,6 +1475,55 @@ moves_loop: // When in check, search starts from here
     // return a fail low score.
 
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
+
+	  if(CC && !moveCount)
+	  {
+		  int N = (int)C.size();
+		  bool T = bestMove;
+		  
+		  assert(N == NC);
+		  if(N != NC) std::exit(-1);
+		  
+		  constexpr int LOOP_START = 0;
+		  constexpr int LOOP_END = 2;
+		  std::vector s(N, LOOP_START);
+		  int i = 0;
+		  while(i >= 0)
+		  {
+			if (i >= N) // innerst loop
+			{
+				int index = 0;
+				bool c = true;
+				for(int j = 0; c && j < N; ++j)
+				{
+					index = index * 3 + s[j];
+					if(s[j] == 1)
+					{
+						c = c && C[j];
+					}
+					else if(s[j] == 2)
+					{
+						c = c && !C[j];
+					}
+				}
+				dbg_hit_on(c, T, index);
+				dbg_cramer_of(c, T, index);
+				
+				--i;
+				s[i]++;
+			}				
+			else if(s[i] > LOOP_END) // loop end
+			{
+			    --i;
+                		if(i >= 0) s[i]++;				
+			}			
+			else //if (i < N) // iterate loop
+			{
+				i++;
+				if(i<N) s[i] = LOOP_START;
+			}			
+		  }
+	  }
 
     if (!moveCount)
         bestValue = excludedMove ? alpha
