@@ -970,8 +970,8 @@ namespace {
 moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
-                                          nullptr                   , (ss-4)->continuationHistory,
-                                          nullptr                   , (ss-6)->continuationHistory };
+                                          (ss-3)->continuationHistory                   , (ss-4)->continuationHistory,
+                                          (ss-5)->continuationHistory                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
@@ -1287,18 +1287,52 @@ moves_loop: // When in check, search starts from here
                      + (*contHist[0])[movedPiece][to_sq(move)] - 4333) / 16384;
               else
                   r -= ss->statScore / 14884;
+	      /*
+	      if(thisThread->nodes % 25 == 0)
+	  std::cerr << "#" 
+		  << " " <<  thisThread->mainHistory[us][from_to(move)]
+		  << " " <<  (*contHist[0])[movedPiece][to_sq(move)] 
+		  << " " <<  (*contHist[1])[movedPiece][to_sq(move)] 
+		  << " " <<  (*contHist[2])[movedPiece][to_sq(move)] 
+		  << " " <<  (*contHist[3])[movedPiece][to_sq(move)] 
+		  << " " <<  (*contHist[4])[movedPiece][to_sq(move)] 
+		  << " " <<  (*contHist[5])[movedPiece][to_sq(move)] 
+		  << std::endl;
+		  */
           }
 
-	  CC = !captureOrPromotion;
-          //CC = true;
+	  CC = captureOrPromotion;
 	  C = {
-              		thisThread->mainHistory[us][from_to(move)] > 0,
+              captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]  > 0,
+	        type_of(movedPiece) == PAWN,
+		                        type_of(movedPiece) == KNIGHT,
+					                         type_of(movedPiece) == BISHOP,
+								                           type_of(movedPiece) == ROOK,
+											                              type_of(movedPiece) == QUEEN
+	  };
+
+	  //CC = !captureOrPromotion;
+          //CC = true;
+	  /*
+	  C = {
                         (*contHist[0])[movedPiece][to_sq(move)] > 0,
                         (*contHist[1])[movedPiece][to_sq(move)] > 0,
+                        (*contHist[2])[movedPiece][to_sq(move)] > 0,
                         (*contHist[3])[movedPiece][to_sq(move)] > 0,
-                        (*contHist[5])[movedPiece][to_sq(move)] > 0,
-			ss->statScore > 0
+                        (*contHist[4])[movedPiece][to_sq(move)] > 0,
+                        (*contHist[5])[movedPiece][to_sq(move)] > 0
 	  };
+	  */
+	  /*
+	  C = {
+                        (*contHist[0])[movedPiece][to_sq(move)] < -5755,
+                        (*contHist[0])[movedPiece][to_sq(move)] < -1921,
+                        (*contHist[0])[movedPiece][to_sq(move)] < -1,
+                        (*contHist[0])[movedPiece][to_sq(move)] < 9,
+                        (*contHist[0])[movedPiece][to_sq(move)] < 2581,
+                        (*contHist[0])[movedPiece][to_sq(move)] < 6951
+	  };
+	  */
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
