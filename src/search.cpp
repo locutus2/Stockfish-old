@@ -1476,7 +1476,7 @@ moves_loop: // When in check, search starts from here
 
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
 
-	  if(CC && !moveCount)
+	  if(CC && moveCount)
 	  {
 		  int N = (int)C.size();
 		  bool T = bestMove;
