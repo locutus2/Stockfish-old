@@ -328,6 +328,7 @@ void Thread::search() {
   std::fill(&lowPlyHistory[MAX_LPH - 2][0], &lowPlyHistory.back().back() + 1, 0);
 
   size_t multiPV = size_t(Options["MultiPV"]);
+  size_t originalMultiPV = multiPV;
 
   // Pick integer skill levels, but non-deterministically round up or down
   // such that the average integer skill corresponds to the input floating point one.
@@ -385,6 +386,11 @@ void Thread::search() {
 
       if (!Threads.increaseDepth)
          searchAgainCounter++;
+
+      if (bestMoveChanges > 11)
+          multiPV = std::min(std::max(originalMultiPV, (size_t)2), rootMoves.size());
+      else
+          multiPV = std::min(originalMultiPV, rootMoves.size());
 
       // MultiPV loop. We perform a full root search for each PV line
       for (pvIdx = 0; pvIdx < multiPV && !Threads.stop; ++pvIdx)
