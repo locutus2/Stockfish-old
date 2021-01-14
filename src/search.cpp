@@ -387,7 +387,7 @@ void Thread::search() {
       if (!Threads.increaseDepth)
          searchAgainCounter++;
 
-      if (bestMoveChanges > 11)
+      if (bestMoveChanges > 12)
           multiPV = std::min(std::max(originalMultiPV, (size_t)2), rootMoves.size());
       else
           multiPV = std::min(originalMultiPV, rootMoves.size());
