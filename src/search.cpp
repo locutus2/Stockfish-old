@@ -387,10 +387,12 @@ void Thread::search() {
       if (!Threads.increaseDepth)
          searchAgainCounter++;
 
-      if (bestMoveChanges > 8)
-          multiPV = std::min(std::max(originalMultiPV, (size_t)2), rootMoves.size());
+      if (nodes % 16)
+          multiPV = originalMultiPV;
       else
-          multiPV = std::min(originalMultiPV, rootMoves.size());
+          multiPV = std::max(originalMultiPV, (size_t)2);
+
+      multiPV = std::min(multiPV, rootMoves.size());
 
       // MultiPV loop. We perform a full root search for each PV line
       for (pvIdx = 0; pvIdx < multiPV && !Threads.stop; ++pvIdx)
