@@ -387,7 +387,7 @@ void Thread::search() {
       if (!Threads.increaseDepth)
          searchAgainCounter++;
 
-      if (nodes % 16)
+      if (nodes % 8)
           multiPV = originalMultiPV;
       else
           multiPV = std::max(originalMultiPV, (size_t)2);
