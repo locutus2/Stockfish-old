@@ -387,10 +387,10 @@ void Thread::search() {
       if (!Threads.increaseDepth)
          searchAgainCounter++;
 
-      if (nodes % 8)
-          multiPV = originalMultiPV;
-      else
+      if (bestMoveChanges > 10 && (nodes & 1))
           multiPV = std::max(originalMultiPV, (size_t)2);
+      else
+          multiPV = originalMultiPV;
 
       multiPV = std::min(multiPV, rootMoves.size());
 
