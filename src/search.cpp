@@ -602,7 +602,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool formerPv, givesCheck, improving, didLMR, priorCaptureOrPromotion;
+    bool formerPv, givesCheck, improving, didLMR, priorNonPawnCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
@@ -611,7 +611,7 @@ namespace {
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
     ss->inCheck = pos.checkers();
-    priorCaptureOrPromotion = pos.captured_piece() || type_of((ss-1)->currentMove) == PROMOTION;
+    priorNonPawnCapture = type_of(pos.captured_piece()) > PAWN;
     Color us = pos.side_to_move();
     moveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue = -VALUE_INFINITE;
@@ -679,7 +679,7 @@ namespace {
     if (   ss->ttPv
         && depth > 12
         && ss->ply - 1 < MAX_LPH
-        && !priorCaptureOrPromotion
+        && !priorNonPawnCapture
         && is_ok((ss-1)->currentMove))
         thisThread->lowPlyHistory[ss->ply - 1][from_to((ss-1)->currentMove)] << stat_bonus(depth - 5);
 
@@ -705,7 +705,7 @@ namespace {
                     update_quiet_stats(pos, ss, ttMove, stat_bonus(depth), depth);
 
                 // Extra penalty for early quiet moves of the previous ply
-                if ((ss-1)->moveCount <= 2 && !priorCaptureOrPromotion)
+                if ((ss-1)->moveCount <= 2 && !priorNonPawnCapture)
                     update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + 1));
             }
             // Penalty for a quiet ttMove that fails low
@@ -815,7 +815,7 @@ namespace {
     }
 
     // Use static evaluation difference to improve quiet move ordering
-    if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorCaptureOrPromotion)
+    if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorNonPawnCapture)
     {
         int bonus = std::clamp(-depth * 4 * int((ss-1)->staticEval + ss->staticEval - 2 * Tempo), -1000, 1000);
         thisThread->mainHistory[~us][from_to((ss-1)->currentMove)] << bonus;
@@ -1384,7 +1384,7 @@ moves_loop: // When in check, search starts from here
 
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
-             && !priorCaptureOrPromotion)
+             && !priorNonPawnCapture)
         update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
 
     if (PvNode)
