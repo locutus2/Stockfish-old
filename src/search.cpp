@@ -1172,6 +1172,10 @@ moves_loop: // When in check, search starts from here
           if (th.marked())
               r++;
 
+          // Increase reduction if previous move was a capture
+          if (priorCapture)
+              r++;
+
           // Decrease reduction if position is or has been on the PV (~10 Elo)
           if (ss->ttPv)
               r -= 2;
