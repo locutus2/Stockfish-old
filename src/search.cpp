@@ -1201,8 +1201,8 @@ moves_loop: // When in check, search starts from here
           }
           else
           {
-              // Increase reduction if previous move was a capture
-              if (priorCapture)
+              // Increase reduction for late move if previous move was a capture
+              if (priorCapture && moveCountPruning)
                   r++;
 
               // Increase reduction if ttMove is a capture (~5 Elo)
