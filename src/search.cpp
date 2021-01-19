@@ -1192,6 +1192,10 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
+          // Increase reduction for late move if previous move was a capture
+          if (priorCapture && moveCountPruning)
+              r++;
+
           if (captureOrPromotion)
           {
               // Unless giving check, this capture is likely bad
@@ -1201,10 +1205,6 @@ moves_loop: // When in check, search starts from here
           }
           else
           {
-              // Increase reduction for late move if previous move was a capture
-              if (priorCapture && moveCountPruning)
-                  r++;
-
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
