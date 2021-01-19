@@ -307,7 +307,7 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
-      (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
+      (ss-i)->continuationHistory = &this->continuationHistory[0][0][0][NO_PIECE][0]; // Use as a sentinel
 
   ss->pv = pv;
 
@@ -853,7 +853,7 @@ namespace {
         Depth R = (1015 + 85 * depth) / 256 + std::min(int(eval - beta) / 191, 3);
 
         ss->currentMove = MOVE_NULL;
-        ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
+        ss->continuationHistory = &thisThread->continuationHistory[0][0][0][NO_PIECE][0];
 
         pos.do_null_move(st);
 
@@ -931,6 +931,7 @@ namespace {
 
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[pos.gives_check(move)]
+                                                                          [ss->inCheck]
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
@@ -1144,6 +1145,7 @@ moves_loop: // When in check, search starts from here
       // Update the current move (this must be done after singular extension search)
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[givesCheck]
+                                                                [ss->inCheck]
                                                                 [captureOrPromotion]
                                                                 [movedPiece]
                                                                 [to_sq(move)];
@@ -1585,6 +1587,7 @@ moves_loop: // When in check, search starts from here
 
       ss->currentMove = move;
       ss->continuationHistory = &thisThread->continuationHistory[givesCheck]
+                                                                [ss->inCheck]
                                                                 [captureOrPromotion]
                                                                 [pos.moved_piece(move)]
                                                                 [to_sq(move)];
