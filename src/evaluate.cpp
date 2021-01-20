@@ -1055,7 +1055,7 @@ Value Eval::evaluate(const Position& pos) {
          int mat = pos.non_pawn_material() + PawnValueMg * pos.count<PAWN>();
 		 Value val = NNUE::evaluate(pos) * (679 + mat / 32) / 1024 + Tempo;
          if (pos.opposite_bishops())
-             val -= val / 16;
+             val -= val / 8;
          return val;
       };
 
