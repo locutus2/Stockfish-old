@@ -1174,14 +1174,14 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if position is or has been on the PV (~10 Elo)
           if (ss->ttPv)
-              r -= 2;
+              r -= 2 - (formerPv && depth >= 13);
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if ((rootNode || !PvNode) && thisThread->rootDepth > 10 && thisThread->bestMoveChanges <= 2)
               r++;
 
           // More reductions for late moves if position was not in previous PV
-          if (moveCountPruning && (!formerPv || depth >= 10))
+          if (moveCountPruning && !formerPv)
               r++;
 
           // Decrease reduction if opponent's move count is high (~5 Elo)
