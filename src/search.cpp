@@ -1181,11 +1181,7 @@ moves_loop: // When in check, search starts from here
               r++;
 
           // More reductions for late moves if position was not in previous PV
-          if (moveCountPruning && !formerPv)
-              r++;
-
-          // More reductions for checking moves at higher depth
-          if (depth >= 13 && givesCheck)
+          if (moveCountPruning && (!formerPv || depth >= 10))
               r++;
 
           // Decrease reduction if opponent's move count is high (~5 Elo)
