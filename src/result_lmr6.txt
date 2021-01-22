@@ -2195,11 +2195,11 @@ Nodes searched  : 78424700
 Nodes/second    : 570465
 
 --- pareto ---
-[620] Total 1809 Hits 442 hit rate (%) 24.4334
+[620] Total 1809 Hits 442 hit rate (%) 24.4334 => 620 [size=6]: !c0 c1 c2 !c3 !c4 !c5
 [618] Total 1823 Hits 442 hit rate (%) 24.2457
 [614] Total 1884 Hits 455 hit rate (%) 24.1507
 [612] Total 1899 Hits 455 hit rate (%) 23.96
-[134] Total 1937 Hits 448 hit rate (%) 23.1285
+[134] Total 1937 Hits 448 hit rate (%) 23.1285 => 134 [size=5]: c1 c2 !c3 !c4 !c5
 [602] Total 1975 Hits 454 hit rate (%) 22.9873
 [128] Total 2014 Hits 461 hit rate (%) 22.8898
 [596] Total 2054 Hits 467 hit rate (%) 22.7361
