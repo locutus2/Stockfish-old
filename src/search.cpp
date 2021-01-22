@@ -1259,6 +1259,7 @@ moves_loop: // When in check, search starts from here
               if (cutNode)
 	      {
                   r += 2;
+				  /*
                   CC = true;
 		  
 		  C = {
@@ -1269,6 +1270,7 @@ moves_loop: // When in check, search starts from here
 			  moveCountPruning,
 			  ttCapture
 		  };
+		  */
 
 	      }
               // Decrease reduction for moves that escape a capture. Filter out
@@ -1347,6 +1349,15 @@ moves_loop: // When in check, search starts from here
                         (*contHist[0])[movedPiece][to_sq(move)] < 6951
 	  };
 	  */
+	  CC = !PvNode && !cutNode;
+	  C = {
+			  formerPv,
+			  givesCheck,
+			  ss->inCheck,
+			  priorCapture, 
+			  moveCountPruning,
+			  ttCapture
+		  };
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
