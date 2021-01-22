@@ -1257,8 +1257,20 @@ moves_loop: // When in check, search starts from here
 
               // Increase reduction for cut nodes (~10 Elo)
               if (cutNode)
+	      {
                   r += 2;
+                  CC = true;
+		  
+		  C = {
+			  formerPv,
+			  givesCheck,
+			  ss->inCheck,
+			  priorCapture, 
+			  moveCountPruning,
+			  ttCapture
+		  };
 
+	      }
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
               // hence break make_move(). (~2 Elo)
@@ -1301,6 +1313,7 @@ moves_loop: // When in check, search starts from here
 		  */
           }
 
+	  /*
 	  CC = captureOrPromotion;
 	  C = {
               captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]  > 0,
@@ -1310,6 +1323,7 @@ moves_loop: // When in check, search starts from here
 								                           type_of(movedPiece) == ROOK,
 											                              type_of(movedPiece) == QUEEN
 	  };
+	  */
 
 	  //CC = !captureOrPromotion;
           //CC = true;
