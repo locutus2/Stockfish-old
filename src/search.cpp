@@ -1166,7 +1166,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Increase reduction at ply 1
-          if(ss->ply == 1 && (ss-1)->moveCount > 3)
+          if(!PvNode && ss->ply == 1 && (ss-1)->moveCount > 3)
               r++;
 
           // Decrease reduction if the ttHit running average is large
