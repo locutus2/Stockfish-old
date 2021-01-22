@@ -1,0 +1,1443 @@
+ CC = !captureOrPromotion;
+C = {
+                        (*contHist[0])[movedPiece][to_sq(move)] < -5755,
+                        (*contHist[0])[movedPiece][to_sq(move)] < -1921,
+                        (*contHist[0])[movedPiece][to_sq(move)] < -1,
+                        (*contHist[0])[movedPiece][to_sq(move)] < 9,
+                        (*contHist[0])[movedPiece][to_sq(move)] < 2581,
+                        (*contHist[0])[movedPiece][to_sq(move)] < 6951
+          };
+ 
+[0] Total 23357255 Hits 1124330 hit rate (%) 4.81362
+[1] Total 20017848 Hits 766111 hit rate (%) 3.82714
+[2] Total 3339407 Hits 358219 hit rate (%) 10.727
+[3] Total 16683431 Hits 550116 hit rate (%) 3.29738
+[4] Total 16683431 Hits 550116 hit rate (%) 3.29738
+[6] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[7] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[8] Total 3339407 Hits 358219 hit rate (%) 10.727
+[9] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[10] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[12] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[13] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[18] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[19] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[20] Total 3339407 Hits 358219 hit rate (%) 10.727
+[21] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[22] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[24] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[25] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[26] Total 3339407 Hits 358219 hit rate (%) 10.727
+[27] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[28] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[30] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[31] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[36] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[37] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[39] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[40] Total 9715915 Hits 331277 hit rate (%) 3.40963
+[54] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[55] Total 10301933 Hits 434834 hit rate (%) 4.2209
+[56] Total 3339407 Hits 358219 hit rate (%) 10.727
+[57] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[58] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[60] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[61] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[62] Total 3339407 Hits 358219 hit rate (%) 10.727
+[63] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[64] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[66] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[67] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[72] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[73] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[74] Total 3339407 Hits 358219 hit rate (%) 10.727
+[75] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[76] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[78] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[79] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[80] Total 3339407 Hits 358219 hit rate (%) 10.727
+[81] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[82] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[84] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[85] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[90] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[91] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[93] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[94] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[108] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[109] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[111] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[112] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[117] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[118] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[120] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[121] Total 6661826 Hits 219522 hit rate (%) 3.29522
+[162] Total 16695429 Hits 904808 hit rate (%) 5.4195
+[163] Total 13356022 Hits 546589 hit rate (%) 4.09245
+[164] Total 3339407 Hits 358219 hit rate (%) 10.727
+[165] Total 10021605 Hits 330594 hit rate (%) 3.29881
+[166] Total 10021605 Hits 330594 hit rate (%) 3.29881
+[168] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[169] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[170] Total 3339407 Hits 358219 hit rate (%) 10.727
+[171] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[172] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[174] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[175] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[180] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[181] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[182] Total 3339407 Hits 358219 hit rate (%) 10.727
+[183] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[184] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[186] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[187] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[188] Total 3339407 Hits 358219 hit rate (%) 10.727
+[189] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[190] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[192] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[193] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[198] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[199] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[201] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[202] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[216] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[217] Total 10301933 Hits 434834 hit rate (%) 4.2209
+[218] Total 3339407 Hits 358219 hit rate (%) 10.727
+[219] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[220] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[222] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[223] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[224] Total 3339407 Hits 358219 hit rate (%) 10.727
+[225] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[226] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[228] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[229] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[234] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[235] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[236] Total 3339407 Hits 358219 hit rate (%) 10.727
+[237] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[238] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[240] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[241] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[242] Total 3339407 Hits 358219 hit rate (%) 10.727
+[243] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[244] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[246] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[247] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[252] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[253] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[255] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[256] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[270] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[271] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[273] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[274] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[279] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[280] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[282] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[283] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[324] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[325] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[327] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[328] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[333] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[334] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[336] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[337] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[351] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[352] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[354] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[355] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[360] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[361] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[363] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[364] Total 3328502 Hits 99006 hit rate (%) 2.97449
+[486] Total 20028753 Hits 1025324 hit rate (%) 5.11926
+[487] Total 16689346 Hits 667105 hit rate (%) 3.99719
+[488] Total 3339407 Hits 358219 hit rate (%) 10.727
+[489] Total 13354929 Hits 451110 hit rate (%) 3.37785
+[490] Total 13354929 Hits 451110 hit rate (%) 3.37785
+[492] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[493] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[494] Total 3339407 Hits 358219 hit rate (%) 10.727
+[495] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[496] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[498] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[499] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[504] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[505] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[506] Total 3339407 Hits 358219 hit rate (%) 10.727
+[507] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[508] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[510] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[511] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[512] Total 3339407 Hits 358219 hit rate (%) 10.727
+[513] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[514] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[516] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[517] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[522] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[523] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[525] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[526] Total 6387413 Hits 232271 hit rate (%) 3.63639
+[540] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[541] Total 10301933 Hits 434834 hit rate (%) 4.2209
+[542] Total 3339407 Hits 358219 hit rate (%) 10.727
+[543] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[544] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[546] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[547] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[548] Total 3339407 Hits 358219 hit rate (%) 10.727
+[549] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[550] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[552] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[553] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[558] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[559] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[560] Total 3339407 Hits 358219 hit rate (%) 10.727
+[561] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[562] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[564] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[565] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[566] Total 3339407 Hits 358219 hit rate (%) 10.727
+[567] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[568] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[570] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[571] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[576] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[577] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[579] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[580] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[594] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[595] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[597] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[598] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[603] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[604] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[606] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[607] Total 3333324 Hits 120516 hit rate (%) 3.61549
+[648] Total 16695429 Hits 904808 hit rate (%) 5.4195
+[649] Total 13356022 Hits 546589 hit rate (%) 4.09245
+[650] Total 3339407 Hits 358219 hit rate (%) 10.727
+[651] Total 10021605 Hits 330594 hit rate (%) 3.29881
+[652] Total 10021605 Hits 330594 hit rate (%) 3.29881
+[654] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[655] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[656] Total 3339407 Hits 358219 hit rate (%) 10.727
+[657] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[658] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[660] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[661] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[666] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[667] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[668] Total 3339407 Hits 358219 hit rate (%) 10.727
+[669] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[670] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[672] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[673] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[674] Total 3339407 Hits 358219 hit rate (%) 10.727
+[675] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[676] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[678] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[679] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[684] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[685] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[687] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[688] Total 3054089 Hits 111755 hit rate (%) 3.65919
+[702] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[703] Total 10301933 Hits 434834 hit rate (%) 4.2209
+[704] Total 3339407 Hits 358219 hit rate (%) 10.727
+[705] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[706] Total 6967516 Hits 218839 hit rate (%) 3.14085
+[708] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[709] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[710] Total 3339407 Hits 358219 hit rate (%) 10.727
+[711] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[712] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[714] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[715] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[720] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[721] Total 6689529 Hits 381452 hit rate (%) 5.70223
+[722] Total 3339407 Hits 358219 hit rate (%) 10.727
+[723] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[724] Total 3355112 Hits 165457 hit rate (%) 4.93149
+[726] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[727] Total 3334417 Hits 215995 hit rate (%) 6.47774
+[728] Total 3339407 Hits 358219 hit rate (%) 10.727
+[0] Total 23357255 CramersV(x,y) = -nan error% =95.1864
+[1] Total 6721272059 CramersV(x,y) = -0.00350243 error% =5.53236
+[2] Total 1804126016 CramersV(x,y) = 0.0186246 error% =3.30597
+[3] Total 16683431 CramersV(x,y) = -nan error% =96.7026
+[4] Total 16683431 CramersV(x,y) = -nan error% =96.7026
+[5] Total 593589587 CramersV(x,y) = -nan error% =3.1389
+[6] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[7] Total 1837601649 CramersV(x,y) = 0.00154669 error% =5.79876
+[8] Total 401710443 CramersV(x,y) = 0.0353432 error% =4.22025
+[9] Total 13328319 CramersV(x,y) = -nan error% =97.114
+[10] Total 13328319 CramersV(x,y) = -nan error% =97.114
+[11] Total 192302052 CramersV(x,y) = -nan error% =3.13431
+[12] Total 13328319 CramersV(x,y) = -nan error% =97.114
+[13] Total 13328319 CramersV(x,y) = -nan error% =97.114
+[14] Total 192302052 CramersV(x,y) = -nan error% =3.13431
+[18] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[19] Total 488627012 CramersV(x,y) = -0.00265904 error% =7.4614
+[20] Total 263390072 CramersV(x,y) = 0.0448668 error% =4.4712
+[21] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[22] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[23] Total 131678873 CramersV(x,y) = -nan error% =3.48221
+[24] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[25] Total 485271900 CramersV(x,y) = 0.000756083 error% =6.85569
+[26] Total 131711199 CramersV(x,y) = 0.0639797 error% =5.45996
+[27] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[28] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[29] Total 59657911 CramersV(x,y) = -nan error% =3.1528
+[30] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[31] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[32] Total 59657911 CramersV(x,y) = -nan error% =3.1528
+[36] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[37] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[38] Total 59657911 CramersV(x,y) = -nan error% =3.1528
+[39] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[40] Total 9715915 CramersV(x,y) = -nan error% =96.5904
+[41] Total 59657911 CramersV(x,y) = -nan error% =3.1528
+[54] Total 13641340 CramersV(x,y) = -nan error% =94.1864
+[55] Total 123923236 CramersV(x,y) = -0.0365869 error% =15.0133
+[56] Total 133704508 CramersV(x,y) = 0.0673395 error% =5.21948
+[57] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[58] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[59] Total 84453712 CramersV(x,y) = -nan error% =3.32098
+[60] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[61] Total 116955720 CramersV(x,y) = -0.00759007 error% =10.1374
+[62] Total 49250796 CramersV(x,y) = 0.117021 error% =8.47497
+[63] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[64] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[65] Total 42774587 CramersV(x,y) = -nan error% =3.44431
+[66] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[67] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[68] Total 42774587 CramersV(x,y) = -nan error% =3.44431
+[72] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[73] Total 120310832 CramersV(x,y) = -0.0172131 error% =12.5059
+[74] Total 90929921 CramersV(x,y) = 0.0842229 error% =6.05454
+[75] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[76] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[77] Total 41679125 CramersV(x,y) = -nan error% =3.1944
+[78] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[79] Total 116955720 CramersV(x,y) = -0.00759007 error% =10.1374
+[80] Total 49250796 CramersV(x,y) = 0.117021 error% =8.47497
+[81] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[82] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[83] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[84] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[85] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[86] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[90] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[91] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[92] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[93] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[94] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[95] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[108] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[109] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[110] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[111] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[112] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[113] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[117] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[118] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[119] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[120] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[121] Total 6661826 CramersV(x,y) = -nan error% =96.7048
+[122] Total 16647332 CramersV(x,y) = -nan error% =3.10284
+[162] Total 16695429 CramersV(x,y) = -nan error% =94.5805
+[163] Total 36716901 CramersV(x,y) = -0.0898675 error% =40.5543
+[164] Total 56760216 CramersV(x,y) = 0.0863293 error% =8.59952
+[165] Total 10021605 CramersV(x,y) = -nan error% =96.7012
+[166] Total 10021605 CramersV(x,y) = -nan error% =96.7012
+[167] Total 40021056 CramersV(x,y) = -nan error% =2.96732
+[168] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[169] Total 26695296 CramersV(x,y) = -0.0286459 error% =19.4764
+[170] Total 16739160 CramersV(x,y) = 0.0883723 error% =22.0653
+[171] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[172] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[173] Total 25828732 CramersV(x,y) = -nan error% =3.33718
+[174] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[175] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[176] Total 25828732 CramersV(x,y) = -nan error% =3.33718
+[180] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[181] Total 30050408 CramersV(x,y) = -0.0486149 error% =27.9162
+[182] Total 30931484 CramersV(x,y) = 0.104116 error% =12.9937
+[183] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[184] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[185] Total 14192324 CramersV(x,y) = -nan error% =2.29422
+[186] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[187] Total 26695296 CramersV(x,y) = -0.0286459 error% =19.4764
+[188] Total 16739160 CramersV(x,y) = 0.0883723 error% =22.0653
+[189] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[190] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[191] Total 13054061 CramersV(x,y) = -nan error% =3.62571
+[192] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[193] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[194] Total 13054061 CramersV(x,y) = -nan error% =3.62571
+[198] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[199] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[200] Total 13054061 CramersV(x,y) = -nan error% =3.62571
+[201] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[202] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[203] Total 13054061 CramersV(x,y) = -nan error% =3.62571
+[216] Total 13641340 CramersV(x,y) = -nan error% =94.1864
+[217] Total 33662812 CramersV(x,y) = -0.0821335 error% =35.4931
+[218] Total 43706155 CramersV(x,y) = 0.0965458 error% =10.0851
+[219] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[220] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[221] Total 26966995 CramersV(x,y) = -nan error% =2.64861
+[222] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[223] Total 26695296 CramersV(x,y) = -0.0286459 error% =19.4764
+[224] Total 16739160 CramersV(x,y) = 0.0883723 error% =22.0653
+[225] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[226] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[227] Total 12774671 CramersV(x,y) = -nan error% =3.04232
+[228] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[229] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[230] Total 12774671 CramersV(x,y) = -nan error% =3.04232
+[234] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[235] Total 30050408 CramersV(x,y) = -0.0486149 error% =27.9162
+[236] Total 30931484 CramersV(x,y) = 0.104116 error% =12.9937
+[237] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[238] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[239] Total 14192324 CramersV(x,y) = -nan error% =2.29422
+[240] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[241] Total 26695296 CramersV(x,y) = -0.0286459 error% =19.4764
+[242] Total 16739160 CramersV(x,y) = 0.0883723 error% =22.0653
+[243] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[244] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[245] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[246] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[247] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[248] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[252] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[253] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[254] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[255] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[256] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[257] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[270] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[271] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[272] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[273] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[274] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[275] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[279] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[280] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[281] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[282] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[283] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[284] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[324] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[325] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[326] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[327] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[328] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[329] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[333] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[334] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[335] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[336] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[337] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[338] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[351] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[352] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[353] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[354] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[355] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[356] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[360] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[361] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[362] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[363] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[364] Total 3328502 CramersV(x,y) = -nan error% =97.0255
+[365] Total 3328502 CramersV(x,y) = -nan error% =2.97449
+[486] Total 20028753 CramersV(x,y) = -nan error% =94.8807
+[487] Total 20028753 CramersV(x,y) = -0.113818 error% =81.7847
+[488] Total 20028753 CramersV(x,y) = 0.113818 error% =18.2153
+[489] Total 13354929 CramersV(x,y) = -nan error% =96.6221
+[490] Total 13354929 CramersV(x,y) = -nan error% =96.6221
+[491] Total 13354929 CramersV(x,y) = -nan error% =3.37785
+[492] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[493] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[494] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+[495] Total 9999817 CramersV(x,y) = -nan error% =97.1434
+[496] Total 9999817 CramersV(x,y) = -nan error% =97.1434
+[497] Total 9999817 CramersV(x,y) = -nan error% =2.85658
+[498] Total 9999817 CramersV(x,y) = -nan error% =97.1434
+[499] Total 9999817 CramersV(x,y) = -nan error% =97.1434
+[500] Total 9999817 CramersV(x,y) = -nan error% =2.85658
+[504] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[505] Total 10028936 CramersV(x,y) = -0.0906027 error% =66.4706
+[506] Total 10028936 CramersV(x,y) = 0.0906027 error% =33.5294
+[507] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[508] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[509] Total 3355112 CramersV(x,y) = -nan error% =4.93149
+[510] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[511] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[512] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+[513] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[514] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[515] Total 6387413 CramersV(x,y) = -nan error% =3.63639
+[516] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[517] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[518] Total 6387413 CramersV(x,y) = -nan error% =3.63639
+[522] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[523] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[524] Total 6387413 CramersV(x,y) = -nan error% =3.63639
+[525] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[526] Total 6387413 CramersV(x,y) = -nan error% =96.3636
+[527] Total 6387413 CramersV(x,y) = -nan error% =3.63639
+[540] Total 13641340 CramersV(x,y) = -nan error% =94.1864
+[541] Total 13641340 CramersV(x,y) = -0.119548 error% =74.9583
+[542] Total 13641340 CramersV(x,y) = 0.119548 error% =25.0417
+[543] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[544] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[545] Total 6967516 CramersV(x,y) = -nan error% =3.14085
+[546] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[547] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[548] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+[549] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[550] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[551] Total 3612404 CramersV(x,y) = -nan error% =1.47774
+[552] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[553] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[554] Total 3612404 CramersV(x,y) = -nan error% =1.47774
+[558] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[559] Total 10028936 CramersV(x,y) = -0.0906027 error% =66.4706
+[560] Total 10028936 CramersV(x,y) = 0.0906027 error% =33.5294
+[561] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[562] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[563] Total 3355112 CramersV(x,y) = -nan error% =4.93149
+[564] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[565] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[566] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+[567] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[568] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[569] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[570] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[571] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[572] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[576] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[577] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[578] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[579] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[580] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[581] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[594] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[595] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[596] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[597] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[598] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[599] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[603] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[604] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[605] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[606] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[607] Total 3333324 CramersV(x,y) = -nan error% =96.3845
+[608] Total 3333324 CramersV(x,y) = -nan error% =3.61549
+[648] Total 16695429 CramersV(x,y) = -nan error% =94.5805
+[649] Total 16695429 CramersV(x,y) = -0.117222 error% =78.8698
+[650] Total 16695429 CramersV(x,y) = 0.117222 error% =21.1302
+[651] Total 10021605 CramersV(x,y) = -nan error% =96.7012
+[652] Total 10021605 CramersV(x,y) = -nan error% =96.7012
+[653] Total 10021605 CramersV(x,y) = -nan error% =3.29881
+[654] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[655] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[656] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+[657] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[658] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[659] Total 6666493 CramersV(x,y) = -nan error% =2.47712
+[660] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[661] Total 6666493 CramersV(x,y) = -nan error% =97.5229
+[662] Total 6666493 CramersV(x,y) = -nan error% =2.47712
+[666] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[667] Total 10028936 CramersV(x,y) = -0.0906027 error% =66.4706
+[668] Total 10028936 CramersV(x,y) = 0.0906027 error% =33.5294
+[669] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[670] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[671] Total 3355112 CramersV(x,y) = -nan error% =4.93149
+[672] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[673] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[674] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+[675] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[676] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[677] Total 3054089 CramersV(x,y) = -nan error% =3.65919
+[678] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[679] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[680] Total 3054089 CramersV(x,y) = -nan error% =3.65919
+[684] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[685] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[686] Total 3054089 CramersV(x,y) = -nan error% =3.65919
+[687] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[688] Total 3054089 CramersV(x,y) = -nan error% =96.3408
+[689] Total 3054089 CramersV(x,y) = -nan error% =3.65919
+[702] Total 13641340 CramersV(x,y) = -nan error% =94.1864
+[703] Total 13641340 CramersV(x,y) = -0.119548 error% =74.9583
+[704] Total 13641340 CramersV(x,y) = 0.119548 error% =25.0417
+[705] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[706] Total 6967516 CramersV(x,y) = -nan error% =96.8592
+[707] Total 6967516 CramersV(x,y) = -nan error% =3.14085
+[708] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[709] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[710] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+[711] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[712] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[713] Total 3612404 CramersV(x,y) = -nan error% =1.47774
+[714] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[715] Total 3612404 CramersV(x,y) = -nan error% =98.5223
+[716] Total 3612404 CramersV(x,y) = -nan error% =1.47774
+[720] Total 10028936 CramersV(x,y) = -nan error% =92.6246
+[721] Total 10028936 CramersV(x,y) = -0.0906027 error% =66.4706
+[722] Total 10028936 CramersV(x,y) = 0.0906027 error% =33.5294
+[723] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[724] Total 3355112 CramersV(x,y) = -nan error% =95.0685
+[725] Total 3355112 CramersV(x,y) = -nan error% =4.93149
+[726] Total 6673824 CramersV(x,y) = -nan error% =91.396
+[727] Total 6673824 CramersV(x,y) = -0.0757656 error% =52.0937
+[728] Total 6673824 CramersV(x,y) = 0.0757656 error% =47.9063
+
+===========================
+Code table NC=6:
+0 [size=0]:
+1 [size=1]: c5
+2 [size=1]: !c5
+3 [size=1]: c4
+4 [size=2]: c4 c5
+5 [size=2]: c4 !c5
+6 [size=1]: !c4
+7 [size=2]: !c4 c5
+8 [size=2]: !c4 !c5
+9 [size=1]: c3
+10 [size=2]: c3 c5
+11 [size=2]: c3 !c5
+12 [size=2]: c3 c4
+13 [size=3]: c3 c4 c5
+14 [size=3]: c3 c4 !c5
+15 [size=2]: c3 !c4
+16 [size=3]: c3 !c4 c5
+17 [size=3]: c3 !c4 !c5
+18 [size=1]: !c3
+19 [size=2]: !c3 c5
+20 [size=2]: !c3 !c5
+21 [size=2]: !c3 c4
+22 [size=3]: !c3 c4 c5
+23 [size=3]: !c3 c4 !c5
+24 [size=2]: !c3 !c4
+25 [size=3]: !c3 !c4 c5
+26 [size=3]: !c3 !c4 !c5
+27 [size=1]: c2
+28 [size=2]: c2 c5
+29 [size=2]: c2 !c5
+30 [size=2]: c2 c4
+31 [size=3]: c2 c4 c5
+32 [size=3]: c2 c4 !c5
+33 [size=2]: c2 !c4
+34 [size=3]: c2 !c4 c5
+35 [size=3]: c2 !c4 !c5
+36 [size=2]: c2 c3
+37 [size=3]: c2 c3 c5
+38 [size=3]: c2 c3 !c5
+39 [size=3]: c2 c3 c4
+40 [size=4]: c2 c3 c4 c5
+41 [size=4]: c2 c3 c4 !c5
+42 [size=3]: c2 c3 !c4
+43 [size=4]: c2 c3 !c4 c5
+44 [size=4]: c2 c3 !c4 !c5
+45 [size=2]: c2 !c3
+46 [size=3]: c2 !c3 c5
+47 [size=3]: c2 !c3 !c5
+48 [size=3]: c2 !c3 c4
+49 [size=4]: c2 !c3 c4 c5
+50 [size=4]: c2 !c3 c4 !c5
+51 [size=3]: c2 !c3 !c4
+52 [size=4]: c2 !c3 !c4 c5
+53 [size=4]: c2 !c3 !c4 !c5
+54 [size=1]: !c2
+55 [size=2]: !c2 c5
+56 [size=2]: !c2 !c5
+57 [size=2]: !c2 c4
+58 [size=3]: !c2 c4 c5
+59 [size=3]: !c2 c4 !c5
+60 [size=2]: !c2 !c4
+61 [size=3]: !c2 !c4 c5
+62 [size=3]: !c2 !c4 !c5
+63 [size=2]: !c2 c3
+64 [size=3]: !c2 c3 c5
+65 [size=3]: !c2 c3 !c5
+66 [size=3]: !c2 c3 c4
+67 [size=4]: !c2 c3 c4 c5
+68 [size=4]: !c2 c3 c4 !c5
+69 [size=3]: !c2 c3 !c4
+70 [size=4]: !c2 c3 !c4 c5
+71 [size=4]: !c2 c3 !c4 !c5
+72 [size=2]: !c2 !c3
+73 [size=3]: !c2 !c3 c5
+74 [size=3]: !c2 !c3 !c5
+75 [size=3]: !c2 !c3 c4
+76 [size=4]: !c2 !c3 c4 c5
+77 [size=4]: !c2 !c3 c4 !c5
+78 [size=3]: !c2 !c3 !c4
+79 [size=4]: !c2 !c3 !c4 c5
+80 [size=4]: !c2 !c3 !c4 !c5
+81 [size=1]: c1
+82 [size=2]: c1 c5
+83 [size=2]: c1 !c5
+84 [size=2]: c1 c4
+85 [size=3]: c1 c4 c5
+86 [size=3]: c1 c4 !c5
+87 [size=2]: c1 !c4
+88 [size=3]: c1 !c4 c5
+89 [size=3]: c1 !c4 !c5
+90 [size=2]: c1 c3
+91 [size=3]: c1 c3 c5
+92 [size=3]: c1 c3 !c5
+93 [size=3]: c1 c3 c4
+94 [size=4]: c1 c3 c4 c5
+95 [size=4]: c1 c3 c4 !c5
+96 [size=3]: c1 c3 !c4
+97 [size=4]: c1 c3 !c4 c5
+98 [size=4]: c1 c3 !c4 !c5
+99 [size=2]: c1 !c3
+100 [size=3]: c1 !c3 c5
+101 [size=3]: c1 !c3 !c5
+102 [size=3]: c1 !c3 c4
+103 [size=4]: c1 !c3 c4 c5
+104 [size=4]: c1 !c3 c4 !c5
+105 [size=3]: c1 !c3 !c4
+106 [size=4]: c1 !c3 !c4 c5
+107 [size=4]: c1 !c3 !c4 !c5
+108 [size=2]: c1 c2
+109 [size=3]: c1 c2 c5
+110 [size=3]: c1 c2 !c5
+111 [size=3]: c1 c2 c4
+112 [size=4]: c1 c2 c4 c5
+113 [size=4]: c1 c2 c4 !c5
+114 [size=3]: c1 c2 !c4
+115 [size=4]: c1 c2 !c4 c5
+116 [size=4]: c1 c2 !c4 !c5
+117 [size=3]: c1 c2 c3
+118 [size=4]: c1 c2 c3 c5
+119 [size=4]: c1 c2 c3 !c5
+120 [size=4]: c1 c2 c3 c4
+121 [size=5]: c1 c2 c3 c4 c5
+122 [size=5]: c1 c2 c3 c4 !c5
+123 [size=4]: c1 c2 c3 !c4
+124 [size=5]: c1 c2 c3 !c4 c5
+125 [size=5]: c1 c2 c3 !c4 !c5
+126 [size=3]: c1 c2 !c3
+127 [size=4]: c1 c2 !c3 c5
+128 [size=4]: c1 c2 !c3 !c5
+129 [size=4]: c1 c2 !c3 c4
+130 [size=5]: c1 c2 !c3 c4 c5
+131 [size=5]: c1 c2 !c3 c4 !c5
+132 [size=4]: c1 c2 !c3 !c4
+133 [size=5]: c1 c2 !c3 !c4 c5
+134 [size=5]: c1 c2 !c3 !c4 !c5
+135 [size=2]: c1 !c2
+136 [size=3]: c1 !c2 c5
+137 [size=3]: c1 !c2 !c5
+138 [size=3]: c1 !c2 c4
+139 [size=4]: c1 !c2 c4 c5
+140 [size=4]: c1 !c2 c4 !c5
+141 [size=3]: c1 !c2 !c4
+142 [size=4]: c1 !c2 !c4 c5
+143 [size=4]: c1 !c2 !c4 !c5
+144 [size=3]: c1 !c2 c3
+145 [size=4]: c1 !c2 c3 c5
+146 [size=4]: c1 !c2 c3 !c5
+147 [size=4]: c1 !c2 c3 c4
+148 [size=5]: c1 !c2 c3 c4 c5
+149 [size=5]: c1 !c2 c3 c4 !c5
+150 [size=4]: c1 !c2 c3 !c4
+151 [size=5]: c1 !c2 c3 !c4 c5
+152 [size=5]: c1 !c2 c3 !c4 !c5
+153 [size=3]: c1 !c2 !c3
+154 [size=4]: c1 !c2 !c3 c5
+155 [size=4]: c1 !c2 !c3 !c5
+156 [size=4]: c1 !c2 !c3 c4
+157 [size=5]: c1 !c2 !c3 c4 c5
+158 [size=5]: c1 !c2 !c3 c4 !c5
+159 [size=4]: c1 !c2 !c3 !c4
+160 [size=5]: c1 !c2 !c3 !c4 c5
+161 [size=5]: c1 !c2 !c3 !c4 !c5
+162 [size=1]: !c1
+163 [size=2]: !c1 c5
+164 [size=2]: !c1 !c5
+165 [size=2]: !c1 c4
+166 [size=3]: !c1 c4 c5
+167 [size=3]: !c1 c4 !c5
+168 [size=2]: !c1 !c4
+169 [size=3]: !c1 !c4 c5
+170 [size=3]: !c1 !c4 !c5
+171 [size=2]: !c1 c3
+172 [size=3]: !c1 c3 c5
+173 [size=3]: !c1 c3 !c5
+174 [size=3]: !c1 c3 c4
+175 [size=4]: !c1 c3 c4 c5
+176 [size=4]: !c1 c3 c4 !c5
+177 [size=3]: !c1 c3 !c4
+178 [size=4]: !c1 c3 !c4 c5
+179 [size=4]: !c1 c3 !c4 !c5
+180 [size=2]: !c1 !c3
+181 [size=3]: !c1 !c3 c5
+182 [size=3]: !c1 !c3 !c5
+183 [size=3]: !c1 !c3 c4
+184 [size=4]: !c1 !c3 c4 c5
+185 [size=4]: !c1 !c3 c4 !c5
+186 [size=3]: !c1 !c3 !c4
+187 [size=4]: !c1 !c3 !c4 c5
+188 [size=4]: !c1 !c3 !c4 !c5
+189 [size=2]: !c1 c2
+190 [size=3]: !c1 c2 c5
+191 [size=3]: !c1 c2 !c5
+192 [size=3]: !c1 c2 c4
+193 [size=4]: !c1 c2 c4 c5
+194 [size=4]: !c1 c2 c4 !c5
+195 [size=3]: !c1 c2 !c4
+196 [size=4]: !c1 c2 !c4 c5
+197 [size=4]: !c1 c2 !c4 !c5
+198 [size=3]: !c1 c2 c3
+199 [size=4]: !c1 c2 c3 c5
+200 [size=4]: !c1 c2 c3 !c5
+201 [size=4]: !c1 c2 c3 c4
+202 [size=5]: !c1 c2 c3 c4 c5
+203 [size=5]: !c1 c2 c3 c4 !c5
+204 [size=4]: !c1 c2 c3 !c4
+205 [size=5]: !c1 c2 c3 !c4 c5
+206 [size=5]: !c1 c2 c3 !c4 !c5
+207 [size=3]: !c1 c2 !c3
+208 [size=4]: !c1 c2 !c3 c5
+209 [size=4]: !c1 c2 !c3 !c5
+210 [size=4]: !c1 c2 !c3 c4
+211 [size=5]: !c1 c2 !c3 c4 c5
+212 [size=5]: !c1 c2 !c3 c4 !c5
+213 [size=4]: !c1 c2 !c3 !c4
+214 [size=5]: !c1 c2 !c3 !c4 c5
+215 [size=5]: !c1 c2 !c3 !c4 !c5
+216 [size=2]: !c1 !c2
+217 [size=3]: !c1 !c2 c5
+218 [size=3]: !c1 !c2 !c5
+219 [size=3]: !c1 !c2 c4
+220 [size=4]: !c1 !c2 c4 c5
+221 [size=4]: !c1 !c2 c4 !c5
+222 [size=3]: !c1 !c2 !c4
+223 [size=4]: !c1 !c2 !c4 c5
+224 [size=4]: !c1 !c2 !c4 !c5
+225 [size=3]: !c1 !c2 c3
+226 [size=4]: !c1 !c2 c3 c5
+227 [size=4]: !c1 !c2 c3 !c5
+228 [size=4]: !c1 !c2 c3 c4
+229 [size=5]: !c1 !c2 c3 c4 c5
+230 [size=5]: !c1 !c2 c3 c4 !c5
+231 [size=4]: !c1 !c2 c3 !c4
+232 [size=5]: !c1 !c2 c3 !c4 c5
+233 [size=5]: !c1 !c2 c3 !c4 !c5
+234 [size=3]: !c1 !c2 !c3
+235 [size=4]: !c1 !c2 !c3 c5
+236 [size=4]: !c1 !c2 !c3 !c5
+237 [size=4]: !c1 !c2 !c3 c4
+238 [size=5]: !c1 !c2 !c3 c4 c5
+239 [size=5]: !c1 !c2 !c3 c4 !c5
+240 [size=4]: !c1 !c2 !c3 !c4
+241 [size=5]: !c1 !c2 !c3 !c4 c5
+242 [size=5]: !c1 !c2 !c3 !c4 !c5
+243 [size=1]: c0
+244 [size=2]: c0 c5
+245 [size=2]: c0 !c5
+246 [size=2]: c0 c4
+247 [size=3]: c0 c4 c5
+248 [size=3]: c0 c4 !c5
+249 [size=2]: c0 !c4
+250 [size=3]: c0 !c4 c5
+251 [size=3]: c0 !c4 !c5
+252 [size=2]: c0 c3
+253 [size=3]: c0 c3 c5
+254 [size=3]: c0 c3 !c5
+255 [size=3]: c0 c3 c4
+256 [size=4]: c0 c3 c4 c5
+257 [size=4]: c0 c3 c4 !c5
+258 [size=3]: c0 c3 !c4
+259 [size=4]: c0 c3 !c4 c5
+260 [size=4]: c0 c3 !c4 !c5
+261 [size=2]: c0 !c3
+262 [size=3]: c0 !c3 c5
+263 [size=3]: c0 !c3 !c5
+264 [size=3]: c0 !c3 c4
+265 [size=4]: c0 !c3 c4 c5
+266 [size=4]: c0 !c3 c4 !c5
+267 [size=3]: c0 !c3 !c4
+268 [size=4]: c0 !c3 !c4 c5
+269 [size=4]: c0 !c3 !c4 !c5
+270 [size=2]: c0 c2
+271 [size=3]: c0 c2 c5
+272 [size=3]: c0 c2 !c5
+273 [size=3]: c0 c2 c4
+274 [size=4]: c0 c2 c4 c5
+275 [size=4]: c0 c2 c4 !c5
+276 [size=3]: c0 c2 !c4
+277 [size=4]: c0 c2 !c4 c5
+278 [size=4]: c0 c2 !c4 !c5
+279 [size=3]: c0 c2 c3
+280 [size=4]: c0 c2 c3 c5
+281 [size=4]: c0 c2 c3 !c5
+282 [size=4]: c0 c2 c3 c4
+283 [size=5]: c0 c2 c3 c4 c5
+284 [size=5]: c0 c2 c3 c4 !c5
+285 [size=4]: c0 c2 c3 !c4
+286 [size=5]: c0 c2 c3 !c4 c5
+287 [size=5]: c0 c2 c3 !c4 !c5
+288 [size=3]: c0 c2 !c3
+289 [size=4]: c0 c2 !c3 c5
+290 [size=4]: c0 c2 !c3 !c5
+291 [size=4]: c0 c2 !c3 c4
+292 [size=5]: c0 c2 !c3 c4 c5
+293 [size=5]: c0 c2 !c3 c4 !c5
+294 [size=4]: c0 c2 !c3 !c4
+295 [size=5]: c0 c2 !c3 !c4 c5
+296 [size=5]: c0 c2 !c3 !c4 !c5
+297 [size=2]: c0 !c2
+298 [size=3]: c0 !c2 c5
+299 [size=3]: c0 !c2 !c5
+300 [size=3]: c0 !c2 c4
+301 [size=4]: c0 !c2 c4 c5
+302 [size=4]: c0 !c2 c4 !c5
+303 [size=3]: c0 !c2 !c4
+304 [size=4]: c0 !c2 !c4 c5
+305 [size=4]: c0 !c2 !c4 !c5
+306 [size=3]: c0 !c2 c3
+307 [size=4]: c0 !c2 c3 c5
+308 [size=4]: c0 !c2 c3 !c5
+309 [size=4]: c0 !c2 c3 c4
+310 [size=5]: c0 !c2 c3 c4 c5
+311 [size=5]: c0 !c2 c3 c4 !c5
+312 [size=4]: c0 !c2 c3 !c4
+313 [size=5]: c0 !c2 c3 !c4 c5
+314 [size=5]: c0 !c2 c3 !c4 !c5
+315 [size=3]: c0 !c2 !c3
+316 [size=4]: c0 !c2 !c3 c5
+317 [size=4]: c0 !c2 !c3 !c5
+318 [size=4]: c0 !c2 !c3 c4
+319 [size=5]: c0 !c2 !c3 c4 c5
+320 [size=5]: c0 !c2 !c3 c4 !c5
+321 [size=4]: c0 !c2 !c3 !c4
+322 [size=5]: c0 !c2 !c3 !c4 c5
+323 [size=5]: c0 !c2 !c3 !c4 !c5
+324 [size=2]: c0 c1
+325 [size=3]: c0 c1 c5
+326 [size=3]: c0 c1 !c5
+327 [size=3]: c0 c1 c4
+328 [size=4]: c0 c1 c4 c5
+329 [size=4]: c0 c1 c4 !c5
+330 [size=3]: c0 c1 !c4
+331 [size=4]: c0 c1 !c4 c5
+332 [size=4]: c0 c1 !c4 !c5
+333 [size=3]: c0 c1 c3
+334 [size=4]: c0 c1 c3 c5
+335 [size=4]: c0 c1 c3 !c5
+336 [size=4]: c0 c1 c3 c4
+337 [size=5]: c0 c1 c3 c4 c5
+338 [size=5]: c0 c1 c3 c4 !c5
+339 [size=4]: c0 c1 c3 !c4
+340 [size=5]: c0 c1 c3 !c4 c5
+341 [size=5]: c0 c1 c3 !c4 !c5
+342 [size=3]: c0 c1 !c3
+343 [size=4]: c0 c1 !c3 c5
+344 [size=4]: c0 c1 !c3 !c5
+345 [size=4]: c0 c1 !c3 c4
+346 [size=5]: c0 c1 !c3 c4 c5
+347 [size=5]: c0 c1 !c3 c4 !c5
+348 [size=4]: c0 c1 !c3 !c4
+349 [size=5]: c0 c1 !c3 !c4 c5
+350 [size=5]: c0 c1 !c3 !c4 !c5
+351 [size=3]: c0 c1 c2
+352 [size=4]: c0 c1 c2 c5
+353 [size=4]: c0 c1 c2 !c5
+354 [size=4]: c0 c1 c2 c4
+355 [size=5]: c0 c1 c2 c4 c5
+356 [size=5]: c0 c1 c2 c4 !c5
+357 [size=4]: c0 c1 c2 !c4
+358 [size=5]: c0 c1 c2 !c4 c5
+359 [size=5]: c0 c1 c2 !c4 !c5
+360 [size=4]: c0 c1 c2 c3
+361 [size=5]: c0 c1 c2 c3 c5
+362 [size=5]: c0 c1 c2 c3 !c5
+363 [size=5]: c0 c1 c2 c3 c4
+364 [size=6]: c0 c1 c2 c3 c4 c5
+365 [size=6]: c0 c1 c2 c3 c4 !c5
+366 [size=5]: c0 c1 c2 c3 !c4
+367 [size=6]: c0 c1 c2 c3 !c4 c5
+368 [size=6]: c0 c1 c2 c3 !c4 !c5
+369 [size=4]: c0 c1 c2 !c3
+370 [size=5]: c0 c1 c2 !c3 c5
+371 [size=5]: c0 c1 c2 !c3 !c5
+372 [size=5]: c0 c1 c2 !c3 c4
+373 [size=6]: c0 c1 c2 !c3 c4 c5
+374 [size=6]: c0 c1 c2 !c3 c4 !c5
+375 [size=5]: c0 c1 c2 !c3 !c4
+376 [size=6]: c0 c1 c2 !c3 !c4 c5
+377 [size=6]: c0 c1 c2 !c3 !c4 !c5
+378 [size=3]: c0 c1 !c2
+379 [size=4]: c0 c1 !c2 c5
+380 [size=4]: c0 c1 !c2 !c5
+381 [size=4]: c0 c1 !c2 c4
+382 [size=5]: c0 c1 !c2 c4 c5
+383 [size=5]: c0 c1 !c2 c4 !c5
+384 [size=4]: c0 c1 !c2 !c4
+385 [size=5]: c0 c1 !c2 !c4 c5
+386 [size=5]: c0 c1 !c2 !c4 !c5
+387 [size=4]: c0 c1 !c2 c3
+388 [size=5]: c0 c1 !c2 c3 c5
+389 [size=5]: c0 c1 !c2 c3 !c5
+390 [size=5]: c0 c1 !c2 c3 c4
+391 [size=6]: c0 c1 !c2 c3 c4 c5
+392 [size=6]: c0 c1 !c2 c3 c4 !c5
+393 [size=5]: c0 c1 !c2 c3 !c4
+394 [size=6]: c0 c1 !c2 c3 !c4 c5
+395 [size=6]: c0 c1 !c2 c3 !c4 !c5
+396 [size=4]: c0 c1 !c2 !c3
+397 [size=5]: c0 c1 !c2 !c3 c5
+398 [size=5]: c0 c1 !c2 !c3 !c5
+399 [size=5]: c0 c1 !c2 !c3 c4
+400 [size=6]: c0 c1 !c2 !c3 c4 c5
+401 [size=6]: c0 c1 !c2 !c3 c4 !c5
+402 [size=5]: c0 c1 !c2 !c3 !c4
+403 [size=6]: c0 c1 !c2 !c3 !c4 c5
+404 [size=6]: c0 c1 !c2 !c3 !c4 !c5
+405 [size=2]: c0 !c1
+406 [size=3]: c0 !c1 c5
+407 [size=3]: c0 !c1 !c5
+408 [size=3]: c0 !c1 c4
+409 [size=4]: c0 !c1 c4 c5
+410 [size=4]: c0 !c1 c4 !c5
+411 [size=3]: c0 !c1 !c4
+412 [size=4]: c0 !c1 !c4 c5
+413 [size=4]: c0 !c1 !c4 !c5
+414 [size=3]: c0 !c1 c3
+415 [size=4]: c0 !c1 c3 c5
+416 [size=4]: c0 !c1 c3 !c5
+417 [size=4]: c0 !c1 c3 c4
+418 [size=5]: c0 !c1 c3 c4 c5
+419 [size=5]: c0 !c1 c3 c4 !c5
+420 [size=4]: c0 !c1 c3 !c4
+421 [size=5]: c0 !c1 c3 !c4 c5
+422 [size=5]: c0 !c1 c3 !c4 !c5
+423 [size=3]: c0 !c1 !c3
+424 [size=4]: c0 !c1 !c3 c5
+425 [size=4]: c0 !c1 !c3 !c5
+426 [size=4]: c0 !c1 !c3 c4
+427 [size=5]: c0 !c1 !c3 c4 c5
+428 [size=5]: c0 !c1 !c3 c4 !c5
+429 [size=4]: c0 !c1 !c3 !c4
+430 [size=5]: c0 !c1 !c3 !c4 c5
+431 [size=5]: c0 !c1 !c3 !c4 !c5
+432 [size=3]: c0 !c1 c2
+433 [size=4]: c0 !c1 c2 c5
+434 [size=4]: c0 !c1 c2 !c5
+435 [size=4]: c0 !c1 c2 c4
+436 [size=5]: c0 !c1 c2 c4 c5
+437 [size=5]: c0 !c1 c2 c4 !c5
+438 [size=4]: c0 !c1 c2 !c4
+439 [size=5]: c0 !c1 c2 !c4 c5
+440 [size=5]: c0 !c1 c2 !c4 !c5
+441 [size=4]: c0 !c1 c2 c3
+442 [size=5]: c0 !c1 c2 c3 c5
+443 [size=5]: c0 !c1 c2 c3 !c5
+444 [size=5]: c0 !c1 c2 c3 c4
+445 [size=6]: c0 !c1 c2 c3 c4 c5
+446 [size=6]: c0 !c1 c2 c3 c4 !c5
+447 [size=5]: c0 !c1 c2 c3 !c4
+448 [size=6]: c0 !c1 c2 c3 !c4 c5
+449 [size=6]: c0 !c1 c2 c3 !c4 !c5
+450 [size=4]: c0 !c1 c2 !c3
+451 [size=5]: c0 !c1 c2 !c3 c5
+452 [size=5]: c0 !c1 c2 !c3 !c5
+453 [size=5]: c0 !c1 c2 !c3 c4
+454 [size=6]: c0 !c1 c2 !c3 c4 c5
+455 [size=6]: c0 !c1 c2 !c3 c4 !c5
+456 [size=5]: c0 !c1 c2 !c3 !c4
+457 [size=6]: c0 !c1 c2 !c3 !c4 c5
+458 [size=6]: c0 !c1 c2 !c3 !c4 !c5
+459 [size=3]: c0 !c1 !c2
+460 [size=4]: c0 !c1 !c2 c5
+461 [size=4]: c0 !c1 !c2 !c5
+462 [size=4]: c0 !c1 !c2 c4
+463 [size=5]: c0 !c1 !c2 c4 c5
+464 [size=5]: c0 !c1 !c2 c4 !c5
+465 [size=4]: c0 !c1 !c2 !c4
+466 [size=5]: c0 !c1 !c2 !c4 c5
+467 [size=5]: c0 !c1 !c2 !c4 !c5
+468 [size=4]: c0 !c1 !c2 c3
+469 [size=5]: c0 !c1 !c2 c3 c5
+470 [size=5]: c0 !c1 !c2 c3 !c5
+471 [size=5]: c0 !c1 !c2 c3 c4
+472 [size=6]: c0 !c1 !c2 c3 c4 c5
+473 [size=6]: c0 !c1 !c2 c3 c4 !c5
+474 [size=5]: c0 !c1 !c2 c3 !c4
+475 [size=6]: c0 !c1 !c2 c3 !c4 c5
+476 [size=6]: c0 !c1 !c2 c3 !c4 !c5
+477 [size=4]: c0 !c1 !c2 !c3
+478 [size=5]: c0 !c1 !c2 !c3 c5
+479 [size=5]: c0 !c1 !c2 !c3 !c5
+480 [size=5]: c0 !c1 !c2 !c3 c4
+481 [size=6]: c0 !c1 !c2 !c3 c4 c5
+482 [size=6]: c0 !c1 !c2 !c3 c4 !c5
+483 [size=5]: c0 !c1 !c2 !c3 !c4
+484 [size=6]: c0 !c1 !c2 !c3 !c4 c5
+485 [size=6]: c0 !c1 !c2 !c3 !c4 !c5
+486 [size=1]: !c0
+487 [size=2]: !c0 c5
+488 [size=2]: !c0 !c5
+489 [size=2]: !c0 c4
+490 [size=3]: !c0 c4 c5
+491 [size=3]: !c0 c4 !c5
+492 [size=2]: !c0 !c4
+493 [size=3]: !c0 !c4 c5
+494 [size=3]: !c0 !c4 !c5
+495 [size=2]: !c0 c3
+496 [size=3]: !c0 c3 c5
+497 [size=3]: !c0 c3 !c5
+498 [size=3]: !c0 c3 c4
+499 [size=4]: !c0 c3 c4 c5
+500 [size=4]: !c0 c3 c4 !c5
+501 [size=3]: !c0 c3 !c4
+502 [size=4]: !c0 c3 !c4 c5
+503 [size=4]: !c0 c3 !c4 !c5
+504 [size=2]: !c0 !c3
+505 [size=3]: !c0 !c3 c5
+506 [size=3]: !c0 !c3 !c5
+507 [size=3]: !c0 !c3 c4
+508 [size=4]: !c0 !c3 c4 c5
+509 [size=4]: !c0 !c3 c4 !c5
+510 [size=3]: !c0 !c3 !c4
+511 [size=4]: !c0 !c3 !c4 c5
+512 [size=4]: !c0 !c3 !c4 !c5
+513 [size=2]: !c0 c2
+514 [size=3]: !c0 c2 c5
+515 [size=3]: !c0 c2 !c5
+516 [size=3]: !c0 c2 c4
+517 [size=4]: !c0 c2 c4 c5
+518 [size=4]: !c0 c2 c4 !c5
+519 [size=3]: !c0 c2 !c4
+520 [size=4]: !c0 c2 !c4 c5
+521 [size=4]: !c0 c2 !c4 !c5
+522 [size=3]: !c0 c2 c3
+523 [size=4]: !c0 c2 c3 c5
+524 [size=4]: !c0 c2 c3 !c5
+525 [size=4]: !c0 c2 c3 c4
+526 [size=5]: !c0 c2 c3 c4 c5
+527 [size=5]: !c0 c2 c3 c4 !c5
+528 [size=4]: !c0 c2 c3 !c4
+529 [size=5]: !c0 c2 c3 !c4 c5
+530 [size=5]: !c0 c2 c3 !c4 !c5
+531 [size=3]: !c0 c2 !c3
+532 [size=4]: !c0 c2 !c3 c5
+533 [size=4]: !c0 c2 !c3 !c5
+534 [size=4]: !c0 c2 !c3 c4
+535 [size=5]: !c0 c2 !c3 c4 c5
+536 [size=5]: !c0 c2 !c3 c4 !c5
+537 [size=4]: !c0 c2 !c3 !c4
+538 [size=5]: !c0 c2 !c3 !c4 c5
+539 [size=5]: !c0 c2 !c3 !c4 !c5
+540 [size=2]: !c0 !c2
+541 [size=3]: !c0 !c2 c5
+542 [size=3]: !c0 !c2 !c5
+543 [size=3]: !c0 !c2 c4
+544 [size=4]: !c0 !c2 c4 c5
+545 [size=4]: !c0 !c2 c4 !c5
+546 [size=3]: !c0 !c2 !c4
+547 [size=4]: !c0 !c2 !c4 c5
+548 [size=4]: !c0 !c2 !c4 !c5
+549 [size=3]: !c0 !c2 c3
+550 [size=4]: !c0 !c2 c3 c5
+551 [size=4]: !c0 !c2 c3 !c5
+552 [size=4]: !c0 !c2 c3 c4
+553 [size=5]: !c0 !c2 c3 c4 c5
+554 [size=5]: !c0 !c2 c3 c4 !c5
+555 [size=4]: !c0 !c2 c3 !c4
+556 [size=5]: !c0 !c2 c3 !c4 c5
+557 [size=5]: !c0 !c2 c3 !c4 !c5
+558 [size=3]: !c0 !c2 !c3
+559 [size=4]: !c0 !c2 !c3 c5
+560 [size=4]: !c0 !c2 !c3 !c5
+561 [size=4]: !c0 !c2 !c3 c4
+562 [size=5]: !c0 !c2 !c3 c4 c5
+563 [size=5]: !c0 !c2 !c3 c4 !c5
+564 [size=4]: !c0 !c2 !c3 !c4
+565 [size=5]: !c0 !c2 !c3 !c4 c5
+566 [size=5]: !c0 !c2 !c3 !c4 !c5
+567 [size=2]: !c0 c1
+568 [size=3]: !c0 c1 c5
+569 [size=3]: !c0 c1 !c5
+570 [size=3]: !c0 c1 c4
+571 [size=4]: !c0 c1 c4 c5
+572 [size=4]: !c0 c1 c4 !c5
+573 [size=3]: !c0 c1 !c4
+574 [size=4]: !c0 c1 !c4 c5
+575 [size=4]: !c0 c1 !c4 !c5
+576 [size=3]: !c0 c1 c3
+577 [size=4]: !c0 c1 c3 c5
+578 [size=4]: !c0 c1 c3 !c5
+579 [size=4]: !c0 c1 c3 c4
+580 [size=5]: !c0 c1 c3 c4 c5
+581 [size=5]: !c0 c1 c3 c4 !c5
+582 [size=4]: !c0 c1 c3 !c4
+583 [size=5]: !c0 c1 c3 !c4 c5
+584 [size=5]: !c0 c1 c3 !c4 !c5
+585 [size=3]: !c0 c1 !c3
+586 [size=4]: !c0 c1 !c3 c5
+587 [size=4]: !c0 c1 !c3 !c5
+588 [size=4]: !c0 c1 !c3 c4
+589 [size=5]: !c0 c1 !c3 c4 c5
+590 [size=5]: !c0 c1 !c3 c4 !c5
+591 [size=4]: !c0 c1 !c3 !c4
+592 [size=5]: !c0 c1 !c3 !c4 c5
+593 [size=5]: !c0 c1 !c3 !c4 !c5
+594 [size=3]: !c0 c1 c2
+595 [size=4]: !c0 c1 c2 c5
+596 [size=4]: !c0 c1 c2 !c5
+597 [size=4]: !c0 c1 c2 c4
+598 [size=5]: !c0 c1 c2 c4 c5
+599 [size=5]: !c0 c1 c2 c4 !c5
+600 [size=4]: !c0 c1 c2 !c4
+601 [size=5]: !c0 c1 c2 !c4 c5
+602 [size=5]: !c0 c1 c2 !c4 !c5
+603 [size=4]: !c0 c1 c2 c3
+604 [size=5]: !c0 c1 c2 c3 c5
+605 [size=5]: !c0 c1 c2 c3 !c5
+606 [size=5]: !c0 c1 c2 c3 c4
+607 [size=6]: !c0 c1 c2 c3 c4 c5
+608 [size=6]: !c0 c1 c2 c3 c4 !c5
+609 [size=5]: !c0 c1 c2 c3 !c4
+610 [size=6]: !c0 c1 c2 c3 !c4 c5
+611 [size=6]: !c0 c1 c2 c3 !c4 !c5
+612 [size=4]: !c0 c1 c2 !c3
+613 [size=5]: !c0 c1 c2 !c3 c5
+614 [size=5]: !c0 c1 c2 !c3 !c5
+615 [size=5]: !c0 c1 c2 !c3 c4
+616 [size=6]: !c0 c1 c2 !c3 c4 c5
+617 [size=6]: !c0 c1 c2 !c3 c4 !c5
+618 [size=5]: !c0 c1 c2 !c3 !c4
+619 [size=6]: !c0 c1 c2 !c3 !c4 c5
+620 [size=6]: !c0 c1 c2 !c3 !c4 !c5
+621 [size=3]: !c0 c1 !c2
+622 [size=4]: !c0 c1 !c2 c5
+623 [size=4]: !c0 c1 !c2 !c5
+624 [size=4]: !c0 c1 !c2 c4
+625 [size=5]: !c0 c1 !c2 c4 c5
+626 [size=5]: !c0 c1 !c2 c4 !c5
+627 [size=4]: !c0 c1 !c2 !c4
+628 [size=5]: !c0 c1 !c2 !c4 c5
+629 [size=5]: !c0 c1 !c2 !c4 !c5
+630 [size=4]: !c0 c1 !c2 c3
+631 [size=5]: !c0 c1 !c2 c3 c5
+632 [size=5]: !c0 c1 !c2 c3 !c5
+633 [size=5]: !c0 c1 !c2 c3 c4
+634 [size=6]: !c0 c1 !c2 c3 c4 c5
+635 [size=6]: !c0 c1 !c2 c3 c4 !c5
+636 [size=5]: !c0 c1 !c2 c3 !c4
+637 [size=6]: !c0 c1 !c2 c3 !c4 c5
+638 [size=6]: !c0 c1 !c2 c3 !c4 !c5
+639 [size=4]: !c0 c1 !c2 !c3
+640 [size=5]: !c0 c1 !c2 !c3 c5
+641 [size=5]: !c0 c1 !c2 !c3 !c5
+642 [size=5]: !c0 c1 !c2 !c3 c4
+643 [size=6]: !c0 c1 !c2 !c3 c4 c5
+644 [size=6]: !c0 c1 !c2 !c3 c4 !c5
+645 [size=5]: !c0 c1 !c2 !c3 !c4
+646 [size=6]: !c0 c1 !c2 !c3 !c4 c5
+647 [size=6]: !c0 c1 !c2 !c3 !c4 !c5
+648 [size=2]: !c0 !c1
+649 [size=3]: !c0 !c1 c5
+650 [size=3]: !c0 !c1 !c5
+651 [size=3]: !c0 !c1 c4
+652 [size=4]: !c0 !c1 c4 c5
+653 [size=4]: !c0 !c1 c4 !c5
+654 [size=3]: !c0 !c1 !c4
+655 [size=4]: !c0 !c1 !c4 c5
+656 [size=4]: !c0 !c1 !c4 !c5
+657 [size=3]: !c0 !c1 c3
+658 [size=4]: !c0 !c1 c3 c5
+659 [size=4]: !c0 !c1 c3 !c5
+660 [size=4]: !c0 !c1 c3 c4
+661 [size=5]: !c0 !c1 c3 c4 c5
+662 [size=5]: !c0 !c1 c3 c4 !c5
+663 [size=4]: !c0 !c1 c3 !c4
+664 [size=5]: !c0 !c1 c3 !c4 c5
+665 [size=5]: !c0 !c1 c3 !c4 !c5
+666 [size=3]: !c0 !c1 !c3
+667 [size=4]: !c0 !c1 !c3 c5
+668 [size=4]: !c0 !c1 !c3 !c5
+669 [size=4]: !c0 !c1 !c3 c4
+670 [size=5]: !c0 !c1 !c3 c4 c5
+671 [size=5]: !c0 !c1 !c3 c4 !c5
+672 [size=4]: !c0 !c1 !c3 !c4
+673 [size=5]: !c0 !c1 !c3 !c4 c5
+674 [size=5]: !c0 !c1 !c3 !c4 !c5
+675 [size=3]: !c0 !c1 c2
+676 [size=4]: !c0 !c1 c2 c5
+677 [size=4]: !c0 !c1 c2 !c5
+678 [size=4]: !c0 !c1 c2 c4
+679 [size=5]: !c0 !c1 c2 c4 c5
+680 [size=5]: !c0 !c1 c2 c4 !c5
+681 [size=4]: !c0 !c1 c2 !c4
+682 [size=5]: !c0 !c1 c2 !c4 c5
+683 [size=5]: !c0 !c1 c2 !c4 !c5
+684 [size=4]: !c0 !c1 c2 c3
+685 [size=5]: !c0 !c1 c2 c3 c5
+686 [size=5]: !c0 !c1 c2 c3 !c5
+687 [size=5]: !c0 !c1 c2 c3 c4
+688 [size=6]: !c0 !c1 c2 c3 c4 c5
+689 [size=6]: !c0 !c1 c2 c3 c4 !c5
+690 [size=5]: !c0 !c1 c2 c3 !c4
+691 [size=6]: !c0 !c1 c2 c3 !c4 c5
+692 [size=6]: !c0 !c1 c2 c3 !c4 !c5
+693 [size=4]: !c0 !c1 c2 !c3
+694 [size=5]: !c0 !c1 c2 !c3 c5
+695 [size=5]: !c0 !c1 c2 !c3 !c5
+696 [size=5]: !c0 !c1 c2 !c3 c4
+697 [size=6]: !c0 !c1 c2 !c3 c4 c5
+698 [size=6]: !c0 !c1 c2 !c3 c4 !c5
+699 [size=5]: !c0 !c1 c2 !c3 !c4
+700 [size=6]: !c0 !c1 c2 !c3 !c4 c5
+701 [size=6]: !c0 !c1 c2 !c3 !c4 !c5
+702 [size=3]: !c0 !c1 !c2
+703 [size=4]: !c0 !c1 !c2 c5
+704 [size=4]: !c0 !c1 !c2 !c5
+705 [size=4]: !c0 !c1 !c2 c4
+706 [size=5]: !c0 !c1 !c2 c4 c5
+707 [size=5]: !c0 !c1 !c2 c4 !c5
+708 [size=4]: !c0 !c1 !c2 !c4
+709 [size=5]: !c0 !c1 !c2 !c4 c5
+710 [size=5]: !c0 !c1 !c2 !c4 !c5
+711 [size=4]: !c0 !c1 !c2 c3
+712 [size=5]: !c0 !c1 !c2 c3 c5
+713 [size=5]: !c0 !c1 !c2 c3 !c5
+714 [size=5]: !c0 !c1 !c2 c3 c4
+715 [size=6]: !c0 !c1 !c2 c3 c4 c5
+716 [size=6]: !c0 !c1 !c2 c3 c4 !c5
+717 [size=5]: !c0 !c1 !c2 c3 !c4
+718 [size=6]: !c0 !c1 !c2 c3 !c4 c5
+719 [size=6]: !c0 !c1 !c2 c3 !c4 !c5
+720 [size=4]: !c0 !c1 !c2 !c3
+721 [size=5]: !c0 !c1 !c2 !c3 c5
+722 [size=5]: !c0 !c1 !c2 !c3 !c5
+723 [size=5]: !c0 !c1 !c2 !c3 c4
+724 [size=6]: !c0 !c1 !c2 !c3 c4 c5
+725 [size=6]: !c0 !c1 !c2 !c3 c4 !c5
+726 [size=5]: !c0 !c1 !c2 !c3 !c4
+727 [size=6]: !c0 !c1 !c2 !c3 !c4 c5
+728 [size=6]: !c0 !c1 !c2 !c3 !c4 !c5
+
+===========================
+Total time (ms) : 292832
+Nodes searched  : 78456450
+Nodes/second    : 267923
+ 
+--- pareto ---
+[164] Total 3339407 Hits 358219 hit rate (%) 10.727
+[170] Total 3339407 Hits 358219 hit rate (%) 10.727
+[182] Total 3339407 Hits 358219 hit rate (%) 10.727
+[188] Total 3339407 Hits 358219 hit rate (%) 10.727
+[20] Total 3339407 Hits 358219 hit rate (%) 10.727      => !c3 !c5
+[218] Total 3339407 Hits 358219 hit rate (%) 10.727
+[224] Total 3339407 Hits 358219 hit rate (%) 10.727
+[236] Total 3339407 Hits 358219 hit rate (%) 10.727
+[242] Total 3339407 Hits 358219 hit rate (%) 10.727
+[26] Total 3339407 Hits 358219 hit rate (%) 10.727
+[2] Total 3339407 Hits 358219 hit rate (%) 10.727       => !c5
+[488] Total 3339407 Hits 358219 hit rate (%) 10.727
+[494] Total 3339407 Hits 358219 hit rate (%) 10.727
+[506] Total 3339407 Hits 358219 hit rate (%) 10.727
+[512] Total 3339407 Hits 358219 hit rate (%) 10.727
+[542] Total 3339407 Hits 358219 hit rate (%) 10.727
+[548] Total 3339407 Hits 358219 hit rate (%) 10.727
+[560] Total 3339407 Hits 358219 hit rate (%) 10.727
+[566] Total 3339407 Hits 358219 hit rate (%) 10.727
+[56] Total 3339407 Hits 358219 hit rate (%) 10.727
+[62] Total 3339407 Hits 358219 hit rate (%) 10.727
+[650] Total 3339407 Hits 358219 hit rate (%) 10.727
+[656] Total 3339407 Hits 358219 hit rate (%) 10.727
+[668] Total 3339407 Hits 358219 hit rate (%) 10.727
+[674] Total 3339407 Hits 358219 hit rate (%) 10.727
+[704] Total 3339407 Hits 358219 hit rate (%) 10.727
+[710] Total 3339407 Hits 358219 hit rate (%) 10.727
+[722] Total 3339407 Hits 358219 hit rate (%) 10.727
+[728] Total 3339407 Hits 358219 hit rate (%) 10.727
+[74] Total 3339407 Hits 358219 hit rate (%) 10.727
+[80] Total 3339407 Hits 358219 hit rate (%) 10.727
+[8] Total 3339407 Hits 358219 hit rate (%) 10.727       => !c4 !c5
+[168] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[186] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[222] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[240] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[24] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[492] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[510] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[546] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[564] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[60] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[654] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[672] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[6] Total 6673824 Hits 574214 hit rate (%) 8.60397      => !c4
+[708] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[726] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[78] Total 6673824 Hits 574214 hit rate (%) 8.60397
+[180] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[18] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[234] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[504] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[558] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[666] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[720] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[72] Total 10028936 Hits 739671 hit rate (%) 7.37537
+[216] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[540] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[54] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[702] Total 13641340 Hits 793053 hit rate (%) 5.8136
+[162] Total 16695429 Hits 904808 hit rate (%) 5.4195
+[648] Total 16695429 Hits 904808 hit rate (%) 5.4195
+[486] Total 20028753 Hits 1025324 hit rate (%) 5.11926
+[0] Total 23357255 Hits 1124330 hit rate (%) 4.81362
+
+--- pareto_rev ---
+[225] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[226] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[228] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[229] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[549] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[550] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[552] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[553] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[63] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[64] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[66] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[67] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[711] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[712] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[714] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[715] Total 3612404 Hits 53382 hit rate (%) 1.47774
+[171] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[172] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[174] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[175] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[657] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[658] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[660] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[661] Total 6666493 Hits 165137 hit rate (%) 2.47712
+[495] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[496] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[498] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[499] Total 9999817 Hits 285653 hit rate (%) 2.85658
+[10] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[12] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[13] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[9] Total 13328319 Hits 384659 hit rate (%) 2.88603
+[3] Total 16683431 Hits 550116 hit rate (%) 3.29738
+[4] Total 16683431 Hits 550116 hit rate (%) 3.29738
+[1] Total 20017848 Hits 766111 hit rate (%) 3.82714
+[0] Total 23357255 Hits 1124330 hit rate (%) 4.81362
