@@ -2194,42 +2194,51 @@ Total time (ms) : 137475
 Nodes searched  : 78424700
 Nodes/second    : 570465
 
+  C = {
+                          formerPv,
+                          givesCheck,
+                          ss->inCheck,
+                          priorCapture,
+                          moveCountPruning,
+                          ttCapture
+                  };
+                  
 --- pareto ---
 [620] Total 1809 Hits 442 hit rate (%) 24.4334 => 620 [size=6]: !c0 c1 c2 !c3 !c4 !c5
-[618] Total 1823 Hits 442 hit rate (%) 24.2457
-[614] Total 1884 Hits 455 hit rate (%) 24.1507
-[612] Total 1899 Hits 455 hit rate (%) 23.96
+[618] Total 1823 Hits 442 hit rate (%) 24.2457 => 618 [size=5]: !c0 c1 c2 !c3 !c4
+[614] Total 1884 Hits 455 hit rate (%) 24.1507 => 614 [size=5]: !c0 c1 c2 !c3 !c5
+[612] Total 1899 Hits 455 hit rate (%) 23.96   => 612 [size=4]: !c0 c1 c2 !c3
 [134] Total 1937 Hits 448 hit rate (%) 23.1285 => 134 [size=5]: c1 c2 !c3 !c4 !c5
-[602] Total 1975 Hits 454 hit rate (%) 22.9873
-[128] Total 2014 Hits 461 hit rate (%) 22.8898
-[596] Total 2054 Hits 467 hit rate (%) 22.7361
-[594] Total 2084 Hits 467 hit rate (%) 22.4088
-[116] Total 2107 Hits 460 hit rate (%) 21.832
-[110] Total 2188 Hits 473 hit rate (%) 21.6179
-[108] Total 2219 Hits 473 hit rate (%) 21.3159
-[593] Total 404474 Hits 80596 hit rate (%) 19.9261
-[591] Total 424280 Hits 84057 hit rate (%) 19.8117
-[585] Total 441986 Hits 86474 hit rate (%) 19.5649
-[575] Total 462194 Hits 88348 hit rate (%) 19.1149
-[573] Total 491360 Hits 92682 hit rate (%) 18.8623
-[567] Total 513458 Hits 95412 hit rate (%) 18.5822
-[89] Total 530073 Hits 92468 hit rate (%) 17.4444
-[83] Total 552289 Hits 95156 hit rate (%) 17.2294
-[87] Total 564189 Hits 96978 hit rate (%) 17.1889
-[81] Total 587556 Hits 99758 hit rate (%) 16.9785
-[512] Total 4984661 Hits 527084 hit rate (%) 10.5741
+[602] Total 1975 Hits 454 hit rate (%) 22.9873 => 602 [size=5]: !c0 c1 c2 !c4 !c5
+[128] Total 2014 Hits 461 hit rate (%) 22.8898 => 128 [size=4]: c1 c2 !c3 !c5
+[596] Total 2054 Hits 467 hit rate (%) 22.7361 => 596 [size=4]: !c0 c1 c2 !c5
+[594] Total 2084 Hits 467 hit rate (%) 22.4088 => 594 [size=3]: !c0 c1 c2
+[116] Total 2107 Hits 460 hit rate (%) 21.832  => 116 [size=4]: c1 c2 !c4 !c5
+[110] Total 2188 Hits 473 hit rate (%) 21.6179 => 110 [size=3]: c1 c2 !c5
+[108] Total 2219 Hits 473 hit rate (%) 21.3159 => 108 [size=2]: c1 c2
+[593] Total 404474 Hits 80596 hit rate (%) 19.9261 => 593 [size=5]: !c0 c1 !c3 !c4 !c5
+[591] Total 424280 Hits 84057 hit rate (%) 19.8117 => 591 [size=4]: !c0 c1 !c3 !c4
+[585] Total 441986 Hits 86474 hit rate (%) 19.5649 => 585 [size=3]: !c0 c1 !c3
+[575] Total 462194 Hits 88348 hit rate (%) 19.1149 => 575 [size=4]: !c0 c1 !c4 !c5
+[573] Total 491360 Hits 92682 hit rate (%) 18.8623 => 573 [size=3]: !c0 c1 !c4
+[567] Total 513458 Hits 95412 hit rate (%) 18.5822 => 567 [size=2]: !c0 c1
+[89] Total 530073 Hits 92468 hit rate (%) 17.4444  => 89 [size=3]: c1 !c4 !c5
+[83] Total 552289 Hits 95156 hit rate (%) 17.2294  => 83 [size=2]: c1 !c5
+[87] Total 564189 Hits 96978 hit rate (%) 17.1889  => 87 [size=2]: c1 !c4
+[81] Total 587556 Hits 99758 hit rate (%) 16.9785  => 81 [size=1]: c1
+[512] Total 4984661 Hits 527084 hit rate (%) 10.5741 => 512 [size=4]: !c0 !c3 !c4 !c5
 [510] Total 5298994 Hits 550322 hit rate (%) 10.3854
 [504] Total 5505639 Hits 559961 hit rate (%) 10.1707
-[26] Total 5903451 Hits 569561 hit rate (%) 9.64793
+[26] Total 5903451 Hits 569561 hit rate (%) 9.64793  => 26 [size=3]: !c3 !c4 !c5
 [494] Total 5964577 Hits 572594 hit rate (%) 9.59991
-[20] Total 6112448 Hits 579153 hit rate (%) 9.47498
+[20] Total 6112448 Hits 579153 hit rate (%) 9.47498  => 20 [size=2]: !c3 !c5
 [24] Total 6297816 Hits 594487 hit rate (%) 9.43957
 [492] Total 6442146 Hits 599443 hit rate (%) 9.30502
 [18] Total 6517787 Hits 604375 hit rate (%) 9.2727
 [486] Total 6709377 Hits 610254 hit rate (%) 9.09554
 [8] Total 6983880 Hits 617855 hit rate (%) 8.84687
-[2] Total 7249203 Hits 628562 hit rate (%) 8.67077
-[6] Total 7576024 Hits 646601 hit rate (%) 8.53483
+[2] Total 7249203 Hits 628562 hit rate (%) 8.67077   => 2 [size=1]: !c5
+[6] Total 7576024 Hits 646601 hit rate (%) 8.53483   => 6 [size=1]: !c4
 [0] Total 7859494 Hits 657675 hit rate (%) 8.36791
 
 --- pareto_rev ---
