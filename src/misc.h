@@ -44,6 +44,7 @@ void dbg_std_of(int v, int n = 0);
 void dbg_cov_of(int v, int w, int n = 0);
 void dbg_corr_of(int v, int w, int n = 0);
 void dbg_cramer_of(bool v, bool w, int n = 0);
+void dbg_chi2_of(bool v, bool w, int n = 0);
 void dbg_print();
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
