@@ -357,9 +357,12 @@ void dbg_print() {
         double dx = (d+b) * (d+c) / m;
         
         double chiQ = std::pow(a - ax, 2) / ax + std::pow(b - bx, 2) / bx + std::pow(c - cx, 2) / cx + std::pow(d - dx, 2) / dx;
+		double chiQ2 =  std::pow(a / ax - 1, 2) * ax + std::pow(b / bx - 1, 2) * bx 
+		              + std::pow(c / cx - 1, 2) * cx + std::pow(d / dx - 1, 2) * dx;
 		double p = 0.5 * std::pow(10, -chiQ/3.84);
 
-        double chi2q = 3.84; // ChiSquare(0.95, 1) qunatile
+        //double chi2q = 3.84; // ChiSquare(0.95, 1) qunatile
+		double chi2q = 6.63; // ChiSquare(0.99, 1) qunatile
         
         cerr << "[" << n << "] Total " << chi2[n][0] << " ChiSquare(x,y) = "
              //<< cramer[n][1] << " "
@@ -367,6 +370,7 @@ void dbg_print() {
              //<< cramer[n][3] << " "
              //<< cramer[n][4] << " "
              << chiQ
+			 << " " << chiQ2
 			 << " p=" << p;
 		
         if (chiQ > chi2q)

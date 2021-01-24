@@ -1490,6 +1490,7 @@ moves_loop: // When in check, search starts from here
 				}
 				dbg_hit_on(c, T, index);
 				dbg_cramer_of(c, T, index);
+				dbg_chi2_of(c, T, index);
 				
 				--i;
 				s[i]++;
