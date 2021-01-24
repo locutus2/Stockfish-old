@@ -267,7 +267,8 @@ const std::string compiler_info() {
 
 
 /// Debug functions used mainly to collect run-time statistics
-static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], cramer[DBG_N][5];
+static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], cramer[DBG_N][5],
+                            chi2[DBG_N][5];
 
 void dbg_hit_on(bool b, int n) { ++hits[n][0]; if (b) ++hits[n][1]; }
 void dbg_hit_on(bool c, bool b, int n) { if (c) dbg_hit_on(b, n); }
@@ -276,6 +277,7 @@ void dbg_std_of(int v, int n) { ++stds[n][0]; stds[n][1] += v; stds[n][2] += v *
 void dbg_cov_of(int v, int w, int n) { ++covs[n][0]; covs[n][1] += v; covs[n][2] += w; covs[n][3] += v*v; covs[n][4] += w*w; covs[n][5] += v*w;}
 void dbg_corr_of(int v, int w, int n) { ++corrs[n][0]; corrs[n][1] += v; corrs[n][2] += w; corrs[n][3] += v*v; corrs[n][4] += w*w; corrs[n][5] += v*w;}
 void dbg_cramer_of(bool v, bool w, int n) { ++cramer[n][0]; ++cramer[n][2*v+w+1];}
+void dbg_chi2_of(bool v, bool w, int n) { ++chi2[n][0]; ++chi2[n][2*v+w+1];}
 
 void dbg_print() {
 
@@ -329,7 +331,7 @@ void dbg_print() {
         double b = cramer[n][2];
         double c = cramer[n][3];
         double d = cramer[n][4];
-        double cr = (a*d-b*c)/std::sqrt((a+b)*(c+d)*(a+c)*(b+d));
+		double cr = (a*d-b*c)/std::sqrt((a+b)*(c+d)*(a+c)*(b+d));
         double ce = 100.*(cramer[n][2]+cramer[n][3])/(double)cramer[n][0];
         cerr << "[" << n << "] Total " << cramer[n][0] << " CramersV(x,y) = "
              //<< cramer[n][1] << " "
@@ -338,6 +340,38 @@ void dbg_print() {
              //<< cramer[n][4] << " "
              << cr
              << " error% =" << ce << endl;
+    }
+	
+  for(int n = 0; n < DBG_N; ++n)
+    if (chi2[n][0])
+    {
+		double m = chi2[n][0];
+        double a = chi2[n][1];
+        double b = chi2[n][2];
+        double c = chi2[n][3];
+        double d = chi2[n][4];
+		double ax = (a+b) * (a+c) / m;
+        double bx = (a+b) * (b+d) / m;
+        double cx = (a+c) * (d+c) / m;
+        double dx = (d+b) * (d+c) / m;
+        
+        double chiQ = std::pow(a - ax, 2) / ax + std::pow(b - bx, 2) / bx + std::pow(c - cx, 2) / cx + std::pow(d - dx, 2) / dx;
+		double p = 0.5 * std::pow(10, -chiQ/3.84);
+
+        double chi2q = 3.84; // ChiSquare(0.95, 1) qunatile
+        
+        cerr << "[" << n << "] Total " << chi2[n][0] << " ChiSquare(x,y) = "
+             //<< cramer[n][1] << " "
+             //<< cramer[n][2] << " "
+             //<< cramer[n][3] << " "
+             //<< cramer[n][4] << " "
+             << chiQ
+			 << " p=" << p;
+		
+        if (chiQ > chi2q)
+			cerr <<  " => H0 rejected" << endl;
+		else			
+			cerr <<  " => H0 accepted" << endl;
     }
 }
 
