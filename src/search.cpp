@@ -1717,7 +1717,7 @@ moves_loop: // When in check, search starts from here
     if (!pos.capture_or_promotion(bestMove))
     {
         // Increase stats for the best move in case it was a quiet move
-        bonus3 = bonus2 * (2 * quietCount + 24) / (quietCount + 24);
+        bonus3 = bonus2 * (3 * quietCount + 8) / (2 * quietCount + 8);
         update_quiet_stats(pos, ss, bestMove, bonus3, depth);
 
         // Decrease stats for all non-best quiet moves
