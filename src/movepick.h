@@ -34,10 +34,14 @@
 template<typename T, int D>
 class StatsEntry {
 
+  const int SMOOTHING = 16;
+
   T entry;
+  T _stability;
 
 public:
-  void operator=(const T& v) { entry = v; }
+  void operator=(const T& v) { entry = v; _stability = T(0); }
+  T stability() const { return _stability; }
   T* operator&() { return &entry; }
   T* operator->() { return &entry; }
   operator const T&() const { return entry; }
@@ -46,7 +50,13 @@ public:
     assert(abs(bonus) <= D); // Ensure range is [-D, D]
     static_assert(D <= std::numeric_limits<T>::max(), "D overflows T");
 
+    int e = entry;
+
     entry += bonus - entry * abs(bonus) / D;
+
+    //_stability = ((SMOOTHIN - 1) * _stability + entry - e) / SMOOTHING;
+    _stability += ((int)entry - e - _stability) / SMOOTHING;
+    dbg_mean_of(_stability);
 
     assert(abs(entry) <= D);
   }
