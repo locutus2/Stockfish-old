@@ -1341,7 +1341,7 @@ moves_loop: // When in check, search starts from here
                   alpha = value;
 
                   if (!captureOrPromotion)
-                      update_continuation_histories(ss, movedPiece, to_sq(move), stat_bonus(depth));
+                      update_continuation_histories(ss, movedPiece, to_sq(move), stat_bonus(depth) / 2);
               }
               else
               {
