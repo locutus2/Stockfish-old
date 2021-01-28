@@ -1337,7 +1337,12 @@ moves_loop: // When in check, search starts from here
                   update_pv(ss->pv, move, (ss+1)->pv);
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
+              {
                   alpha = value;
+
+                  if (!captureOrPromotion)
+                      update_continuation_histories(ss, movedPiece, to_sq(move), stat_bonus(depth));
+              }
               else
               {
                   assert(value >= beta); // Fail high
