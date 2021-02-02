@@ -992,7 +992,7 @@ moves_loop: // When in check, search starts from here
 
     // Step 11. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
-    while ((move = mp.next_move(moveCountPruning && (ss->ttPv || quietCount > 0))) != MOVE_NONE)
+    while ((move = mp.next_move(moveCountPruning && (formerPv || !cutNode || priorCapture || ttCapture))) != MOVE_NONE)
     {
       assert(is_ok(move));
 
