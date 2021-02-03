@@ -1098,11 +1098,13 @@ moves_loop: // When in check, search starts from here
           value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
           ss->excludedMove = MOVE_NONE;
 
-          if (   value < singularBeta
-              && (!formerPv || givesCheck || cutNode || !priorCapture || ttCapture))
+          if (value < singularBeta)
           {
-              extension = 1;
-              singularQuietLMR = !ttCapture;
+              if (!formerPv || givesCheck || cutNode || !priorCapture || ttCapture)
+              {
+                  extension = 1;
+                  singularQuietLMR = !ttCapture;
+              }
           }
 
           // Multi-cut pruning
