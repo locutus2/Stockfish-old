@@ -784,8 +784,8 @@ namespace {
         improving = false;
         ss->staticEval = eval = VALUE_NONE;
 
-        if (!(ss-1)->inCheck)
-            ss->staticEval = -(ss-1)->staticEval;
+        if (!(ss-2)->inCheck)
+            ss->staticEval = (ss-2)->staticEval;
 
         goto moves_loop;
     }
