@@ -1101,7 +1101,7 @@ moves_loop: // When in check, search starts from here
           if (value < singularBeta)
           {
               extension = 1;
-              singularQuietLMR = !ttCapture || !cutNode;
+              singularQuietLMR = !ttCapture && !cutNode;
           }
 
           // Multi-cut pruning
