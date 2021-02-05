@@ -1242,7 +1242,7 @@ moves_loop: // When in check, search starts from here
                   r -= ss->statScore / 14884;
           }
 
-          if (thisThread->rootDepth > 10 * (newDepth + ss->ply - r))
+          if (thisThread->rootDepth > 9 * (newDepth + ss->ply - r))
               r--;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
