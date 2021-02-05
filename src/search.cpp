@@ -829,6 +829,10 @@ namespace {
                ? ss->staticEval > (ss-4)->staticEval || (ss-4)->staticEval == VALUE_NONE
                : ss->staticEval > (ss-2)->staticEval;
 
+    // Skip pruning if in singular search
+    if (excludedMove)
+        goto moves_loop;
+
     // Step 7. Futility pruning: child node (~50 Elo)
     if (   !PvNode
         &&  depth < 9
@@ -843,7 +847,6 @@ namespace {
         &&  eval >= beta
         &&  eval >= ss->staticEval
         &&  ss->staticEval >= beta - 30 * depth - 28 * improving + 84 * ss->ttPv + 168
-        && !excludedMove
         &&  pos.non_pawn_material(us)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
