@@ -781,7 +781,7 @@ namespace {
     if (ss->inCheck)
     {
         // Skip early pruning when in check
-        ss->staticEval = eval = -(ss-1)->staticEval;
+        ss->staticEval = eval = -(ss-1)->staticEval - PieceValue[MG][pos.captured_piece()];
 
         if (ss->ttHit)
         {
