@@ -781,7 +781,7 @@ namespace {
     if (ss->inCheck)
     {
         // Skip early pruning when in check
-        ss->staticEval = eval = -(ss-1)->staticEval - PieceValue[MG][pos.captured_piece()];
+        ss->staticEval = eval = Eval::useNNUE ? evaluate(pos, true) : VALUE_NONE;
         improving = false;
         goto moves_loop;
     }
