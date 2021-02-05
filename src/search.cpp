@@ -1192,9 +1192,6 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
-          if (thisThread->rootDepth > 3 * (depth + ss->ply))
-              r--;
-
           if (captureOrPromotion)
           {
               // Unless giving check, this capture is likely bad
@@ -1244,6 +1241,9 @@ moves_loop: // When in check, search starts from here
               else
                   r -= ss->statScore / 14884;
           }
+
+          if (thisThread->rootDepth > 10 * (newDepth + ss->ply - r))
+              r--;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
