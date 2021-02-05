@@ -782,23 +782,6 @@ namespace {
     {
         // Skip early pruning when in check
         ss->staticEval = eval = -(ss-1)->staticEval - PieceValue[MG][pos.captured_piece()];
-
-        if (ss->ttHit)
-        {
-            // Never assume anything about values stored in TT
-            if (tte->eval() != VALUE_NONE)
-                ss->staticEval = eval = tte->eval();
-
-            // Randomize draw evaluation
-            if (eval == VALUE_DRAW)
-                eval = value_draw(thisThread);
-
-            // Can ttValue be used as a better position evaluation?
-            if (    ttValue != VALUE_NONE
-                && (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER)))
-                eval = ttValue;
-        }
-
         improving = false;
         goto moves_loop;
     }
