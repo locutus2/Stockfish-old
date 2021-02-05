@@ -1192,7 +1192,7 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
-          if (thisThread->rootDepth - depth - ss->ply > 8)
+          if (thisThread->rootDepth - depth - ss->ply > 7)
               r--;
 
           if (captureOrPromotion)
