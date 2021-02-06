@@ -1243,7 +1243,7 @@ moves_loop: // When in check, search starts from here
           }
 
           // Increase reduction of already many reductions are done from root to current node
-          if (thisThread->rootDepth > 2 * (newDepth + ss->ply - r))
+          if (thisThread->rootDepth > 4 * (newDepth + ss->ply - r))
               r++;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
