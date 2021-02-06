@@ -1198,10 +1198,6 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
-
-              // Decrease reduction of already many reductions are done from root to current node
-              if (thisThread->rootDepth > 6 * (newDepth + ss->ply - r))
-                 r--;
           }
           else
           {
@@ -1245,6 +1241,10 @@ moves_loop: // When in check, search starts from here
               else
                   r -= ss->statScore / 14884;
           }
+
+          // Decrease reduction of already many reductions are done from root to current node
+          if (cutNode && thisThread->rootDepth > 6 * (newDepth + ss->ply - r))
+              r--;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
