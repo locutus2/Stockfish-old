@@ -1240,11 +1240,11 @@ moves_loop: // When in check, search starts from here
                      + (*contHist[0])[movedPiece][to_sq(move)] - 4333) / 16384;
               else
                   r -= ss->statScore / 14884;
-
-              // Decrease reduction of already many reductions are done from root to current node
-              if (thisThread->rootDepth > 6 * (newDepth + ss->ply - r))
-                  r--;
           }
+
+          // Increase reduction of already many reductions are done from root to current node
+          if (thisThread->rootDepth > 2 * (newDepth + ss->ply - r))
+              r++;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
