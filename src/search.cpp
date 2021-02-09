@@ -970,8 +970,8 @@ namespace {
 moves_loop: // When in check, search starts from here
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
-                                          nullptr                   , (ss-4)->continuationHistory,
-                                          nullptr                   , (ss-6)->continuationHistory };
+                                          (ss-3)->continuationHistory                   , (ss-4)->continuationHistory,
+                                          (ss-5)->continuationHistory                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
@@ -1244,7 +1244,8 @@ int V = 0;
                   r -= ss->statScore / 14382;
 			  
 			  CC = true;
-			  C = (ss-1)->moveCount == 0 && (ss-1)->currentMove != MOVE_NULL;
+			  C = (*contHist[0])[movedPiece][from_sq(move)] > 0;
+			  dbg_mean_of((*contHist[0])[movedPiece][from_sq(move)], 1000);
 			  V = ss->statScore;
           }
 
