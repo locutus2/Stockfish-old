@@ -1244,7 +1244,7 @@ int V = 0;
                   r -= ss->statScore / 14382;
 			  
 			  CC = true;
-			  C = ss->inCheck;
+			  C = (ss-1)->moveCount == 0 && (ss-1)->currentMove != MOVE_NULL;
 			  V = ss->statScore;
           }
 
