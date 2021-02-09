@@ -1151,6 +1151,8 @@ moves_loop: // When in check, search starts from here
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
 
+bool CC = false, C = false;
+int V = 0;
       // Step 15. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1240,6 +1242,10 @@ moves_loop: // When in check, search starts from here
                      + (*contHist[0])[movedPiece][to_sq(move)] - 4341) / 16384;
               else
                   r -= ss->statScore / 14382;
+			  
+			  CC = true;
+			  C = ss->inCheck;
+			  V = ss->statScore;
           }
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
@@ -1324,6 +1330,16 @@ moves_loop: // When in check, search starts from here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
+	  
+	  if(CC)
+	  {
+		  bool T = value > alpha;
+		  dbg_hit_on(T, 0);
+		  dbg_hit_on(T, 10+C);
+		  
+		  dbg_mean_of(V, 0);
+		  dbg_mean_of(V, 10+C);
+	  }
 
       if (value > bestValue)
       {
