@@ -1242,7 +1242,7 @@ moves_loop: // When in check, search starts from here
                   r -= ss->statScore / 14382;
           }
 
-          Depth d = std::clamp(newDepth - r, Depth(!givesCheck), newDepth);
+          Depth d = std::clamp(newDepth - r, Depth(!captureOrPromotion), newDepth);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
