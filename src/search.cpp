@@ -987,6 +987,14 @@ moves_loop: // When in check, search starts from here
     singularQuietLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
+    // Indicate PvNodes that will probably fail low if node was searched with non-PV search 
+    // at depth equal or greater to current depth and result of this search was far below alpha
+    bool likelyFailLow =   PvNode
+                        && ttMove
+                        && (tte->bound() & BOUND_UPPER)
+                        && ttValue < alpha + 200 + 100 * depth
+                        && tte->depth() >= depth;
+
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
 
@@ -1024,14 +1032,6 @@ moves_loop: // When in check, search starts from here
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
-
-      // Indicate PvNodes that will probably fail low if node was searched with non-PV search 
-      // at depth equal or greater to current depth and result of this search was far below alpha
-      bool likelyFailLow =    PvNode 
-                           && ttMove 
-                           && (tte->bound() & BOUND_UPPER) 
-                           && ttValue < alpha + 200 + 100 * depth 
-                           && tte->depth() >= depth;
 
       // Calculate new depth for this move
       newDepth = depth - 1;
