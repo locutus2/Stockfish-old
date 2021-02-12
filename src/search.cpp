@@ -987,10 +987,9 @@ moves_loop: // When in check, search starts from here
     singularQuietLMR = moveCountPruning = false;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
-    // Indicate PvNodes that will probably fail low if node was searched with non-PV search 
+    // Indicate PvNodes that will probably fail low if node was searched with non-PV search
     // at depth equal or greater to current depth and result of this search was far below alpha
-    bool likelyFailLow =   PvNode
-                        && ttMove
+    bool likelyFailLow =   ttMove
                         && (tte->bound() & BOUND_UPPER)
                         && ttValue < alpha + 200 + 100 * depth
                         && tte->depth() >= depth;
