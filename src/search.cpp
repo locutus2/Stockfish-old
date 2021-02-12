@@ -1253,8 +1253,9 @@ int V = 0;
                   r -= ss->statScore / 14382;
 			  
 			  CC = true;
-			  C = (*contHist[0])[movedPiece][from_sq(move)] > 0;
-			  dbg_mean_of((*contHist[0])[movedPiece][from_sq(move)], 1000);
+			  //C = (*contHist[0])[movedPiece][from_sq(move)] > 0;
+			  C = givesCheck && improving;
+			  //dbg_mean_of((*contHist[0])[movedPiece][from_sq(move)], 1000);
 			  V = ss->statScore;
           }
 
