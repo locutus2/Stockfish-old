@@ -1027,8 +1027,9 @@ moves_loop: // When in check, search starts from here
 
       // Indicate PvNodes that will probably fail low if node was searched with non-PV search 
       // at depth equal or greater to current depth and result of this search was far below alpha
-      bool likelyFailLow =    PvNode 
-                           && ss->ttHit
+      bool likelyFailLow =    PvNode
+                           && ttMove
+                           && !ss->inCheck
                            && (tte->bound() & BOUND_UPPER) 
                            && ttValue < alpha + 200 + 100 * depth 
                            && tte->depth() >= depth;
