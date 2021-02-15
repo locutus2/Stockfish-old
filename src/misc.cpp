@@ -283,8 +283,16 @@ void dbg_print() {
 
   for(int n = 0; n < DBG_N; ++n)
     if (hits[n][0])
+	{
+		int size = 0;
+		int x = n;
+		while(x) {
+			if(x%3) ++size;
+			x /= 3;
+		}
         cerr << "[" << n << "] Total " << hits[n][0] << " Hits " << hits[n][1]
-             << " hit rate (%) " << 100. * hits[n][1] / hits[n][0] << endl;
+             << " hit rate (%) " << 100. * hits[n][1] / hits[n][0] << " size " << size << endl;
+	}
 
   for(int n = 0; n < DBG_N; ++n)
     if (means[n][0])

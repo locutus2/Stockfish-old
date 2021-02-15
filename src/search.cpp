@@ -653,6 +653,9 @@ namespace {
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
+	
+	bool CC = false, P = false;
+    std::vector<bool> C(NC, false);
 
     // Initialize statScore to zero for the grandchildren of the current position.
     // So statScore is shared between all grandchildren and only the first grandchild
@@ -849,6 +852,9 @@ namespace {
     {
         assert(eval - beta >= 0);
 
+        CC = true;
+		C = {cutNode, improving, formerPv, ss->ttHit, (ss-1)->inCheck, ttMove != MOVE_NONE};
+		
         // Null move dynamic reduction based on depth and value
         Depth R = (1062 + 68 * depth) / 256 + std::min(int(eval - beta) / 190, 3);
 
@@ -868,7 +874,13 @@ namespace {
                 nullValue = beta;
 
             if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14))
-                return nullValue;
+			{
+				if (!CC) return nullValue;
+				P = true;
+			}
+            else{
+				
+			
 
             assert(!thisThread->nmpMinPly); // Recursive verification is not allowed
 
@@ -882,8 +894,11 @@ namespace {
             thisThread->nmpMinPly = 0;
 
             if (v >= beta)
-                return nullValue;
+				P = true;
+                if(!CC) return nullValue;
+			}
         }
+		CC = P;
     }
 
     probCutBeta = beta + 209 - 44 * improving;
@@ -1159,8 +1174,6 @@ moves_loop: // When in check, search starts from here
       // Step 14. Make the move
       pos.do_move(move, st, givesCheck);
 
-      bool CC = false;
-      std::vector<bool> C(NC, false);
       // Step 15. Reduced depth search (LMR, ~200 Elo). If the move fails high it will be
       // re-searched at full depth.
       if (    depth >= 3
@@ -1358,6 +1371,7 @@ moves_loop: // When in check, search starts from here
                         (*contHist[0])[movedPiece][to_sq(move)] < 6951
 	  };
 	  */
+	  /*
 	  CC = !PvNode && !cutNode;
 	  C = {
 			  formerPv,
@@ -1367,6 +1381,7 @@ moves_loop: // When in check, search starts from here
 			  moveCountPruning,
 			  ttCapture
 		  };
+		  */
 
           Depth d = std::clamp(newDepth - r, 1, newDepth);
 
@@ -1451,7 +1466,7 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
-	  if(CC)
+	  if(false && CC)
 	  {
 		  int N = (int)C.size();
 		  bool T = value > alpha;
@@ -1578,6 +1593,56 @@ moves_loop: // When in check, search starts from here
     else if (   (depth >= 3 || PvNode)
              && !priorCapture)
         update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
+
+    if(CC)
+	  {
+		  int N = (int)C.size();
+		  bool T = !P || bestValue >= beta;
+		    
+		  assert(N == NC);
+		  if(N != NC) std::exit(-1);
+		  
+		  constexpr int LOOP_START = 0;
+		  constexpr int LOOP_END = 2;
+		  std::vector s(N, LOOP_START);
+		  int i = 0;
+		  while(i >= 0)
+		  {
+			if (i >= N) // innerst loop
+			{
+				int index = 0;
+				bool c = true;
+				for(int j = 0; c && j < N; ++j)
+				{
+					index = index * 3 + s[j];
+					if(s[j] == 1)
+					{
+						c = c && C[j];
+					}
+					else if(s[j] == 2)
+					{
+						c = c && !C[j];
+					}
+				}
+				dbg_hit_on(c, T, index);
+				//dbg_cramer_of(c, T, index);
+				dbg_chi2_of(c, T, index);
+				
+				--i;
+				s[i]++;
+			}				
+			else if(s[i] > LOOP_END) // loop end
+			{
+			    --i;
+                		if(i >= 0) s[i]++;				
+			}			
+			else //if (i < N) // iterate loop
+			{
+				i++;
+				if(i<N) s[i] = LOOP_START;
+			}			
+		  }
+	  }
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
