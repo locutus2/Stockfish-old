@@ -853,7 +853,7 @@ namespace {
         assert(eval - beta >= 0);
 
         CC = true;
-		C = {cutNode, improving, formerPv, ss->ttHit, (ss-1)->inCheck, ttMove != MOVE_NONE};
+		C = {cutNode, improving, formerPv, priorCapture, (ss-1)->moveCount > 1, ttMove != MOVE_NONE};
 		
         // Null move dynamic reduction based on depth and value
         Depth R = (1062 + 68 * depth) / 256 + std::min(int(eval - beta) / 190, 3);
