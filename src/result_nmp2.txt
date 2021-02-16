@@ -1,0 +1,1784 @@
+relax eval >= ss->staticEval
+CC = !(eval >= ss->staticEval);
+		C = {cutNode, improving, formerPv, ss->ttHit, (ss-1)->inCheck, ttMove != MOVE_NONE};
+
+[0] Total 37821 Hits 19760 hit rate (%) 52.2461 size 0
+[1] Total 6932 Hits 4229 hit rate (%) 61.0069 size 1
+[2] Total 30889 Hits 15531 hit rate (%) 50.28 size 1
+[3] Total 3988 Hits 2017 hit rate (%) 50.5767 size 1
+[4] Total 740 Hits 462 hit rate (%) 62.4324 size 2
+[5] Total 3248 Hits 1555 hit rate (%) 47.8756 size 2
+[6] Total 33833 Hits 17743 hit rate (%) 52.4429 size 1
+[7] Total 6192 Hits 3767 hit rate (%) 60.8366 size 2
+[8] Total 27641 Hits 13976 hit rate (%) 50.5626 size 2
+[9] Total 37821 Hits 19760 hit rate (%) 52.2461 size 1
+[10] Total 6932 Hits 4229 hit rate (%) 61.0069 size 2
+[11] Total 30889 Hits 15531 hit rate (%) 50.28 size 2
+[12] Total 3988 Hits 2017 hit rate (%) 50.5767 size 2
+[13] Total 740 Hits 462 hit rate (%) 62.4324 size 3
+[14] Total 3248 Hits 1555 hit rate (%) 47.8756 size 3
+[15] Total 33833 Hits 17743 hit rate (%) 52.4429 size 2
+[16] Total 6192 Hits 3767 hit rate (%) 60.8366 size 3
+[17] Total 27641 Hits 13976 hit rate (%) 50.5626 size 3
+[27] Total 3969 Hits 2160 hit rate (%) 54.4218 size 1
+[28] Total 2629 Hits 1600 hit rate (%) 60.8596 size 2
+[29] Total 1340 Hits 560 hit rate (%) 41.791 size 2
+[30] Total 430 Hits 236 hit rate (%) 54.8837 size 2
+[31] Total 276 Hits 172 hit rate (%) 62.3188 size 3
+[32] Total 154 Hits 64 hit rate (%) 41.5584 size 3
+[33] Total 3539 Hits 1924 hit rate (%) 54.3656 size 2
+[34] Total 2353 Hits 1428 hit rate (%) 60.6885 size 3
+[35] Total 1186 Hits 496 hit rate (%) 41.8212 size 3
+[36] Total 3969 Hits 2160 hit rate (%) 54.4218 size 2
+[37] Total 2629 Hits 1600 hit rate (%) 60.8596 size 3
+[38] Total 1340 Hits 560 hit rate (%) 41.791 size 3
+[39] Total 430 Hits 236 hit rate (%) 54.8837 size 3
+[40] Total 276 Hits 172 hit rate (%) 62.3188 size 4
+[41] Total 154 Hits 64 hit rate (%) 41.5584 size 4
+[42] Total 3539 Hits 1924 hit rate (%) 54.3656 size 3
+[43] Total 2353 Hits 1428 hit rate (%) 60.6885 size 4
+[44] Total 1186 Hits 496 hit rate (%) 41.8212 size 4
+[54] Total 33852 Hits 17600 hit rate (%) 51.991 size 1
+[55] Total 4303 Hits 2629 hit rate (%) 61.0969 size 2
+[56] Total 29549 Hits 14971 hit rate (%) 50.665 size 2
+[57] Total 3558 Hits 1781 hit rate (%) 50.0562 size 2
+[58] Total 464 Hits 290 hit rate (%) 62.5 size 3
+[59] Total 3094 Hits 1491 hit rate (%) 48.19 size 3
+[60] Total 30294 Hits 15819 hit rate (%) 52.2183 size 2
+[61] Total 3839 Hits 2339 hit rate (%) 60.9273 size 3
+[62] Total 26455 Hits 13480 hit rate (%) 50.9545 size 3
+[63] Total 33852 Hits 17600 hit rate (%) 51.991 size 2
+[64] Total 4303 Hits 2629 hit rate (%) 61.0969 size 3
+[65] Total 29549 Hits 14971 hit rate (%) 50.665 size 3
+[66] Total 3558 Hits 1781 hit rate (%) 50.0562 size 3
+[67] Total 464 Hits 290 hit rate (%) 62.5 size 4
+[68] Total 3094 Hits 1491 hit rate (%) 48.19 size 4
+[69] Total 30294 Hits 15819 hit rate (%) 52.2183 size 3
+[70] Total 3839 Hits 2339 hit rate (%) 60.9273 size 4
+[71] Total 26455 Hits 13480 hit rate (%) 50.9545 size 4
+[81] Total 21700 Hits 12393 hit rate (%) 57.1106 size 1
+[82] Total 3996 Hits 2576 hit rate (%) 64.4645 size 2
+[83] Total 17704 Hits 9817 hit rate (%) 55.4507 size 2
+[84] Total 2530 Hits 1346 hit rate (%) 53.2016 size 2
+[85] Total 475 Hits 307 hit rate (%) 64.6316 size 3
+[86] Total 2055 Hits 1039 hit rate (%) 50.5596 size 3
+[87] Total 19170 Hits 11047 hit rate (%) 57.6265 size 2
+[88] Total 3521 Hits 2269 hit rate (%) 64.4419 size 3
+[89] Total 15649 Hits 8778 hit rate (%) 56.093 size 3
+[90] Total 21700 Hits 12393 hit rate (%) 57.1106 size 2
+[91] Total 3996 Hits 2576 hit rate (%) 64.4645 size 3
+[92] Total 17704 Hits 9817 hit rate (%) 55.4507 size 3
+[93] Total 2530 Hits 1346 hit rate (%) 53.2016 size 3
+[94] Total 475 Hits 307 hit rate (%) 64.6316 size 4
+[95] Total 2055 Hits 1039 hit rate (%) 50.5596 size 4
+[96] Total 19170 Hits 11047 hit rate (%) 57.6265 size 3
+[97] Total 3521 Hits 2269 hit rate (%) 64.4419 size 4
+[98] Total 15649 Hits 8778 hit rate (%) 56.093 size 4
+[108] Total 2648 Hits 1486 hit rate (%) 56.1178 size 2
+[109] Total 1703 Hits 1075 hit rate (%) 63.1239 size 3
+[110] Total 945 Hits 411 hit rate (%) 43.4921 size 3
+[111] Total 302 Hits 170 hit rate (%) 56.2914 size 3
+[112] Total 188 Hits 120 hit rate (%) 63.8298 size 4
+[113] Total 114 Hits 50 hit rate (%) 43.8596 size 4
+[114] Total 2346 Hits 1316 hit rate (%) 56.0955 size 3
+[115] Total 1515 Hits 955 hit rate (%) 63.0363 size 4
+[116] Total 831 Hits 361 hit rate (%) 43.4416 size 4
+[117] Total 2648 Hits 1486 hit rate (%) 56.1178 size 3
+[118] Total 1703 Hits 1075 hit rate (%) 63.1239 size 4
+[119] Total 945 Hits 411 hit rate (%) 43.4921 size 4
+[120] Total 302 Hits 170 hit rate (%) 56.2914 size 4
+[121] Total 188 Hits 120 hit rate (%) 63.8298 size 5
+[122] Total 114 Hits 50 hit rate (%) 43.8596 size 5
+[123] Total 2346 Hits 1316 hit rate (%) 56.0955 size 4
+[124] Total 1515 Hits 955 hit rate (%) 63.0363 size 5
+[125] Total 831 Hits 361 hit rate (%) 43.4416 size 5
+[135] Total 19052 Hits 10907 hit rate (%) 57.2486 size 2
+[136] Total 2293 Hits 1501 hit rate (%) 65.4601 size 3
+[137] Total 16759 Hits 9406 hit rate (%) 56.1251 size 3
+[138] Total 2228 Hits 1176 hit rate (%) 52.7828 size 3
+[139] Total 287 Hits 187 hit rate (%) 65.1568 size 4
+[140] Total 1941 Hits 989 hit rate (%) 50.9531 size 4
+[141] Total 16824 Hits 9731 hit rate (%) 57.84 size 3
+[142] Total 2006 Hits 1314 hit rate (%) 65.5035 size 4
+[143] Total 14818 Hits 8417 hit rate (%) 56.8025 size 4
+[144] Total 19052 Hits 10907 hit rate (%) 57.2486 size 3
+[145] Total 2293 Hits 1501 hit rate (%) 65.4601 size 4
+[146] Total 16759 Hits 9406 hit rate (%) 56.1251 size 4
+[147] Total 2228 Hits 1176 hit rate (%) 52.7828 size 4
+[148] Total 287 Hits 187 hit rate (%) 65.1568 size 5
+[149] Total 1941 Hits 989 hit rate (%) 50.9531 size 5
+[150] Total 16824 Hits 9731 hit rate (%) 57.84 size 4
+[151] Total 2006 Hits 1314 hit rate (%) 65.5035 size 5
+[152] Total 14818 Hits 8417 hit rate (%) 56.8025 size 5
+[162] Total 16121 Hits 7367 hit rate (%) 45.6982 size 1
+[163] Total 2936 Hits 1653 hit rate (%) 56.3011 size 2
+[164] Total 13185 Hits 5714 hit rate (%) 43.3371 size 2
+[165] Total 1458 Hits 671 hit rate (%) 46.0219 size 2
+[166] Total 265 Hits 155 hit rate (%) 58.4906 size 3
+[167] Total 1193 Hits 516 hit rate (%) 43.2523 size 3
+[168] Total 14663 Hits 6696 hit rate (%) 45.666 size 2
+[169] Total 2671 Hits 1498 hit rate (%) 56.0839 size 3
+[170] Total 11992 Hits 5198 hit rate (%) 43.3456 size 3
+[171] Total 16121 Hits 7367 hit rate (%) 45.6982 size 2
+[172] Total 2936 Hits 1653 hit rate (%) 56.3011 size 3
+[173] Total 13185 Hits 5714 hit rate (%) 43.3371 size 3
+[174] Total 1458 Hits 671 hit rate (%) 46.0219 size 3
+[175] Total 265 Hits 155 hit rate (%) 58.4906 size 4
+[176] Total 1193 Hits 516 hit rate (%) 43.2523 size 4
+[177] Total 14663 Hits 6696 hit rate (%) 45.666 size 3
+[178] Total 2671 Hits 1498 hit rate (%) 56.0839 size 4
+[179] Total 11992 Hits 5198 hit rate (%) 43.3456 size 4
+[189] Total 1321 Hits 674 hit rate (%) 51.022 size 2
+[190] Total 926 Hits 525 hit rate (%) 56.6955 size 3
+[191] Total 395 Hits 149 hit rate (%) 37.7215 size 3
+[192] Total 128 Hits 66 hit rate (%) 51.5625 size 3
+[193] Total 88 Hits 52 hit rate (%) 59.0909 size 4
+[194] Total 40 Hits 14 hit rate (%) 35 size 4
+[195] Total 1193 Hits 608 hit rate (%) 50.964 size 3
+[196] Total 838 Hits 473 hit rate (%) 56.4439 size 4
+[197] Total 355 Hits 135 hit rate (%) 38.0282 size 4
+[198] Total 1321 Hits 674 hit rate (%) 51.022 size 3
+[199] Total 926 Hits 525 hit rate (%) 56.6955 size 4
+[200] Total 395 Hits 149 hit rate (%) 37.7215 size 4
+[201] Total 128 Hits 66 hit rate (%) 51.5625 size 4
+[202] Total 88 Hits 52 hit rate (%) 59.0909 size 5
+[203] Total 40 Hits 14 hit rate (%) 35 size 5
+[204] Total 1193 Hits 608 hit rate (%) 50.964 size 4
+[205] Total 838 Hits 473 hit rate (%) 56.4439 size 5
+[206] Total 355 Hits 135 hit rate (%) 38.0282 size 5
+[216] Total 14800 Hits 6693 hit rate (%) 45.223 size 2
+[217] Total 2010 Hits 1128 hit rate (%) 56.1194 size 3
+[218] Total 12790 Hits 5565 hit rate (%) 43.5106 size 3
+[219] Total 1330 Hits 605 hit rate (%) 45.4887 size 3
+[220] Total 177 Hits 103 hit rate (%) 58.1921 size 4
+[221] Total 1153 Hits 502 hit rate (%) 43.5386 size 4
+[222] Total 13470 Hits 6088 hit rate (%) 45.1967 size 3
+[223] Total 1833 Hits 1025 hit rate (%) 55.9193 size 4
+[224] Total 11637 Hits 5063 hit rate (%) 43.5078 size 4
+[225] Total 14800 Hits 6693 hit rate (%) 45.223 size 3
+[226] Total 2010 Hits 1128 hit rate (%) 56.1194 size 4
+[227] Total 12790 Hits 5565 hit rate (%) 43.5106 size 4
+[228] Total 1330 Hits 605 hit rate (%) 45.4887 size 4
+[229] Total 177 Hits 103 hit rate (%) 58.1921 size 5
+[230] Total 1153 Hits 502 hit rate (%) 43.5386 size 5
+[231] Total 13470 Hits 6088 hit rate (%) 45.1967 size 4
+[232] Total 1833 Hits 1025 hit rate (%) 55.9193 size 5
+[233] Total 11637 Hits 5063 hit rate (%) 43.5078 size 5
+[243] Total 10391 Hits 8021 hit rate (%) 77.1918 size 1
+[244] Total 2433 Hits 1959 hit rate (%) 80.5179 size 2
+[245] Total 7958 Hits 6062 hit rate (%) 76.1749 size 2
+[246] Total 1087 Hits 764 hit rate (%) 70.2852 size 2
+[247] Total 244 Hits 196 hit rate (%) 80.3279 size 3
+[248] Total 843 Hits 568 hit rate (%) 67.3784 size 3
+[249] Total 9304 Hits 7257 hit rate (%) 77.9987 size 2
+[250] Total 2189 Hits 1763 hit rate (%) 80.5391 size 3
+[251] Total 7115 Hits 5494 hit rate (%) 77.2171 size 3
+[252] Total 10391 Hits 8021 hit rate (%) 77.1918 size 2
+[253] Total 2433 Hits 1959 hit rate (%) 80.5179 size 3
+[254] Total 7958 Hits 6062 hit rate (%) 76.1749 size 3
+[255] Total 1087 Hits 764 hit rate (%) 70.2852 size 3
+[256] Total 244 Hits 196 hit rate (%) 80.3279 size 4
+[257] Total 843 Hits 568 hit rate (%) 67.3784 size 4
+[258] Total 9304 Hits 7257 hit rate (%) 77.9987 size 3
+[259] Total 2189 Hits 1763 hit rate (%) 80.5391 size 4
+[260] Total 7115 Hits 5494 hit rate (%) 77.2171 size 4
+[270] Total 992 Hits 798 hit rate (%) 80.4435 size 2
+[271] Total 791 Hits 672 hit rate (%) 84.9558 size 3
+[272] Total 201 Hits 126 hit rate (%) 62.6866 size 3
+[273] Total 111 Hits 87 hit rate (%) 78.3784 size 3
+[274] Total 83 Hits 69 hit rate (%) 83.1325 size 4
+[275] Total 28 Hits 18 hit rate (%) 64.2857 size 4
+[276] Total 881 Hits 711 hit rate (%) 80.7037 size 3
+[277] Total 708 Hits 603 hit rate (%) 85.1695 size 4
+[278] Total 173 Hits 108 hit rate (%) 62.4277 size 4
+[279] Total 992 Hits 798 hit rate (%) 80.4435 size 3
+[280] Total 791 Hits 672 hit rate (%) 84.9558 size 4
+[281] Total 201 Hits 126 hit rate (%) 62.6866 size 4
+[282] Total 111 Hits 87 hit rate (%) 78.3784 size 4
+[283] Total 83 Hits 69 hit rate (%) 83.1325 size 5
+[284] Total 28 Hits 18 hit rate (%) 64.2857 size 5
+[285] Total 881 Hits 711 hit rate (%) 80.7037 size 4
+[286] Total 708 Hits 603 hit rate (%) 85.1695 size 5
+[287] Total 173 Hits 108 hit rate (%) 62.4277 size 5
+[297] Total 9399 Hits 7223 hit rate (%) 76.8486 size 2
+[298] Total 1642 Hits 1287 hit rate (%) 78.38 size 3
+[299] Total 7757 Hits 5936 hit rate (%) 76.5244 size 3
+[300] Total 976 Hits 677 hit rate (%) 69.3648 size 3
+[301] Total 161 Hits 127 hit rate (%) 78.882 size 4
+[302] Total 815 Hits 550 hit rate (%) 67.4847 size 4
+[303] Total 8423 Hits 6546 hit rate (%) 77.7158 size 3
+[304] Total 1481 Hits 1160 hit rate (%) 78.3255 size 4
+[305] Total 6942 Hits 5386 hit rate (%) 77.5857 size 4
+[306] Total 9399 Hits 7223 hit rate (%) 76.8486 size 3
+[307] Total 1642 Hits 1287 hit rate (%) 78.38 size 4
+[308] Total 7757 Hits 5936 hit rate (%) 76.5244 size 4
+[309] Total 976 Hits 677 hit rate (%) 69.3648 size 4
+[310] Total 161 Hits 127 hit rate (%) 78.882 size 5
+[311] Total 815 Hits 550 hit rate (%) 67.4847 size 5
+[312] Total 8423 Hits 6546 hit rate (%) 77.7158 size 4
+[313] Total 1481 Hits 1160 hit rate (%) 78.3255 size 5
+[314] Total 6942 Hits 5386 hit rate (%) 77.5857 size 5
+[324] Total 7088 Hits 5632 hit rate (%) 79.4582 size 2
+[325] Total 1588 Hits 1299 hit rate (%) 81.801 size 3
+[326] Total 5500 Hits 4333 hit rate (%) 78.7818 size 3
+[327] Total 760 Hits 550 hit rate (%) 72.3684 size 3
+[328] Total 175 Hits 144 hit rate (%) 82.2857 size 4
+[329] Total 585 Hits 406 hit rate (%) 69.4017 size 4
+[330] Total 6328 Hits 5082 hit rate (%) 80.3097 size 3
+[331] Total 1413 Hits 1155 hit rate (%) 81.741 size 4
+[332] Total 4915 Hits 3927 hit rate (%) 79.8983 size 4
+[333] Total 7088 Hits 5632 hit rate (%) 79.4582 size 3
+[334] Total 1588 Hits 1299 hit rate (%) 81.801 size 4
+[335] Total 5500 Hits 4333 hit rate (%) 78.7818 size 4
+[336] Total 760 Hits 550 hit rate (%) 72.3684 size 4
+[337] Total 175 Hits 144 hit rate (%) 82.2857 size 5
+[338] Total 585 Hits 406 hit rate (%) 69.4017 size 5
+[339] Total 6328 Hits 5082 hit rate (%) 80.3097 size 4
+[340] Total 1413 Hits 1155 hit rate (%) 81.741 size 5
+[341] Total 4915 Hits 3927 hit rate (%) 79.8983 size 5
+[351] Total 730 Hits 587 hit rate (%) 80.411 size 3
+[352] Total 569 Hits 485 hit rate (%) 85.2373 size 4
+[353] Total 161 Hits 102 hit rate (%) 63.354 size 4
+[354] Total 83 Hits 65 hit rate (%) 78.3133 size 4
+[355] Total 61 Hits 51 hit rate (%) 83.6066 size 5
+[356] Total 22 Hits 14 hit rate (%) 63.6364 size 5
+[357] Total 647 Hits 522 hit rate (%) 80.6801 size 4
+[358] Total 508 Hits 434 hit rate (%) 85.4331 size 5
+[359] Total 139 Hits 88 hit rate (%) 63.3094 size 5
+[360] Total 730 Hits 587 hit rate (%) 80.411 size 4
+[361] Total 569 Hits 485 hit rate (%) 85.2373 size 5
+[362] Total 161 Hits 102 hit rate (%) 63.354 size 5
+[363] Total 83 Hits 65 hit rate (%) 78.3133 size 5
+[364] Total 61 Hits 51 hit rate (%) 83.6066 size 6
+[365] Total 22 Hits 14 hit rate (%) 63.6364 size 6
+[366] Total 647 Hits 522 hit rate (%) 80.6801 size 5
+[367] Total 508 Hits 434 hit rate (%) 85.4331 size 6
+[368] Total 139 Hits 88 hit rate (%) 63.3094 size 6
+[378] Total 6358 Hits 5045 hit rate (%) 79.3489 size 3
+[379] Total 1019 Hits 814 hit rate (%) 79.8822 size 4
+[380] Total 5339 Hits 4231 hit rate (%) 79.2471 size 4
+[381] Total 677 Hits 485 hit rate (%) 71.6396 size 4
+[382] Total 114 Hits 93 hit rate (%) 81.5789 size 5
+[383] Total 563 Hits 392 hit rate (%) 69.627 size 5
+[384] Total 5681 Hits 4560 hit rate (%) 80.2676 size 4
+[385] Total 905 Hits 721 hit rate (%) 79.6685 size 5
+[386] Total 4776 Hits 3839 hit rate (%) 80.3811 size 5
+[387] Total 6358 Hits 5045 hit rate (%) 79.3489 size 4
+[388] Total 1019 Hits 814 hit rate (%) 79.8822 size 5
+[389] Total 5339 Hits 4231 hit rate (%) 79.2471 size 5
+[390] Total 677 Hits 485 hit rate (%) 71.6396 size 5
+[391] Total 114 Hits 93 hit rate (%) 81.5789 size 6
+[392] Total 563 Hits 392 hit rate (%) 69.627 size 6
+[393] Total 5681 Hits 4560 hit rate (%) 80.2676 size 5
+[394] Total 905 Hits 721 hit rate (%) 79.6685 size 6
+[395] Total 4776 Hits 3839 hit rate (%) 80.3811 size 6
+[405] Total 3303 Hits 2389 hit rate (%) 72.3282 size 2
+[406] Total 845 Hits 660 hit rate (%) 78.1065 size 3
+[407] Total 2458 Hits 1729 hit rate (%) 70.3417 size 3
+[408] Total 327 Hits 214 hit rate (%) 65.4434 size 3
+[409] Total 69 Hits 52 hit rate (%) 75.3623 size 4
+[410] Total 258 Hits 162 hit rate (%) 62.7907 size 4
+[411] Total 2976 Hits 2175 hit rate (%) 73.0847 size 3
+[412] Total 776 Hits 608 hit rate (%) 78.3505 size 4
+[413] Total 2200 Hits 1567 hit rate (%) 71.2273 size 4
+[414] Total 3303 Hits 2389 hit rate (%) 72.3282 size 3
+[415] Total 845 Hits 660 hit rate (%) 78.1065 size 4
+[416] Total 2458 Hits 1729 hit rate (%) 70.3417 size 4
+[417] Total 327 Hits 214 hit rate (%) 65.4434 size 4
+[418] Total 69 Hits 52 hit rate (%) 75.3623 size 5
+[419] Total 258 Hits 162 hit rate (%) 62.7907 size 5
+[420] Total 2976 Hits 2175 hit rate (%) 73.0847 size 4
+[421] Total 776 Hits 608 hit rate (%) 78.3505 size 5
+[422] Total 2200 Hits 1567 hit rate (%) 71.2273 size 5
+[432] Total 262 Hits 211 hit rate (%) 80.5344 size 3
+[433] Total 222 Hits 187 hit rate (%) 84.2342 size 4
+[434] Total 40 Hits 24 hit rate (%) 60 size 4
+[435] Total 28 Hits 22 hit rate (%) 78.5714 size 4
+[436] Total 22 Hits 18 hit rate (%) 81.8182 size 5
+[437] Total 6 Hits 4 hit rate (%) 66.6667 size 5
+[438] Total 234 Hits 189 hit rate (%) 80.7692 size 4
+[439] Total 200 Hits 169 hit rate (%) 84.5 size 5
+[440] Total 34 Hits 20 hit rate (%) 58.8235 size 5
+[441] Total 262 Hits 211 hit rate (%) 80.5344 size 4
+[442] Total 222 Hits 187 hit rate (%) 84.2342 size 5
+[443] Total 40 Hits 24 hit rate (%) 60 size 5
+[444] Total 28 Hits 22 hit rate (%) 78.5714 size 5
+[445] Total 22 Hits 18 hit rate (%) 81.8182 size 6
+[446] Total 6 Hits 4 hit rate (%) 66.6667 size 6
+[447] Total 234 Hits 189 hit rate (%) 80.7692 size 5
+[448] Total 200 Hits 169 hit rate (%) 84.5 size 6
+[449] Total 34 Hits 20 hit rate (%) 58.8235 size 6
+[459] Total 3041 Hits 2178 hit rate (%) 71.6212 size 3
+[460] Total 623 Hits 473 hit rate (%) 75.923 size 4
+[461] Total 2418 Hits 1705 hit rate (%) 70.5128 size 4
+[462] Total 299 Hits 192 hit rate (%) 64.214 size 4
+[463] Total 47 Hits 34 hit rate (%) 72.3404 size 5
+[464] Total 252 Hits 158 hit rate (%) 62.6984 size 5
+[465] Total 2742 Hits 1986 hit rate (%) 72.4289 size 4
+[466] Total 576 Hits 439 hit rate (%) 76.2153 size 5
+[467] Total 2166 Hits 1547 hit rate (%) 71.422 size 5
+[468] Total 3041 Hits 2178 hit rate (%) 71.6212 size 4
+[469] Total 623 Hits 473 hit rate (%) 75.923 size 5
+[470] Total 2418 Hits 1705 hit rate (%) 70.5128 size 5
+[471] Total 299 Hits 192 hit rate (%) 64.214 size 5
+[472] Total 47 Hits 34 hit rate (%) 72.3404 size 6
+[473] Total 252 Hits 158 hit rate (%) 62.6984 size 6
+[474] Total 2742 Hits 1986 hit rate (%) 72.4289 size 5
+[475] Total 576 Hits 439 hit rate (%) 76.2153 size 6
+[476] Total 2166 Hits 1547 hit rate (%) 71.422 size 6
+[486] Total 27430 Hits 11739 hit rate (%) 42.7962 size 1
+[487] Total 4499 Hits 2270 hit rate (%) 50.4557 size 2
+[488] Total 22931 Hits 9469 hit rate (%) 41.2934 size 2
+[489] Total 2901 Hits 1253 hit rate (%) 43.192 size 2
+[490] Total 496 Hits 266 hit rate (%) 53.629 size 3
+[491] Total 2405 Hits 987 hit rate (%) 41.0395 size 3
+[492] Total 24529 Hits 10486 hit rate (%) 42.7494 size 2
+[493] Total 4003 Hits 2004 hit rate (%) 50.0625 size 3
+[494] Total 20526 Hits 8482 hit rate (%) 41.3232 size 3
+[495] Total 27430 Hits 11739 hit rate (%) 42.7962 size 2
+[496] Total 4499 Hits 2270 hit rate (%) 50.4557 size 3
+[497] Total 22931 Hits 9469 hit rate (%) 41.2934 size 3
+[498] Total 2901 Hits 1253 hit rate (%) 43.192 size 3
+[499] Total 496 Hits 266 hit rate (%) 53.629 size 4
+[500] Total 2405 Hits 987 hit rate (%) 41.0395 size 4
+[501] Total 24529 Hits 10486 hit rate (%) 42.7494 size 3
+[502] Total 4003 Hits 2004 hit rate (%) 50.0625 size 4
+[503] Total 20526 Hits 8482 hit rate (%) 41.3232 size 4
+[513] Total 2977 Hits 1362 hit rate (%) 45.7508 size 2
+[514] Total 1838 Hits 928 hit rate (%) 50.4897 size 3
+[515] Total 1139 Hits 434 hit rate (%) 38.1036 size 3
+[516] Total 319 Hits 149 hit rate (%) 46.7085 size 3
+[517] Total 193 Hits 103 hit rate (%) 53.3679 size 4
+[518] Total 126 Hits 46 hit rate (%) 36.5079 size 4
+[519] Total 2658 Hits 1213 hit rate (%) 45.6358 size 3
+[520] Total 1645 Hits 825 hit rate (%) 50.152 size 4
+[521] Total 1013 Hits 388 hit rate (%) 38.3021 size 4
+[522] Total 2977 Hits 1362 hit rate (%) 45.7508 size 3
+[523] Total 1838 Hits 928 hit rate (%) 50.4897 size 4
+[524] Total 1139 Hits 434 hit rate (%) 38.1036 size 4
+[525] Total 319 Hits 149 hit rate (%) 46.7085 size 4
+[526] Total 193 Hits 103 hit rate (%) 53.3679 size 5
+[527] Total 126 Hits 46 hit rate (%) 36.5079 size 5
+[528] Total 2658 Hits 1213 hit rate (%) 45.6358 size 4
+[529] Total 1645 Hits 825 hit rate (%) 50.152 size 5
+[530] Total 1013 Hits 388 hit rate (%) 38.3021 size 5
+[540] Total 24453 Hits 10377 hit rate (%) 42.4365 size 2
+[541] Total 2661 Hits 1342 hit rate (%) 50.4322 size 3
+[542] Total 21792 Hits 9035 hit rate (%) 41.4602 size 3
+[543] Total 2582 Hits 1104 hit rate (%) 42.7576 size 3
+[544] Total 303 Hits 163 hit rate (%) 53.7954 size 4
+[545] Total 2279 Hits 941 hit rate (%) 41.29 size 4
+[546] Total 21871 Hits 9273 hit rate (%) 42.3986 size 3
+[547] Total 2358 Hits 1179 hit rate (%) 50 size 4
+[548] Total 19513 Hits 8094 hit rate (%) 41.48 size 4
+[549] Total 24453 Hits 10377 hit rate (%) 42.4365 size 3
+[550] Total 2661 Hits 1342 hit rate (%) 50.4322 size 4
+[551] Total 21792 Hits 9035 hit rate (%) 41.4602 size 4
+[552] Total 2582 Hits 1104 hit rate (%) 42.7576 size 4
+[553] Total 303 Hits 163 hit rate (%) 53.7954 size 5
+[554] Total 2279 Hits 941 hit rate (%) 41.29 size 5
+[555] Total 21871 Hits 9273 hit rate (%) 42.3986 size 4
+[556] Total 2358 Hits 1179 hit rate (%) 50 size 5
+[557] Total 19513 Hits 8094 hit rate (%) 41.48 size 5
+[567] Total 14612 Hits 6761 hit rate (%) 46.2702 size 2
+[568] Total 2408 Hits 1277 hit rate (%) 53.0316 size 3
+[569] Total 12204 Hits 5484 hit rate (%) 44.9361 size 3
+[570] Total 1770 Hits 796 hit rate (%) 44.9718 size 3
+[571] Total 300 Hits 163 hit rate (%) 54.3333 size 4
+[572] Total 1470 Hits 633 hit rate (%) 43.0612 size 4
+[573] Total 12842 Hits 5965 hit rate (%) 46.4492 size 3
+[574] Total 2108 Hits 1114 hit rate (%) 52.8463 size 4
+[575] Total 10734 Hits 4851 hit rate (%) 45.1928 size 4
+[576] Total 14612 Hits 6761 hit rate (%) 46.2702 size 3
+[577] Total 2408 Hits 1277 hit rate (%) 53.0316 size 4
+[578] Total 12204 Hits 5484 hit rate (%) 44.9361 size 4
+[579] Total 1770 Hits 796 hit rate (%) 44.9718 size 4
+[580] Total 300 Hits 163 hit rate (%) 54.3333 size 5
+[581] Total 1470 Hits 633 hit rate (%) 43.0612 size 5
+[582] Total 12842 Hits 5965 hit rate (%) 46.4492 size 4
+[583] Total 2108 Hits 1114 hit rate (%) 52.8463 size 5
+[584] Total 10734 Hits 4851 hit rate (%) 45.1928 size 5
+[594] Total 1918 Hits 899 hit rate (%) 46.8717 size 3
+[595] Total 1134 Hits 590 hit rate (%) 52.0282 size 4
+[596] Total 784 Hits 309 hit rate (%) 39.4133 size 4
+[597] Total 219 Hits 105 hit rate (%) 47.9452 size 4
+[598] Total 127 Hits 69 hit rate (%) 54.3307 size 5
+[599] Total 92 Hits 36 hit rate (%) 39.1304 size 5
+[600] Total 1699 Hits 794 hit rate (%) 46.7334 size 4
+[601] Total 1007 Hits 521 hit rate (%) 51.7378 size 5
+[602] Total 692 Hits 273 hit rate (%) 39.4509 size 5
+[603] Total 1918 Hits 899 hit rate (%) 46.8717 size 4
+[604] Total 1134 Hits 590 hit rate (%) 52.0282 size 5
+[605] Total 784 Hits 309 hit rate (%) 39.4133 size 5
+[606] Total 219 Hits 105 hit rate (%) 47.9452 size 5
+[607] Total 127 Hits 69 hit rate (%) 54.3307 size 6
+[608] Total 92 Hits 36 hit rate (%) 39.1304 size 6
+[609] Total 1699 Hits 794 hit rate (%) 46.7334 size 5
+[610] Total 1007 Hits 521 hit rate (%) 51.7378 size 6
+[611] Total 692 Hits 273 hit rate (%) 39.4509 size 6
+[621] Total 12694 Hits 5862 hit rate (%) 46.1793 size 3
+[622] Total 1274 Hits 687 hit rate (%) 53.9246 size 4
+[623] Total 11420 Hits 5175 hit rate (%) 45.3152 size 4
+[624] Total 1551 Hits 691 hit rate (%) 44.5519 size 4
+[625] Total 173 Hits 94 hit rate (%) 54.3353 size 5
+[626] Total 1378 Hits 597 hit rate (%) 43.3237 size 5
+[627] Total 11143 Hits 5171 hit rate (%) 46.4058 size 4
+[628] Total 1101 Hits 593 hit rate (%) 53.8601 size 5
+[629] Total 10042 Hits 4578 hit rate (%) 45.5885 size 5
+[630] Total 12694 Hits 5862 hit rate (%) 46.1793 size 4
+[631] Total 1274 Hits 687 hit rate (%) 53.9246 size 5
+[632] Total 11420 Hits 5175 hit rate (%) 45.3152 size 5
+[633] Total 1551 Hits 691 hit rate (%) 44.5519 size 5
+[634] Total 173 Hits 94 hit rate (%) 54.3353 size 6
+[635] Total 1378 Hits 597 hit rate (%) 43.3237 size 6
+[636] Total 11143 Hits 5171 hit rate (%) 46.4058 size 5
+[637] Total 1101 Hits 593 hit rate (%) 53.8601 size 6
+[638] Total 10042 Hits 4578 hit rate (%) 45.5885 size 6
+[648] Total 12818 Hits 4978 hit rate (%) 38.836 size 2
+[649] Total 2091 Hits 993 hit rate (%) 47.4892 size 3
+[650] Total 10727 Hits 3985 hit rate (%) 37.1492 size 3
+[651] Total 1131 Hits 457 hit rate (%) 40.4067 size 3
+[652] Total 196 Hits 103 hit rate (%) 52.551 size 4
+[653] Total 935 Hits 354 hit rate (%) 37.861 size 4
+[654] Total 11687 Hits 4521 hit rate (%) 38.684 size 3
+[655] Total 1895 Hits 890 hit rate (%) 46.9657 size 4
+[656] Total 9792 Hits 3631 hit rate (%) 37.0813 size 4
+[657] Total 12818 Hits 4978 hit rate (%) 38.836 size 3
+[658] Total 2091 Hits 993 hit rate (%) 47.4892 size 4
+[659] Total 10727 Hits 3985 hit rate (%) 37.1492 size 4
+[660] Total 1131 Hits 457 hit rate (%) 40.4067 size 4
+[661] Total 196 Hits 103 hit rate (%) 52.551 size 5
+[662] Total 935 Hits 354 hit rate (%) 37.861 size 5
+[663] Total 11687 Hits 4521 hit rate (%) 38.684 size 4
+[664] Total 1895 Hits 890 hit rate (%) 46.9657 size 5
+[665] Total 9792 Hits 3631 hit rate (%) 37.0813 size 5
+[675] Total 1059 Hits 463 hit rate (%) 43.7205 size 3
+[676] Total 704 Hits 338 hit rate (%) 48.0114 size 4
+[677] Total 355 Hits 125 hit rate (%) 35.2113 size 4
+[678] Total 100 Hits 44 hit rate (%) 44 size 4
+[679] Total 66 Hits 34 hit rate (%) 51.5152 size 5
+[680] Total 34 Hits 10 hit rate (%) 29.4118 size 5
+[681] Total 959 Hits 419 hit rate (%) 43.6913 size 4
+[682] Total 638 Hits 304 hit rate (%) 47.6489 size 5
+[683] Total 321 Hits 115 hit rate (%) 35.8255 size 5
+[684] Total 1059 Hits 463 hit rate (%) 43.7205 size 4
+[685] Total 704 Hits 338 hit rate (%) 48.0114 size 5
+[686] Total 355 Hits 125 hit rate (%) 35.2113 size 5
+[687] Total 100 Hits 44 hit rate (%) 44 size 5
+[688] Total 66 Hits 34 hit rate (%) 51.5152 size 6
+[689] Total 34 Hits 10 hit rate (%) 29.4118 size 6
+[690] Total 959 Hits 419 hit rate (%) 43.6913 size 5
+[691] Total 638 Hits 304 hit rate (%) 47.6489 size 6
+[692] Total 321 Hits 115 hit rate (%) 35.8255 size 6
+[702] Total 11759 Hits 4515 hit rate (%) 38.3961 size 3
+[703] Total 1387 Hits 655 hit rate (%) 47.2242 size 4
+[704] Total 10372 Hits 3860 hit rate (%) 37.2156 size 4
+[705] Total 1031 Hits 413 hit rate (%) 40.0582 size 4
+[706] Total 130 Hits 69 hit rate (%) 53.0769 size 5
+[707] Total 901 Hits 344 hit rate (%) 38.1798 size 5
+[708] Total 10728 Hits 4102 hit rate (%) 38.2364 size 4
+[709] Total 1257 Hits 586 hit rate (%) 46.6189 size 5
+[710] Total 9471 Hits 3516 hit rate (%) 37.1239 size 5
+[711] Total 11759 Hits 4515 hit rate (%) 38.3961 size 4
+[712] Total 1387 Hits 655 hit rate (%) 47.2242 size 5
+[713] Total 10372 Hits 3860 hit rate (%) 37.2156 size 5
+[714] Total 1031 Hits 413 hit rate (%) 40.0582 size 5
+[715] Total 130 Hits 69 hit rate (%) 53.0769 size 6
+[716] Total 901 Hits 344 hit rate (%) 38.1798 size 6
+[717] Total 10728 Hits 4102 hit rate (%) 38.2364 size 5
+[718] Total 1257 Hits 586 hit rate (%) 46.6189 size 6
+[719] Total 9471 Hits 3516 hit rate (%) 37.1239 size 6
+[0] Total 37821 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[1] Total 9024615 ChiSquare(x,y) = 785.186 CV=0.00932764 p=1.67288e-205 => H0 rejected
+[2] Total 4780050 ChiSquare(x,y) = 4068.83 CV=-0.0291755 p=0 => H0 rejected
+[3] Total 3988 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[4] Total 887434 ChiSquare(x,y) = 0.462232 CV=0.000721709 p=0.378963 => H0 accepted
+[5] Total 697297 ChiSquare(x,y) = 1296.19 CV=-0.0431148 p=0 => H0 rejected
+[6] Total 33833 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[7] Total 1471691 ChiSquare(x,y) = 1024.34 CV=0.0263824 p=8.76185e-268 => H0 rejected
+[8] Total 1557740 ChiSquare(x,y) = 96.8907 CV=0.00788667 p=2.93093e-26 => H0 rejected
+[9] Total 37821 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[10] Total 302211 ChiSquare(x,y) = 515.754 CV=-0.041311 p=2.44392e-135 => H0 rejected
+[11] Total 261195 ChiSquare(x,y) = 1046.62 CV=-0.0633013 p=1.38436e-273 => H0 rejected
+[12] Total 3988 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[13] Total 186271 ChiSquare(x,y) = 93.7287 CV=-0.0224318 p=1.95185e-25 => H0 rejected
+[14] Total 48820 ChiSquare(x,y) = 474.664 CV=-0.0986039 p=1.22616e-124 => H0 rejected
+[15] Total 33833 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[16] Total 115940 ChiSquare(x,y) = 78.4901 CV=-0.026019 p=1.81479e-21 => H0 rejected
+[17] Total 212375 ChiSquare(x,y) = 582.182 CV=-0.0523573 p=1.22781e-152 => H0 rejected
+[19] Total 751113 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[20] Total 236142 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[22] Total 433620 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[23] Total 74349 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[25] Total 317493 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[26] Total 161793 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[27] Total 3969 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[28] Total 61479 ChiSquare(x,y) = 13.2931 CV=0.0147045 p=0.000172671 => H0 rejected
+[29] Total 105078 ChiSquare(x,y) = 770.989 CV=-0.0856581 p=8.32777e-202 => H0 rejected
+[30] Total 430 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[31] Total 57940 ChiSquare(x,y) = 2.52203 CV=0.0065976 p=0.110203 => H0 accepted
+[32] Total 16948 ChiSquare(x,y) = 48.0978 CV=-0.0532726 p=1.49106e-13 => H0 rejected
+[33] Total 3539 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[34] Total 3539 ChiSquare(x,y) = 113.143 CV=0.178802 p=1.71694e-30 => H0 rejected
+[35] Total 88130 ChiSquare(x,y) = 766.314 CV=-0.0932484 p=1.37431e-200 => H0 rejected
+[36] Total 3969 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[37] Total 11007 ChiSquare(x,y) = 40.2925 CV=0.0605031 p=1.60742e-11 => H0 rejected
+[38] Total 68667 ChiSquare(x,y) = 1017.54 CV=-0.121731 p=5.18892e-266 => H0 rejected
+[39] Total 430 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[40] Total 7468 ChiSquare(x,y) = 4.60692 CV=0.0248372 p=0.0315682 => H0 accepted
+[41] Total 7906 ChiSquare(x,y) = 104.455 CV=-0.114944 p=3.14159e-28 => H0 rejected
+[42] Total 3539 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[43] Total 3539 ChiSquare(x,y) = 113.143 CV=0.178802 p=1.71694e-30 => H0 rejected
+[44] Total 60761 ChiSquare(x,y) = 914.069 CV=-0.122653 p=4.57225e-239 => H0 rejected
+[46] Total 50472 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[47] Total 36411 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[49] Total 50472 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[50] Total 9042 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[53] Total 27369 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[54] Total 33852 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[55] Total 77841 ChiSquare(x,y) = 293.238 CV=0.061377 p=2.1622e-77 => H0 rejected
+[56] Total 285096 ChiSquare(x,y) = 605.71 CV=0.0460932 p=9.16085e-159 => H0 rejected
+[57] Total 3558 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[58] Total 47547 ChiSquare(x,y) = 51.3915 CV=0.0328764 p=2.06907e-14 => H0 rejected
+[59] Total 34725 ChiSquare(x,y) = 5.27068 CV=0.01232 p=0.021203 => H0 accepted
+[60] Total 30294 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[61] Total 30294 ChiSquare(x,y) = 133.637 CV=0.0664178 p=7.90244e-36 => H0 rejected
+[62] Total 250371 ChiSquare(x,y) = 647.028 CV=0.0508358 p=1.59272e-169 => H0 rejected
+[63] Total 33852 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[64] Total 37431 ChiSquare(x,y) = 164.988 CV=0.0663912 p=5.41181e-44 => H0 rejected
+[65] Total 165744 ChiSquare(x,y) = 148.981 CV=0.029981 p=7.97685e-40 => H0 rejected
+[66] Total 3558 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[67] Total 7137 ChiSquare(x,y) = 28.5334 CV=0.0632294 p=1.85523e-08 => H0 rejected
+[68] Total 21204 ChiSquare(x,y) = 0.7098 CV=0.00578574 p=0.326683 => H0 accepted
+[69] Total 30294 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[70] Total 30294 ChiSquare(x,y) = 133.637 CV=0.0664178 p=7.90244e-36 => H0 rejected
+[71] Total 144540 ChiSquare(x,y) = 159.947 CV=0.0332655 p=1.11216e-42 => H0 rejected
+[73] Total 40410 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[74] Total 119352 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[76] Total 40410 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[77] Total 13521 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[80] Total 105831 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[81] Total 21700 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[82] Total 49612 ChiSquare(x,y) = 39.203 CV=-0.0281104 p=3.0892e-11 => H0 rejected
+[83] Total 24961 ChiSquare(x,y) = 287.409 CV=-0.107305 p=7.12547e-76 => H0 rejected
+[84] Total 2530 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[85] Total 30442 ChiSquare(x,y) = 33.7574 CV=-0.0333003 p=8.0904e-10 => H0 rejected
+[86] Total 5791 ChiSquare(x,y) = 205.061 CV=-0.188176 p=1.98507e-54 => H0 rejected
+[87] Total 19170 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[88] Total 19170 ChiSquare(x,y) = 82.0484 CV=0.065422 p=2.14879e-22 => H0 rejected
+[89] Total 19170 ChiSquare(x,y) = 82.0484 CV=-0.065422 p=2.14879e-22 => H0 rejected
+[90] Total 21700 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[91] Total 24343 ChiSquare(x,y) = 45.6254 CV=0.0432929 p=6.56676e-13 => H0 rejected
+[92] Total 22033 ChiSquare(x,y) = 144.682 CV=-0.0810347 p=1.05019e-38 => H0 rejected
+[93] Total 2530 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[94] Total 5173 ChiSquare(x,y) = 1.63203 CV=-0.017762 p=0.187915 => H0 accepted
+[95] Total 2863 ChiSquare(x,y) = 91.7529 CV=-0.179019 p=6.38247e-25 => H0 rejected
+[96] Total 19170 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[97] Total 19170 ChiSquare(x,y) = 82.0484 CV=0.065422 p=2.14879e-22 => H0 rejected
+[98] Total 19170 ChiSquare(x,y) = 82.0484 CV=-0.065422 p=2.14879e-22 => H0 rejected
+[100] Total 25269 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[101] Total 2928 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[103] Total 25269 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[104] Total 2928 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[108] Total 2648 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[109] Total 21632 ChiSquare(x,y) = 213.475 CV=-0.0993403 p=1.27774e-56 => H0 rejected
+[110] Total 4928 ChiSquare(x,y) = 205.033 CV=-0.203975 p=2.0181e-54 => H0 rejected
+[111] Total 302 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[112] Total 19286 ChiSquare(x,y) = 30.6954 CV=-0.0398947 p=5.0744e-09 => H0 rejected
+[113] Total 2582 ChiSquare(x,y) = 40.6528 CV=-0.125478 p=1.29511e-11 => H0 rejected
+[114] Total 2346 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[115] Total 2346 ChiSquare(x,y) = 83.6612 CV=0.188842 p=8.16935e-23 => H0 rejected
+[116] Total 2346 ChiSquare(x,y) = 83.6612 CV=-0.188842 p=8.16935e-23 => H0 rejected
+[117] Total 2648 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[118] Total 4589 ChiSquare(x,y) = 13.9126 CV=-0.0550612 p=0.000119094 => H0 rejected
+[119] Total 2897 ChiSquare(x,y) = 121.629 CV=-0.204901 p=1.05895e-32 => H0 rejected
+[120] Total 302 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[121] Total 2243 ChiSquare(x,y) = 21.5882 CV=-0.0981054 p=1.19414e-06 => H0 rejected
+[122] Total 551 ChiSquare(x,y) = 32.2055 CV=-0.241763 p=2.05173e-09 => H0 rejected
+[123] Total 2346 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[124] Total 2346 ChiSquare(x,y) = 83.6612 CV=0.188842 p=8.16935e-23 => H0 rejected
+[125] Total 2346 ChiSquare(x,y) = 83.6612 CV=-0.188842 p=8.16935e-23 => H0 rejected
+[127] Total 17043 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[128] Total 2031 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[130] Total 17043 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[131] Total 2031 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[135] Total 19052 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[136] Total 27980 ChiSquare(x,y) = 10.6088 CV=0.0194719 p=0.000863515 => H0 rejected
+[137] Total 20033 ChiSquare(x,y) = 97.6549 CV=-0.0698191 p=1.85353e-26 => H0 rejected
+[138] Total 2228 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[139] Total 11156 ChiSquare(x,y) = 2.06724 CV=-0.0136126 p=0.144753 => H0 accepted
+[140] Total 3209 ChiSquare(x,y) = 64.9907 CV=-0.142312 p=5.94718e-18 => H0 rejected
+[141] Total 16824 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[142] Total 16824 ChiSquare(x,y) = 54.8524 CV=0.0570996 p=2.59706e-15 => H0 rejected
+[143] Total 16824 ChiSquare(x,y) = 54.8524 CV=-0.0570996 p=2.59706e-15 => H0 rejected
+[144] Total 19052 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[145] Total 19754 ChiSquare(x,y) = 57.9637 CV=0.054169 p=4.02019e-16 => H0 rejected
+[146] Total 19136 ChiSquare(x,y) = 81.7072 CV=-0.0653438 p=2.63658e-22 => H0 rejected
+[147] Total 2228 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[148] Total 2930 ChiSquare(x,y) = 4.24241 CV=0.0380516 p=0.0392804 => H0 accepted
+[149] Total 2312 ChiSquare(x,y) = 37.2396 CV=-0.126914 p=1.0027e-10 => H0 rejected
+[150] Total 16824 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[151] Total 16824 ChiSquare(x,y) = 54.8524 CV=0.0570996 p=2.59706e-15 => H0 rejected
+[152] Total 16824 ChiSquare(x,y) = 54.8524 CV=-0.0570996 p=2.59706e-15 => H0 rejected
+[154] Total 8226 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[155] Total 897 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[157] Total 8226 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[158] Total 897 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[162] Total 16121 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[163] Total 89708 ChiSquare(x,y) = 209.665 CV=0.0483446 p=1.2549e-55 => H0 rejected
+[164] Total 24824 ChiSquare(x,y) = 24.9871 CV=-0.0317265 p=1.55561e-07 => H0 rejected
+[165] Total 1458 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[166] Total 75045 ChiSquare(x,y) = 26.6973 CV=0.0188614 p=5.57882e-08 => H0 rejected
+[167] Total 10161 ChiSquare(x,y) = 0.065718 CV=-0.00254316 p=0.48068 => H0 accepted
+[168] Total 14663 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[169] Total 14663 ChiSquare(x,y) = 142.857 CV=0.098705 p=3.13812e-38 => H0 rejected
+[170] Total 14663 ChiSquare(x,y) = 142.857 CV=-0.098705 p=3.13812e-38 => H0 rejected
+[171] Total 16121 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[172] Total 24095 ChiSquare(x,y) = 152.071 CV=0.0794437 p=1.25075e-40 => H0 rejected
+[173] Total 17078 ChiSquare(x,y) = 136.214 CV=-0.0893083 p=1.6853e-36 => H0 rejected
+[174] Total 1458 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[175] Total 9432 ChiSquare(x,y) = 17.9886 CV=0.0436714 p=1.03379e-05 => H0 rejected
+[176] Total 2415 ChiSquare(x,y) = 8.77342 CV=-0.0602734 p=0.00259552 => H0 rejected
+[177] Total 14663 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[178] Total 14663 ChiSquare(x,y) = 142.857 CV=0.098705 p=3.13812e-38 => H0 rejected
+[179] Total 14663 ChiSquare(x,y) = 142.857 CV=-0.098705 p=3.13812e-38 => H0 rejected
+[181] Total 65613 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[182] Total 7746 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[184] Total 65613 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[185] Total 7746 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[189] Total 1321 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[190] Total 39847 ChiSquare(x,y) = 38.8224 CV=0.0312136 p=3.88114e-11 => H0 rejected
+[191] Total 6631 ChiSquare(x,y) = 12.0825 CV=-0.0426864 p=0.000356844 => H0 rejected
+[192] Total 128 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[193] Total 38654 ChiSquare(x,y) = 5.65143 CV=0.0120915 p=0.016875 => H0 accepted
+[194] Total 5438 ChiSquare(x,y) = 1.66887 CV=-0.0175183 p=0.183809 => H0 accepted
+[195] Total 1193 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[196] Total 1193 ChiSquare(x,y) = 33.8401 CV=0.168421 p=7.69906e-10 => H0 rejected
+[197] Total 1193 ChiSquare(x,y) = 33.8401 CV=-0.168421 p=7.69906e-10 => H0 rejected
+[198] Total 1321 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[199] Total 6418 ChiSquare(x,y) = 35.7636 CV=0.0746485 p=2.42957e-10 => H0 rejected
+[200] Total 1978 ChiSquare(x,y) = 29.764 CV=-0.122668 p=8.86993e-09 => H0 rejected
+[201] Total 128 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[202] Total 5225 ChiSquare(x,y) = 5.3846 CV=0.0321021 p=0.019803 => H0 accepted
+[203] Total 785 ChiSquare(x,y) = 3.09118 CV=-0.062752 p=0.0783383 => H0 accepted
+[204] Total 1193 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[205] Total 1193 ChiSquare(x,y) = 33.8401 CV=0.168421 p=7.69906e-10 => H0 rejected
+[206] Total 1193 ChiSquare(x,y) = 33.8401 CV=-0.168421 p=7.69906e-10 => H0 rejected
+[208] Total 33429 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[209] Total 4653 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[211] Total 33429 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[212] Total 4653 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[216] Total 14800 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[217] Total 49861 ChiSquare(x,y) = 208.46 CV=0.0646593 p=2.58552e-55 => H0 rejected
+[218] Total 18193 ChiSquare(x,y) = 11.5685 CV=-0.0252166 p=0.000485662 => H0 rejected
+[219] Total 1330 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[220] Total 36391 ChiSquare(x,y) = 27.7493 CV=0.027614 p=2.96881e-08 => H0 rejected
+[221] Total 4723 ChiSquare(x,y) = 1.81328 CV=0.019594 p=0.168562 => H0 accepted
+[222] Total 13470 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[223] Total 13470 ChiSquare(x,y) = 98.4849 CV=0.0855069 p=1.12684e-26 => H0 rejected
+[224] Total 13470 ChiSquare(x,y) = 98.4849 CV=-0.0855069 p=1.12684e-26 => H0 rejected
+[225] Total 14800 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[226] Total 17677 ChiSquare(x,y) = 113.843 CV=0.0802506 p=1.12832e-30 => H0 rejected
+[227] Total 15100 ChiSquare(x,y) = 96.189 CV=-0.0798131 p=4.46418e-26 => H0 rejected
+[228] Total 1330 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[229] Total 4207 ChiSquare(x,y) = 14.5386 CV=0.0587862 p=8.18229e-05 => H0 rejected
+[230] Total 1630 ChiSquare(x,y) = 4.46858 CV=-0.052359 p=0.0342986 => H0 accepted
+[231] Total 13470 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[232] Total 13470 ChiSquare(x,y) = 98.4849 CV=0.0855069 p=1.12684e-26 => H0 rejected
+[233] Total 13470 ChiSquare(x,y) = 98.4849 CV=-0.0855069 p=1.12684e-26 => H0 rejected
+[235] Total 32184 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[236] Total 3093 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[238] Total 32184 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[239] Total 3093 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[243] Total 10391 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[244] Total 10391 ChiSquare(x,y) = 19.9617 CV=0.0438299 p=3.16665e-06 => H0 rejected
+[245] Total 10391 ChiSquare(x,y) = 19.9617 CV=-0.0438299 p=3.16665e-06 => H0 rejected
+[246] Total 1087 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[247] Total 1087 ChiSquare(x,y) = 15.1934 CV=0.118226 p=5.52538e-05 => H0 rejected
+[248] Total 1087 ChiSquare(x,y) = 15.1934 CV=-0.118226 p=5.52538e-05 => H0 rejected
+[249] Total 9304 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[250] Total 9304 ChiSquare(x,y) = 10.7644 CV=0.0340143 p=0.000786555 => H0 rejected
+[251] Total 9304 ChiSquare(x,y) = 10.7644 CV=-0.0340143 p=0.000786555 => H0 rejected
+[252] Total 10391 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[253] Total 10391 ChiSquare(x,y) = 19.9617 CV=0.0438299 p=3.16665e-06 => H0 rejected
+[254] Total 10391 ChiSquare(x,y) = 19.9617 CV=-0.0438299 p=3.16665e-06 => H0 rejected
+[255] Total 1087 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[256] Total 1087 ChiSquare(x,y) = 15.1934 CV=0.118226 p=5.52538e-05 => H0 rejected
+[257] Total 1087 ChiSquare(x,y) = 15.1934 CV=-0.118226 p=5.52538e-05 => H0 rejected
+[258] Total 9304 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[259] Total 9304 ChiSquare(x,y) = 10.7644 CV=0.0340143 p=0.000786555 => H0 rejected
+[260] Total 9304 ChiSquare(x,y) = 10.7644 CV=-0.0340143 p=0.000786555 => H0 rejected
+[270] Total 992 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[271] Total 992 ChiSquare(x,y) = 50.5229 CV=0.225678 p=3.4831e-14 => H0 rejected
+[272] Total 992 ChiSquare(x,y) = 50.5229 CV=-0.225678 p=3.4831e-14 => H0 rejected
+[273] Total 111 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[274] Total 111 ChiSquare(x,y) = 4.38838 CV=0.198834 p=0.0359883 => H0 accepted
+[275] Total 111 ChiSquare(x,y) = 4.38838 CV=-0.198834 p=0.0359883 => H0 accepted
+[276] Total 881 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[277] Total 881 ChiSquare(x,y) = 46.1726 CV=0.228931 p=4.72993e-13 => H0 rejected
+[278] Total 881 ChiSquare(x,y) = 46.1726 CV=-0.228931 p=4.72993e-13 => H0 rejected
+[279] Total 992 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[280] Total 992 ChiSquare(x,y) = 50.5229 CV=0.225678 p=3.4831e-14 => H0 rejected
+[281] Total 992 ChiSquare(x,y) = 50.5229 CV=-0.225678 p=3.4831e-14 => H0 rejected
+[282] Total 111 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[283] Total 111 ChiSquare(x,y) = 4.38838 CV=0.198834 p=0.0359883 => H0 accepted
+[284] Total 111 ChiSquare(x,y) = 4.38838 CV=-0.198834 p=0.0359883 => H0 accepted
+[285] Total 881 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[286] Total 881 ChiSquare(x,y) = 46.1726 CV=0.228931 p=4.72993e-13 => H0 rejected
+[287] Total 881 ChiSquare(x,y) = 46.1726 CV=-0.228931 p=4.72993e-13 => H0 rejected
+[297] Total 9399 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[298] Total 9399 ChiSquare(x,y) = 2.62264 CV=0.0167043 p=0.103751 => H0 accepted
+[299] Total 9399 ChiSquare(x,y) = 2.62264 CV=-0.0167043 p=0.103751 => H0 accepted
+[300] Total 976 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[301] Total 976 ChiSquare(x,y) = 8.21825 CV=0.0917624 p=0.00362077 => H0 rejected
+[302] Total 976 ChiSquare(x,y) = 8.21825 CV=-0.0917624 p=0.00362077 => H0 rejected
+[303] Total 8423 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[304] Total 8423 ChiSquare(x,y) = 0.385683 CV=0.00676678 p=0.396763 => H0 accepted
+[305] Total 8423 ChiSquare(x,y) = 0.385683 CV=-0.00676678 p=0.396763 => H0 accepted
+[306] Total 9399 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[307] Total 9399 ChiSquare(x,y) = 2.62264 CV=0.0167043 p=0.103751 => H0 accepted
+[308] Total 9399 ChiSquare(x,y) = 2.62264 CV=-0.0167043 p=0.103751 => H0 accepted
+[309] Total 976 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[310] Total 976 ChiSquare(x,y) = 8.21825 CV=0.0917624 p=0.00362077 => H0 rejected
+[311] Total 976 ChiSquare(x,y) = 8.21825 CV=-0.0917624 p=0.00362077 => H0 rejected
+[312] Total 8423 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[313] Total 8423 ChiSquare(x,y) = 0.385683 CV=0.00676678 p=0.396763 => H0 accepted
+[314] Total 8423 ChiSquare(x,y) = 0.385683 CV=-0.00676678 p=0.396763 => H0 accepted
+[324] Total 7088 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[325] Total 7088 ChiSquare(x,y) = 6.88167 CV=0.0311591 p=0.00806993 => H0 rejected
+[326] Total 7088 ChiSquare(x,y) = 6.88167 CV=-0.0311591 p=0.00806993 => H0 rejected
+[327] Total 760 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[328] Total 760 ChiSquare(x,y) = 11.1822 CV=0.121299 p=0.000612264 => H0 rejected
+[329] Total 760 ChiSquare(x,y) = 11.1822 CV=-0.121299 p=0.000612264 => H0 rejected
+[330] Total 6328 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[331] Total 6328 ChiSquare(x,y) = 2.35663 CV=0.019298 p=0.121693 => H0 accepted
+[332] Total 6328 ChiSquare(x,y) = 2.35663 CV=-0.019298 p=0.121693 => H0 accepted
+[333] Total 7088 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[334] Total 7088 ChiSquare(x,y) = 6.88167 CV=0.0311591 p=0.00806993 => H0 rejected
+[335] Total 7088 ChiSquare(x,y) = 6.88167 CV=-0.0311591 p=0.00806993 => H0 rejected
+[336] Total 760 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[337] Total 760 ChiSquare(x,y) = 11.1822 CV=0.121299 p=0.000612264 => H0 rejected
+[338] Total 760 ChiSquare(x,y) = 11.1822 CV=-0.121299 p=0.000612264 => H0 rejected
+[339] Total 6328 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[340] Total 6328 ChiSquare(x,y) = 2.35663 CV=0.019298 p=0.121693 => H0 accepted
+[341] Total 6328 ChiSquare(x,y) = 2.35663 CV=-0.019298 p=0.121693 => H0 accepted
+[351] Total 730 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[352] Total 730 ChiSquare(x,y) = 38.1513 CV=0.228609 p=5.8041e-11 => H0 rejected
+[353] Total 730 ChiSquare(x,y) = 38.1513 CV=-0.228609 p=5.8041e-11 => H0 rejected
+[354] Total 83 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[355] Total 83 ChiSquare(x,y) = 3.79673 CV=0.213878 p=0.0513144 => H0 accepted
+[356] Total 83 ChiSquare(x,y) = 3.79673 CV=-0.213878 p=0.0513144 => H0 accepted
+[357] Total 647 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[358] Total 647 ChiSquare(x,y) = 34.2703 CV=0.230148 p=5.9484e-10 => H0 rejected
+[359] Total 647 ChiSquare(x,y) = 34.2703 CV=-0.230148 p=5.9484e-10 => H0 rejected
+[360] Total 730 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[361] Total 730 ChiSquare(x,y) = 38.1513 CV=0.228609 p=5.8041e-11 => H0 rejected
+[362] Total 730 ChiSquare(x,y) = 38.1513 CV=-0.228609 p=5.8041e-11 => H0 rejected
+[363] Total 83 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[364] Total 83 ChiSquare(x,y) = 3.79673 CV=0.213878 p=0.0513144 => H0 accepted
+[365] Total 83 ChiSquare(x,y) = 3.79673 CV=-0.213878 p=0.0513144 => H0 accepted
+[366] Total 647 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[367] Total 647 ChiSquare(x,y) = 34.2703 CV=0.230148 p=5.9484e-10 => H0 rejected
+[368] Total 647 ChiSquare(x,y) = 34.2703 CV=-0.230148 p=5.9484e-10 => H0 rejected
+[378] Total 6358 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[379] Total 6358 ChiSquare(x,y) = 0.210685 CV=0.00575647 p=0.440661 => H0 accepted
+[380] Total 6358 ChiSquare(x,y) = 0.210685 CV=-0.00575647 p=0.440661 => H0 accepted
+[381] Total 677 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[382] Total 677 ChiSquare(x,y) = 6.66556 CV=0.0992256 p=0.00918646 => H0 rejected
+[383] Total 677 ChiSquare(x,y) = 6.66556 CV=-0.0992256 p=0.00918646 => H0 rejected
+[384] Total 5681 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[385] Total 5681 ChiSquare(x,y) = 0.243902 CV=-0.00655232 p=0.43197 => H0 accepted
+[386] Total 5681 ChiSquare(x,y) = 0.243902 CV=0.00655232 p=0.43197 => H0 accepted
+[387] Total 6358 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[388] Total 6358 ChiSquare(x,y) = 0.210685 CV=0.00575647 p=0.440661 => H0 accepted
+[389] Total 6358 ChiSquare(x,y) = 0.210685 CV=-0.00575647 p=0.440661 => H0 accepted
+[390] Total 677 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[391] Total 677 ChiSquare(x,y) = 6.66556 CV=0.0992256 p=0.00918646 => H0 rejected
+[392] Total 677 ChiSquare(x,y) = 6.66556 CV=-0.0992256 p=0.00918646 => H0 rejected
+[393] Total 5681 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[394] Total 5681 ChiSquare(x,y) = 0.243902 CV=-0.00655232 p=0.43197 => H0 accepted
+[395] Total 5681 ChiSquare(x,y) = 0.243902 CV=0.00655232 p=0.43197 => H0 accepted
+[405] Total 3303 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[406] Total 3303 ChiSquare(x,y) = 18.9427 CV=0.0757298 p=5.83414e-06 => H0 rejected
+[407] Total 3303 ChiSquare(x,y) = 18.9427 CV=-0.0757298 p=5.83414e-06 => H0 rejected
+[408] Total 327 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[409] Total 327 ChiSquare(x,y) = 3.80458 CV=0.107865 p=0.0510733 => H0 accepted
+[410] Total 327 ChiSquare(x,y) = 3.80458 CV=-0.107865 p=0.0510733 => H0 accepted
+[411] Total 2976 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[412] Total 2976 ChiSquare(x,y) = 14.7973 CV=0.0705138 p=7.00679e-05 => H0 rejected
+[413] Total 2976 ChiSquare(x,y) = 14.7973 CV=-0.0705138 p=7.00679e-05 => H0 rejected
+[414] Total 3303 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[415] Total 3303 ChiSquare(x,y) = 18.9427 CV=0.0757298 p=5.83414e-06 => H0 rejected
+[416] Total 3303 ChiSquare(x,y) = 18.9427 CV=-0.0757298 p=5.83414e-06 => H0 rejected
+[417] Total 327 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[418] Total 327 ChiSquare(x,y) = 3.80458 CV=0.107865 p=0.0510733 => H0 accepted
+[419] Total 327 ChiSquare(x,y) = 3.80458 CV=-0.107865 p=0.0510733 => H0 accepted
+[420] Total 2976 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[421] Total 2976 ChiSquare(x,y) = 14.7973 CV=0.0705138 p=7.00679e-05 => H0 rejected
+[422] Total 2976 ChiSquare(x,y) = 14.7973 CV=-0.0705138 p=7.00679e-05 => H0 rejected
+[432] Total 262 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[433] Total 262 ChiSquare(x,y) = 12.6976 CV=0.220145 p=0.000246782 => H0 rejected
+[434] Total 262 ChiSquare(x,y) = 12.6976 CV=-0.220145 p=0.000246782 => H0 rejected
+[435] Total 28 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[436] Total 28 ChiSquare(x,y) = 0.642792 CV=0.151515 p=0.340076 => H0 accepted
+[437] Total 28 ChiSquare(x,y) = 0.642792 CV=-0.151515 p=0.340076 => H0 accepted
+[438] Total 234 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[439] Total 234 ChiSquare(x,y) = 12.3345 CV=0.22959 p=0.000306806 => H0 rejected
+[440] Total 234 ChiSquare(x,y) = 12.3345 CV=-0.22959 p=0.000306806 => H0 rejected
+[441] Total 262 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[442] Total 262 ChiSquare(x,y) = 12.6976 CV=0.220145 p=0.000246782 => H0 rejected
+[443] Total 262 ChiSquare(x,y) = 12.6976 CV=-0.220145 p=0.000246782 => H0 rejected
+[444] Total 28 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[445] Total 28 ChiSquare(x,y) = 0.642792 CV=0.151515 p=0.340076 => H0 accepted
+[446] Total 28 ChiSquare(x,y) = 0.642792 CV=-0.151515 p=0.340076 => H0 accepted
+[447] Total 234 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[448] Total 234 ChiSquare(x,y) = 12.3345 CV=0.22959 p=0.000306806 => H0 rejected
+[449] Total 234 ChiSquare(x,y) = 12.3345 CV=-0.22959 p=0.000306806 => H0 rejected
+[459] Total 3041 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[460] Total 3041 ChiSquare(x,y) = 7.13359 CV=0.0484335 p=0.00693849 => H0 rejected
+[461] Total 3041 ChiSquare(x,y) = 7.13359 CV=-0.0484335 p=0.00693849 => H0 rejected
+[462] Total 299 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[463] Total 299 ChiSquare(x,y) = 1.60258 CV=0.0732107 p=0.191263 => H0 accepted
+[464] Total 299 ChiSquare(x,y) = 1.60258 CV=-0.0732107 p=0.191263 => H0 accepted
+[465] Total 2742 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[466] Total 2742 ChiSquare(x,y) = 5.235 CV=0.0436943 p=0.0216615 => H0 accepted
+[467] Total 2742 ChiSquare(x,y) = 5.235 CV=-0.0436943 p=0.0216615 => H0 accepted
+[468] Total 3041 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[469] Total 3041 ChiSquare(x,y) = 7.13359 CV=0.0484335 p=0.00693849 => H0 rejected
+[470] Total 3041 ChiSquare(x,y) = 7.13359 CV=-0.0484335 p=0.00693849 => H0 rejected
+[471] Total 299 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[472] Total 299 ChiSquare(x,y) = 1.60258 CV=0.0732107 p=0.191263 => H0 accepted
+[473] Total 299 ChiSquare(x,y) = 1.60258 CV=-0.0732107 p=0.191263 => H0 accepted
+[474] Total 2742 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[475] Total 2742 ChiSquare(x,y) = 5.235 CV=0.0436943 p=0.0216615 => H0 accepted
+[476] Total 2742 ChiSquare(x,y) = 5.235 CV=-0.0436943 p=0.0216615 => H0 accepted
+[486] Total 27430 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[487] Total 27430 ChiSquare(x,y) = 128.969 CV=0.0685692 p=1.29844e-34 => H0 rejected
+[488] Total 27430 ChiSquare(x,y) = 128.969 CV=-0.0685692 p=1.29844e-34 => H0 rejected
+[489] Total 2901 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[490] Total 2901 ChiSquare(x,y) = 26.5617 CV=0.0956872 p=6.05159e-08 => H0 rejected
+[491] Total 2901 ChiSquare(x,y) = 26.5617 CV=-0.0956872 p=6.05159e-08 => H0 rejected
+[492] Total 24529 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[493] Total 24529 ChiSquare(x,y) = 104.532 CV=0.0652806 p=3.00008e-28 => H0 rejected
+[494] Total 24529 ChiSquare(x,y) = 104.532 CV=-0.0652806 p=3.00008e-28 => H0 rejected
+[495] Total 27430 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[496] Total 27430 ChiSquare(x,y) = 128.969 CV=0.0685692 p=1.29844e-34 => H0 rejected
+[497] Total 27430 ChiSquare(x,y) = 128.969 CV=-0.0685692 p=1.29844e-34 => H0 rejected
+[498] Total 2901 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[499] Total 2901 ChiSquare(x,y) = 26.5617 CV=0.0956872 p=6.05159e-08 => H0 rejected
+[500] Total 2901 ChiSquare(x,y) = 26.5617 CV=-0.0956872 p=6.05159e-08 => H0 rejected
+[501] Total 24529 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[502] Total 24529 ChiSquare(x,y) = 104.532 CV=0.0652806 p=3.00008e-28 => H0 rejected
+[503] Total 24529 ChiSquare(x,y) = 104.532 CV=-0.0652806 p=3.00008e-28 => H0 rejected
+[513] Total 2977 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[514] Total 2977 ChiSquare(x,y) = 43.4675 CV=0.120835 p=2.39497e-12 => H0 rejected
+[515] Total 2977 ChiSquare(x,y) = 43.4675 CV=-0.120835 p=2.39497e-12 => H0 rejected
+[516] Total 319 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[517] Total 319 ChiSquare(x,y) = 8.70553 CV=0.165197 p=0.00270336 => H0 rejected
+[518] Total 319 ChiSquare(x,y) = 8.70553 CV=-0.165197 p=0.00270336 => H0 rejected
+[519] Total 2658 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[520] Total 2658 ChiSquare(x,y) = 35.4839 CV=0.115542 p=2.87325e-10 => H0 rejected
+[521] Total 2658 ChiSquare(x,y) = 35.4839 CV=-0.115542 p=2.87325e-10 => H0 rejected
+[522] Total 2977 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[523] Total 2977 ChiSquare(x,y) = 43.4675 CV=0.120835 p=2.39497e-12 => H0 rejected
+[524] Total 2977 ChiSquare(x,y) = 43.4675 CV=-0.120835 p=2.39497e-12 => H0 rejected
+[525] Total 319 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[526] Total 319 ChiSquare(x,y) = 8.70553 CV=0.165197 p=0.00270336 => H0 rejected
+[527] Total 319 ChiSquare(x,y) = 8.70553 CV=-0.165197 p=0.00270336 => H0 rejected
+[528] Total 2658 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[529] Total 2658 ChiSquare(x,y) = 35.4839 CV=0.115542 p=2.87325e-10 => H0 rejected
+[530] Total 2658 ChiSquare(x,y) = 35.4839 CV=-0.115542 p=2.87325e-10 => H0 rejected
+[540] Total 24453 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[541] Total 24453 ChiSquare(x,y) = 78.1451 CV=0.0565307 p=2.232e-21 => H0 rejected
+[542] Total 24453 ChiSquare(x,y) = 78.1451 CV=-0.0565307 p=2.232e-21 => H0 rejected
+[543] Total 2582 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[544] Total 2582 ChiSquare(x,y) = 17.088 CV=0.0813518 p=1.77409e-05 => H0 rejected
+[545] Total 2582 ChiSquare(x,y) = 17.088 CV=-0.0813518 p=1.77409e-05 => H0 rejected
+[546] Total 21871 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[547] Total 21871 ChiSquare(x,y) = 62.5302 CV=0.0534701 p=2.60054e-17 => H0 rejected
+[548] Total 21871 ChiSquare(x,y) = 62.5302 CV=-0.0534701 p=2.60054e-17 => H0 rejected
+[549] Total 24453 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[550] Total 24453 ChiSquare(x,y) = 78.1451 CV=0.0565307 p=2.232e-21 => H0 rejected
+[551] Total 24453 ChiSquare(x,y) = 78.1451 CV=-0.0565307 p=2.232e-21 => H0 rejected
+[552] Total 2582 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[553] Total 2582 ChiSquare(x,y) = 17.088 CV=0.0813518 p=1.77409e-05 => H0 rejected
+[554] Total 2582 ChiSquare(x,y) = 17.088 CV=-0.0813518 p=1.77409e-05 => H0 rejected
+[555] Total 21871 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[556] Total 21871 ChiSquare(x,y) = 62.5302 CV=0.0534701 p=2.60054e-17 => H0 rejected
+[557] Total 21871 ChiSquare(x,y) = 62.5302 CV=-0.0534701 p=2.60054e-17 => H0 rejected
+[567] Total 14612 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[568] Total 14612 ChiSquare(x,y) = 53.0172 CV=0.0602357 p=7.80545e-15 => H0 rejected
+[569] Total 14612 ChiSquare(x,y) = 53.0172 CV=-0.0602357 p=7.80545e-15 => H0 rejected
+[570] Total 1770 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[571] Total 1770 ChiSquare(x,y) = 12.7923 CV=0.0850136 p=0.000233147 => H0 rejected
+[572] Total 1770 ChiSquare(x,y) = 12.7923 CV=-0.0850136 p=0.000233147 => H0 rejected
+[573] Total 12842 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[574] Total 12842 ChiSquare(x,y) = 41.4926 CV=0.0568419 p=7.82729e-12 => H0 rejected
+[575] Total 12842 ChiSquare(x,y) = 41.4926 CV=-0.0568419 p=7.82729e-12 => H0 rejected
+[576] Total 14612 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[577] Total 14612 ChiSquare(x,y) = 53.0172 CV=0.0602357 p=7.80545e-15 => H0 rejected
+[578] Total 14612 ChiSquare(x,y) = 53.0172 CV=-0.0602357 p=7.80545e-15 => H0 rejected
+[579] Total 1770 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[580] Total 1770 ChiSquare(x,y) = 12.7923 CV=0.0850136 p=0.000233147 => H0 rejected
+[581] Total 1770 ChiSquare(x,y) = 12.7923 CV=-0.0850136 p=0.000233147 => H0 rejected
+[582] Total 12842 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[583] Total 12842 ChiSquare(x,y) = 41.4926 CV=0.0568419 p=7.82729e-12 => H0 rejected
+[584] Total 12842 ChiSquare(x,y) = 41.4926 CV=-0.0568419 p=7.82729e-12 => H0 rejected
+[594] Total 1918 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[595] Total 1918 ChiSquare(x,y) = 29.6221 CV=0.124275 p=9.65815e-09 => H0 rejected
+[596] Total 1918 ChiSquare(x,y) = 29.6221 CV=-0.124275 p=9.65815e-09 => H0 rejected
+[597] Total 219 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[598] Total 219 ChiSquare(x,y) = 4.93906 CV=0.150176 p=0.0258676 => H0 accepted
+[599] Total 219 ChiSquare(x,y) = 4.93906 CV=-0.150176 p=0.0258676 => H0 accepted
+[600] Total 1699 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[601] Total 1699 ChiSquare(x,y) = 24.8742 CV=0.120998 p=1.6646e-07 => H0 rejected
+[602] Total 1699 ChiSquare(x,y) = 24.8742 CV=-0.120998 p=1.6646e-07 => H0 rejected
+[603] Total 1918 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[604] Total 1918 ChiSquare(x,y) = 29.6221 CV=0.124275 p=9.65815e-09 => H0 rejected
+[605] Total 1918 ChiSquare(x,y) = 29.6221 CV=-0.124275 p=9.65815e-09 => H0 rejected
+[606] Total 219 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[607] Total 219 ChiSquare(x,y) = 4.93906 CV=0.150176 p=0.0258676 => H0 accepted
+[608] Total 219 ChiSquare(x,y) = 4.93906 CV=-0.150176 p=0.0258676 => H0 accepted
+[609] Total 1699 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[610] Total 1699 ChiSquare(x,y) = 24.8742 CV=0.120998 p=1.6646e-07 => H0 rejected
+[611] Total 1699 ChiSquare(x,y) = 24.8742 CV=-0.120998 p=1.6646e-07 => H0 rejected
+[621] Total 12694 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[622] Total 12694 ChiSquare(x,y) = 34.1812 CV=0.0518913 p=6.27507e-10 => H0 rejected
+[623] Total 12694 ChiSquare(x,y) = 34.1812 CV=-0.0518913 p=6.27507e-10 => H0 rejected
+[624] Total 1551 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[625] Total 1551 ChiSquare(x,y) = 7.54452 CV=0.0697445 p=0.00542314 => H0 rejected
+[626] Total 1551 ChiSquare(x,y) = 7.54452 CV=-0.0697445 p=0.00542314 => H0 rejected
+[627] Total 11143 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[628] Total 11143 ChiSquare(x,y) = 27.2957 CV=0.0494933 p=3.89685e-08 => H0 rejected
+[629] Total 11143 ChiSquare(x,y) = 27.2957 CV=-0.0494933 p=3.89685e-08 => H0 rejected
+[630] Total 12694 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[631] Total 12694 ChiSquare(x,y) = 34.1812 CV=0.0518913 p=6.27507e-10 => H0 rejected
+[632] Total 12694 ChiSquare(x,y) = 34.1812 CV=-0.0518913 p=6.27507e-10 => H0 rejected
+[633] Total 1551 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[634] Total 1551 ChiSquare(x,y) = 7.54452 CV=0.0697445 p=0.00542314 => H0 rejected
+[635] Total 1551 ChiSquare(x,y) = 7.54452 CV=-0.0697445 p=0.00542314 => H0 rejected
+[636] Total 11143 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[637] Total 11143 ChiSquare(x,y) = 27.2957 CV=0.0494933 p=3.89685e-08 => H0 rejected
+[638] Total 11143 ChiSquare(x,y) = 27.2957 CV=-0.0494933 p=3.89685e-08 => H0 rejected
+[648] Total 12818 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[649] Total 12818 ChiSquare(x,y) = 78.7629 CV=0.0783882 p=1.54096e-21 => H0 rejected
+[650] Total 12818 ChiSquare(x,y) = 78.7629 CV=-0.0783882 p=1.54096e-21 => H0 rejected
+[651] Total 1131 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[652] Total 1131 ChiSquare(x,y) = 14.5212 CV=0.11331 p=8.26835e-05 => H0 rejected
+[653] Total 1131 ChiSquare(x,y) = 14.5212 CV=-0.11331 p=8.26835e-05 => H0 rejected
+[654] Total 11687 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[655] Total 11687 ChiSquare(x,y) = 65.3994 CV=0.0748058 p=4.65456e-18 => H0 rejected
+[656] Total 11687 ChiSquare(x,y) = 65.3994 CV=-0.0748058 p=4.65456e-18 => H0 rejected
+[657] Total 12818 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[658] Total 12818 ChiSquare(x,y) = 78.7629 CV=0.0783882 p=1.54096e-21 => H0 rejected
+[659] Total 12818 ChiSquare(x,y) = 78.7629 CV=-0.0783882 p=1.54096e-21 => H0 rejected
+[660] Total 1131 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[661] Total 1131 ChiSquare(x,y) = 14.5212 CV=0.11331 p=8.26835e-05 => H0 rejected
+[662] Total 1131 ChiSquare(x,y) = 14.5212 CV=-0.11331 p=8.26835e-05 => H0 rejected
+[663] Total 11687 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[664] Total 11687 ChiSquare(x,y) = 65.3994 CV=0.0748058 p=4.65456e-18 => H0 rejected
+[665] Total 11687 ChiSquare(x,y) = 65.3994 CV=-0.0748058 p=4.65456e-18 => H0 rejected
+[675] Total 1059 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[676] Total 1059 ChiSquare(x,y) = 15.7143 CV=0.121815 p=4.04291e-05 => H0 rejected
+[677] Total 1059 ChiSquare(x,y) = 15.7143 CV=-0.121815 p=4.04291e-05 => H0 rejected
+[678] Total 100 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[679] Total 100 ChiSquare(x,y) = 4.44938 CV=0.210936 p=0.0346958 => H0 accepted
+[680] Total 100 ChiSquare(x,y) = 4.44938 CV=-0.210936 p=0.0346958 => H0 accepted
+[681] Total 959 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[682] Total 959 ChiSquare(x,y) = 12.1344 CV=0.112486 p=0.000345916 => H0 rejected
+[683] Total 959 ChiSquare(x,y) = 12.1344 CV=-0.112486 p=0.000345916 => H0 rejected
+[684] Total 1059 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[685] Total 1059 ChiSquare(x,y) = 15.7143 CV=0.121815 p=4.04291e-05 => H0 rejected
+[686] Total 1059 ChiSquare(x,y) = 15.7143 CV=-0.121815 p=4.04291e-05 => H0 rejected
+[687] Total 100 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[688] Total 100 ChiSquare(x,y) = 4.44938 CV=0.210936 p=0.0346958 => H0 accepted
+[689] Total 100 ChiSquare(x,y) = 4.44938 CV=-0.210936 p=0.0346958 => H0 accepted
+[690] Total 959 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[691] Total 959 ChiSquare(x,y) = 12.1344 CV=0.112486 p=0.000345916 => H0 rejected
+[692] Total 959 ChiSquare(x,y) = 12.1344 CV=-0.112486 p=0.000345916 => H0 rejected
+[702] Total 11759 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[703] Total 11759 ChiSquare(x,y) = 51.8112 CV=0.0663784 p=1.60868e-14 => H0 rejected
+[704] Total 11759 ChiSquare(x,y) = 51.8112 CV=-0.0663784 p=1.60868e-14 => H0 rejected
+[705] Total 1031 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[706] Total 1031 ChiSquare(x,y) = 10.5001 CV=0.100918 p=0.000921661 => H0 rejected
+[707] Total 1031 ChiSquare(x,y) = 10.5001 CV=-0.100918 p=0.000921661 => H0 rejected
+[708] Total 10728 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[709] Total 10728 ChiSquare(x,y) = 42.3643 CV=0.0628407 p=4.64082e-12 => H0 rejected
+[710] Total 10728 ChiSquare(x,y) = 42.3643 CV=-0.0628407 p=4.64082e-12 => H0 rejected
+[711] Total 11759 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[712] Total 11759 ChiSquare(x,y) = 51.8112 CV=0.0663784 p=1.60868e-14 => H0 rejected
+[713] Total 11759 ChiSquare(x,y) = 51.8112 CV=-0.0663784 p=1.60868e-14 => H0 rejected
+[714] Total 1031 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[715] Total 1031 ChiSquare(x,y) = 10.5001 CV=0.100918 p=0.000921661 => H0 rejected
+[716] Total 1031 ChiSquare(x,y) = 10.5001 CV=-0.100918 p=0.000921661 => H0 rejected
+[717] Total 10728 ChiSquare(x,y) = nan CV=nan p=nan => H0 accepted
+[718] Total 10728 ChiSquare(x,y) = 42.3643 CV=0.0628407 p=4.64082e-12 => H0 rejected
+[719] Total 10728 ChiSquare(x,y) = 42.3643 CV=-0.0628407 p=4.64082e-12 => H0 rejected
+
+===========================
+Code table NC=6:
+0 [size=0]:
+1 [size=1]: c5
+2 [size=1]: !c5
+3 [size=1]: c4
+4 [size=2]: c4 c5
+5 [size=2]: c4 !c5
+6 [size=1]: !c4
+7 [size=2]: !c4 c5
+8 [size=2]: !c4 !c5
+9 [size=1]: c3
+10 [size=2]: c3 c5
+11 [size=2]: c3 !c5
+12 [size=2]: c3 c4
+13 [size=3]: c3 c4 c5
+14 [size=3]: c3 c4 !c5
+15 [size=2]: c3 !c4
+16 [size=3]: c3 !c4 c5
+17 [size=3]: c3 !c4 !c5
+18 [size=1]: !c3
+19 [size=2]: !c3 c5
+20 [size=2]: !c3 !c5
+21 [size=2]: !c3 c4
+22 [size=3]: !c3 c4 c5
+23 [size=3]: !c3 c4 !c5
+24 [size=2]: !c3 !c4
+25 [size=3]: !c3 !c4 c5
+26 [size=3]: !c3 !c4 !c5
+27 [size=1]: c2
+28 [size=2]: c2 c5
+29 [size=2]: c2 !c5
+30 [size=2]: c2 c4
+31 [size=3]: c2 c4 c5
+32 [size=3]: c2 c4 !c5
+33 [size=2]: c2 !c4
+34 [size=3]: c2 !c4 c5
+35 [size=3]: c2 !c4 !c5
+36 [size=2]: c2 c3
+37 [size=3]: c2 c3 c5
+38 [size=3]: c2 c3 !c5
+39 [size=3]: c2 c3 c4
+40 [size=4]: c2 c3 c4 c5
+41 [size=4]: c2 c3 c4 !c5
+42 [size=3]: c2 c3 !c4
+43 [size=4]: c2 c3 !c4 c5
+44 [size=4]: c2 c3 !c4 !c5
+45 [size=2]: c2 !c3
+46 [size=3]: c2 !c3 c5
+47 [size=3]: c2 !c3 !c5
+48 [size=3]: c2 !c3 c4
+49 [size=4]: c2 !c3 c4 c5
+50 [size=4]: c2 !c3 c4 !c5
+51 [size=3]: c2 !c3 !c4
+52 [size=4]: c2 !c3 !c4 c5
+53 [size=4]: c2 !c3 !c4 !c5
+54 [size=1]: !c2
+55 [size=2]: !c2 c5
+56 [size=2]: !c2 !c5
+57 [size=2]: !c2 c4
+58 [size=3]: !c2 c4 c5
+59 [size=3]: !c2 c4 !c5
+60 [size=2]: !c2 !c4
+61 [size=3]: !c2 !c4 c5
+62 [size=3]: !c2 !c4 !c5
+63 [size=2]: !c2 c3
+64 [size=3]: !c2 c3 c5
+65 [size=3]: !c2 c3 !c5
+66 [size=3]: !c2 c3 c4
+67 [size=4]: !c2 c3 c4 c5
+68 [size=4]: !c2 c3 c4 !c5
+69 [size=3]: !c2 c3 !c4
+70 [size=4]: !c2 c3 !c4 c5
+71 [size=4]: !c2 c3 !c4 !c5
+72 [size=2]: !c2 !c3
+73 [size=3]: !c2 !c3 c5
+74 [size=3]: !c2 !c3 !c5
+75 [size=3]: !c2 !c3 c4
+76 [size=4]: !c2 !c3 c4 c5
+77 [size=4]: !c2 !c3 c4 !c5
+78 [size=3]: !c2 !c3 !c4
+79 [size=4]: !c2 !c3 !c4 c5
+80 [size=4]: !c2 !c3 !c4 !c5
+81 [size=1]: c1
+82 [size=2]: c1 c5
+83 [size=2]: c1 !c5
+84 [size=2]: c1 c4
+85 [size=3]: c1 c4 c5
+86 [size=3]: c1 c4 !c5
+87 [size=2]: c1 !c4
+88 [size=3]: c1 !c4 c5
+89 [size=3]: c1 !c4 !c5
+90 [size=2]: c1 c3
+91 [size=3]: c1 c3 c5
+92 [size=3]: c1 c3 !c5
+93 [size=3]: c1 c3 c4
+94 [size=4]: c1 c3 c4 c5
+95 [size=4]: c1 c3 c4 !c5
+96 [size=3]: c1 c3 !c4
+97 [size=4]: c1 c3 !c4 c5
+98 [size=4]: c1 c3 !c4 !c5
+99 [size=2]: c1 !c3
+100 [size=3]: c1 !c3 c5
+101 [size=3]: c1 !c3 !c5
+102 [size=3]: c1 !c3 c4
+103 [size=4]: c1 !c3 c4 c5
+104 [size=4]: c1 !c3 c4 !c5
+105 [size=3]: c1 !c3 !c4
+106 [size=4]: c1 !c3 !c4 c5
+107 [size=4]: c1 !c3 !c4 !c5
+108 [size=2]: c1 c2
+109 [size=3]: c1 c2 c5
+110 [size=3]: c1 c2 !c5
+111 [size=3]: c1 c2 c4
+112 [size=4]: c1 c2 c4 c5
+113 [size=4]: c1 c2 c4 !c5
+114 [size=3]: c1 c2 !c4
+115 [size=4]: c1 c2 !c4 c5
+116 [size=4]: c1 c2 !c4 !c5
+117 [size=3]: c1 c2 c3
+118 [size=4]: c1 c2 c3 c5
+119 [size=4]: c1 c2 c3 !c5
+120 [size=4]: c1 c2 c3 c4
+121 [size=5]: c1 c2 c3 c4 c5
+122 [size=5]: c1 c2 c3 c4 !c5
+123 [size=4]: c1 c2 c3 !c4
+124 [size=5]: c1 c2 c3 !c4 c5
+125 [size=5]: c1 c2 c3 !c4 !c5
+126 [size=3]: c1 c2 !c3
+127 [size=4]: c1 c2 !c3 c5
+128 [size=4]: c1 c2 !c3 !c5
+129 [size=4]: c1 c2 !c3 c4
+130 [size=5]: c1 c2 !c3 c4 c5
+131 [size=5]: c1 c2 !c3 c4 !c5
+132 [size=4]: c1 c2 !c3 !c4
+133 [size=5]: c1 c2 !c3 !c4 c5
+134 [size=5]: c1 c2 !c3 !c4 !c5
+135 [size=2]: c1 !c2
+136 [size=3]: c1 !c2 c5
+137 [size=3]: c1 !c2 !c5
+138 [size=3]: c1 !c2 c4
+139 [size=4]: c1 !c2 c4 c5
+140 [size=4]: c1 !c2 c4 !c5
+141 [size=3]: c1 !c2 !c4
+142 [size=4]: c1 !c2 !c4 c5
+143 [size=4]: c1 !c2 !c4 !c5
+144 [size=3]: c1 !c2 c3
+145 [size=4]: c1 !c2 c3 c5
+146 [size=4]: c1 !c2 c3 !c5
+147 [size=4]: c1 !c2 c3 c4
+148 [size=5]: c1 !c2 c3 c4 c5
+149 [size=5]: c1 !c2 c3 c4 !c5
+150 [size=4]: c1 !c2 c3 !c4
+151 [size=5]: c1 !c2 c3 !c4 c5
+152 [size=5]: c1 !c2 c3 !c4 !c5
+153 [size=3]: c1 !c2 !c3
+154 [size=4]: c1 !c2 !c3 c5
+155 [size=4]: c1 !c2 !c3 !c5
+156 [size=4]: c1 !c2 !c3 c4
+157 [size=5]: c1 !c2 !c3 c4 c5
+158 [size=5]: c1 !c2 !c3 c4 !c5
+159 [size=4]: c1 !c2 !c3 !c4
+160 [size=5]: c1 !c2 !c3 !c4 c5
+161 [size=5]: c1 !c2 !c3 !c4 !c5
+162 [size=1]: !c1
+163 [size=2]: !c1 c5
+164 [size=2]: !c1 !c5
+165 [size=2]: !c1 c4
+166 [size=3]: !c1 c4 c5
+167 [size=3]: !c1 c4 !c5
+168 [size=2]: !c1 !c4
+169 [size=3]: !c1 !c4 c5
+170 [size=3]: !c1 !c4 !c5
+171 [size=2]: !c1 c3
+172 [size=3]: !c1 c3 c5
+173 [size=3]: !c1 c3 !c5
+174 [size=3]: !c1 c3 c4
+175 [size=4]: !c1 c3 c4 c5
+176 [size=4]: !c1 c3 c4 !c5
+177 [size=3]: !c1 c3 !c4
+178 [size=4]: !c1 c3 !c4 c5
+179 [size=4]: !c1 c3 !c4 !c5
+180 [size=2]: !c1 !c3
+181 [size=3]: !c1 !c3 c5
+182 [size=3]: !c1 !c3 !c5
+183 [size=3]: !c1 !c3 c4
+184 [size=4]: !c1 !c3 c4 c5
+185 [size=4]: !c1 !c3 c4 !c5
+186 [size=3]: !c1 !c3 !c4
+187 [size=4]: !c1 !c3 !c4 c5
+188 [size=4]: !c1 !c3 !c4 !c5
+189 [size=2]: !c1 c2
+190 [size=3]: !c1 c2 c5
+191 [size=3]: !c1 c2 !c5
+192 [size=3]: !c1 c2 c4
+193 [size=4]: !c1 c2 c4 c5
+194 [size=4]: !c1 c2 c4 !c5
+195 [size=3]: !c1 c2 !c4
+196 [size=4]: !c1 c2 !c4 c5
+197 [size=4]: !c1 c2 !c4 !c5
+198 [size=3]: !c1 c2 c3
+199 [size=4]: !c1 c2 c3 c5
+200 [size=4]: !c1 c2 c3 !c5
+201 [size=4]: !c1 c2 c3 c4
+202 [size=5]: !c1 c2 c3 c4 c5
+203 [size=5]: !c1 c2 c3 c4 !c5
+204 [size=4]: !c1 c2 c3 !c4
+205 [size=5]: !c1 c2 c3 !c4 c5
+206 [size=5]: !c1 c2 c3 !c4 !c5
+207 [size=3]: !c1 c2 !c3
+208 [size=4]: !c1 c2 !c3 c5
+209 [size=4]: !c1 c2 !c3 !c5
+210 [size=4]: !c1 c2 !c3 c4
+211 [size=5]: !c1 c2 !c3 c4 c5
+212 [size=5]: !c1 c2 !c3 c4 !c5
+213 [size=4]: !c1 c2 !c3 !c4
+214 [size=5]: !c1 c2 !c3 !c4 c5
+215 [size=5]: !c1 c2 !c3 !c4 !c5
+216 [size=2]: !c1 !c2
+217 [size=3]: !c1 !c2 c5
+218 [size=3]: !c1 !c2 !c5
+219 [size=3]: !c1 !c2 c4
+220 [size=4]: !c1 !c2 c4 c5
+221 [size=4]: !c1 !c2 c4 !c5
+222 [size=3]: !c1 !c2 !c4
+223 [size=4]: !c1 !c2 !c4 c5
+224 [size=4]: !c1 !c2 !c4 !c5
+225 [size=3]: !c1 !c2 c3
+226 [size=4]: !c1 !c2 c3 c5
+227 [size=4]: !c1 !c2 c3 !c5
+228 [size=4]: !c1 !c2 c3 c4
+229 [size=5]: !c1 !c2 c3 c4 c5
+230 [size=5]: !c1 !c2 c3 c4 !c5
+231 [size=4]: !c1 !c2 c3 !c4
+232 [size=5]: !c1 !c2 c3 !c4 c5
+233 [size=5]: !c1 !c2 c3 !c4 !c5
+234 [size=3]: !c1 !c2 !c3
+235 [size=4]: !c1 !c2 !c3 c5
+236 [size=4]: !c1 !c2 !c3 !c5
+237 [size=4]: !c1 !c2 !c3 c4
+238 [size=5]: !c1 !c2 !c3 c4 c5
+239 [size=5]: !c1 !c2 !c3 c4 !c5
+240 [size=4]: !c1 !c2 !c3 !c4
+241 [size=5]: !c1 !c2 !c3 !c4 c5
+242 [size=5]: !c1 !c2 !c3 !c4 !c5
+243 [size=1]: c0
+244 [size=2]: c0 c5
+245 [size=2]: c0 !c5
+246 [size=2]: c0 c4
+247 [size=3]: c0 c4 c5
+248 [size=3]: c0 c4 !c5
+249 [size=2]: c0 !c4
+250 [size=3]: c0 !c4 c5
+251 [size=3]: c0 !c4 !c5
+252 [size=2]: c0 c3
+253 [size=3]: c0 c3 c5
+254 [size=3]: c0 c3 !c5
+255 [size=3]: c0 c3 c4
+256 [size=4]: c0 c3 c4 c5
+257 [size=4]: c0 c3 c4 !c5
+258 [size=3]: c0 c3 !c4
+259 [size=4]: c0 c3 !c4 c5
+260 [size=4]: c0 c3 !c4 !c5
+261 [size=2]: c0 !c3
+262 [size=3]: c0 !c3 c5
+263 [size=3]: c0 !c3 !c5
+264 [size=3]: c0 !c3 c4
+265 [size=4]: c0 !c3 c4 c5
+266 [size=4]: c0 !c3 c4 !c5
+267 [size=3]: c0 !c3 !c4
+268 [size=4]: c0 !c3 !c4 c5
+269 [size=4]: c0 !c3 !c4 !c5
+270 [size=2]: c0 c2
+271 [size=3]: c0 c2 c5
+272 [size=3]: c0 c2 !c5
+273 [size=3]: c0 c2 c4
+274 [size=4]: c0 c2 c4 c5
+275 [size=4]: c0 c2 c4 !c5
+276 [size=3]: c0 c2 !c4
+277 [size=4]: c0 c2 !c4 c5
+278 [size=4]: c0 c2 !c4 !c5
+279 [size=3]: c0 c2 c3
+280 [size=4]: c0 c2 c3 c5
+281 [size=4]: c0 c2 c3 !c5
+282 [size=4]: c0 c2 c3 c4
+283 [size=5]: c0 c2 c3 c4 c5
+284 [size=5]: c0 c2 c3 c4 !c5
+285 [size=4]: c0 c2 c3 !c4
+286 [size=5]: c0 c2 c3 !c4 c5
+287 [size=5]: c0 c2 c3 !c4 !c5
+288 [size=3]: c0 c2 !c3
+289 [size=4]: c0 c2 !c3 c5
+290 [size=4]: c0 c2 !c3 !c5
+291 [size=4]: c0 c2 !c3 c4
+292 [size=5]: c0 c2 !c3 c4 c5
+293 [size=5]: c0 c2 !c3 c4 !c5
+294 [size=4]: c0 c2 !c3 !c4
+295 [size=5]: c0 c2 !c3 !c4 c5
+296 [size=5]: c0 c2 !c3 !c4 !c5
+297 [size=2]: c0 !c2
+298 [size=3]: c0 !c2 c5
+299 [size=3]: c0 !c2 !c5
+300 [size=3]: c0 !c2 c4
+301 [size=4]: c0 !c2 c4 c5
+302 [size=4]: c0 !c2 c4 !c5
+303 [size=3]: c0 !c2 !c4
+304 [size=4]: c0 !c2 !c4 c5
+305 [size=4]: c0 !c2 !c4 !c5
+306 [size=3]: c0 !c2 c3
+307 [size=4]: c0 !c2 c3 c5
+308 [size=4]: c0 !c2 c3 !c5
+309 [size=4]: c0 !c2 c3 c4
+310 [size=5]: c0 !c2 c3 c4 c5
+311 [size=5]: c0 !c2 c3 c4 !c5
+312 [size=4]: c0 !c2 c3 !c4
+313 [size=5]: c0 !c2 c3 !c4 c5
+314 [size=5]: c0 !c2 c3 !c4 !c5
+315 [size=3]: c0 !c2 !c3
+316 [size=4]: c0 !c2 !c3 c5
+317 [size=4]: c0 !c2 !c3 !c5
+318 [size=4]: c0 !c2 !c3 c4
+319 [size=5]: c0 !c2 !c3 c4 c5
+320 [size=5]: c0 !c2 !c3 c4 !c5
+321 [size=4]: c0 !c2 !c3 !c4
+322 [size=5]: c0 !c2 !c3 !c4 c5
+323 [size=5]: c0 !c2 !c3 !c4 !c5
+324 [size=2]: c0 c1
+325 [size=3]: c0 c1 c5
+326 [size=3]: c0 c1 !c5
+327 [size=3]: c0 c1 c4
+328 [size=4]: c0 c1 c4 c5
+329 [size=4]: c0 c1 c4 !c5
+330 [size=3]: c0 c1 !c4
+331 [size=4]: c0 c1 !c4 c5
+332 [size=4]: c0 c1 !c4 !c5
+333 [size=3]: c0 c1 c3
+334 [size=4]: c0 c1 c3 c5
+335 [size=4]: c0 c1 c3 !c5
+336 [size=4]: c0 c1 c3 c4
+337 [size=5]: c0 c1 c3 c4 c5
+338 [size=5]: c0 c1 c3 c4 !c5
+339 [size=4]: c0 c1 c3 !c4
+340 [size=5]: c0 c1 c3 !c4 c5
+341 [size=5]: c0 c1 c3 !c4 !c5
+342 [size=3]: c0 c1 !c3
+343 [size=4]: c0 c1 !c3 c5
+344 [size=4]: c0 c1 !c3 !c5
+345 [size=4]: c0 c1 !c3 c4
+346 [size=5]: c0 c1 !c3 c4 c5
+347 [size=5]: c0 c1 !c3 c4 !c5
+348 [size=4]: c0 c1 !c3 !c4
+349 [size=5]: c0 c1 !c3 !c4 c5
+350 [size=5]: c0 c1 !c3 !c4 !c5
+351 [size=3]: c0 c1 c2
+352 [size=4]: c0 c1 c2 c5
+353 [size=4]: c0 c1 c2 !c5
+354 [size=4]: c0 c1 c2 c4
+355 [size=5]: c0 c1 c2 c4 c5
+356 [size=5]: c0 c1 c2 c4 !c5
+357 [size=4]: c0 c1 c2 !c4
+358 [size=5]: c0 c1 c2 !c4 c5
+359 [size=5]: c0 c1 c2 !c4 !c5
+360 [size=4]: c0 c1 c2 c3
+361 [size=5]: c0 c1 c2 c3 c5
+362 [size=5]: c0 c1 c2 c3 !c5
+363 [size=5]: c0 c1 c2 c3 c4
+364 [size=6]: c0 c1 c2 c3 c4 c5
+365 [size=6]: c0 c1 c2 c3 c4 !c5
+366 [size=5]: c0 c1 c2 c3 !c4
+367 [size=6]: c0 c1 c2 c3 !c4 c5
+368 [size=6]: c0 c1 c2 c3 !c4 !c5
+369 [size=4]: c0 c1 c2 !c3
+370 [size=5]: c0 c1 c2 !c3 c5
+371 [size=5]: c0 c1 c2 !c3 !c5
+372 [size=5]: c0 c1 c2 !c3 c4
+373 [size=6]: c0 c1 c2 !c3 c4 c5
+374 [size=6]: c0 c1 c2 !c3 c4 !c5
+375 [size=5]: c0 c1 c2 !c3 !c4
+376 [size=6]: c0 c1 c2 !c3 !c4 c5
+377 [size=6]: c0 c1 c2 !c3 !c4 !c5
+378 [size=3]: c0 c1 !c2
+379 [size=4]: c0 c1 !c2 c5
+380 [size=4]: c0 c1 !c2 !c5
+381 [size=4]: c0 c1 !c2 c4
+382 [size=5]: c0 c1 !c2 c4 c5
+383 [size=5]: c0 c1 !c2 c4 !c5
+384 [size=4]: c0 c1 !c2 !c4
+385 [size=5]: c0 c1 !c2 !c4 c5
+386 [size=5]: c0 c1 !c2 !c4 !c5
+387 [size=4]: c0 c1 !c2 c3
+388 [size=5]: c0 c1 !c2 c3 c5
+389 [size=5]: c0 c1 !c2 c3 !c5
+390 [size=5]: c0 c1 !c2 c3 c4
+391 [size=6]: c0 c1 !c2 c3 c4 c5
+392 [size=6]: c0 c1 !c2 c3 c4 !c5
+393 [size=5]: c0 c1 !c2 c3 !c4
+394 [size=6]: c0 c1 !c2 c3 !c4 c5
+395 [size=6]: c0 c1 !c2 c3 !c4 !c5
+396 [size=4]: c0 c1 !c2 !c3
+397 [size=5]: c0 c1 !c2 !c3 c5
+398 [size=5]: c0 c1 !c2 !c3 !c5
+399 [size=5]: c0 c1 !c2 !c3 c4
+400 [size=6]: c0 c1 !c2 !c3 c4 c5
+401 [size=6]: c0 c1 !c2 !c3 c4 !c5
+402 [size=5]: c0 c1 !c2 !c3 !c4
+403 [size=6]: c0 c1 !c2 !c3 !c4 c5
+404 [size=6]: c0 c1 !c2 !c3 !c4 !c5
+405 [size=2]: c0 !c1
+406 [size=3]: c0 !c1 c5
+407 [size=3]: c0 !c1 !c5
+408 [size=3]: c0 !c1 c4
+409 [size=4]: c0 !c1 c4 c5
+410 [size=4]: c0 !c1 c4 !c5
+411 [size=3]: c0 !c1 !c4
+412 [size=4]: c0 !c1 !c4 c5
+413 [size=4]: c0 !c1 !c4 !c5
+414 [size=3]: c0 !c1 c3
+415 [size=4]: c0 !c1 c3 c5
+416 [size=4]: c0 !c1 c3 !c5
+417 [size=4]: c0 !c1 c3 c4
+418 [size=5]: c0 !c1 c3 c4 c5
+419 [size=5]: c0 !c1 c3 c4 !c5
+420 [size=4]: c0 !c1 c3 !c4
+421 [size=5]: c0 !c1 c3 !c4 c5
+422 [size=5]: c0 !c1 c3 !c4 !c5
+423 [size=3]: c0 !c1 !c3
+424 [size=4]: c0 !c1 !c3 c5
+425 [size=4]: c0 !c1 !c3 !c5
+426 [size=4]: c0 !c1 !c3 c4
+427 [size=5]: c0 !c1 !c3 c4 c5
+428 [size=5]: c0 !c1 !c3 c4 !c5
+429 [size=4]: c0 !c1 !c3 !c4
+430 [size=5]: c0 !c1 !c3 !c4 c5
+431 [size=5]: c0 !c1 !c3 !c4 !c5
+432 [size=3]: c0 !c1 c2
+433 [size=4]: c0 !c1 c2 c5
+434 [size=4]: c0 !c1 c2 !c5
+435 [size=4]: c0 !c1 c2 c4
+436 [size=5]: c0 !c1 c2 c4 c5
+437 [size=5]: c0 !c1 c2 c4 !c5
+438 [size=4]: c0 !c1 c2 !c4
+439 [size=5]: c0 !c1 c2 !c4 c5
+440 [size=5]: c0 !c1 c2 !c4 !c5
+441 [size=4]: c0 !c1 c2 c3
+442 [size=5]: c0 !c1 c2 c3 c5
+443 [size=5]: c0 !c1 c2 c3 !c5
+444 [size=5]: c0 !c1 c2 c3 c4
+445 [size=6]: c0 !c1 c2 c3 c4 c5
+446 [size=6]: c0 !c1 c2 c3 c4 !c5
+447 [size=5]: c0 !c1 c2 c3 !c4
+448 [size=6]: c0 !c1 c2 c3 !c4 c5
+449 [size=6]: c0 !c1 c2 c3 !c4 !c5
+450 [size=4]: c0 !c1 c2 !c3
+451 [size=5]: c0 !c1 c2 !c3 c5
+452 [size=5]: c0 !c1 c2 !c3 !c5
+453 [size=5]: c0 !c1 c2 !c3 c4
+454 [size=6]: c0 !c1 c2 !c3 c4 c5
+455 [size=6]: c0 !c1 c2 !c3 c4 !c5
+456 [size=5]: c0 !c1 c2 !c3 !c4
+457 [size=6]: c0 !c1 c2 !c3 !c4 c5
+458 [size=6]: c0 !c1 c2 !c3 !c4 !c5
+459 [size=3]: c0 !c1 !c2
+460 [size=4]: c0 !c1 !c2 c5
+461 [size=4]: c0 !c1 !c2 !c5
+462 [size=4]: c0 !c1 !c2 c4
+463 [size=5]: c0 !c1 !c2 c4 c5
+464 [size=5]: c0 !c1 !c2 c4 !c5
+465 [size=4]: c0 !c1 !c2 !c4
+466 [size=5]: c0 !c1 !c2 !c4 c5
+467 [size=5]: c0 !c1 !c2 !c4 !c5
+468 [size=4]: c0 !c1 !c2 c3
+469 [size=5]: c0 !c1 !c2 c3 c5
+470 [size=5]: c0 !c1 !c2 c3 !c5
+471 [size=5]: c0 !c1 !c2 c3 c4
+472 [size=6]: c0 !c1 !c2 c3 c4 c5
+473 [size=6]: c0 !c1 !c2 c3 c4 !c5
+474 [size=5]: c0 !c1 !c2 c3 !c4
+475 [size=6]: c0 !c1 !c2 c3 !c4 c5
+476 [size=6]: c0 !c1 !c2 c3 !c4 !c5
+477 [size=4]: c0 !c1 !c2 !c3
+478 [size=5]: c0 !c1 !c2 !c3 c5
+479 [size=5]: c0 !c1 !c2 !c3 !c5
+480 [size=5]: c0 !c1 !c2 !c3 c4
+481 [size=6]: c0 !c1 !c2 !c3 c4 c5
+482 [size=6]: c0 !c1 !c2 !c3 c4 !c5
+483 [size=5]: c0 !c1 !c2 !c3 !c4
+484 [size=6]: c0 !c1 !c2 !c3 !c4 c5
+485 [size=6]: c0 !c1 !c2 !c3 !c4 !c5
+486 [size=1]: !c0
+487 [size=2]: !c0 c5
+488 [size=2]: !c0 !c5
+489 [size=2]: !c0 c4
+490 [size=3]: !c0 c4 c5
+491 [size=3]: !c0 c4 !c5
+492 [size=2]: !c0 !c4
+493 [size=3]: !c0 !c4 c5
+494 [size=3]: !c0 !c4 !c5
+495 [size=2]: !c0 c3
+496 [size=3]: !c0 c3 c5
+497 [size=3]: !c0 c3 !c5
+498 [size=3]: !c0 c3 c4
+499 [size=4]: !c0 c3 c4 c5
+500 [size=4]: !c0 c3 c4 !c5
+501 [size=3]: !c0 c3 !c4
+502 [size=4]: !c0 c3 !c4 c5
+503 [size=4]: !c0 c3 !c4 !c5
+504 [size=2]: !c0 !c3
+505 [size=3]: !c0 !c3 c5
+506 [size=3]: !c0 !c3 !c5
+507 [size=3]: !c0 !c3 c4
+508 [size=4]: !c0 !c3 c4 c5
+509 [size=4]: !c0 !c3 c4 !c5
+510 [size=3]: !c0 !c3 !c4
+511 [size=4]: !c0 !c3 !c4 c5
+512 [size=4]: !c0 !c3 !c4 !c5
+513 [size=2]: !c0 c2
+514 [size=3]: !c0 c2 c5
+515 [size=3]: !c0 c2 !c5
+516 [size=3]: !c0 c2 c4
+517 [size=4]: !c0 c2 c4 c5
+518 [size=4]: !c0 c2 c4 !c5
+519 [size=3]: !c0 c2 !c4
+520 [size=4]: !c0 c2 !c4 c5
+521 [size=4]: !c0 c2 !c4 !c5
+522 [size=3]: !c0 c2 c3
+523 [size=4]: !c0 c2 c3 c5
+524 [size=4]: !c0 c2 c3 !c5
+525 [size=4]: !c0 c2 c3 c4
+526 [size=5]: !c0 c2 c3 c4 c5
+527 [size=5]: !c0 c2 c3 c4 !c5
+528 [size=4]: !c0 c2 c3 !c4
+529 [size=5]: !c0 c2 c3 !c4 c5
+530 [size=5]: !c0 c2 c3 !c4 !c5
+531 [size=3]: !c0 c2 !c3
+532 [size=4]: !c0 c2 !c3 c5
+533 [size=4]: !c0 c2 !c3 !c5
+534 [size=4]: !c0 c2 !c3 c4
+535 [size=5]: !c0 c2 !c3 c4 c5
+536 [size=5]: !c0 c2 !c3 c4 !c5
+537 [size=4]: !c0 c2 !c3 !c4
+538 [size=5]: !c0 c2 !c3 !c4 c5
+539 [size=5]: !c0 c2 !c3 !c4 !c5
+540 [size=2]: !c0 !c2
+541 [size=3]: !c0 !c2 c5
+542 [size=3]: !c0 !c2 !c5
+543 [size=3]: !c0 !c2 c4
+544 [size=4]: !c0 !c2 c4 c5
+545 [size=4]: !c0 !c2 c4 !c5
+546 [size=3]: !c0 !c2 !c4
+547 [size=4]: !c0 !c2 !c4 c5
+548 [size=4]: !c0 !c2 !c4 !c5
+549 [size=3]: !c0 !c2 c3
+550 [size=4]: !c0 !c2 c3 c5
+551 [size=4]: !c0 !c2 c3 !c5
+552 [size=4]: !c0 !c2 c3 c4
+553 [size=5]: !c0 !c2 c3 c4 c5
+554 [size=5]: !c0 !c2 c3 c4 !c5
+555 [size=4]: !c0 !c2 c3 !c4
+556 [size=5]: !c0 !c2 c3 !c4 c5
+557 [size=5]: !c0 !c2 c3 !c4 !c5
+558 [size=3]: !c0 !c2 !c3
+559 [size=4]: !c0 !c2 !c3 c5
+560 [size=4]: !c0 !c2 !c3 !c5
+561 [size=4]: !c0 !c2 !c3 c4
+562 [size=5]: !c0 !c2 !c3 c4 c5
+563 [size=5]: !c0 !c2 !c3 c4 !c5
+564 [size=4]: !c0 !c2 !c3 !c4
+565 [size=5]: !c0 !c2 !c3 !c4 c5
+566 [size=5]: !c0 !c2 !c3 !c4 !c5
+567 [size=2]: !c0 c1
+568 [size=3]: !c0 c1 c5
+569 [size=3]: !c0 c1 !c5
+570 [size=3]: !c0 c1 c4
+571 [size=4]: !c0 c1 c4 c5
+572 [size=4]: !c0 c1 c4 !c5
+573 [size=3]: !c0 c1 !c4
+574 [size=4]: !c0 c1 !c4 c5
+575 [size=4]: !c0 c1 !c4 !c5
+576 [size=3]: !c0 c1 c3
+577 [size=4]: !c0 c1 c3 c5
+578 [size=4]: !c0 c1 c3 !c5
+579 [size=4]: !c0 c1 c3 c4
+580 [size=5]: !c0 c1 c3 c4 c5
+581 [size=5]: !c0 c1 c3 c4 !c5
+582 [size=4]: !c0 c1 c3 !c4
+583 [size=5]: !c0 c1 c3 !c4 c5
+584 [size=5]: !c0 c1 c3 !c4 !c5
+585 [size=3]: !c0 c1 !c3
+586 [size=4]: !c0 c1 !c3 c5
+587 [size=4]: !c0 c1 !c3 !c5
+588 [size=4]: !c0 c1 !c3 c4
+589 [size=5]: !c0 c1 !c3 c4 c5
+590 [size=5]: !c0 c1 !c3 c4 !c5
+591 [size=4]: !c0 c1 !c3 !c4
+592 [size=5]: !c0 c1 !c3 !c4 c5
+593 [size=5]: !c0 c1 !c3 !c4 !c5
+594 [size=3]: !c0 c1 c2
+595 [size=4]: !c0 c1 c2 c5
+596 [size=4]: !c0 c1 c2 !c5
+597 [size=4]: !c0 c1 c2 c4
+598 [size=5]: !c0 c1 c2 c4 c5
+599 [size=5]: !c0 c1 c2 c4 !c5
+600 [size=4]: !c0 c1 c2 !c4
+601 [size=5]: !c0 c1 c2 !c4 c5
+602 [size=5]: !c0 c1 c2 !c4 !c5
+603 [size=4]: !c0 c1 c2 c3
+604 [size=5]: !c0 c1 c2 c3 c5
+605 [size=5]: !c0 c1 c2 c3 !c5
+606 [size=5]: !c0 c1 c2 c3 c4
+607 [size=6]: !c0 c1 c2 c3 c4 c5
+608 [size=6]: !c0 c1 c2 c3 c4 !c5
+609 [size=5]: !c0 c1 c2 c3 !c4
+610 [size=6]: !c0 c1 c2 c3 !c4 c5
+611 [size=6]: !c0 c1 c2 c3 !c4 !c5
+612 [size=4]: !c0 c1 c2 !c3
+613 [size=5]: !c0 c1 c2 !c3 c5
+614 [size=5]: !c0 c1 c2 !c3 !c5
+615 [size=5]: !c0 c1 c2 !c3 c4
+616 [size=6]: !c0 c1 c2 !c3 c4 c5
+617 [size=6]: !c0 c1 c2 !c3 c4 !c5
+618 [size=5]: !c0 c1 c2 !c3 !c4
+619 [size=6]: !c0 c1 c2 !c3 !c4 c5
+620 [size=6]: !c0 c1 c2 !c3 !c4 !c5
+621 [size=3]: !c0 c1 !c2
+622 [size=4]: !c0 c1 !c2 c5
+623 [size=4]: !c0 c1 !c2 !c5
+624 [size=4]: !c0 c1 !c2 c4
+625 [size=5]: !c0 c1 !c2 c4 c5
+626 [size=5]: !c0 c1 !c2 c4 !c5
+627 [size=4]: !c0 c1 !c2 !c4
+628 [size=5]: !c0 c1 !c2 !c4 c5
+629 [size=5]: !c0 c1 !c2 !c4 !c5
+630 [size=4]: !c0 c1 !c2 c3
+631 [size=5]: !c0 c1 !c2 c3 c5
+632 [size=5]: !c0 c1 !c2 c3 !c5
+633 [size=5]: !c0 c1 !c2 c3 c4
+634 [size=6]: !c0 c1 !c2 c3 c4 c5
+635 [size=6]: !c0 c1 !c2 c3 c4 !c5
+636 [size=5]: !c0 c1 !c2 c3 !c4
+637 [size=6]: !c0 c1 !c2 c3 !c4 c5
+638 [size=6]: !c0 c1 !c2 c3 !c4 !c5
+639 [size=4]: !c0 c1 !c2 !c3
+640 [size=5]: !c0 c1 !c2 !c3 c5
+641 [size=5]: !c0 c1 !c2 !c3 !c5
+642 [size=5]: !c0 c1 !c2 !c3 c4
+643 [size=6]: !c0 c1 !c2 !c3 c4 c5
+644 [size=6]: !c0 c1 !c2 !c3 c4 !c5
+645 [size=5]: !c0 c1 !c2 !c3 !c4
+646 [size=6]: !c0 c1 !c2 !c3 !c4 c5
+647 [size=6]: !c0 c1 !c2 !c3 !c4 !c5
+648 [size=2]: !c0 !c1
+649 [size=3]: !c0 !c1 c5
+650 [size=3]: !c0 !c1 !c5
+651 [size=3]: !c0 !c1 c4
+652 [size=4]: !c0 !c1 c4 c5
+653 [size=4]: !c0 !c1 c4 !c5
+654 [size=3]: !c0 !c1 !c4
+655 [size=4]: !c0 !c1 !c4 c5
+656 [size=4]: !c0 !c1 !c4 !c5
+657 [size=3]: !c0 !c1 c3
+658 [size=4]: !c0 !c1 c3 c5
+659 [size=4]: !c0 !c1 c3 !c5
+660 [size=4]: !c0 !c1 c3 c4
+661 [size=5]: !c0 !c1 c3 c4 c5
+662 [size=5]: !c0 !c1 c3 c4 !c5
+663 [size=4]: !c0 !c1 c3 !c4
+664 [size=5]: !c0 !c1 c3 !c4 c5
+665 [size=5]: !c0 !c1 c3 !c4 !c5
+666 [size=3]: !c0 !c1 !c3
+667 [size=4]: !c0 !c1 !c3 c5
+668 [size=4]: !c0 !c1 !c3 !c5
+669 [size=4]: !c0 !c1 !c3 c4
+670 [size=5]: !c0 !c1 !c3 c4 c5
+671 [size=5]: !c0 !c1 !c3 c4 !c5
+672 [size=4]: !c0 !c1 !c3 !c4
+673 [size=5]: !c0 !c1 !c3 !c4 c5
+674 [size=5]: !c0 !c1 !c3 !c4 !c5
+675 [size=3]: !c0 !c1 c2
+676 [size=4]: !c0 !c1 c2 c5
+677 [size=4]: !c0 !c1 c2 !c5
+678 [size=4]: !c0 !c1 c2 c4
+679 [size=5]: !c0 !c1 c2 c4 c5
+680 [size=5]: !c0 !c1 c2 c4 !c5
+681 [size=4]: !c0 !c1 c2 !c4
+682 [size=5]: !c0 !c1 c2 !c4 c5
+683 [size=5]: !c0 !c1 c2 !c4 !c5
+684 [size=4]: !c0 !c1 c2 c3
+685 [size=5]: !c0 !c1 c2 c3 c5
+686 [size=5]: !c0 !c1 c2 c3 !c5
+687 [size=5]: !c0 !c1 c2 c3 c4
+688 [size=6]: !c0 !c1 c2 c3 c4 c5
+689 [size=6]: !c0 !c1 c2 c3 c4 !c5
+690 [size=5]: !c0 !c1 c2 c3 !c4
+691 [size=6]: !c0 !c1 c2 c3 !c4 c5
+692 [size=6]: !c0 !c1 c2 c3 !c4 !c5
+693 [size=4]: !c0 !c1 c2 !c3
+694 [size=5]: !c0 !c1 c2 !c3 c5
+695 [size=5]: !c0 !c1 c2 !c3 !c5
+696 [size=5]: !c0 !c1 c2 !c3 c4
+697 [size=6]: !c0 !c1 c2 !c3 c4 c5
+698 [size=6]: !c0 !c1 c2 !c3 c4 !c5
+699 [size=5]: !c0 !c1 c2 !c3 !c4
+700 [size=6]: !c0 !c1 c2 !c3 !c4 c5
+701 [size=6]: !c0 !c1 c2 !c3 !c4 !c5
+702 [size=3]: !c0 !c1 !c2
+703 [size=4]: !c0 !c1 !c2 c5
+704 [size=4]: !c0 !c1 !c2 !c5
+705 [size=4]: !c0 !c1 !c2 c4
+706 [size=5]: !c0 !c1 !c2 c4 c5
+707 [size=5]: !c0 !c1 !c2 c4 !c5
+708 [size=4]: !c0 !c1 !c2 !c4
+709 [size=5]: !c0 !c1 !c2 !c4 c5
+710 [size=5]: !c0 !c1 !c2 !c4 !c5
+711 [size=4]: !c0 !c1 !c2 c3
+712 [size=5]: !c0 !c1 !c2 c3 c5
+713 [size=5]: !c0 !c1 !c2 c3 !c5
+714 [size=5]: !c0 !c1 !c2 c3 c4
+715 [size=6]: !c0 !c1 !c2 c3 c4 c5
+716 [size=6]: !c0 !c1 !c2 c3 c4 !c5
+717 [size=5]: !c0 !c1 !c2 c3 !c4
+718 [size=6]: !c0 !c1 !c2 c3 !c4 c5
+719 [size=6]: !c0 !c1 !c2 c3 !c4 !c5
+720 [size=4]: !c0 !c1 !c2 !c3
+721 [size=5]: !c0 !c1 !c2 !c3 c5
+722 [size=5]: !c0 !c1 !c2 !c3 !c5
+723 [size=5]: !c0 !c1 !c2 !c3 c4
+724 [size=6]: !c0 !c1 !c2 !c3 c4 c5
+725 [size=6]: !c0 !c1 !c2 !c3 c4 !c5
+726 [size=5]: !c0 !c1 !c2 !c3 !c4
+727 [size=6]: !c0 !c1 !c2 !c3 !c4 c5
+728 [size=6]: !c0 !c1 !c2 !c3 !c4 !c5
+
+===========================
+Total time (ms) : 53379
+Nodes searched  : 76471075
+Nodes/second    : 1432605
+		
+--- pareto ---
+[358] Total 508 Hits 434 hit rate (%) 85.4331 size 5
+[352] Total 569 Hits 485 hit rate (%) 85.2373 size 4
+[277] Total 708 Hits 603 hit rate (%) 85.1695 size 4
+[271] Total 791 Hits 672 hit rate (%) 84.9558 size 3
+[325] Total 1588 Hits 1299 hit rate (%) 81.801 size 3
+[250] Total 2189 Hits 1763 hit rate (%) 80.5391 size 3
+[244] Total 2433 Hits 1959 hit rate (%) 80.5179 size 2
+[324] Total 7088 Hits 5632 hit rate (%) 79.4582 size 2
+[249] Total 9304 Hits 7257 hit rate (%) 77.9987 size 2
+[243] Total 10391 Hits 8021 hit rate (%) 77.1918 size 1
+[81] Total 21700 Hits 12393 hit rate (%) 57.1106 size 1
+[6] Total 33833 Hits 17743 hit rate (%) 52.4429 size 1
+[0] Total 37821 Hits 19760 hit rate (%) 52.2461 size 0
+
+--- pareto_rev ---
+[680] Total 34 Hits 10 hit rate (%) 29.4118 size 5
+[194] Total 40 Hits 14 hit rate (%) 35 size 4
+[677] Total 355 Hits 125 hit rate (%) 35.2113 size 4
+[656] Total 9792 Hits 3631 hit rate (%) 37.0813 size 4
+[650] Total 10727 Hits 3985 hit rate (%) 37.1492 size 3
+[702] Total 11759 Hits 4515 hit rate (%) 38.3961 size 3
+[648] Total 12818 Hits 4978 hit rate (%) 38.836 size 2
+[488] Total 22931 Hits 9469 hit rate (%) 41.2934 size 2
+[540] Total 24453 Hits 10377 hit rate (%) 42.4365 size 2
+[492] Total 24529 Hits 10486 hit rate (%) 42.7494 size 2
+[486] Total 27430 Hits 11739 hit rate (%) 42.7962 size 1
+[2] Total 30889 Hits 15531 hit rate (%) 50.28 size 1
+[54] Total 33852 Hits 17600 hit rate (%) 51.991 size 1
+[0] Total 37821 Hits 19760 hit rate (%) 52.2461 size 0

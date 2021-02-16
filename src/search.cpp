@@ -842,7 +842,7 @@ namespace {
     // Step 8. Null move search with verification search (~40 Elo)
     if (   !PvNode
         && (ss-1)->currentMove != MOVE_NULL
-        && (ss-1)->statScore < 22661
+        //&& (ss-1)->statScore < 22661
         &&  eval >= beta
         &&  eval >= ss->staticEval
         &&  ss->staticEval >= beta - 24 * depth - 34 * improving + 162 * ss->ttPv + 159
@@ -852,7 +852,7 @@ namespace {
     {
         assert(eval - beta >= 0);
 
-        CC = true;
+        CC = !((ss-1)->statScore < 22661);
 		C = {cutNode, improving, formerPv, priorCapture, (ss-1)->moveCount > 1, ttMove != MOVE_NONE};
 		
         // Null move dynamic reduction based on depth and value
