@@ -10,3 +10,5 @@ src/-lstdc++.res
 # Neural network for the NNUE evaluation
 **/*.nnue
 
+# my ignores
+doc

@@ -1634,10 +1634,16 @@ moves_loop: // When in check, search starts from here
 			else if(s[i] > LOOP_END) // loop end
 			{
 			    --i;
-                		if(i >= 0) s[i]++;				
+                if(i >= 0) s[i]++;				
 			}			
 			else //if (i < N) // iterate loop
 			{
+				if ((s[i] == 1 && !C[i]) || (s[i] == 2 && C[i])) // skip inner loops because expression c is sure false
+				{
+					s[i]++;
+					continue;
+				}
+				
 				i++;
 				if(i<N) s[i] = LOOP_START;
 			}			
