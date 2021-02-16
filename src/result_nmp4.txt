@@ -2029,11 +2029,11 @@ CC = !((ss-1)->statScore < 22661);
 [93] Total 689 Hits 671 hit rate (%) 97.3875 size 3
 [14] Total 830 Hits 805 hit rate (%) 96.988 size 3
 [66] Total 901 Hits 872 hit rate (%) 96.7814 size 3
-[12] Total 911 Hits 878 hit rate (%) 96.3776 size 2
-[90] Total 1842 Hits 1751 hit rate (%) 95.0597 size 2
-[252] Total 2310 Hits 2169 hit rate (%) 93.8961 size 2
+[12] Total 911 Hits 878 hit rate (%) 96.3776 size 2 => c3 c4 => priorCapture && (ss-1)->moveCount > 1 => STC: 
+[90] Total 1842 Hits 1751 hit rate (%) 95.0597 size 2 => c1 c3 => improving && priorCapture
+[252] Total 2310 Hits 2169 hit rate (%) 93.8961 size 2 => c0 c3 => cutNode && priorCapture
 [63] Total 2354 Hits 2204 hit rate (%) 93.6279 size 2
-[9] Total 2365 Hits 2211 hit rate (%) 93.4884 size 1
+[9] Total 2365 Hits 2211 hit rate (%) 93.4884 size 1 => c3 => priorCapture
 [6] Total 2744 Hits 2492 hit rate (%) 90.8163 size 1
 [81] Total 47716 Hits 41625 hit rate (%) 87.2349 size 1
 [2] Total 51610 Hits 43563 hit rate (%) 84.4081 size 1
