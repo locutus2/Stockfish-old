@@ -843,9 +843,9 @@ namespace {
         &&  eval >= beta
         &&  eval >= ss->staticEval
         &&  ss->staticEval >= beta - 24 * depth - 34 * improving + 162 * ss->ttPv + 159
-        && (cutNode || improving)
         && !excludedMove
         &&  pos.non_pawn_material(us)
+        && (!priorCapture || captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] < 10000)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
