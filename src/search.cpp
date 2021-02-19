@@ -842,9 +842,9 @@ namespace {
     // Step 8. Null move search with verification search (~40 Elo)
     if (   !PvNode
         && (ss-1)->currentMove != MOVE_NULL
-        && ((ss-1)->statScore < 22661 || priorCapture)
+        && (ss-1)->statScore < 22661
         &&  eval >= beta
-        &&  eval >= ss->staticEval
+        &&  eval >= ss->staticEval - 60
         &&  ss->staticEval >= beta - 24 * depth - 34 * improving + 162 * ss->ttPv + 159
         && !excludedMove
         &&  pos.non_pawn_material(us)
@@ -852,8 +852,18 @@ namespace {
     {
         assert(eval - beta >= 0);
 
-        CC = !((ss-1)->statScore < 22661) && priorCapture;
-		C = {cutNode, improving, formerPv, thisThread->captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] > 0, (ss-1)->moveCount > 1, ttMove != MOVE_NONE};
+        //CC = !((ss-1)->statScore < 22661) && priorCapture;
+		//C = {cutNode, improving, formerPv, thisThread->captureHistory[pos.piece_on(prevSq)][prevSq][type_of(pos.captured_piece())] > 0, (ss-1)->moveCount > 1, ttMove != MOVE_NONE};
+		CC = eval - ss->staticEval < 0;
+		C = {
+			eval - ss->staticEval >= -60 && eval - ss->staticEval < -50,
+			eval - ss->staticEval >= -50 && eval - ss->staticEval < -40,
+			eval - ss->staticEval >= -40 && eval - ss->staticEval < -30,
+			eval - ss->staticEval >= -30 && eval - ss->staticEval < -20,
+			eval - ss->staticEval >= -20 && eval - ss->staticEval < -10,
+			eval - ss->staticEval >= -10 && eval - ss->staticEval < 0
+			
+		};
 		
         // Null move dynamic reduction based on depth and value
         Depth R = (1062 + 68 * depth) / 256 + std::min(int(eval - beta) / 190, 3);
