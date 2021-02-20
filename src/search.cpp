@@ -965,7 +965,7 @@ namespace {
     if (   ss->ttPv
         && depth >= 6
         && !ttMove)
-        depth -= 2;
+        depth -= 1 + PvNode;
 
 moves_loop: // When in check, search starts from here
 
