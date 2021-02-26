@@ -853,6 +853,7 @@ namespace {
         // Null move dynamic reduction based on depth and value
         Depth R = (1062 + 68 * depth) / 256 + std::min(int(eval - beta) / 190, 3);
 
+        (ss+1)->distanceFromPv = ss->distanceFromPv;
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
 
@@ -930,7 +931,6 @@ namespace {
                 captureOrPromotion = true;
                 probCutCount++;
 
-                (ss+1)->distanceFromPv = ss->distanceFromPv + probCutCount - 1;
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
                                                                           [captureOrPromotion]
