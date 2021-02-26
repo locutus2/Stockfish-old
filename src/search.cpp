@@ -1177,6 +1177,8 @@ moves_loop: // When in check, search starts from here
       pos.do_move(move, st, givesCheck);
 
       (ss+1)->distanceFromPv = ss->distanceFromPv + moveCount - 1;
+      bool CC = false, C = false;
+      int V = (ss+1)->distanceFromPv;
 
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1192,6 +1194,8 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+	  CC = true;
+	  C = captureOrPromotion;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1355,6 +1359,15 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      	bool T = value > alpha;
+		dbg_hit_on(T, 0);
+		dbg_hit_on(T, 10+V);
+		dbg_hit_on(T, 1000+C);
+		dbg_hit_on(T, 2000+1000*C+V);
       }
 
       if (value > bestValue)

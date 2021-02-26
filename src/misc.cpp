@@ -64,7 +64,7 @@ using namespace std;
 
 namespace {
 
-const int DBG_N = 2048;
+const int DBG_N = 16384;
 
 /// Version number. If Version is left empty, then compile date in the format
 /// DD-MM-YY and show in engine_info.
