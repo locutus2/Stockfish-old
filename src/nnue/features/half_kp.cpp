@@ -23,11 +23,6 @@
 
 namespace Eval::NNUE::Features {
 
-  // Orient a square according to perspective (rotates by 180 for black)
-  inline Square orient(Color perspective, Square s) {
-    return Square(int(s) ^ (bool(perspective) * 63));
-  }
-
   // Index of a feature for a given king position and another piece on some square
   inline IndexType make_index(Color perspective, Square s, Piece pc, Square ksq) {
     return IndexType(orient(perspective, s) + kpp_board_index[perspective][pc] + PS_END * ksq);

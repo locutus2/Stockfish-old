@@ -26,6 +26,11 @@
 
 namespace Eval::NNUE::Features {
 
+  // Orient a square according to perspective (rotates by 180 for black)
+  inline Square orient(Color perspective, Square s) {
+    return Square(int(s) ^ (bool(perspective) * 63));
+  }
+
   // Feature HalfKP: Combination of the position of own king
   // and the position of pieces other than kings
   template <Side AssociatedKing>

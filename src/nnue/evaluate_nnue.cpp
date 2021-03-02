@@ -115,21 +115,27 @@ namespace Eval::NNUE {
 #if defined(ALIGNAS_ON_STACK_VARIABLES_BROKEN)
     TransformedFeatureType transformed_features_unaligned[
       FeatureTransformer::kBufferSize + alignment / sizeof(TransformedFeatureType)];
+    char buffer_unaligned[Network::kBufferSize + alignment];
 
     auto* transformed_features = align_ptr_up<alignment>(&transformed_features_unaligned[0]);
+    auto* buffer = align_ptr_up<alignment>(&buffer_unaligned[0]);
 #else
     alignas(alignment)
       TransformedFeatureType transformed_features[FeatureTransformer::kBufferSize];
+    alignas(alignment) char buffer[Network::kBufferSize];
 #endif
 
-    if(!pos.this_thread()->network_buffer)
-        pos.this_thread()->network_buffer = (char*)std_aligned_alloc(alignment, Network::kBufferSize);
-
     ASSERT_ALIGNED(transformed_features, alignment);
-    ASSERT_ALIGNED(pos.this->thread()->network_buffer, alignment);
+    ASSERT_ALIGNED(buffer, alignment);
 
     feature_transformer->Transform(pos, transformed_features);
-    const auto output = network->Propagate(transformed_features, pos.this_thread()->network_buffer);
+    const auto output = network->Propagate(transformed_features, buffer);
+        
+    if(!pos.this_thread()->policy_output)
+        pos.this_thread()->policy_output = new int[64];
+    
+    for (int i = 0; i < 64; ++i)
+        pos.this_thread()->policy_output[i] = static_cast<int>(output[i+1] / POLICY_SCALE);
 
     return static_cast<Value>(output[0] / FV_SCALE);
   }
@@ -140,6 +146,17 @@ namespace Eval::NNUE {
     Initialize();
     fileName = name;
     return ReadParameters(stream);
+  }
+
+  int evaluate_move(const Position& pos, Move move)
+  {
+      Square to = Eval::NNUE::Features::orient(pos.side_to_move(), to_sq(move));
+      return pos.this_thread()->policy_output[to];
+  }
+  
+  void init_policy(const Position& pos)
+  {
+      evaluate(pos);
   }
 
 } // namespace Eval::NNUE

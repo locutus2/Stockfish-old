@@ -74,7 +74,7 @@ public:
   ContinuationHistory continuationHistory[2][2];
   Score contempt;
   int failedHighCnt;
-  char* network_buffer = nullptr;
+  int* policy_output = nullptr;
 };
 
 

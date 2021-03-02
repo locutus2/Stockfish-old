@@ -45,6 +45,9 @@ namespace Eval {
     void init();
     void verify();
 
+    int evaluate_move(const Position& pos, Move move);    
+    void init_policy(const Position& pos);
+
   } // namespace NNUE
 
 } // namespace Eval
