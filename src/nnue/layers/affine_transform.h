@@ -432,14 +432,14 @@ namespace Eval::NNUE::Layers {
       return output;
     }
 
-   private:
     using BiasType = OutputType;
     using WeightType = std::int8_t;
-
-    PreviousLayer previous_layer_;
-
     alignas(kCacheLineSize) BiasType biases_[kOutputDimensions];
     alignas(kCacheLineSize) WeightType weights_[kOutputDimensions * kPaddedInputDimensions];
+
+   private:
+    PreviousLayer previous_layer_;
+
 #if defined (USE_SSSE3)
     struct CanSaturate {
         int count;

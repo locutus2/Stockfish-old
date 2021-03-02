@@ -32,6 +32,8 @@
 
 namespace Eval::NNUE {
 
+  int w[64][32], b[64];
+
   // Input feature converter
   LargePagePtr<FeatureTransformer> feature_transformer;
 
@@ -158,5 +160,24 @@ namespace Eval::NNUE {
   {
       evaluate(pos);
   }
+
+  void updatePolicy()
+  {
+      if (!network) return;
+
+      for(int i = 0; i < 64; ++i)
+          network->biases_[i + 1] = b[i];
+
+      for(int i = 0; i < 64; ++i)
+      {
+          int offset = 32 + i * 32;
+          for(int j = 0; j < 32; ++j)
+              network->weights_[offset + j] = (int8_t)w[i][j];
+      }
+  }
+
+  TUNE(SetRange(-128, 127), w, updatePolicy);
+  TUNE(SetRange(-8192, 8192), b, updatePolicy);
+  UPDATE_ON_LAST();
 
 } // namespace Eval::NNUE
