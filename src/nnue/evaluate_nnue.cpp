@@ -25,6 +25,7 @@
 #include "../position.h"
 #include "../misc.h"
 #include "../uci.h"
+#include "../thread.h"
 #include "../types.h"
 
 #include "evaluate_nnue.h"
@@ -114,21 +115,21 @@ namespace Eval::NNUE {
 #if defined(ALIGNAS_ON_STACK_VARIABLES_BROKEN)
     TransformedFeatureType transformed_features_unaligned[
       FeatureTransformer::kBufferSize + alignment / sizeof(TransformedFeatureType)];
-    char buffer_unaligned[Network::kBufferSize + alignment];
 
     auto* transformed_features = align_ptr_up<alignment>(&transformed_features_unaligned[0]);
-    auto* buffer = align_ptr_up<alignment>(&buffer_unaligned[0]);
 #else
     alignas(alignment)
       TransformedFeatureType transformed_features[FeatureTransformer::kBufferSize];
-    alignas(alignment) char buffer[Network::kBufferSize];
 #endif
 
+    if(!pos.this_thread()->network_buffer)
+        pos.this_thread()->network_buffer = (char*)std_aligned_alloc(alignment, Network::kBufferSize);
+
     ASSERT_ALIGNED(transformed_features, alignment);
-    ASSERT_ALIGNED(buffer, alignment);
+    ASSERT_ALIGNED(pos.this->thread()->network_buffer, alignment);
 
     feature_transformer->Transform(pos, transformed_features);
-    const auto output = network->Propagate(transformed_features, buffer);
+    const auto output = network->Propagate(transformed_features, pos.this_thread()->network_buffer);
 
     return static_cast<Value>(output[0] / FV_SCALE);
   }

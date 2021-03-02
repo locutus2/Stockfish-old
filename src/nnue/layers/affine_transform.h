@@ -27,7 +27,7 @@
 namespace Eval::NNUE::Layers {
 
   // Affine transformation layer
-  template <typename PreviousLayer, IndexType OutputDimensions>
+  template <typename PreviousLayer, IndexType OutputDimensions, IndexType LoadedOutputDimensions>
   class AffineTransform {
    public:
     // Input/output type
@@ -58,7 +58,7 @@ namespace Eval::NNUE::Layers {
     // Hash value embedded in the evaluation file
     static constexpr std::uint32_t GetHashValue() {
       std::uint32_t hash_value = 0xCC03DAE4u;
-      hash_value += kOutputDimensions;
+      hash_value += LoadedOutputDimensions;
       hash_value ^= PreviousLayer::GetHashValue() >> 1;
       hash_value ^= PreviousLayer::GetHashValue() << 31;
       return hash_value;
@@ -68,20 +68,20 @@ namespace Eval::NNUE::Layers {
     bool ReadParameters(std::istream& stream) {
       if (!previous_layer_.ReadParameters(stream)) return false;
       for (std::size_t i = 0; i < kOutputDimensions; ++i)
-        biases_[i] = read_little_endian<BiasType>(stream);
+        biases_[i] = i < LoadedOutputDimensions ? read_little_endian<BiasType>(stream) : 0;
       for (std::size_t i = 0; i < kOutputDimensions * kPaddedInputDimensions; ++i)
 #if !defined (USE_SSSE3)
-        weights_[i] = read_little_endian<WeightType>(stream);
+        weights_[i] = i < LoadedOutputDimensions * kPaddedInputDimensions  ? read_little_endian<WeightType>(stream) : 0;
 #else
         weights_[
           (i / 4) % (kPaddedInputDimensions / 4) * kOutputDimensions * 4 +
           i / kPaddedInputDimensions * 4 +
           i % 4
-        ] = read_little_endian<WeightType>(stream);
+        ] = i < LoadedOutputDimensions * kPaddedInputDimensions ? read_little_endian<WeightType>(stream) : 0;
 
       // Determine if eights of weight and input products can be summed using 16bits
       // without saturation. We assume worst case combinations of 0 and 127 for all inputs.
-      if (kOutputDimensions > 1 && !stream.fail())
+      if (LoadedOutputDimensions > 1 && !stream.fail())
       {
           canSaturate16.count = 0;
 #if !defined(USE_VNNI)
