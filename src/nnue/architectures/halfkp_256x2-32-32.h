@@ -43,7 +43,7 @@ namespace Layers {
 using InputLayer = InputSlice<kTransformedFeatureDimensions * 2>;
 using HiddenLayer1 = ClippedReLU<AffineTransform<InputLayer, 32, 32>>;
 using HiddenLayer2 = ClippedReLU<AffineTransform<HiddenLayer1, 32, 32>>;
-using OutputLayer = AffineTransform<HiddenLayer2, 96, 1>;
+using OutputLayer = AffineTransform<HiddenLayer2, 80, 1>;
 
 }  // namespace Layers
 

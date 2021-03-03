@@ -63,6 +63,16 @@ namespace Eval::NNUE::Layers {
       hash_value ^= PreviousLayer::GetHashValue() << 31;
       return hash_value;
     }
+    
+    IndexType getWeightIndex(IndexType i) {
+#if !defined (USE_SSSE3)
+        return i;
+#else   
+        return (i / 4) % (kPaddedInputDimensions / 4) * kOutputDimensions * 4 +
+          i / kPaddedInputDimensions * 4 +
+          i % 4;
+#endif
+    }
 
    // Read network parameters
     bool ReadParameters(std::istream& stream) {

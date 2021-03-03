@@ -34,8 +34,8 @@
 
 namespace Eval::NNUE {
 
-//#include "policy_weights.h"
-  int w[64][32], b[64];
+#include "policy_weights.h"
+//  int w[64][32], b[64];
   
 
   // Input feature converter
@@ -141,7 +141,10 @@ namespace Eval::NNUE {
         pos.this_thread()->policy_output = new int[64];
     
     for (int i = 0; i < 64; ++i)
+    {
+        dbg_mean_of(std::abs(output[i+1]));
         pos.this_thread()->policy_output[i] = static_cast<int>(output[i+1] / POLICY_SCALE);
+    }
 
     return static_cast<Value>(output[0] / FV_SCALE);
   }
@@ -172,17 +175,26 @@ int sum = 0, count = 0;
       
       sum = count = 0;
       
+      std::set<int> fixed_weights;
+      for(int i = 0; i < 32; ++i)
+      {
+         int index = network->getWeightIndex(i);   
+         //std::cerr << "fixed weight " << index << std::endl;
+         // std::cerr << "=> weight " << (int)network->weights_[i] << " vs " << (int)network->weights_[index] << std::endl;
+         fixed_weights.insert(index); 
+      }
+          
+      
       for(int i = 0; i < 64; ++i)
       {
           int offset = 32 + i * 32;
           for(int j = 0; j < 32; ++j)
           {
-             
-              network->weights_[offset + j] = 0;//(int)w[i][j];
-             
-              //if(i==0) std::cerr << "j=" << j << " " << w[i][j] << " '" << (int)(network->weights_[offset + j]) << "'" << std::endl;
-              
-              
+            int index = network->getWeightIndex(offset + j);
+            if(fixed_weights.find(offset + j) == fixed_weights.end())
+                network->weights_[offset + j] = (int)w[i][j];
+            else    
+               std::cerr << "skip weight[" << offset + j << "] " << index << std::endl;
           }
       }
       
@@ -218,14 +230,14 @@ int sum = 0, count = 0;
 
   int evaluate_move(const Position& pos, Move move)
   {
-      return 0;
+      //return 0;
       Square to = Eval::NNUE::Features::orient(pos.side_to_move(), to_sq(move));
       return pos.this_thread()->policy_output[to];
   }
   
   void init_policy(const Position& pos)
   {
-      //evaluate(pos);
+      evaluate(pos);
   }
 
   TUNE(SetRange(-128, 127), w, updatePolicyWeights);
