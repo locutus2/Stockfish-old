@@ -27,7 +27,7 @@
 namespace Eval::NNUE::Layers {
 
   // Affine transformation layer
-  template <typename PreviousLayer, IndexType OutputDimensions, IndexType LoadedOutputDimensions>
+  template <typename PreviousLayer, IndexType OutputDimensions>
   class AffineTransform {
    public:
     // Input/output type
@@ -58,30 +58,44 @@ namespace Eval::NNUE::Layers {
     // Hash value embedded in the evaluation file
     static constexpr std::uint32_t GetHashValue() {
       std::uint32_t hash_value = 0xCC03DAE4u;
-      hash_value += LoadedOutputDimensions;
+      hash_value += kOutputDimensions;
       hash_value ^= PreviousLayer::GetHashValue() >> 1;
       hash_value ^= PreviousLayer::GetHashValue() << 31;
       return hash_value;
+    }
+
+    inline IndexType getWeightIndex(IndexType i) {
+#if !defined (USE_SSSE3)
+        return i;
+#else
+        return (i / 4) % (kPaddedInputDimensions / 4) * kOutputDimensions * 4 +
+                i / kPaddedInputDimensions * 4 +
+                i % 4;
+#endif
+    }
+
+    PreviousLayer* getPreviousLayer() {
+        return &previous_layer_;
     }
 
    // Read network parameters
     bool ReadParameters(std::istream& stream) {
       if (!previous_layer_.ReadParameters(stream)) return false;
       for (std::size_t i = 0; i < kOutputDimensions; ++i)
-        biases_[i] = i < LoadedOutputDimensions ? read_little_endian<BiasType>(stream) : 0;
+        biases_[i] = read_little_endian<BiasType>(stream);
       for (std::size_t i = 0; i < kOutputDimensions * kPaddedInputDimensions; ++i)
 #if !defined (USE_SSSE3)
-        weights_[i] = i < LoadedOutputDimensions * kPaddedInputDimensions  ? read_little_endian<WeightType>(stream) : 0;
+        weights_[i] = read_little_endian<WeightType>(stream);
 #else
         weights_[
           (i / 4) % (kPaddedInputDimensions / 4) * kOutputDimensions * 4 +
           i / kPaddedInputDimensions * 4 +
           i % 4
-        ] = i < LoadedOutputDimensions * kPaddedInputDimensions ? read_little_endian<WeightType>(stream) : 0;
+        ] = read_little_endian<WeightType>(stream);
 
       // Determine if eights of weight and input products can be summed using 16bits
       // without saturation. We assume worst case combinations of 0 and 127 for all inputs.
-      if (LoadedOutputDimensions > 1 && !stream.fail())
+      if (kOutputDimensions > 1 && !stream.fail())
       {
           canSaturate16.count = 0;
 #if !defined(USE_VNNI)
@@ -432,14 +446,15 @@ namespace Eval::NNUE::Layers {
       return output;
     }
 
-   private:
     using BiasType = OutputType;
     using WeightType = std::int8_t;
 
-    PreviousLayer previous_layer_;
-
     alignas(kCacheLineSize) BiasType biases_[kOutputDimensions];
     alignas(kCacheLineSize) WeightType weights_[kOutputDimensions * kPaddedInputDimensions];
+
+    private:
+       PreviousLayer previous_layer_;
+
 #if defined (USE_SSSE3)
     struct CanSaturate {
         int count;

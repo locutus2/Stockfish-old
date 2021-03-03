@@ -38,6 +38,9 @@ namespace Eval::NNUE {
   // Evaluation function
   AlignedPtr<Network> network;
 
+  // Move policy
+  AlignedPtr<PolicyNetwork> policy_network;
+
   // Evaluation function file name
   std::string fileName;
 
@@ -76,6 +79,10 @@ namespace Eval::NNUE {
 
     Detail::Initialize(feature_transformer);
     Detail::Initialize(network);
+    Detail::Initialize(policy_network);
+
+    // set reused layer
+    policy_network->getPreviousLayer()->setLayer(network->getPreviousLayer());
   }
 
   // Read network header
@@ -130,12 +137,6 @@ namespace Eval::NNUE {
 
     feature_transformer->Transform(pos, transformed_features);
     const auto output = network->Propagate(transformed_features, buffer);
-        
-    if(!pos.this_thread()->policy_output)
-        pos.this_thread()->policy_output = new int[64];
-    
-    for (int i = 0; i < 64; ++i)
-        pos.this_thread()->policy_output[i] = static_cast<int>(output[i+1] / POLICY_SCALE);
 
     return static_cast<Value>(output[0] / FV_SCALE);
   }
@@ -156,7 +157,44 @@ namespace Eval::NNUE {
   
   void init_policy(const Position& pos)
   {
-      evaluate(pos);
+    // We manually align the arrays on the stack because with gcc < 9.3
+    // overaligning stack variables with alignas() doesn't work correctly.
+
+    constexpr uint64_t alignment = kCacheLineSize;
+
+#if defined(ALIGNAS_ON_STACK_VARIABLES_BROKEN)
+    TransformedFeatureType transformed_features_unaligned[
+      FeatureTransformer::kBufferSize + alignment / sizeof(TransformedFeatureType)];
+    char buffer_unaligned[PolicyNetwork::kBufferSize + alignment];
+
+    auto* transformed_features = align_ptr_up<alignment>(&transformed_features_unaligned[0]);
+    auto* buffer = align_ptr_up<alignment>(&buffer_unaligned[0]);
+#else
+    alignas(alignment)
+      TransformedFeatureType transformed_features[FeatureTransformer::kBufferSize];
+    alignas(alignment) char buffer[PolicyNetwork::kBufferSize];
+#endif
+
+    ASSERT_ALIGNED(transformed_features, alignment);
+    ASSERT_ALIGNED(buffer, alignment);
+
+    feature_transformer->Transform(pos, transformed_features);
+    const auto output = policy_network->Propagate(transformed_features, buffer);
+
+/*
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    {
+        policy_network->biases_[i] = i;
+        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+        {
+            int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
+            policy_network->weights_[index] = i - j;
+        }
+    }
+    */
+
+    for (unsigned i = 0; i <  PolicyNetwork::kOutputDimensions; ++i)
+        pos.this_thread()->policy_output[i] = static_cast<int>(output[i] / POLICY_SCALE);
   }
 
 } // namespace Eval::NNUE
