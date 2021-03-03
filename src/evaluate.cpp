@@ -110,6 +110,7 @@ namespace Eval {
                     eval_file_loaded = eval_file;
             }
         }
+        
   }
 
   /// NNUE::verify() verifies that the last net used was loaded successfully

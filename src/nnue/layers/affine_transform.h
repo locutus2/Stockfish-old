@@ -72,7 +72,7 @@ namespace Eval::NNUE::Layers {
       for (std::size_t i = 0; i < kOutputDimensions * kPaddedInputDimensions; ++i)
 #if !defined (USE_SSSE3)
         weights_[i] = i < LoadedOutputDimensions * kPaddedInputDimensions  ? read_little_endian<WeightType>(stream) : 0;
-#else
+#else   
         weights_[
           (i / 4) % (kPaddedInputDimensions / 4) * kOutputDimensions * 4 +
           i / kPaddedInputDimensions * 4 +

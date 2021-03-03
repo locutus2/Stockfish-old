@@ -30,9 +30,13 @@
 
 #include "evaluate_nnue.h"
 
+
+
 namespace Eval::NNUE {
 
+//#include "policy_weights.h"
   int w[64][32], b[64];
+  
 
   // Input feature converter
   LargePagePtr<FeatureTransformer> feature_transformer;
@@ -141,43 +145,91 @@ namespace Eval::NNUE {
 
     return static_cast<Value>(output[0] / FV_SCALE);
   }
+  
+  void updatePolicyWeights()
+  {
+      if (!network) return;
+
+      for(int i = 0; i < 64; ++i)
+          network->biases_[i + 1] = (int32_t)b[i];
+
+int sum = 0, count = 0;
+   for(int i = 0; i < 65; ++i)
+      {
+          int offset = i * 32;
+          for(int j = 0; j < 32; ++j)
+          {
+             
+            
+              //if(i==0) std::cerr << "j=" << j << " " << w[i][j] << " '" << (int)(network->weights_[offset + j]) << "'" << std::endl;
+              sum += network->weights_[offset + j];
+              ++count;
+              
+          }
+      }
+      
+      std::cerr << "sum1=" << sum << " count=" << count << std::endl;
+      
+      sum = count = 0;
+      
+      for(int i = 0; i < 64; ++i)
+      {
+          int offset = 32 + i * 32;
+          for(int j = 0; j < 32; ++j)
+          {
+             
+              network->weights_[offset + j] = 0;//(int)w[i][j];
+             
+              //if(i==0) std::cerr << "j=" << j << " " << w[i][j] << " '" << (int)(network->weights_[offset + j]) << "'" << std::endl;
+              
+              
+          }
+      }
+      
+      for(int i = 0; i < 65; ++i)
+      {
+          int offset = i * 32;
+          for(int j = 0; j < 32; ++j)
+          {
+             
+            
+              //if(i==0) std::cerr << "j=" << j << " " << w[i][j] << " '" << (int)(network->weights_[offset + j]) << "'" << std::endl;
+              sum += network->weights_[offset + j];
+                ++count;
+          }
+      }
+      
+      std::cerr << "sum2=" << sum << " count=" << count << std::endl;
+  }
 
   // Load eval, from a file stream or a memory stream
   bool load_eval(std::string name, std::istream& stream) {
 
     Initialize();
     fileName = name;
-    return ReadParameters(stream);
+    if(ReadParameters(stream))
+    {
+        updatePolicyWeights();
+        return true;
+    }
+    else
+        return false;
   }
 
   int evaluate_move(const Position& pos, Move move)
   {
+      return 0;
       Square to = Eval::NNUE::Features::orient(pos.side_to_move(), to_sq(move));
       return pos.this_thread()->policy_output[to];
   }
   
   void init_policy(const Position& pos)
   {
-      evaluate(pos);
+      //evaluate(pos);
   }
 
-  void updatePolicy()
-  {
-      if (!network) return;
-
-      for(int i = 0; i < 64; ++i)
-          network->biases_[i + 1] = b[i];
-
-      for(int i = 0; i < 64; ++i)
-      {
-          int offset = 32 + i * 32;
-          for(int j = 0; j < 32; ++j)
-              network->weights_[offset + j] = (int8_t)w[i][j];
-      }
-  }
-
-  TUNE(SetRange(-128, 127), w, updatePolicy);
-  TUNE(SetRange(-8192, 8192), b, updatePolicy);
+  TUNE(SetRange(-128, 127), w, updatePolicyWeights);
+  TUNE(SetRange(-8192, 8192), b, updatePolicyWeights);
   UPDATE_ON_LAST();
 
 } // namespace Eval::NNUE
