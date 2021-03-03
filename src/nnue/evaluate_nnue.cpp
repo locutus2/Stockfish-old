@@ -44,6 +44,9 @@ namespace Eval::NNUE {
   // Evaluation function
   AlignedPtr<Network> network;
 
+  // Move policy
+  AlignedPtr<PolicyNetwork> policy_network;
+
   // Evaluation function file name
   std::string fileName;
 
@@ -82,6 +85,10 @@ namespace Eval::NNUE {
 
     Detail::Initialize(feature_transformer);
     Detail::Initialize(network);
+    Detail::Initialize(policy_network);
+
+    // set reused layer
+    policy_network->getPreviousLayer()->setLayer(network->getPreviousLayer());
   }
 
   // Read network header
@@ -136,82 +143,17 @@ namespace Eval::NNUE {
 
     feature_transformer->Transform(pos, transformed_features);
     const auto output = network->Propagate(transformed_features, buffer);
-        
-    if(!pos.this_thread()->policy_output)
-        pos.this_thread()->policy_output = new int[64];
-    
-    for (int i = 0; i < 64; ++i)
-    {
-        dbg_mean_of(std::abs(output[i+1]));
-        pos.this_thread()->policy_output[i] = static_cast<int>(output[i+1] / POLICY_SCALE);
-    }
 
     return static_cast<Value>(output[0] / FV_SCALE);
   }
   
   void updatePolicyWeights()
   {
-      if (!network) return;
-
-      for(int i = 0; i < 64; ++i)
-          network->biases_[i + 1] = (int32_t)b[i];
-
-int sum = 0, count = 0;
-   for(int i = 0; i < 65; ++i)
-      {
-          int offset = i * 32;
-          for(int j = 0; j < 32; ++j)
-          {
-             
-            
-              //if(i==0) std::cerr << "j=" << j << " " << w[i][j] << " '" << (int)(network->weights_[offset + j]) << "'" << std::endl;
-              sum += network->weights_[offset + j];
-              ++count;
-              
-          }
-      }
-      
-      std::cerr << "sum1=" << sum << " count=" << count << std::endl;
-      
-      sum = count = 0;
-      
-      std::set<int> fixed_weights;
-      for(int i = 0; i < 32; ++i)
-      {
-         int index = network->getWeightIndex(i);   
-         //std::cerr << "fixed weight " << index << std::endl;
-         // std::cerr << "=> weight " << (int)network->weights_[i] << " vs " << (int)network->weights_[index] << std::endl;
-         fixed_weights.insert(index); 
-      }
-          
-      
-      for(int i = 0; i < 64; ++i)
-      {
-          int offset = 32 + i * 32;
-          for(int j = 0; j < 32; ++j)
-          {
-            int index = network->getWeightIndex(offset + j);
-            if(fixed_weights.find(offset + j) == fixed_weights.end())
-                network->weights_[offset + j] = (int)w[i][j];
-            else    
-               std::cerr << "skip weight[" << offset + j << "] " << index << std::endl;
-          }
-      }
-      
-      for(int i = 0; i < 65; ++i)
-      {
-          int offset = i * 32;
-          for(int j = 0; j < 32; ++j)
-          {
-             
-            
-              //if(i==0) std::cerr << "j=" << j << " " << w[i][j] << " '" << (int)(network->weights_[offset + j]) << "'" << std::endl;
-              sum += network->weights_[offset + j];
-                ++count;
-          }
-      }
-      
-      std::cerr << "sum2=" << sum << " count=" << count << std::endl;
+      if (!policy_network) return;
+     
+      for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+          for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+              policy_network->weights_[i * PolicyNetwork::kPaddedInputDimensions + j] = (int)w[i][j];
   }
 
   // Load eval, from a file stream or a memory stream
@@ -237,7 +179,44 @@ int sum = 0, count = 0;
   
   void init_policy(const Position& pos)
   {
-      evaluate(pos);
+    // We manually align the arrays on the stack because with gcc < 9.3
+    // overaligning stack variables with alignas() doesn't work correctly.
+
+    constexpr uint64_t alignment = kCacheLineSize;
+
+#if defined(ALIGNAS_ON_STACK_VARIABLES_BROKEN)
+    TransformedFeatureType transformed_features_unaligned[
+      FeatureTransformer::kBufferSize + alignment / sizeof(TransformedFeatureType)];
+    char buffer_unaligned[PolicyNetwork::kBufferSize + alignment];
+
+    auto* transformed_features = align_ptr_up<alignment>(&transformed_features_unaligned[0]);
+    auto* buffer = align_ptr_up<alignment>(&buffer_unaligned[0]);
+#else
+    alignas(alignment)
+      TransformedFeatureType transformed_features[FeatureTransformer::kBufferSize];
+    alignas(alignment) char buffer[PolicyNetwork::kBufferSize];
+#endif
+
+    ASSERT_ALIGNED(transformed_features, alignment);
+    ASSERT_ALIGNED(buffer, alignment);
+
+    feature_transformer->Transform(pos, transformed_features);
+    const auto output = policy_network->Propagate(transformed_features, buffer);
+
+/*
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    {
+        policy_network->biases_[i] = i;
+        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+        {
+            int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
+            policy_network->weights_[index] = i - j;
+        }
+    }
+    */
+
+    for (unsigned i = 0; i <  PolicyNetwork::kOutputDimensions; ++i)
+        pos.this_thread()->policy_output[i] = static_cast<int>(output[i] / POLICY_SCALE);
   }
 
   TUNE(SetRange(-128, 127), w, updatePolicyWeights);

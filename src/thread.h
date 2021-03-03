@@ -74,7 +74,7 @@ public:
   ContinuationHistory continuationHistory[2][2];
   Score contempt;
   int failedHighCnt;
-  int* policy_output = nullptr;
+  int policy_output[Eval::NNUE::PolicyNetwork::kOutputDimensions];
 };
 
 
