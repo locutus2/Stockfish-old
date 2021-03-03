@@ -152,8 +152,11 @@ namespace Eval::NNUE {
       if (!policy_network) return;
      
       for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+      {
+          policy_network->biases_[i] = b[i];
           for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
-              policy_network->weights_[i * PolicyNetwork::kPaddedInputDimensions + j] = (int)w[i][j];
+              policy_network->weights_[PolicyNetwork::getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j)] = w[i][j];
+      }
   }
 
   // Load eval, from a file stream or a memory stream
@@ -172,7 +175,6 @@ namespace Eval::NNUE {
 
   int evaluate_move(const Position& pos, Move move)
   {
-      //return 0;
       Square to = Eval::NNUE::Features::orient(pos.side_to_move(), to_sq(move));
       return pos.this_thread()->policy_output[to];
   }
