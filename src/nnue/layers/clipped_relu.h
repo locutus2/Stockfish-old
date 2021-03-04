@@ -59,6 +59,10 @@ namespace Eval::NNUE::Layers {
       return previous_layer_.ReadParameters(stream);
     }
 
+    PreviousLayer* getPreviousLayer() {
+        return &previous_layer_;
+    }
+
     // Forward propagation
     const OutputType* Propagate(
         const TransformedFeatureType* transformed_features, char* buffer) const {

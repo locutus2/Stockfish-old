@@ -88,7 +88,14 @@ namespace Eval::NNUE {
     Detail::Initialize(policy_network);
 
     // set reused layer
-    policy_network->getPreviousLayer()->setLayer(network->getPreviousLayer());
+    auto sourceLayer = network->getPreviousLayer()
+                              ->getPreviousLayer()
+                              ->getPreviousLayer();
+    auto targetLayer = policy_network->getPreviousLayer()
+                                     ->getPreviousLayer()
+                                     ->getPreviousLayer();
+
+    targetLayer->setLayer(sourceLayer);
   }
 
   // Read network header
@@ -150,6 +157,14 @@ namespace Eval::NNUE {
   void updatePolicyWeights()
   {
       if (!policy_network) return;
+
+      auto hiddenLayer = policy_network->getPreviousLayer()->getPreviousLayer();
+      for(unsigned i = 0; i < hiddenLayer->kOutputDimensions; ++i)
+      {
+          hiddenLayer->biases_[i] = a[i];
+          for(unsigned j = 0; j < hiddenLayer->kPaddedInputDimensions; ++j)
+              hiddenLayer->weights_[hiddenLayer->getWeightIndex(i * hiddenLayer->kPaddedInputDimensions + j)] = v[i][j];
+      }
      
       for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
       {
@@ -221,8 +236,8 @@ namespace Eval::NNUE {
         pos.this_thread()->policy_output[i] = static_cast<int>(output[i] / POLICY_SCALE);
   }
 
-  TUNE(SetRange(-128, 127), w, updatePolicyWeights);
-  TUNE(SetRange(-8192, 8192), b, updatePolicyWeights);
+  TUNE(SetRange(-128, 127), v, w, updatePolicyWeights);
+  TUNE(SetRange(-8192, 8192), a, b, updatePolicyWeights);
   UPDATE_ON_LAST();
 
 } // namespace Eval::NNUE
