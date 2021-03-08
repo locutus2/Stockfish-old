@@ -47,6 +47,11 @@ namespace {
 } // namespace
 
 
+int MovePicker::isQuiet() const
+{
+		return stage == QUIET;
+}
+
 /// Constructors of the MovePicker class. As arguments we pass information
 /// to help it to return the (presumably) good moves first, to decide which
 /// moves to return (in the quiescence search, for instance, we only want to
@@ -107,13 +112,16 @@ void MovePicker::score() {
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if constexpr (Type == QUIETS)
+      {
+	  m.value2 = (Eval::useNNUE ? Eval::NNUE::evaluate_move(pos, m) : 0);
           m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
                    + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
-                   +     (Eval::useNNUE ? Eval::NNUE::evaluate_move(pos, m) : 0)
+		   + m.value2
                    + (ply < MAX_LPH ? std::min(4, depth / 3) * (*lowPlyHistory)[ply][from_to(m)] : 0);
+      }
 
       else // Type == EVASIONS
       {
@@ -215,7 +223,7 @@ top:
           && select<Next>([&](){return   *cur != refutations[0].move
                                       && *cur != refutations[1].move
                                       && *cur != refutations[2].move;}))
-          return *(cur - 1);
+          return currentMove =  *(cur - 1);
 
       // Prepare the pointers to loop over the bad captures
       cur = moves;

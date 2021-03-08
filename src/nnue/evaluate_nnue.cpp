@@ -31,11 +31,12 @@
 #include "evaluate_nnue.h"
 
 
+constexpr bool LEARN = false;
 
 namespace Eval::NNUE {
 
 #include "policy_weights.h"
-//  int w[64][32], b[64];
+  int wd[64][32], bd[64];
   
 
   // Input feature converter
@@ -216,13 +217,94 @@ namespace Eval::NNUE {
         }
     }
     */
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    {
+        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+        {
+	    int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
+	    pos.this_thread()->policy_hidden[index] = ((int32_t*)buffer)[index + PolicyNetwork::kOutputDimensions];
+        }
+    }
 
     for (unsigned i = 0; i <  PolicyNetwork::kOutputDimensions; ++i)
         pos.this_thread()->policy_output[i] = static_cast<int>(output[i] / POLICY_SCALE);
   }
 
-  TUNE(SetRange(-128, 127), w, updatePolicyWeights);
-  TUNE(SetRange(-8192, 8192), b, updatePolicyWeights);
-  UPDATE_ON_LAST();
+  void learn_policy(const Position& pos, Move move, int target, int value)
+  {
+	  if(!LEARN) return;
+    // We manually align the arrays on the stack because with gcc < 9.3
+    // overaligning stack variables with alignas() doesn't work correctly.
+
+    /*
+    constexpr uint64_t alignment = kCacheLineSize;
+
+#if defined(ALIGNAS_ON_STACK_VARIABLES_BROKEN)
+    TransformedFeatureType transformed_features_unaligned[
+      FeatureTransformer::kBufferSize + alignment / sizeof(TransformedFeatureType)];
+    char buffer_unaligned[PolicyNetwork::kBufferSize + alignment];
+
+    auto* transformed_features = align_ptr_up<alignment>(&transformed_features_unaligned[0]);
+    auto* buffer = align_ptr_up<alignment>(&buffer_unaligned[0]);
+#else
+    alignas(alignment)
+      TransformedFeatureType transformed_features[FeatureTransformer::kBufferSize];
+    alignas(alignment) char buffer[PolicyNetwork::kBufferSize];
+#endif
+
+    ASSERT_ALIGNED(transformed_features, alignment);
+    ASSERT_ALIGNED(buffer, alignment);
+
+    feature_transformer->Transform(pos, transformed_features);
+    const auto output = policy_network->Propagate(transformed_features, buffer);
+    */
+
+    constexpr double ALPHA = 1e-14;
+
+    Square to = Eval::NNUE::Features::orient(pos.side_to_move(), to_sq(move));
+    double Err = (value - target);
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    {
+        if (i != (unsigned)to) continue;
+        double delta = -ALPHA * Err;
+	bd[i] += delta;
+        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+        {
+		int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
+            delta = -ALPHA * Err * pos.this_thread()->policy_hidden[index];
+	    wd[i][j] += delta;
+        }
+    }
+
+  }
+
+  void learn_print(std::ostream& out)
+  {
+	  if(!LEARN) return;
+	  int wbmax = 0;
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    {
+        //wbmax = std::max(wbmax, std::abs(b[i]+bd[i]));
+        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+        {
+        wbmax = std::max(wbmax, std::abs(w[i][j]+wd[i][j]));
+        }
+    }
+    wbmax /= 128;
+
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    {
+        out << "b[" << i<< "] " << (b[i]+bd[i])/(double)wbmax << std::endl;
+        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+        {
+            out << "w[" << i<< "][" << j << "] " << (w[i][j]+wd[i][j])/(double)wbmax << std::endl;
+        }
+    }
+  }
+
+
+  //TUNE(SetRange(-128, 127), w, updatePolicyWeights);
+  //TUNE(SetRange(-8192, 8192), b, updatePolicyWeights);
+  //UPDATE_ON_LAST();
 
 } // namespace Eval::NNUE

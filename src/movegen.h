@@ -37,6 +37,7 @@ enum GenType {
 struct ExtMove {
   Move move;
   int value;
+  int value2 = 0;
 
   operator Move() const { return move; }
   void operator=(Move m) { move = m; }

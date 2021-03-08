@@ -189,6 +189,8 @@ namespace {
 
     dbg_print(); // Just before exiting
 
+    Eval::NNUE::learn_print();
+
     cerr << "\n==========================="
          << "\nTotal time (ms) : " << elapsed
          << "\nNodes searched  : " << nodes

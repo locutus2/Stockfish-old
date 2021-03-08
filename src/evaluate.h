@@ -20,6 +20,7 @@
 #define EVALUATE_H_INCLUDED
 
 #include <string>
+#include <iostream>
 
 #include "types.h"
 
@@ -47,6 +48,8 @@ namespace Eval {
 
     int evaluate_move(const Position& pos, Move move);    
     void init_policy(const Position& pos);
+    void learn_policy(const Position& pos, Move move, int target, int value);
+    void learn_print(std::ostream& out = std::cerr);
 
   } // namespace NNUE
 

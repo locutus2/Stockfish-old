@@ -135,6 +135,9 @@ public:
                                            int);
   Move next_move(bool skipQuiets = false);
 
+  ExtMove currentMove;
+  int isQuiet() const;
+
 private:
   template<PickType T, typename Pred> Move select(Pred);
   template<GenType> void score();

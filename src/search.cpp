@@ -35,6 +35,7 @@
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
+
 namespace Search {
 
   LimitsType Limits;
@@ -1355,6 +1356,27 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(mp.isQuiet())
+      {
+	      bool T = value > alpha;
+	      int v = mp.currentMove.value2;
+	      const int VMAX = 170000;
+	      const int VMIN = -140000;
+	      int target = T ? VMAX : VMIN;
+
+	      Eval::NNUE::learn_policy(pos, move, target, v);
+/*
+	      static int vmax = 0;
+	      static int vmin = 0;
+	      static int n = 0;
+	      ++n;
+	      vmax = std::max(vmax, v);
+	      vmin = std::min(vmin, v);
+	      //dbg_mean_of(vmin);
+	      if(n%100000 == 0) std::cerr << vmin << " " << vmax << std::endl;
+	      */
       }
 
       if (value > bestValue)
