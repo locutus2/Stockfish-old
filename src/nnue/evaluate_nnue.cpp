@@ -205,24 +205,12 @@ namespace Eval::NNUE {
     feature_transformer->Transform(pos, transformed_features);
     const auto output = policy_network->Propagate(transformed_features, buffer);
 
-/*
-    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
-    {
-        policy_network->biases_[i] = i;
-        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
-        {
-            int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
-            policy_network->weights_[index] = i - j;
-        }
-    }
-    */
-
     for (unsigned i = 0; i <  PolicyNetwork::kOutputDimensions; ++i)
         pos.this_thread()->policy_output[i] = static_cast<int>(output[i] / POLICY_SCALE);
   }
 
-  TUNE(SetRange(-128, 127), w, updatePolicyWeights);
-  TUNE(SetRange(-8192, 8192), b, updatePolicyWeights);
-  UPDATE_ON_LAST();
+  //TUNE(SetRange(-128, 127), w, updatePolicyWeights);
+  //TUNE(SetRange(-8192, 8192), b, updatePolicyWeights);
+  //UPDATE_ON_LAST();
 
 } // namespace Eval::NNUE
