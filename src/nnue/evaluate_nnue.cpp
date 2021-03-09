@@ -37,7 +37,7 @@ namespace Eval::NNUE {
 
 #include "policy_weights.h"
   double wd[64][32], bd[64];
-  
+  int64_t N[64];  
 
   // Input feature converter
   LargePagePtr<FeatureTransformer> feature_transformer;
@@ -221,8 +221,9 @@ namespace Eval::NNUE {
     {
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
-	    int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
-	    pos.this_thread()->policy_hidden[index] = ((int32_t*)buffer)[index + PolicyNetwork::kOutputDimensions];
+	    //int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
+	    int index = i * PolicyNetwork::kPaddedInputDimensions + j;
+	    pos.this_thread()->policy_hidden[index] = ((int32_t*)(((char*)buffer)+PolicyNetwork::kSelfBufferSize))[index];
         }
     }
 
@@ -266,12 +267,12 @@ namespace Eval::NNUE {
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
         if (i != (unsigned)to) continue;
+	N[to]++;
         double delta = -ALPHA * Err;
 	bd[i] += delta;
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
-		int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
-            delta = -ALPHA * Err * pos.this_thread()->policy_hidden[index];
+            delta = -ALPHA * Err * pos.this_thread()->policy_hidden[j];
 	    wd[i][j] += delta;
         }
     }
@@ -282,34 +283,40 @@ namespace Eval::NNUE {
   {
 	  if(!LEARN) return;
 
-	  int wbmax = 0;
+	  double wbmax = 0;
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
-        //wbmax = std::max(wbmax, std::abs(b[i]+bd[i]));
+        //wbmax = std::max(wbmax, std::abs(b[i]+bd[i]/N[i]));
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
-        wbmax = std::max(wbmax, std::abs(w[i][j]+wd[i][j]));
+            wbmax = std::max(wbmax, std::abs(w[i][j]+wd[i][j]/N[i]));
         }
     }
-    wbmax /= 64;
+    double factor = 1;
+    constexpr double MAXW = 127;
+    if(wbmax > MAXW) factor = MAXW/wbmax;
 
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
-        b[i] = (b[i]+bd[i])/(double)wbmax;
+        //b[i] = (b[i]+bd[i]/N[i])/(double)wbmax;
+        b[i] = (b[i]+bd[i]/N[i])*factor;
+	bd[i] = 0;
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
-            w[i][j] =  (w[i][j]+wd[i][j])/(double)wbmax;
+            //w[i][j] =  (w[i][j]+wd[i][j]/N[i])/(double)wbmax;
+            w[i][j] =  (w[i][j]+wd[i][j]/N[i])*factor;
+	    wd[i][j] = 0;
         }
     }
 
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
-        out << "b[" << i<< "] " << (b[i]+bd[i])/(double)wbmax << std::endl;
+        out << "b[" << i<< "] " << b[i] << std::endl;
 
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
-            out << "w[" << i<< "][" << j << "] " << (w[i][j]+wd[i][j])/(double)wbmax << std::endl;
+            out << "w[" << i<< "][" << j << "] " << w[i][j] << std::endl;
         }
     }
   }
