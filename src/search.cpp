@@ -1007,6 +1007,8 @@ moves_loop: // When in check, search starts from here
 
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
+    std::vector<std::pair<Move, int>> values;
+
 
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
@@ -1361,20 +1363,33 @@ moves_loop: // When in check, search starts from here
       if(mp.isQuiet())
       {
 	      bool T = value > alpha;
-	      int v = mp.currentMove.value2;
+	      int v = mp.currentMove.value;
+	      int v2 = mp.currentMove.value2;
 	      const int VMAX = 170000;
 	      const int VMIN = -140000;
-	      int target = T ? VMAX : VMIN;
+	      //int target = T ? VMAX : VMIN;
 
-	      Eval::NNUE::learn_policy(pos, move, target, v);
+	      //Eval::NNUE::learn_policy(pos, move, target, v);
+	      if(T)
+	      {
+		      for(auto& x : values)
+		      {
+	                  Eval::NNUE::learn_policy(pos, x.first, VMIN, x.second);
+		      }
+	              Eval::NNUE::learn_policy(pos, move, VMAX, v);
+		      values.clear();
+	      }
+	      else
+	      {
+		      values.push_back(std::make_pair(move, v));
+	      }
 /*
 	      static int vmax = 0;
 	      static int vmin = 0;
 	      static int n = 0;
 	      ++n;
-	      vmax = std::max(vmax, v);
-	      vmin = std::min(vmin, v);
-	      //dbg_mean_of(vmin);
+	      vmax = std::max(vmax, v2);
+	      vmin = std::min(vmin, v2);
 	      if(n%100000 == 0) std::cerr << vmin << " " << vmax << std::endl;
 	      */
       }

@@ -31,12 +31,12 @@
 #include "evaluate_nnue.h"
 
 
-constexpr bool LEARN = false;
+constexpr bool LEARN = true;
 
 namespace Eval::NNUE {
 
 #include "policy_weights.h"
-  int wd[64][32], bd[64];
+  double wd[64][32], bd[64];
   
 
   // Input feature converter
@@ -281,6 +281,7 @@ namespace Eval::NNUE {
   void learn_print(std::ostream& out)
   {
 	  if(!LEARN) return;
+
 	  int wbmax = 0;
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
@@ -290,11 +291,22 @@ namespace Eval::NNUE {
         wbmax = std::max(wbmax, std::abs(w[i][j]+wd[i][j]));
         }
     }
-    wbmax /= 128;
+    wbmax /= 64;
 
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
+        b[i] = (b[i]+bd[i])/(double)wbmax;
+        for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
+        {
+            w[i][j] =  (w[i][j]+wd[i][j])/(double)wbmax;
+        }
+    }
+
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
         out << "b[" << i<< "] " << (b[i]+bd[i])/(double)wbmax << std::endl;
+
+    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    {
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
             out << "w[" << i<< "][" << j << "] " << (w[i][j]+wd[i][j])/(double)wbmax << std::endl;
