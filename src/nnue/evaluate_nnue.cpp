@@ -277,7 +277,7 @@ namespace Eval::NNUE {
 
   }
 
-  void learn_print(std::ostream& out)
+  void learn_update()
   {
 	  if(!LEARN) return;
 
@@ -306,6 +306,12 @@ namespace Eval::NNUE {
 	    wd[i][j] = 0;
         }
     }
+  }
+
+  void learn_print(std::ostream& out)
+  {
+	  if(!LEARN) return;
+          learn_update();
 
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
         out << "b[" << i<< "] " << b[i] << std::endl;
