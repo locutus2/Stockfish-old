@@ -31,8 +31,6 @@
 #include "evaluate_nnue.h"
 
 
-constexpr bool LEARN = true;
-
 namespace Eval::NNUE {
 
 #include "policy_weights.h"

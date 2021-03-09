@@ -1368,8 +1368,9 @@ moves_loop: // When in check, search starts from here
 	      const int VMAX = 170000;
 	      const int VMIN = -140000;
 	      //int target = T ? VMAX : VMIN;
-
 	      //Eval::NNUE::learn_policy(pos, move, target, v);
+	      if(LEARN)
+	      {
 	      if(T)
 	      {
 		      for(auto& x : values)
@@ -1383,7 +1384,9 @@ moves_loop: // When in check, search starts from here
 	      {
 		      values.push_back(std::make_pair(move, v));
 	      }
-/*
+	      }
+	      else
+	      {
 	      static int vmax = 0;
 	      static int vmin = 0;
 	      static int n = 0;
@@ -1391,7 +1394,7 @@ moves_loop: // When in check, search starts from here
 	      vmax = std::max(vmax, v2);
 	      vmin = std::min(vmin, v2);
 	      if(n%100000 == 0) std::cerr << vmin << " " << vmax << std::endl;
-	      */
+	      }
       }
 
       if (value > bestValue)
