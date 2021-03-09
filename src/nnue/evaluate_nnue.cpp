@@ -155,7 +155,7 @@ namespace Eval::NNUE {
       {
           policy_network->biases_[i] = b[i];
           for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
-              policy_network->weights_[PolicyNetwork::getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j)] = w[i][j];
+              policy_network->weights_[PolicyNetwork::getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j)] = (int8_t)w[i][j];
       }
   }
 
