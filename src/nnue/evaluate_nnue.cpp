@@ -34,8 +34,10 @@
 namespace Eval::NNUE {
 
 #include "policy_weights.h"
+  constexpr int MINIBATCH = 1000000;
+
   double wd[64][32], bd[64];
-  int64_t N[64];  
+  int64_t N[64], NN;  
 
   // Input feature converter
   LargePagePtr<FeatureTransformer> feature_transformer;
@@ -215,19 +217,20 @@ namespace Eval::NNUE {
         }
     }
     */
-    for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
+    //for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
 	    //int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
-	    int index = i * PolicyNetwork::kPaddedInputDimensions + j;
-	    pos.this_thread()->policy_hidden[index] = ((int32_t*)(((char*)buffer)+PolicyNetwork::kSelfBufferSize))[index];
+	    pos.this_thread()->policy_hidden[j] = ((PolicyNetwork::InputType*)(((char*)buffer)+PolicyNetwork::kSelfBufferSize))[j];
         }
     }
 
     for (unsigned i = 0; i <  PolicyNetwork::kOutputDimensions; ++i)
         pos.this_thread()->policy_output[i] = static_cast<int>(output[i] / POLICY_SCALE);
   }
+
+  void learn_update();
 
   void learn_policy(const Position& pos, Move move, int target, int value)
   {
@@ -258,14 +261,15 @@ namespace Eval::NNUE {
     const auto output = policy_network->Propagate(transformed_features, buffer);
     */
 
-    constexpr double ALPHA = 1e-14;
+    //constexpr double ALPHA = 1e-14;
+    constexpr double ALPHA = 0.01;
 
     Square to = Eval::NNUE::Features::orient(pos.side_to_move(), to_sq(move));
     double Err = (value - target);
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
         if (i != (unsigned)to) continue;
-	N[to]++;
+	N[i]++;
         double delta = -ALPHA * Err;
 	bd[i] += delta;
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
@@ -274,13 +278,19 @@ namespace Eval::NNUE {
 	    wd[i][j] += delta;
         }
     }
+    ++NN;
 
+    if(NN >= MINIBATCH)
+    {
+	    learn_update();
+    }
   }
 
   void learn_update()
   {
-	  if(!LEARN) return;
+	  if(!LEARN || NN == 0) return;
 
+	  std::cerr << "UPDATE" << std::endl;
 	  double wbmax = 0;
     for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
     {
@@ -306,6 +316,10 @@ namespace Eval::NNUE {
 	    wd[i][j] = 0;
         }
     }
+
+    NN = 0;
+    for(int i = 0; i < 64; ++i)
+       N[i] = 0;
   }
 
   void learn_print(std::ostream& out)
