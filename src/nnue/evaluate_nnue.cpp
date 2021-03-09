@@ -154,9 +154,9 @@ namespace Eval::NNUE {
      
       for(unsigned i = 0; i < PolicyNetwork::kOutputDimensions; ++i)
       {
-          policy_network->biases_[i] = b[i];
+          policy_network->biases_[i] = static_cast<PolicyNetwork::BiasType>(b[i]);
           for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
-              policy_network->weights_[PolicyNetwork::getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j)] = w[i][j];
+              policy_network->weights_[PolicyNetwork::getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j)] = static_cast<PolicyNetwork::WeightType>(w[i][j]);
       }
   }
 
@@ -222,12 +222,26 @@ namespace Eval::NNUE {
         for(unsigned j = 0; j < PolicyNetwork::kPaddedInputDimensions; ++j)
         {
 	    //int index = policy_network->getWeightIndex(i * PolicyNetwork::kPaddedInputDimensions + j);
-	    pos.this_thread()->policy_hidden[j] = ((PolicyNetwork::InputType*)(((char*)buffer)+PolicyNetwork::kSelfBufferSize))[j];
+	    pos.this_thread()->policy_hidden[j] = static_cast<int>(((PolicyNetwork::InputType*)(((char*)buffer)+PolicyNetwork::kSelfBufferSize))[j]);
+	    dbg_mean_of(pos.this_thread()->policy_hidden[j]);
         }
     }
 
     for (unsigned i = 0; i <  PolicyNetwork::kOutputDimensions; ++i)
+    {
         pos.this_thread()->policy_output[i] = static_cast<int>(output[i] / POLICY_SCALE);
+	    dbg_mean_of(pos.this_thread()->policy_output[i]);
+    }
+
+    static bool initp = false;
+    if(!initp)
+    {
+    std::ostream& out = std::cerr;
+    out << "InputSizePadded " << PolicyNetwork::kPaddedInputDimensions << std::endl;
+    out << "InputSize " << PolicyNetwork::kInputDimensions << std::endl;
+    out << "OutputSize " << PolicyNetwork::kOutputDimensions << std::endl;
+    initp = true;
+    }
   }
 
   void learn_update();
@@ -337,6 +351,7 @@ namespace Eval::NNUE {
             out << "w[" << i<< "][" << j << "] " << w[i][j] << std::endl;
         }
     }
+
   }
 
 

@@ -25,7 +25,7 @@
 #include "types.h"
 
 class Position;
-constexpr bool LEARN = true;
+constexpr bool LEARN = false;
 
 
 namespace Eval {
