@@ -1563,7 +1563,8 @@ moves_loop: // When in check, search starts from here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->captureHistory,
                                       contHist,
-                                      type_of(pos.piece_on(to_sq((ss-1)->currentMove))) != PAWN ? to_sq((ss-1)->currentMove) : SQ_NONE);
+                                         type_of(pos.piece_on(to_sq((ss-1)->currentMove))) != PAWN
+                                      || pos.pawn_passed(~pos.side_to_move(), to_sq((ss-1)->currentMove)) ? to_sq((ss-1)->currentMove) : SQ_NONE);
 
     // Loop through the moves until no moves remain or a beta cutoff occurs
     while ((move = mp.next_move()) != MOVE_NONE)
