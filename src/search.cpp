@@ -1500,6 +1500,7 @@ moves_loop: // When in check, search starts from here
     ttValue = ss->ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
     ttMove = ss->ttHit ? tte->move() : MOVE_NONE;
     pvHit = ss->ttHit && tte->is_pv();
+    (ss+1)->distanceFromPv = ss->distanceFromPv;
 
     if (  !PvNode
         && ss->ttHit
@@ -1576,13 +1577,12 @@ moves_loop: // When in check, search starts from here
       moveCount++;
 
       // Futility pruning and moveCount pruning
-      if (   !pvHit
-          &&  bestValue > VALUE_TB_LOSS_IN_MAX_PLY
+      if (    bestValue > VALUE_TB_LOSS_IN_MAX_PLY
           && !givesCheck
           &&  futilityBase > -VALUE_KNOWN_WIN
-          && !pos.advanced_pawn_push(move))
+          && !pos.advanced_pawn_push(move)
+          &&  ss->distanceFromPv > 0)
       {
-
           if (moveCount > 2)
               continue;
 
