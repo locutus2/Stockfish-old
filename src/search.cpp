@@ -1576,7 +1576,7 @@ moves_loop: // When in check, search starts from here
       moveCount++;
 
       // Futility pruning and moveCount pruning
-      if (   !PvNode
+      if (   !pvHit
           &&  bestValue > VALUE_TB_LOSS_IN_MAX_PLY
           && !givesCheck
           &&  futilityBase > -VALUE_KNOWN_WIN
