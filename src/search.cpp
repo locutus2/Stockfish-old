@@ -1576,10 +1576,10 @@ moves_loop: // When in check, search starts from here
       moveCount++;
 
       // Futility pruning and moveCount pruning
-      if (   !pvHit
-          &&  bestValue > VALUE_TB_LOSS_IN_MAX_PLY
+      if (    bestValue > VALUE_TB_LOSS_IN_MAX_PLY
           && !givesCheck
           &&  futilityBase > -VALUE_KNOWN_WIN
+          &&  to_sq(move) != to_sq((ss-1)->currentMove)
           && !pos.advanced_pawn_push(move))
       {
 
