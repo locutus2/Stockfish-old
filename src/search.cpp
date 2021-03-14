@@ -1422,7 +1422,7 @@ moves_loop: // When in check, search starts from here
             &&  depth > 11
             &&  ss->ply < MAX_LPH
             && !pos.capture_or_promotion(secondBestMove))
-            thisThread->lowPlyHistory[ss->ply][from_to(secondBestMove)] << stat_bonus(depth - 7);
+            thisThread->lowPlyHistory[ss->ply][from_to(secondBestMove)] << stat_bonus(depth - 7) / 2;
     }
 
     // Bonus for prior countermove that caused the fail low
