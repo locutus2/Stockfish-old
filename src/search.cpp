@@ -601,7 +601,7 @@ namespace {
 
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove;
+    Move ttMove, move, excludedMove, bestMove, secondBestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool formerPv, givesCheck, improving, didLMR, priorCapture;
@@ -653,7 +653,7 @@ namespace {
 
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->ttPv = false;
-    (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    (ss+1)->excludedMove = bestMove = secondBestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -1365,6 +1365,7 @@ moves_loop: // When in check, search starts from here
 
           if (value > alpha)
           {
+              secondBestMove = bestMove;
               bestMove = move;
 
               if (PvNode && !rootNode) // Update pv even in fail-high case
@@ -1413,8 +1414,16 @@ moves_loop: // When in check, search starts from here
 
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
+    {
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
                          quietsSearched, quietCount, capturesSearched, captureCount, depth);
+
+        if (    secondBestMove
+            &&  depth > 11
+            &&  ss->ply < MAX_LPH
+            && !pos.capture_or_promotion(secondBestMove))
+            thisThread->lowPlyHistory[ss->ply][from_to(secondBestMove)] << stat_bonus(depth - 7);
+    }
 
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
