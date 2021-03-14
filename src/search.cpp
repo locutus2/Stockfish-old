@@ -1418,7 +1418,9 @@ moves_loop: // When in check, search starts from here
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
                          quietsSearched, quietCount, capturesSearched, captureCount, depth);
 
-        if (secondBestMove && !pos.capture_or_promotion(secondBestMove))
+        if (    secondBestMove
+            && !pos.capture_or_promotion(secondBestMove)
+            && !pos.capture_or_promotion(bestMove))
             thisThread->mainHistory[us][from_to(secondBestMove)] << stat_bonus(depth);
     }
 
