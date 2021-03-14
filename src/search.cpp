@@ -1058,6 +1058,7 @@ moves_loop: // When in check, search starts from here
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
+          && move != singularBestMove
           && bestValue > VALUE_TB_LOSS_IN_MAX_PLY)
       {
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
@@ -1149,9 +1150,9 @@ moves_loop: // When in check, search starts from here
 
               if (value >= beta)
                   return beta;
-
-              singularBestMove = ss->currentMove;
           }
+          else
+              singularBestMove = ss->currentMove;
       }
 
       // Check extension (~2 Elo)
@@ -1224,9 +1225,6 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if ttMove has been singularly extended (~3 Elo)
           if (singularQuietLMR)
-              r--;
-
-          if (move == singularBestMove)
               r--;
 
           if (captureOrPromotion)
