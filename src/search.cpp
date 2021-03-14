@@ -1418,12 +1418,14 @@ moves_loop: // When in check, search starts from here
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
                          quietsSearched, quietCount, capturesSearched, captureCount, depth);
 
-        if (    secondBestMove
-            &&  depth > 11
-            &&  ss->ply < MAX_LPH
-            && !pos.capture_or_promotion(secondBestMove)
-            && !pos.capture_or_promotion(bestMove))
-            thisThread->lowPlyHistory[ss->ply][from_to(secondBestMove)] << stat_bonus(depth - 7);
+        if (secondBestMove && !pos.capture_or_promotion(secondBestMove))
+        {
+            if (!pos.capture_or_promotion(bestMove))
+                update_continuation_histories(ss, pos.moved_piece(secondBestMove), to_sq(secondBestMove), stat_bonus(depth));
+
+            if (depth > 11 &&  ss->ply < MAX_LPH)
+                thisThread->lowPlyHistory[ss->ply][from_to(secondBestMove)] << stat_bonus(depth - 7);
+        }
     }
 
     // Bonus for prior countermove that caused the fail low
