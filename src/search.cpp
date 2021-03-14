@@ -1149,9 +1149,9 @@ moves_loop: // When in check, search starts from here
 
               if (value >= beta)
                   return beta;
-          }
-          else
+
               singularBestMove = ss->currentMove;
+          }
       }
 
       // Check extension (~2 Elo)
