@@ -1188,7 +1188,7 @@ moves_loop: // When in check, search starts from here
       // cases where we extend a son if it has good chances to be "interesting".
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
-          && (  true || !captureOrPromotion
+          && (   !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode
@@ -1197,10 +1197,10 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
           
-          CC = captureOrPromotion && !(
+          CC = captureOrPromotion && cutNode && !(
                  moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
-              || cutNode
+              //|| cutNode
               || (!PvNode && !formerPv && captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 3678)
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024);
           V = (ss+1)->distanceFromPv;
@@ -1371,7 +1371,12 @@ moves_loop: // When in check, search starts from here
       
       if(CC)
       {
-            std::cerr << "# " << V << std::endl;
+	      bool T = value > alpha;
+            //std::cerr << "# " << V << std::endl;
+		C = V < 4;
+	      dbg_hit_on(C, 0);
+	      dbg_hit_on(T, 1);
+	      dbg_hit_on(T, 10+C);
       }
 
       if (value > bestValue)
