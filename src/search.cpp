@@ -1186,7 +1186,7 @@ moves_loop: // When in check, search starts from here
       // cases where we extend a son if it has good chances to be "interesting".
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
-          && (captureOrPromotion || (ss+1)->distanceFromPv > 2)
+          && (captureOrPromotion || (ss+1)->distanceFromPv > 4)
           && (  !captureOrPromotion
               || moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
