@@ -1201,14 +1201,17 @@ moves_loop: // When in check, search starts from here
 		  //cutNode && 
                   //ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha &&
                   //(!PvNode && !formerPv && captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 3678) &&
-                  thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024 &&
+                  //thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024 &&
+                  moveCountPruning &&
 		  !( false
-              || moveCountPruning
+              //|| moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode
               || (!PvNode && !formerPv && captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 3678)
-              //|| thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024
+              || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024
 	      );
+
+	  CC = !captureOrPromotion;
           V = (ss+1)->distanceFromPv;
 
           // Decrease reduction if the ttHit running average is large
