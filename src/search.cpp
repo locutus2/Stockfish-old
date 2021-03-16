@@ -1188,10 +1188,10 @@ moves_loop: // When in check, search starts from here
           &&  moveCount > 1 + 2 * rootNode
           && (  !captureOrPromotion
               || moveCountPruning
-              || (ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha && (ss+1)->distanceFromPv > 16)
+              || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               || cutNode
               || (!PvNode && !formerPv && captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 3678)
-              || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
+              || (thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024 && (ss+1)->distanceFromPv > 25)))
       {
           Depth r = reduction(improving, depth, moveCount);
 
