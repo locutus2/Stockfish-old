@@ -1197,7 +1197,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
           
-          CC = captureOrPromotion && cutNode && !(
+          CC = captureOrPromotion && 
+		  cutNode && 
+		  !(
                  moveCountPruning
               || ss->staticEval + PieceValue[EG][pos.captured_piece()] <= alpha
               //|| cutNode
@@ -1373,10 +1375,11 @@ moves_loop: // When in check, search starts from here
       {
 	      bool T = value > alpha;
             //std::cerr << "# " << V << std::endl;
-		C = V < 4;
+		C = V < 2;
 	      dbg_hit_on(C, 0);
 	      dbg_hit_on(T, 1);
 	      dbg_hit_on(T, 10+C);
+	      dbg_hit_on(T, 1000+V);
       }
 
       if (value > bestValue)
