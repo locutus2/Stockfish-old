@@ -58,9 +58,9 @@ using namespace Search;
 
 namespace {
 
-  constexpr int history_index(Stack* ss)
+  constexpr int history_index(Stack* ss, int history = 4)
   {
-      return (ss->posKey ^ (ss-4)->posKey) & (MOVE_HISTORY_SIZE - 1);
+      return (ss->posKey ^ (ss-history)->posKey) & (MOVE_HISTORY_SIZE - 1);
   }
 
   // Different node types, used as a template parameter
@@ -1832,7 +1832,9 @@ moves_loop: // When in check, search starts from here
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
-    thisThread->moveHistory[history_index(ss)] = move;
+    thisThread->moveHistory[history_index(ss, 2)] = move;
+    thisThread->moveHistory[history_index(ss, 3)] = move;
+    thisThread->moveHistory[history_index(ss, 4)] = move;
 
     // Update low ply history
     if (depth > 11 && ss->ply < MAX_LPH)
