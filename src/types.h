@@ -454,6 +454,13 @@ constexpr int from_to(Move m) {
  return m & 0xFFF;
 }
 
+
+constexpr int history_index(Search::Stack* ss)
+{
+	return (ss->posKey ^ (ss-2)->posKey) & (MOVE_HISTORY_SIZE - 1);
+}
+
+
 constexpr MoveType type_of(Move m) {
   return MoveType(m & (3 << 14));
 }
