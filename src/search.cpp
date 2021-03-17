@@ -60,7 +60,7 @@ namespace {
 
   constexpr int history_index(Stack* ss)
   {
-      return (ss->posKey ^ (ss-3)->posKey) & (MOVE_HISTORY_SIZE - 1);
+      return (ss->posKey ^ (ss-4)->posKey) & (MOVE_HISTORY_SIZE - 1);
   }
 
   // Different node types, used as a template parameter
