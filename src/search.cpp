@@ -58,6 +58,11 @@ using namespace Search;
 
 namespace {
 
+  constexpr int history_index(Stack* ss)
+  {
+      return (ss->posKey ^ (ss-2)->posKey) & (MOVE_HISTORY_SIZE - 1);
+  }
+
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV };
 
@@ -309,7 +314,10 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
+  {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
+      (ss-i)->posKey = rootPos.key();
+  }
 
   ss->pv = pv;
 
@@ -651,6 +659,7 @@ namespace {
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
+    ss->posKey = pos.key();
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->ttPv = false;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
@@ -993,7 +1002,10 @@ moves_loop: // When in check, search starts from here
                                           nullptr                   , (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
 
-    Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move countermove = thisThread->moveHistory[history_index(ss)];
+
+    if (!countermove)
+        countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->lowPlyHistory,
@@ -1820,6 +1832,7 @@ moves_loop: // When in check, search starts from here
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
+    thisThread->moveHistory[history_index(ss)] = move;
 
     // Update low ply history
     if (depth > 11 && ss->ply < MAX_LPH)

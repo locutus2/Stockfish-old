@@ -29,6 +29,8 @@
 
 namespace Stockfish {
 
+constexpr int MOVE_HISTORY_SIZE = 65536;
+
 /// StatsEntry stores the stat table value. It is usually a number but could
 /// be a move or even a nested history. We use a class instead of naked value
 /// to directly call history update operator<<() on the entry so to use stats
@@ -76,7 +78,20 @@ struct Stats : public std::array<Stats<T, D, Sizes...>, Size>
 };
 
 template <typename T, int D, int Size>
-struct Stats<T, D, Size> : public std::array<StatsEntry<T, D>, Size> {};
+struct Stats<T, D, Size> : public std::array<StatsEntry<T, D>, Size>
+{
+  typedef Stats<T, D, Size> stats;
+
+  void fill(const T& v) {
+
+    // For standard-layout 'this' points to first struct member
+    assert(std::is_standard_layout<stats>::value);
+
+    typedef StatsEntry<T, D> entry;
+    entry* p = reinterpret_cast<entry*>(this);
+    std::fill(p, p + sizeof(*this) / sizeof(entry), v);
+  }
+};
 
 /// In stats table, D=0 means that the template parameter is not used
 enum StatsParams { NOT_USED = 0 };
@@ -108,6 +123,8 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// the current one given a previous one. The nested history table is based on
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
+
+typedef Stats<Move, NOT_USED, MOVE_HISTORY_SIZE> MoveHistory;
 
 
 /// MovePicker class is used to pick one pseudo-legal move at a time from the
