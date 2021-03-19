@@ -244,7 +244,7 @@ namespace {
     // Iterations
     const bool FULL_RANDOM = true;
     const int MAX_COUNT = 2 * N_PARAMS;
-    int p = 0, delta = 1, A = 1, AR = 8;
+    int p = 0, delta = 1, A = 1, AR = 16;
     int score = s;
     int count = 0;
     std::srand(std::time(0));
