@@ -89,6 +89,7 @@ struct MainThread : public Thread {
 
   double previousTimeReduction;
   Value bestPreviousScore;
+  Move bestPreviousMove;
   Value iterValue[4];
   int callsCnt;
   bool stopOnPonderhit;

@@ -36,6 +36,8 @@ using namespace std;
 
 namespace Stockfish {
 
+	int params[N_PARAMS] = { PARAMS_SCALE, 2 * PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE };
+
 extern vector<string> setup_bench(const Position&, istream&);
 
 namespace {
@@ -121,7 +123,7 @@ namespace {
   // the thinking time and other parameters from the input string, then starts
   // the search.
 
-  void go(Position& pos, istringstream& is, StateListPtr& states) {
+  void go(Position& pos, istringstream& is, StateListPtr& states, int depth_offset = 0) {
 
     Search::LimitsType limits;
     string token;
@@ -147,7 +149,171 @@ namespace {
         else if (token == "infinite")  limits.infinite = 1;
         else if (token == "ponder")    ponderMode = true;
 
+    limits.depth += depth_offset;
     Threads.start_thinking(pos, states, limits, ponderMode);
+  }
+
+  void learn(Position& pos, istream& args, StateListPtr& states) {
+
+    string token;
+    uint64_t num, nodes = 0;
+
+    vector<string> list = setup_bench(pos, args);
+    num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
+
+    TimePoint elapsed = now();
+    vector<Move> bestMove;
+
+    std::cerr << "Init" << std::endl;
+    for (const auto& cmd : list)
+    {
+        istringstream is(cmd);
+        is >> skipws >> token;
+
+        if (token == "go" || token == "eval")
+        {
+         //   cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+            if (token == "go")
+            {
+               go(pos, is, states);
+               Threads.main()->wait_for_search_finished();
+               nodes += Threads.nodes_searched();
+	       bestMove.push_back(Threads.main()->bestPreviousMove);
+            }
+            else
+               trace_eval(pos);
+        }
+        else if (token == "setoption")  setoption(is);
+        else if (token == "position")   position(pos, is, states);
+        else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+    }
+
+    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
+
+    //dbg_print(); // Just before exiting
+
+    //cerr << "\n==========================="
+    //     << "\nTotal time (ms) : " << elapsed
+    //     << "\nNodes searched  : " << nodes
+    //     << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+    //
+    constexpr int DEPTH_OFFSET = -2;
+    const int n = (int)bestMove.size();
+    std::cerr << "Start " << std::flush;
+
+    // score start params
+	int s = 0;
+        int i = 0;
+        for (const auto& cmd : list)
+        {
+            istringstream is(cmd);
+            is >> skipws >> token;
+
+            if (token == "go" || token == "eval")
+            {
+        //        cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                if (token == "go")
+                {
+                   go(pos, is, states, DEPTH_OFFSET);
+                   Threads.main()->wait_for_search_finished();
+                   nodes += Threads.nodes_searched();
+		   char c = '-'; 
+	           if(Threads.main()->bestPreviousMove == bestMove[i])
+		       ++s, c = '+';
+	//	   std::cerr << c << "move=" << UCI::move(Threads.main()->bestPreviousMove, pos.is_chess960()) << " best=" << UCI::move(bestMove[i], pos.is_chess960()) << std::endl;
+		   ++i;
+                }
+                else
+                   trace_eval(pos);
+            }
+            else if (token == "setoption")  setoption(is);
+            else if (token == "position")   position(pos, is, states);
+            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+        }
+
+    std::cerr << "score=" << s <<"/" << n << std::endl;
+		std::cerr << "=> ";
+		for(int k = 0; k < N_PARAMS; ++k)
+		{
+			if(k) std::cerr << ", ";
+			std::cerr << params[k];
+		}
+		std::cerr << std::endl;
+		std::cerr << std::flush;
+
+    // Iterations
+    int p = 0, delta = 1;
+    int score = s;
+    for(int it = 1;score < n; ++it)
+    {
+        std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " " << std::flush;
+
+        params[p] += delta;
+	s = 0;
+        i = 0;
+        for (const auto& cmd : list)
+        {
+            istringstream is(cmd);
+            is >> skipws >> token;
+
+            if (token == "go" || token == "eval")
+            {
+        //        cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                if (token == "go")
+                {
+                   go(pos, is, states, DEPTH_OFFSET);
+                   Threads.main()->wait_for_search_finished();
+                   nodes += Threads.nodes_searched();
+		   char c = '-'; 
+	           if(Threads.main()->bestPreviousMove == bestMove[i])
+		       ++s, c = '+';
+	//	   std::cerr << c << "move=" << UCI::move(Threads.main()->bestPreviousMove, pos.is_chess960()) << " best=" << UCI::move(bestMove[i], pos.is_chess960()) << std::endl;
+		   ++i;
+                }
+                else
+                   trace_eval(pos);
+            }
+            else if (token == "setoption")  setoption(is);
+            else if (token == "position")   position(pos, is, states);
+            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+        }
+
+	bool newBest = false;
+	bool newTake = false;
+	if(s >= score)
+	{
+		if(s > score) newBest = true;
+		newTake = true;
+		score = s;
+	}
+
+        std::cerr << "score=" << s << "/" << n << " best=" << score << std::endl;
+	if(newBest)
+	{
+		std::cerr << "=> NEW BEST: ";
+		for(int k = 0; k < N_PARAMS; ++k)
+		{
+			if(k) std::cerr << ", ";
+			std::cerr << params[k];
+		}
+		std::cerr << std::endl;
+	}
+        std::cerr << std::flush;
+
+	if(newTake)
+	{
+	    p = (p+1) % N_PARAMS;
+	    delta = 1;
+	}
+	else
+	{
+            params[p] -= delta;
+	    if(delta == -1)
+	       p = (p+1) % N_PARAMS;
+	    delta = -delta;
+	}
+    }
+
   }
 
 
@@ -274,6 +440,7 @@ void UCI::loop(int argc, char* argv[]) {
       // Do not use these commands during a search!
       else if (token == "flip")     pos.flip();
       else if (token == "bench")    bench(pos, is, states);
+      else if (token == "learn")    learn(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
       else if (token == "eval")     trace_eval(pos);
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;
