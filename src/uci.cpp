@@ -242,12 +242,19 @@ namespace {
 		std::cerr << std::flush;
 
     // Iterations
+    const bool FULL_RANDOM = true;
     const int MAX_COUNT = 2 * N_PARAMS;
-    int p = 0, delta = 1, A = 1;
+    int p = 0, delta = 1, A = 1, AR = 8;
     int score = s;
     int count = 0;
+    std::srand(std::time(0));
     for(int it = 1;score < n; ++it)
     {
+	    if(FULL_RANDOM)
+	    {
+		    p = std::rand() % N_PARAMS;
+		    delta = (1 + std::rand() % AR) * (std::rand() % 2 ? 1 : -1);
+	    }
         std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " A=" << A << " " << std::flush;
 
 	++count;
@@ -300,26 +307,37 @@ namespace {
 			std::cerr << params[k];
 		}
 		std::cerr << std::endl;
-		A = 1;
-		count = 0;
+		if(!FULL_RANDOM)
+		{
+			A = 1;
+			count = 0;
+		}
 	}
         std::cerr << std::flush;
 
-	if(newTake)
+	if(FULL_RANDOM)
 	{
-	    p = (p+1) % N_PARAMS;
-	    delta = 1;
+	    if(!newTake)
+	       params[p] -= delta * A;
 	}
 	else
 	{
-            params[p] -= delta * A;
-	    if(delta == -1)
-	       p = (p+1) % N_PARAMS;
-	    delta = -delta;
-	}
+	    if(newTake)
+	    {
+	        p = (p+1) % N_PARAMS;
+	        delta = 1;
+	    }
+	    else
+	    {
+                params[p] -= delta * A;
+	        if(delta == -1)
+	           p = (p+1) % N_PARAMS;
+	        delta = -delta;
+	    }
 
-	if(count >= MAX_COUNT)
-	   A++, count = 0;	
+	    if(count >= MAX_COUNT)
+	       A++, count = 0;	
+        }
     }
 
   }
