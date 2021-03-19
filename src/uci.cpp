@@ -242,13 +242,16 @@ namespace {
 		std::cerr << std::flush;
 
     // Iterations
-    int p = 0, delta = 1;
+    const int MAX_COUNT = 2 * N_PARAMS;
+    int p = 0, delta = 1, A = 1;
     int score = s;
+    int count = 0;
     for(int it = 1;score < n; ++it)
     {
-        std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " " << std::flush;
+        std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " A=" << A << std::flush;
 
-        params[p] += delta;
+	++count;
+        params[p] += delta * A;
 	s = 0;
         i = 0;
         for (const auto& cmd : list)
@@ -297,6 +300,8 @@ namespace {
 			std::cerr << params[k];
 		}
 		std::cerr << std::endl;
+		A = 1;
+		count = 0;
 	}
         std::cerr << std::flush;
 
@@ -307,11 +312,14 @@ namespace {
 	}
 	else
 	{
-            params[p] -= delta;
+            params[p] -= delta * A;
 	    if(delta == -1)
 	       p = (p+1) % N_PARAMS;
 	    delta = -delta;
 	}
+
+	if(count >= MAX_COUNT)
+	   A++;	
     }
 
   }
