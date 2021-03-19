@@ -248,7 +248,7 @@ namespace {
     int count = 0;
     for(int it = 1;score < n; ++it)
     {
-        std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " A=" << A << std::flush;
+        std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " A=" << A << " " << std::flush;
 
 	++count;
         params[p] += delta * A;
