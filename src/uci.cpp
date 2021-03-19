@@ -319,7 +319,7 @@ namespace {
 	}
 
 	if(count >= MAX_COUNT)
-	   A++;	
+	   A++, count = 0;	
     }
 
   }
