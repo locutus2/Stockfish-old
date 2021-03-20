@@ -37,6 +37,7 @@ using namespace std;
 namespace Stockfish {
 
 	int params[N_PARAMS] = { PARAMS_SCALE, 2 * PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE };
+	int params_start[N_PARAMS] = { 0 };
 
 extern vector<string> setup_bench(const Position&, istream&);
 
@@ -156,10 +157,10 @@ namespace {
   void learn(Position& pos, istream& args, StateListPtr& states) {
 
     string token;
-    uint64_t num, nodes = 0;
+    //uint64_t num, nodes = 0;
 
     vector<string> list = setup_bench(pos, args);
-    num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
+    //num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
 
     TimePoint elapsed = now();
     vector<Move> bestMove;
@@ -177,7 +178,7 @@ namespace {
             {
                go(pos, is, states);
                Threads.main()->wait_for_search_finished();
-               nodes += Threads.nodes_searched();
+               //nodes += Threads.nodes_searched();
 	       bestMove.push_back(Threads.main()->bestPreviousMove);
             }
             else
@@ -197,8 +198,15 @@ namespace {
     //     << "\nNodes searched  : " << nodes
     //     << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
     //
-    constexpr int DEPTH_OFFSET = -2;
+	constexpr bool START_FROM_DIFFERENT = true;
+    constexpr int DEPTH_OFFSET = 0;//-2;
     const int n = (int)bestMove.size();
+	
+	if(START_FROM_DIFFERENT)
+	{
+		for(int i = 0; i < N_PARAMS; ++i)
+			params[i] = params_start[i];
+	}
     std::cerr << "Start " << std::flush;
 
     // score start params
@@ -216,7 +224,7 @@ namespace {
                 {
                    go(pos, is, states, DEPTH_OFFSET);
                    Threads.main()->wait_for_search_finished();
-                   nodes += Threads.nodes_searched();
+                   //nodes += Threads.nodes_searched();
 		   char c = '-'; 
 	           if(Threads.main()->bestPreviousMove == bestMove[i])
 		       ++s, c = '+';
@@ -243,7 +251,9 @@ namespace {
 
     // Iterations
     const bool FULL_RANDOM = true;
+	const bool ALL_PARAMS = true;
     const int MAX_COUNT = 2 * N_PARAMS;
+	int deltaP[N_PARAMS];
     int p = 0, delta = 1, A = 1, AR = 16;
     int score = s;
     int count = 0;
@@ -252,13 +262,36 @@ namespace {
     {
 	    if(FULL_RANDOM)
 	    {
-		    p = std::rand() % N_PARAMS;
-		    delta = (1 + std::rand() % AR) * (std::rand() % 2 ? 1 : -1);
+			if(ALL_PARAMS)
+			{
+				std::cerr << "Iteration " << it << ": d=(";
+				for(p = 0; p < N_PARAMS; p++)
+				{
+					deltaP[p] = std::rand() % (2*AR+1) - AR;
+					std::cerr << (p?",":"") << deltaP[p];
+				}
+				std::cerr << ") " << std::flush;
+			}
+			else
+			{
+				
+				p = std::rand() % N_PARAMS;
+				delta = (1 + std::rand() % AR) * (std::rand() % 2 ? 1 : -1);
+				std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " " << std::flush;
+			}
 	    }
-        std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " A=" << A << " " << std::flush;
+		else 
+            std::cerr << "Iteration " << it << ": p=" << p << " d=" << delta << " A=" << A << " " << std::flush;
 
 	++count;
+	if (FULL_RANDOM && ALL_PARAMS)
+	{
+		for(p = 0; p < N_PARAMS; p++)
+			params[p] += deltaP[p];
+	}
+	else
         params[p] += delta * A;
+	
 	s = 0;
         i = 0;
         for (const auto& cmd : list)
@@ -273,7 +306,7 @@ namespace {
                 {
                    go(pos, is, states, DEPTH_OFFSET);
                    Threads.main()->wait_for_search_finished();
-                   nodes += Threads.nodes_searched();
+                   //nodes += Threads.nodes_searched();
 		   char c = '-'; 
 	           if(Threads.main()->bestPreviousMove == bestMove[i])
 		       ++s, c = '+';
@@ -318,7 +351,15 @@ namespace {
 	if(FULL_RANDOM)
 	{
 	    if(!newTake)
-	       params[p] -= delta * A;
+		{
+			if (ALL_PARAMS)
+			{
+				for(p = 0; p < N_PARAMS; p++)
+					params[p] -= deltaP[p];
+			}
+			else
+				params[p] -= delta * A;
+		}
 	}
 	else
 	{
