@@ -56,7 +56,7 @@ namespace {
   int Quantile[32];
 
   inline int quantile(int depth) {
-      return depth > 31 ? 100 : Quantile[depth];
+      return depth > 31 ? 128 : Quantile[depth];
   }
 
 } // namespace
