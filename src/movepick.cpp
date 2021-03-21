@@ -39,7 +39,7 @@ namespace {
     ExtMove* qEnd = begin + (end - begin) * quantile / 128;
     for (ExtMove *sortedEnd = begin, *p = begin + 1; p < end; ++p)
     {
-        if (sortedEnd < qEnd)
+        if (sortedEnd < qEnd || (p->value > 0 && sortedEnd->value > 0))
             ++sortedEnd;
 
         else if (p->value <= sortedEnd->value)
