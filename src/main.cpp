@@ -42,6 +42,7 @@ int main(int argc, char* argv[]) {
   Position::init();
   Bitbases::init();
   Endgames::init();
+  MovePicker::init();
   Threads.set(size_t(Options["Threads"]));
   Search::clear(); // After threads are up
   Eval::NNUE::init();

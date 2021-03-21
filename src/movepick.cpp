@@ -17,6 +17,7 @@
 */
 
 #include <cassert>
+#include <cmath>
 
 #include "movepick.h"
 
@@ -33,21 +34,38 @@ namespace {
 
   // partial_insertion_sort() sorts moves in descending order up to and including
   // a given limit. The order of moves smaller than the limit is left unspecified.
-  void partial_insertion_sort(ExtMove* begin, ExtMove* end, int limit) {
+  void partial_insertion_sort(ExtMove* begin, ExtMove* end, int quantile) {
 
+    ExtMove* qEnd = begin + (end - begin) * quantile / 128;
     for (ExtMove *sortedEnd = begin, *p = begin + 1; p < end; ++p)
-        if (p->value >= limit)
-        {
-            ExtMove tmp = *p, *q;
-            *p = *++sortedEnd;
-            for (q = sortedEnd; q != begin && *(q - 1) < tmp; --q)
-                *q = *(q - 1);
-            *q = tmp;
-        }
+    {
+        if (sortedEnd < qEnd)
+            ++sortedEnd;
+
+        else if (p->value <= sortedEnd->value)
+            continue;
+
+        ExtMove tmp = *p, *q;
+        *p = *sortedEnd;
+        for (q = sortedEnd; q != begin && *(q - 1) < tmp; --q)
+            *q = *(q - 1);
+        *q = tmp;
+    }
+  }
+
+  int Quantile[32];
+
+  inline int quantile(int depth) {
+      return depth > 31 ? 100 : Quantile[depth];
   }
 
 } // namespace
 
+void MovePicker::init() {
+
+    for (int i = 0; i < 32; ++i)
+        Quantile[i] = 128 / (1 + std::exp(1.617 - 0.24842 * i)) + 0.5;
+}
 
 /// Constructors of the MovePicker class. As arguments we pass information
 /// to help it to return the (presumably) good moves first, to decide which
@@ -202,7 +220,7 @@ top:
           endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, -3000 * depth);
+          partial_insertion_sort(cur, endMoves, quantile(depth));
       }
 
       ++stage;
