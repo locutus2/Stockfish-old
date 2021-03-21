@@ -32,11 +32,18 @@ namespace {
     QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
   };
 
+  constexpr int MAX_QUANTILE = 128;
+  int Quantile[32];
+
+  inline int quantile(int depth) {
+      return depth > 31 ? MAX_QUANTILE : Quantile[depth];
+  }
+
   // partial_insertion_sort() sorts moves in descending order up to and including
   // a given limit. The order of moves smaller than the limit is left unspecified.
   void partial_insertion_sort(ExtMove* begin, ExtMove* end, int quantile) {
 
-    ExtMove* qEnd = begin + (end - begin) * quantile / 128;
+    ExtMove* qEnd = begin + (end - begin) * quantile / MAX_QUANTILE;
     for (ExtMove *sortedEnd = begin, *p = begin + 1; p < end; ++p)
     {
         if (sortedEnd < qEnd || (p->value > 0 && sortedEnd->value > 0))
@@ -53,18 +60,12 @@ namespace {
     }
   }
 
-  int Quantile[32];
-
-  inline int quantile(int depth) {
-      return depth > 31 ? 128 : Quantile[depth];
-  }
-
 } // namespace
 
 void MovePicker::init() {
 
     for (int i = 0; i < 32; ++i)
-        Quantile[i] = 128 / (1 + std::exp(1.617 - 0.30842 * i));
+        Quantile[i] = MAX_QUANTILE / (1 + std::exp(1.3015 - 0.1008 * i - 0.0123 * i * i));
 }
 
 /// Constructors of the MovePicker class. As arguments we pass information
