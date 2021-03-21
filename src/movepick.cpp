@@ -64,7 +64,7 @@ namespace {
 void MovePicker::init() {
 
     for (int i = 0; i < 32; ++i)
-        Quantile[i] = 128 / (1 + std::exp(1.617 - 0.24842 * i)) + 0.5;
+        Quantile[i] = 128 / (1 + std::exp(1.617 - 0.30842 * i));
 }
 
 /// Constructors of the MovePicker class. As arguments we pass information
