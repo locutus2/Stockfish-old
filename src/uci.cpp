@@ -262,7 +262,7 @@ namespace {
     constexpr bool PRINT_PARAMS = true;
 	
 	constexpr int MAX_ITERATION = 1000;
-	double T = n / 2; //std::max(n - bestScore, bestScore);
+	double T = n * 0.1;// / 2; //std::max(n - bestScore, bestScore);
 	double TF = std::pow(1/T, 1.0/MAX_ITERATION);
 	
     std::srand(std::time(0));
