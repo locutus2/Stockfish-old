@@ -27,7 +27,7 @@
 namespace Stockfish {
 
 	constexpr int PARAMS_SCALE = 64;
-	constexpr int N_PARAMS = 6;
+	constexpr int N_PARAMS = 6 * 3;
 	extern int params[N_PARAMS];
 
 class Position;

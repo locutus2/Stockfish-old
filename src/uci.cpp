@@ -36,7 +36,9 @@ using namespace std;
 
 namespace Stockfish {
 
-	int params[N_PARAMS] = { PARAMS_SCALE, 2 * PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE };
+	int params[N_PARAMS] = { PARAMS_SCALE, 2 * PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE,
+                             PARAMS_SCALE, 2 * PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, 
+							 PARAMS_SCALE, 2 * PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE, PARAMS_SCALE };
 	int params_start[N_PARAMS] = { 0 };
 
 extern vector<string> setup_bench(const Position&, istream&);
@@ -198,7 +200,7 @@ namespace {
     //     << "\nNodes searched  : " << nodes
     //     << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
     //
-	constexpr bool START_FROM_DIFFERENT = false;
+	constexpr bool START_FROM_DIFFERENT = true;
     constexpr int DEPTH_OFFSET = -2;
     const int n = (int)bestMove.size();
 	
@@ -251,7 +253,7 @@ namespace {
 
     // Iterations
 	const bool THRESHOLD_ACCEPTANCE = true;
-	constexpr int CUM_RANDOM = 0;
+	constexpr int CUM_RANDOM = 2;
     const bool FULL_RANDOM = true;
 	const bool ALL_PARAMS = true;
     const int MAX_COUNT = 2 * N_PARAMS;

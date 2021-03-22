@@ -58,9 +58,10 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const LowPlyHistory* lp,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, const Move* killers, int pl)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, const Move* killers, int pl,
+					   bool pv, bool cut)
            : pos(p), mainHistory(mh), lowPlyHistory(lp), captureHistory(cph), continuationHistory(ch),
-             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl) {
+             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl), PvNode(pv), cutNode(cut) {
 
   assert(d > 0);
 
@@ -100,6 +101,7 @@ template<GenType Type>
 void MovePicker::score() {
 
   static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
+  int offset = (PvNode ? 0 : cutNode ? 6 : 12);
 
   for (auto& m : *this)
       if constexpr (Type == CAPTURES)
@@ -107,12 +109,12 @@ void MovePicker::score() {
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if constexpr (Type == QUIETS)
-          m.value =   params[0] *  (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   +  params[1] * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   +  params[2] *   (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   +  params[3] *   (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   +  params[4] *   (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
-                   +  params[5] * (ply < MAX_LPH ? std::min(4, depth / 3) * (*lowPlyHistory)[ply][from_to(m)] : 0);
+          m.value =   params[0 + offset] *  (*mainHistory)[pos.side_to_move()][from_to(m)]
+                   +  params[1 + offset] * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                   +  params[2 + offset] *   (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                   +  params[3 + offset] *   (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                   +  params[4 + offset] *   (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
+                   +  params[5 + offset] * (ply < MAX_LPH ? std::min(4, depth / 3) * (*lowPlyHistory)[ply][from_to(m)] : 0);
 
       else // Type == EVASIONS
       {
