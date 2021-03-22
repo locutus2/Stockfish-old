@@ -200,7 +200,7 @@ namespace {
     //     << "\nNodes searched  : " << nodes
     //     << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
     //
-	constexpr bool START_FROM_DIFFERENT = true;
+	constexpr bool START_FROM_DIFFERENT = false;
     constexpr int DEPTH_OFFSET = -2;
     const int n = (int)bestMove.size();
 	
