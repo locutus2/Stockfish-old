@@ -280,7 +280,7 @@ namespace {
 				{
 					deltaP[p] = std::rand() % (2*AR+1) - AR;
 					if(PRINT_PARAMS)
-						std::cerr << (p?",":"") << params[p];
+						std::cerr << (p?",":"") << params[p]+deltaP[p];
 					else
 						std::cerr << (p?",":"") << deltaP[p];
 				}
