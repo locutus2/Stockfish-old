@@ -65,7 +65,7 @@ namespace {
 void MovePicker::init() {
 
     for (int i = 0; i < 32; ++i)
-        Quantile[i] = MAX_QUANTILE / (1 + std::exp(1.7188 - 0.4038 * i + 0.0398 * i * i - 0.0025 * i * i * i));
+        Quantile[i] = MAX_QUANTILE * std::min(1.0, 0.1261 + 0.0576 * i);
 }
 
 /// Constructors of the MovePicker class. As arguments we pass information
