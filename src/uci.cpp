@@ -250,13 +250,20 @@ namespace {
 		std::cerr << std::flush;
 
     // Iterations
+	const bool THRESHOLD_ACCEPTANCE = true;
     const bool FULL_RANDOM = true;
 	const bool ALL_PARAMS = true;
     const int MAX_COUNT = 2 * N_PARAMS;
 	int deltaP[N_PARAMS];
     int p = 0, delta = 1, A = 1, AR = 16;
     int score = s;
+	int bestScore = s;
     int count = 0;
+	
+	constexpr int MAX_ITERATION = 1000;
+	double T = std::max(n - bestScore, bestScore);
+	double TF = std::pow(1/T, 1.0/MAX_ITERATION);
+	
     std::srand(std::time(0));
     for(int it = 1;score < n; ++it)
     {
@@ -323,14 +330,28 @@ namespace {
 
 	bool newBest = false;
 	bool newTake = false;
-	if(s >= score)
+	
+	if(THRESHOLD_ACCEPTANCE)
 	{
-		if(s > score) newBest = true;
-		newTake = true;
-		score = s;
+		if(s >= bestScore)
+				newBest = true;
+		if(s >= score - T)
+			newTake = true;
+		std::cerr << "score=" << s << "/" << n << " T=" << T << " best=" << bestScore << (newTake ? " => accept" : "") << std::endl;
+		T *= TF;
+	}
+	else
+	{
+		if(s >= score)
+		{
+			if(s > score) newBest = true;
+			newTake = true;
+			score = s;
+		}
+		        std::cerr << "score=" << s << "/" << n << " best=" << score << std::endl;
 	}
 
-        std::cerr << "score=" << s << "/" << n << " best=" << score << std::endl;
+
 	if(newBest)
 	{
 		std::cerr << "=> NEW BEST: ";
