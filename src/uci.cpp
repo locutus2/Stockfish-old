@@ -259,6 +259,7 @@ namespace {
     int score = s;
 	int bestScore = s;
     int count = 0;
+    constexpr bool PRINT_PARAMS = true;
 	
 	constexpr int MAX_ITERATION = 1000;
 	double T = n / 2; //std::max(n - bestScore, bestScore);
@@ -271,11 +272,17 @@ namespace {
 	    {
 			if(ALL_PARAMS)
 			{
-				std::cerr << "Iteration " << it << ": d=(";
+				if(PRINT_PARAMS)
+				    std::cerr << "Iteration " << it << ": p=(";
+				else
+				    std::cerr << "Iteration " << it << ": d=(";
 				for(p = 0; p < N_PARAMS; p++)
 				{
 					deltaP[p] = std::rand() % (2*AR+1) - AR;
-					std::cerr << (p?",":"") << deltaP[p];
+					if(PRINT_PARAMS)
+						std::cerr << (p?",":"") << params[p];
+					else
+						std::cerr << (p?",":"") << deltaP[p];
 				}
 				std::cerr << ") " << std::flush;
 			}
