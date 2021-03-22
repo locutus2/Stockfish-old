@@ -251,6 +251,7 @@ namespace {
 
     // Iterations
 	const bool THRESHOLD_ACCEPTANCE = true;
+	constexpr int CUM_RANDOM = 0;
     const bool FULL_RANDOM = true;
 	const bool ALL_PARAMS = true;
     const int MAX_COUNT = 2 * N_PARAMS;
@@ -278,7 +279,16 @@ namespace {
 				    std::cerr << "Iteration " << it << ": d=(";
 				for(p = 0; p < N_PARAMS; p++)
 				{
-					deltaP[p] = std::rand() % (2*AR+1) - AR;
+					if(CUM_RANDOM)
+					{
+					    int dd = 0;
+					    for(int x = 0; x < CUM_RANDOM; ++x)
+					        dd += std::rand() % (2*AR+1) - AR;
+					    deltaP[p] = dd / CUM_RANDOM;
+					}
+					else
+					    deltaP[p] = std::rand() % (2*AR+1) - AR;
+
 					if(PRINT_PARAMS)
 						std::cerr << (p?",":"") << params[p]+deltaP[p];
 					else
