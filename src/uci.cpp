@@ -198,8 +198,8 @@ namespace {
     //     << "\nNodes searched  : " << nodes
     //     << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
     //
-	constexpr bool START_FROM_DIFFERENT = true;
-    constexpr int DEPTH_OFFSET = 0;//-2;
+	constexpr bool START_FROM_DIFFERENT = false;
+    constexpr int DEPTH_OFFSET = -2;
     const int n = (int)bestMove.size();
 	
 	if(START_FROM_DIFFERENT)
@@ -261,7 +261,7 @@ namespace {
     int count = 0;
 	
 	constexpr int MAX_ITERATION = 1000;
-	double T = std::max(n - bestScore, bestScore);
+	double T = n / 2; //std::max(n - bestScore, bestScore);
 	double TF = std::pow(1/T, 1.0/MAX_ITERATION);
 	
     std::srand(std::time(0));
@@ -334,10 +334,10 @@ namespace {
 	if(THRESHOLD_ACCEPTANCE)
 	{
 		if(s >= bestScore)
-				newBest = true;
+				bestScore = s, newBest = true;
 		if(s >= score - T)
-			newTake = true;
-		std::cerr << "score=" << s << "/" << n << " T=" << T << " best=" << bestScore << (newTake ? " => accept" : "") << std::endl;
+			score = s, newTake = true;
+		std::cerr << "score=" << s << "/" << n << " T=" << T << " best=" << bestScore << (newBest ? " => new best" : newTake ? " => accept" : "") << std::endl;
 		T *= TF;
 	}
 	else
