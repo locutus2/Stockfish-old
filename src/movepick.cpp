@@ -46,6 +46,14 @@ namespace {
         }
   }
 
+  constexpr int W[6][3] = {
+      {  64,  64,  64},
+      { 128, 128, 128},
+      {  64,  64,  64},
+      {  64,  64,  64},
+      {  64,  64,  64},
+      {  64,  64,  64}
+  };
 } // namespace
 
 
@@ -57,9 +65,10 @@ namespace {
 
 /// MovePicker constructor for the main search
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh, const LowPlyHistory* lp,
-                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, const Move* killers, int pl)
+                       const CapturePieceToHistory* cph, const PieceToHistory** ch, Move cm, const Move* killers,
+                       int pl, bool pv, bool cut)
            : pos(p), mainHistory(mh), lowPlyHistory(lp), captureHistory(cph), continuationHistory(ch),
-             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl) {
+             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), ply(pl), PvNode(pv), cutNode(cut) {
 
   assert(d > 0);
 
@@ -106,12 +115,12 @@ void MovePicker::score() {
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if constexpr (Type == QUIETS)
-          m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
-                   + (ply < MAX_LPH ? std::min(4, depth / 3) * (*lowPlyHistory)[ply][from_to(m)] : 0);
+          m.value =  W[0][!PvNode * (1 + cutNode)] * (*mainHistory)[pos.side_to_move()][from_to(m)]
+                   + W[1][!PvNode * (1 + cutNode)] * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                   + W[2][!PvNode * (1 + cutNode)] * (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                   + W[3][!PvNode * (1 + cutNode)] * (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                   + W[4][!PvNode * (1 + cutNode)] * (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
+                   + (ply < MAX_LPH ? W[5][!PvNode * (1 + cutNode)] * std::min(4, depth / 3) * (*lowPlyHistory)[ply][from_to(m)] : 0);
 
       else // Type == EVASIONS
       {
@@ -202,7 +211,7 @@ top:
           endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, -3000 * depth);
+          partial_insertion_sort(cur, endMoves, -3000 * 64 * depth);
       }
 
       ++stage;
