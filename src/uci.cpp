@@ -253,6 +253,7 @@ namespace {
 
     // Iterations
 	const bool THRESHOLD_ACCEPTANCE = true;
+	const bool ADAPTIVE = true;
 	constexpr int CUM_RANDOM = 2;
     const bool FULL_RANDOM = true;
 	const bool ALL_PARAMS = true;
@@ -265,8 +266,16 @@ namespace {
     constexpr bool PRINT_PARAMS = true;
 	
 	constexpr int MAX_ITERATION = 1000;
-	double T = n * 0.1;// / 2; //std::max(n - bestScore, bestScore);
-	double TF = std::pow(1/T, 1.0/MAX_ITERATION);
+	const double T_MIN = 1;
+	double T = n * 0.15;// / 2; //std::max(n - bestScore, bestScore);
+	double TF = std::pow(T_MIN/T, 1.0/MAX_ITERATION);
+	
+	if(ADAPTIVE)
+	{
+		constexpr int SCALE_ITERATION = 50;
+		//T = n;
+		TF = std::pow(T_MIN/T, 1.0/SCALE_ITERATION);
+	}
 	
     std::srand(std::time(0));
     for(int it = 1;score < n; ++it)
@@ -357,7 +366,11 @@ namespace {
 		if(s >= score - T)
 			score = s, newTake = true;
 		std::cerr << "score=" << s << "/" << n << " T=" << T << " best=" << bestScore << (newBest ? " => new best" : newTake ? " => accept" : "") << std::endl;
-		T *= TF;
+		
+		if(ADAPTIVE)
+			T = T * (newTake ? TF : 1/TF);
+		else
+			T *= TF;
 	}
 	else
 	{
