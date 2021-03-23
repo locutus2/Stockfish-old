@@ -62,10 +62,16 @@ namespace {
 
 } // namespace
 
+int A = 0, B = 0, C = 0;
+
+TUNE(SetRange(-128, 128), A);
+TUNE(SetRange(-128, 128), B);
+TUNE(SetRange(-128, 128), C);
+
 void MovePicker::init() {
 
     for (int i = 0; i < 32; ++i)
-        Quantile[i] = MAX_QUANTILE / (1 + std::exp(1.3015 - 0.1008 * i - 0.0123 * i * i));
+        Quantile[i] = MAX_QUANTILE * std::max(0.0, std::min(1.0, A / 128.0 + 0.1732 + (B / 512.0 + 0.0388) * i + (C / 2048.0 + 0.0013) * i * i));
 }
 
 /// Constructors of the MovePicker class. As arguments we pass information
