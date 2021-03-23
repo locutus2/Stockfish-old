@@ -46,7 +46,7 @@ namespace {
         }
   }
 
-  constexpr int W[6][3] = {
+  int W[6][3] = {
       {  64,  64,  64},
       { 128, 128, 128},
       {  64,  64,  64},
@@ -55,6 +55,13 @@ namespace {
       {  64,  64,  64}
   };
 } // namespace
+
+Range centered(int v)
+{
+	return Range(v - 128, v + 128);
+}
+
+TUNE(SetRange(centered), W);
 
 
 /// Constructors of the MovePicker class. As arguments we pass information
