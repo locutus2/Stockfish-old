@@ -46,7 +46,7 @@ namespace {
         }
   }
 
-#define S(o,n) ((o) + ((n)-(o)) * 2)
+#define S(o,n) ((o) + ((n)-(o)) / 2)
 
   constexpr int W[6][3] = {
       {  S(64,74),  S(64,72),  S(64,69) },
