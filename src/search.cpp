@@ -1790,6 +1790,9 @@ moves_loop: // When in check, search starts from here
 
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus) {
 
+    if ((ss-1)->currentMove == MOVE_NULL)
+        bonus *= 2;
+
     for (int i : {1, 2, 4, 6})
     {
         // Only update first 2 continuation histories if we are in check
