@@ -54,6 +54,29 @@ public:
   }
 };
 
+template<int D>
+class StatsEntry<Move, D> {
+
+  Move entry;
+  int16_t count;
+
+public:
+  void operator=(const Move& v) {
+
+     if (entry == v)
+         ++count;
+     else if (entry && count > 1)
+         --count;
+     else
+         entry = v, count = 1;
+  }
+
+  Move* operator&() { return &entry; }
+  Move* operator->() { return &entry; }
+  operator const Move&() const { return entry; }
+};
+
+
 /// Stats is a generic N-dimensional array used to store various statistics.
 /// The first template parameter T is the base type of the array, the second
 /// template parameter D limits the range of updates in [-D, D] when we update
