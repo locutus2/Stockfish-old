@@ -1105,7 +1105,7 @@ moves_loop: // When in check, search starts from here
       }
 
       // Step 14. Extensions (~75 Elo)
-      if(ss->ply > 1)
+      if(ss->ply > 2)
       {
       // Singular extension search (~70 Elo). If all moves but one fail low on a
       // search of (alpha-s, beta-s), and just one fails high on (alpha, beta),
