@@ -618,7 +618,6 @@ namespace {
     moveCount          = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
-    ss->distanceFromPv = (PvNode ? 0 : ss->distanceFromPv);
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -677,6 +676,7 @@ namespace {
     if (!excludedMove)
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
     formerPv = ss->ttPv && !PvNode;
+    ss->distanceFromPv = (ss->ttPv ? 0 : ss->distanceFromPv);
 
     // Update low ply history for previous move if we are near root and position is or has been in PV
     if (   ss->ttPv
