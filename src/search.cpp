@@ -676,7 +676,7 @@ namespace {
     if (!excludedMove)
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
     formerPv = ss->ttPv && !PvNode;
-    ss->distanceFromPv = (ss->ttPv ? 0 : ss->distanceFromPv);
+    ss->distanceFromPv = (ss->ttPv && (PvNode || (ss-1)->ttPv) ? 0 : ss->distanceFromPv);
 
     // Update low ply history for previous move if we are near root and position is or has been in PV
     if (   ss->ttPv
