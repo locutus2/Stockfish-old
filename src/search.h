@@ -25,6 +25,8 @@
 #include "movepick.h"
 #include "types.h"
 
+namespace Stockfish {
+
 class Position;
 
 namespace Search {
@@ -47,6 +49,7 @@ struct Stack {
   Value staticEval;
   int statScore;
   int moveCount;
+  int distanceFromPv;
   bool inCheck;
   bool ttPv;
   bool ttHit;
@@ -105,5 +108,7 @@ void init();
 void clear();
 
 } // namespace Search
+
+} // namespace Stockfish
 
 #endif // #ifndef SEARCH_H_INCLUDED

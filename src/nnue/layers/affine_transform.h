@@ -24,7 +24,7 @@
 #include <iostream>
 #include "../nnue_common.h"
 
-namespace Eval::NNUE::Layers {
+namespace Stockfish::Eval::NNUE::Layers {
 
   // Affine transformation layer
   template <typename PreviousLayer, IndexType OutputDimensions>
@@ -96,7 +96,7 @@ namespace Eval::NNUE::Layers {
                           IndexType idx = k / 2 * kOutputDimensions * 4 + k % 2;
                           sum[w[idx] < 0] += w[idx];
                       }
-                      for (int sign : {-1, 1})
+                      for (int sign : { -1, 1 })
                           while (sign * sum[sign == -1] > 258)
                           {
                               int maxK = 0, maxW = 0;
@@ -234,9 +234,9 @@ namespace Eval::NNUE::Layers {
         __m128i product1 = _mm_maddubs_epi16(a1, b1);
         __m128i product2 = _mm_maddubs_epi16(a2, b2);
         __m128i product3 = _mm_maddubs_epi16(a3, b3);
-        product0 = _mm_adds_epi16(product0, product1);
-        product2 = _mm_adds_epi16(product2, product3);
-        product0 = _mm_adds_epi16(product0, product2);
+        product0 = _mm_add_epi16(product0, product1);
+        product2 = _mm_add_epi16(product2, product3);
+        product0 = _mm_add_epi16(product0, product2);
         product0 = _mm_madd_epi16(product0, kOnes128);
         acc = _mm_add_epi32(acc, product0);
       };
@@ -459,6 +459,6 @@ namespace Eval::NNUE::Layers {
 #endif
   };
 
-}  // namespace Eval::NNUE::Layers
+}  // namespace Stockfish::Eval::NNUE::Layers
 
 #endif // #ifndef NNUE_LAYERS_AFFINE_TRANSFORM_H_INCLUDED
