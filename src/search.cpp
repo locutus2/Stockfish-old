@@ -1156,7 +1156,7 @@ moves_loop: // When in check, search starts from here
 
       // Check extension (~2 Elo)
       else if (    givesCheck
-               && (!formerPv || move == ttMove)
+               && (cutNode || !formerPv || move == ttMove)
                && (pos.is_discovered_check_on_king(~us, move) || pos.see_ge(move)))
           extension = 1;
 
