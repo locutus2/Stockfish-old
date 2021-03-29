@@ -887,6 +887,8 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        else
+            ss->threatMove = (ss+1)->currentMove;
     }
 
     probCutBeta = beta + 209 - 44 * improving;
@@ -1162,6 +1164,9 @@ moves_loop: // When in check, search starts from here
       // Last captures extension
       else if (   PieceValue[EG][pos.captured_piece()] > PawnValueEg
                && pos.non_pawn_material() <= 2 * RookValueMg)
+          extension = 1;
+
+      else if (ss->threatMove && ss->threatMove == (ss-2)->threatMove)
           extension = 1;
 
       // Add extension to new depth
