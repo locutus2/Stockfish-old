@@ -1166,9 +1166,6 @@ moves_loop: // When in check, search starts from here
                && pos.non_pawn_material() <= 2 * RookValueMg)
           extension = 1;
 
-      else if (ss->threatMove && ss->threatMove == (ss-2)->threatMove)
-          extension = 1;
-
       // Add extension to new depth
       newDepth += extension;
 
@@ -1201,6 +1198,10 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
+          if (ss->threatMove && ss->threatMove == (ss-2)->threatMove)
+              r--;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
