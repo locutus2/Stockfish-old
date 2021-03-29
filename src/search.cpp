@@ -887,6 +887,8 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        else
+            ss->threatMove = (ss+1)->currentMove;
     }
 
     probCutBeta = beta + 209 - 44 * improving;
@@ -1182,6 +1184,7 @@ moves_loop: // When in check, search starts from here
 
       (ss+1)->distanceFromPv = ss->distanceFromPv + moveCount - 1;
 
+      bool CC = false, C = false;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1196,6 +1199,8 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+	  CC = true;
+	  C = ss->threatMove && ss->threatMove == (ss-2)->threatMove;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1363,6 +1368,14 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(C, 0);
+	      dbg_hit_on(T, 1);
+	      dbg_hit_on(T, 10+C);
       }
 
       if (value > bestValue)
