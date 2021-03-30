@@ -1169,7 +1169,7 @@ moves_loop: // When in check, search starts from here
                && pos.non_pawn_material() <= 2 * RookValueMg)
           extension = 1;
 
-      else if (ss->threatMove && ss->threatMove == (ss-2)->threatMove)
+      else if (ss->threatMove && ss->threatMove == (ss-2)->threatMove && to_sq(move) == from_sq(ss->threatMove))
           extension = 1;
 
       // Add extension to new depth
