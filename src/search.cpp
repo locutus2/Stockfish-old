@@ -1202,10 +1202,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
-          if (!PvNode && !cutNode && ss->threatMove && ss->threatMove == (ss-2)->threatMove)
-              r--;
-
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1245,6 +1241,10 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
+
+              // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
+              if (ss->threatMove && ss->threatMove == (ss-2)->threatMove && to_sq(move) == from_sq(ss->threatMove))
+                  r--;
           }
           else
           {
