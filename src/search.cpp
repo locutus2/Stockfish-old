@@ -1203,7 +1203,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
-          if (cutNode && ss->threatMove && ss->threatMove == (ss-2)->threatMove)
+          if (!PvNode && !cutNode && ss->threatMove && ss->threatMove == (ss-2)->threatMove)
               r--;
 
           // Decrease reduction if the ttHit running average is large
