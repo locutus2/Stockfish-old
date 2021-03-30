@@ -1230,6 +1230,10 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
+          // Decrease reduction if double check
+          if (more_than_one(pos.checkers()))
+              r--;
+
           if (captureOrPromotion)
           {
               // Increase reduction for non-checking captures likely to be bad
