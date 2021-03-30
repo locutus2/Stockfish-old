@@ -890,7 +890,7 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
-        else if(pos.piece_on(to_sq((ss+1)->currentMove)) || type_of((ss+1)->currentMove) == PROMOTION)
+        else
             ss->threatMove = (ss+1)->currentMove;
     }
 
@@ -1238,7 +1238,7 @@ moves_loop: // When in check, search starts from here
           // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
           if (   ss->threatMove
               && ss->threatMove == (ss-2)->threatMove
-              && from_sq(ss->threatMove) == to_sq(move))
+              && ((between_bb(from_sq(ss->threatMove), to_sq(ss->threatMove)) | from_sq(ss->threatMove)) & to_sq(move)))
               r--;
 
           if (captureOrPromotion)
