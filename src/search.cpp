@@ -1235,16 +1235,16 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
+          // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
+          if (ss->threatMove && ss->threatMove == (ss-2)->threatMove && (givesCheck || to_sq(move) == from_sq(ss->threatMove)))
+              r--;
+
           if (captureOrPromotion)
           {
               // Increase reduction for non-checking captures likely to be bad
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
-
-              // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
-              if (ss->threatMove && ss->threatMove == (ss-2)->threatMove)
-                  r--;
           }
           else
           {
