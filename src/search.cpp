@@ -1242,8 +1242,8 @@ moves_loop: // When in check, search starts from here
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
 
-              // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
-              if (ss->threatMove && ss->threatMove == (ss-2)->threatMove && to_sq(move) == from_sq(ss->threatMove))
+              // Decrease reduction if threat move piece is captured
+              if (ss->threatMove && to_sq(move) == from_sq(ss->threatMove))
                   r--;
           }
           else
