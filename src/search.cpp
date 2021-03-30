@@ -890,7 +890,7 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
-        else if(pos.piece_on(to_sq((ss+1)->currentMove)))
+        else if(pos.piece_on(to_sq((ss+1)->currentMove)) || type_of((ss+1)->currentMove) == PROMOTION)
             ss->threatMove = (ss+1)->currentMove;
     }
 
