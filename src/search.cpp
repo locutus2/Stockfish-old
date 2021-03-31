@@ -1237,8 +1237,7 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
           if (   ss->threatMove
-              && ss->threatMove == (ss-2)->threatMove
-              && from_sq(ss->threatMove) == to_sq(move))
+              && ss->threatMove == (ss-2)->threatMove)
               r--;
 
           if (captureOrPromotion)
