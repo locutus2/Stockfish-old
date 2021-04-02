@@ -158,7 +158,6 @@ namespace {
             limits.inc[WHITE]  = (limits.inc[WHITE] + 1) / 2;
             limits.inc[BLACK]  = (limits.inc[BLACK] + 1) / 2;
             limits.movetime    = (limits.movetime + 1) / 2;
-            limits.nodes       = (limits.nodes + 1) / 2;
         }
     }
 
