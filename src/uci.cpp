@@ -40,6 +40,8 @@ extern vector<string> setup_bench(const Position&, istream&);
 
 namespace {
 
+  bool reduceTC = false;
+
   // FEN string of the initial position, normal chess
   const char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -147,6 +149,16 @@ namespace {
         else if (token == "infinite")  limits.infinite = 1;
         else if (token == "ponder")    ponderMode = true;
 
+    if (reduceTC)
+    {
+        limits.time[WHITE] /= 2;
+        limits.time[BLACK] /= 2;
+        limits.inc[WHITE] /= 2;
+        limits.inc[BLACK] /= 2;
+        limits.movetime /= 2;
+        limits.nodes /= 2;
+    }
+
     Threads.start_thinking(pos, states, limits, ponderMode);
   }
 
@@ -184,7 +196,16 @@ namespace {
         }
         else if (token == "setoption")  setoption(is);
         else if (token == "position")   position(pos, is, states);
-        else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+        else if (token == "ucinewgame")
+        {
+            if (Options["RandomTC"])
+                reduceTC = std::rand() % 2;
+            else
+                reduceTC = false;
+
+            Search::clear();  // Search::clear() may take some while
+            elapsed = now();
+        }
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
@@ -233,6 +254,8 @@ void UCI::loop(int argc, char* argv[]) {
   Position pos;
   string token, cmd;
   StateListPtr states(new std::deque<StateInfo>(1));
+
+  std::srand(std::time(nullptr));
 
   pos.set(StartFEN, false, &states->back(), Threads.main());
 
