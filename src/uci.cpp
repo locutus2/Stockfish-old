@@ -155,7 +155,7 @@ namespace {
             limits.time[~pos.side_to_move()] = (limits.time[~pos.side_to_move()] * Options["RandomTC"] + 50) / 100;
             limits.inc[WHITE]  = (limits.inc[WHITE] * Options["RandomTC"] + 50) / 100;
             limits.inc[BLACK]  = (limits.inc[BLACK] * Options["RandomTC"] + 50) / 100;
-            limits.movetime    = (limits.movetime + 50) / 100;
+            limits.movetime    = (limits.movetime * Options["RandomTC"] + 50) / 100;
         }
     }
 
