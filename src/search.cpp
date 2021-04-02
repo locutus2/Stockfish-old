@@ -675,7 +675,10 @@ namespace {
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     if (!excludedMove)
+    {
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
+        ss->threatMove = MOVE_NONE;
+    }
     formerPv = ss->ttPv && !PvNode;
 
     // Update low ply history for previous move if we are near root and position is or has been in PV
@@ -887,6 +890,8 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        else
+            ss->threatMove = (ss+1)->currentMove;
     }
 
     probCutBeta = beta + 209 - 44 * improving;
@@ -1236,6 +1241,10 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
+
+              // Decrease reduction if threat move repeats from previous two plies (inspired by the Botvinnik Markov extension)
+              if (ss->threatMove && ss->threatMove == (ss-2)->threatMove && to_sq(move) == from_sq(ss->threatMove))
+                  r--;
           }
           else
           {
