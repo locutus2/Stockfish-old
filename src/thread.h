@@ -93,6 +93,8 @@ struct MainThread : public Thread {
   int callsCnt;
   bool stopOnPonderhit;
   std::atomic_bool ponder;
+  bool reduceTC = false;
+  int reduceTCbuffer = 0;
 };
 
 
