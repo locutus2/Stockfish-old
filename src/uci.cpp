@@ -40,8 +40,6 @@ extern vector<string> setup_bench(const Position&, istream&);
 
 namespace {
 
-  bool reduceTC = false;
-
   // FEN string of the initial position, normal chess
   const char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -151,13 +149,13 @@ namespace {
 
     if (Options["RandomTC"])
     {
-        if (reduceTC)
+        if (Threads.main()->reduceTC)
         {
-            limits.time[WHITE] = (limits.time[WHITE] + 1) / 2;
-            limits.time[BLACK] = (limits.time[BLACK] + 1) / 2;
-            limits.inc[WHITE]  = (limits.inc[WHITE] + 1) / 2;
-            limits.inc[BLACK]  = (limits.inc[BLACK] + 1) / 2;
-            limits.movetime    = (limits.movetime + 1) / 2;
+            limits.time[pos.side_to_move()] = (std::max(TimePoint(0), limits.time[pos.side_to_move()] - Threads.main()->reduceTCbuffer) * Options["RandomTC"] + 50) / 100;
+            limits.time[~pos.side_to_move()] = (limits.time[~pos.side_to_move()] * Options["RandomTC"] + 50) / 100;
+            limits.inc[WHITE]  = (limits.inc[WHITE] * Options["RandomTC"] + 50) / 100;
+            limits.inc[BLACK]  = (limits.inc[BLACK] * Options["RandomTC"] + 50) / 100;
+            limits.movetime    = (limits.movetime + 50) / 100;
         }
     }
 
@@ -200,10 +198,11 @@ namespace {
         else if (token == "position")   position(pos, is, states);
         else if (token == "ucinewgame")
         {
+            Threads.main()->reduceTCbuffer = 0;
             if (Options["RandomTC"])
-                reduceTC = std::rand() % 2;
+                Threads.main()->reduceTC = std::rand() % 2;
             else
-                reduceTC = false;
+                Threads.main()->reduceTC = false;
 
             Search::clear();  // Search::clear() may take some while
             elapsed = now();

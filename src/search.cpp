@@ -537,7 +537,12 @@ void Thread::search() {
               if (mainThread->ponder)
                   mainThread->stopOnPonderhit = true;
               else
+              {
                   Threads.stop = true;
+
+                  if (Options["RandomTC"])
+                      Threads.main()->reduceTCbuffer += Time.elapsed() * (100 - Options["RandomTC"]) / Options["RandomTC"];
+              }
           }
           else if (   Threads.increaseDepth
                    && !mainThread->ponder
@@ -1907,7 +1912,12 @@ void MainThread::check_time() {
   if (   (Limits.use_time_management() && (elapsed > Time.maximum() - 10 || stopOnPonderhit))
       || (Limits.movetime && elapsed >= Limits.movetime)
       || (Limits.nodes && Threads.nodes_searched() >= (uint64_t)Limits.nodes))
+  {
       Threads.stop = true;
+
+      if (Options["RandomTC"])
+          Threads.main()->reduceTCbuffer += elapsed * (100 - Options["RandomTC"]) / Options["RandomTC"];
+  }
 }
 
 
