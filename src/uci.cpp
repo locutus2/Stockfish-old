@@ -153,21 +153,12 @@ namespace {
     {
         if (reduceTC)
         {
-            limits.time[WHITE] = (limits.time[WHITE] * 2 + 1) / 3;
-            limits.time[BLACK] = (limits.time[BLACK] * 2 + 1) / 3;
-            limits.inc[WHITE]  = (limits.inc[WHITE] * 2 + 1) / 3;
-            limits.inc[BLACK]  = (limits.inc[BLACK] * 2 + 1) / 3;
-            limits.movetime    = (limits.movetime * 2 + 1) / 3;
-            limits.nodes       = (limits.nodes * 2 + 1) / 3;
-        }
-        else
-        {
-            limits.time[WHITE] = (limits.time[WHITE] * 4 + 1) / 3;
-            limits.time[BLACK] = (limits.time[BLACK] * 4 + 1) / 3;
-            limits.inc[WHITE]  = (limits.inc[WHITE] * 4 + 1) / 3;
-            limits.inc[BLACK]  = (limits.inc[BLACK] * 4 + 1) / 3;
-            limits.movetime    = (limits.movetime * 4 + 1) / 3;
-            limits.nodes       = (limits.nodes * 4 + 1) / 3;
+            limits.time[WHITE] = (limits.time[WHITE] + 1) / 2;
+            limits.time[BLACK] = (limits.time[BLACK] + 1) / 2;
+            limits.inc[WHITE]  = (limits.inc[WHITE] + 1) / 2;
+            limits.inc[BLACK]  = (limits.inc[BLACK] + 1) / 2;
+            limits.movetime    = (limits.movetime + 1) / 2;
+            limits.nodes       = (limits.nodes + 1) / 2;
         }
     }
 
