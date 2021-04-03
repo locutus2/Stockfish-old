@@ -301,7 +301,17 @@ void UCI::loop(int argc, char* argv[]) {
       else if (token == "setoption")  setoption(is);
       else if (token == "go")         go(pos, is, states);
       else if (token == "position")   position(pos, is, states);
-      else if (token == "ucinewgame") Search::clear();
+      else if (token == "ucinewgame")
+      {
+          newGameStarted = true;
+          Threads.main()->reduceTCbuffer = 0;
+          if (Options["RandomTC"])
+              Threads.main()->reduceTC = std::rand() % 2;
+          else
+              Threads.main()->reduceTC = false;
+
+          Search::clear();
+      }
       else if (token == "isready")    sync_cout << "readyok" << sync_endl;
 
       // Additional custom non-UCI commands, mainly for debugging.
