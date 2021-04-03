@@ -210,7 +210,7 @@ namespace {
             newGameStarted = true;
             Threads.main()->reduceTCbuffer = 0;
             if (Options["RandomTC"])
-                Threads.main()->reduceTC = std::rand() % 2;
+                Threads.main()->reduceTC = true;//std::rand() % 2;
             else
                 Threads.main()->reduceTC = false;
 
