@@ -40,6 +40,9 @@ extern vector<string> setup_bench(const Position&, istream&);
 
 namespace {
 
+  bool reduceTCInitialized = false;
+  bool newGameStarted = false;
+
   // FEN string of the initial position, normal chess
   const char* StartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
@@ -75,6 +78,12 @@ namespace {
     {
         states->emplace_back();
         pos.do_move(m, states->back());
+    }
+
+    if (!reduceTCInitialized && newGameStarted)
+    {
+        std::srand(std::time(nullptr) + 137 * pos.side_to_move());
+        reduceTCInitialized = true;
     }
   }
 
@@ -198,6 +207,7 @@ namespace {
         else if (token == "position")   position(pos, is, states);
         else if (token == "ucinewgame")
         {
+            newGameStarted = true;
             Threads.main()->reduceTCbuffer = 0;
             if (Options["RandomTC"])
                 Threads.main()->reduceTC = std::rand() % 2;
