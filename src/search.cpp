@@ -1232,13 +1232,13 @@ moves_loop: // When in check, search starts from here
 
           if (captureOrPromotion)
           {
-              // Increase reduction for non-checking captures likely to be bad
-              if (   !givesCheck
-                  && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
-                  r++;
-
-              else if (priorCapture && to_sq(move) == prevSq)
+              if (priorCapture && to_sq(move) == prevSq)
                   r--;
+
+              // Increase reduction for non-checking captures likely to be bad
+              else if (   !givesCheck
+                       && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
+                  r++;
           }
           else
           {
