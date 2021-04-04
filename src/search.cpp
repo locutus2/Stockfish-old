@@ -994,8 +994,6 @@ moves_loop: // When in check, search starts from here
                                           nullptr                   , (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
 
-    //Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq][0];
-
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->lowPlyHistory,
                                       &captureHistory,

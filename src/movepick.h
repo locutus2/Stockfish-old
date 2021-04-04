@@ -52,12 +52,6 @@ public:
 
     assert(abs(entry) <= D);
   }
-
-  void operator=(const Move* v) {
-      
-    entry[0] = v[0];
-    entry[1] = v[1];
-  }
 };
 
 template<int D>
