@@ -1233,7 +1233,7 @@ moves_loop: // When in check, search starts from here
           if (captureOrPromotion)
           {
               if (priorCapture && to_sq(move) == prevSq)
-                  r--;
+                  r -= 2;
 
               // Increase reduction for non-checking captures likely to be bad
               else if (   !givesCheck
