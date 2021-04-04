@@ -52,7 +52,41 @@ public:
 
     assert(abs(entry) <= D);
   }
+
+  void operator=(const Move* v) {
+      
+    entry[0] = v[0];
+    entry[1] = v[1];
+  }
 };
+
+template<int D>
+class StatsEntry<Move[2], D> {
+
+  typedef Move T[2];
+
+  T entry;
+
+public:
+  void operator=(const T& v) {
+    entry[0] = v[0];
+    entry[1] = v[1];
+  }
+
+  T* operator&() { return &entry; }
+  T* operator->() { return &entry; }
+  operator const T&() const { return entry; }
+
+  void operator=(Move move) {
+
+    if (entry[0] != move)
+    {
+        entry[1] = entry[0];
+        entry[0] = move;
+    }
+  }
+};
+
 
 /// Stats is a generic N-dimensional array used to store various statistics.
 /// The first template parameter T is the base type of the array, the second
@@ -96,7 +130,7 @@ typedef Stats<int16_t, 10692, MAX_LPH, int(SQUARE_NB) * int(SQUARE_NB)> LowPlyHi
 
 /// CounterMoveHistory stores counter moves indexed by [piece][to] of the previous
 /// move, see www.chessprogramming.org/Countermove_Heuristic
-typedef Stats<Move, NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
+typedef Stats<Move[2], NOT_USED, PIECE_NB, SQUARE_NB> CounterMoveHistory;
 
 /// CapturePieceToHistory is addressed by a move's [piece][to][captured piece type]
 typedef Stats<int16_t, 10692, PIECE_NB, SQUARE_NB, PIECE_TYPE_NB> CapturePieceToHistory;
@@ -132,7 +166,7 @@ public:
                                            const LowPlyHistory*,
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
-                                           Move,
+                                           const Move*,
                                            const Move*,
                                            int);
   Move next_move(bool skipQuiets = false);
@@ -149,7 +183,7 @@ private:
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** continuationHistory;
   Move ttMove;
-  ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
+  ExtMove refutations[4], *cur, *endMoves, *endBadCaptures;
   int stage;
   Square recaptureSquare;
   Value threshold;
