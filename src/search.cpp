@@ -1003,7 +1003,7 @@ moves_loop: // When in check, search starts from here
                                       countermove,
                                       ss->killers,
                                       ss->ply,
-                                      PvNode);
+                                      cutNode);
 
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;

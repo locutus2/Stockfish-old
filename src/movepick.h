@@ -156,7 +156,7 @@ private:
   Value threshold;
   Depth depth;
   int ply;
-  bool PvNode;
+  bool cutNode;
   ExtMove moves[MAX_MOVES];
 };
 
