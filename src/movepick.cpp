@@ -224,7 +224,7 @@ top:
           cur = endMoves;
           endMoves = endQuiets;
 
-          score<QUIETS>();
+          //score<QUIETS>();
           partial_insertion_sort(cur, endMoves, std::numeric_limits<int>::min());
       }
 
