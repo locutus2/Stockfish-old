@@ -25,7 +25,7 @@ namespace Stockfish {
 namespace {
 
   enum Stages {
-    MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
+    MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, QUIET2, BAD_CAPTURE,
     EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
     QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
@@ -33,9 +33,10 @@ namespace {
 
   // partial_insertion_sort() sorts moves in descending order up to and including
   // a given limit. The order of moves smaller than the limit is left unspecified.
-  void partial_insertion_sort(ExtMove* begin, ExtMove* end, int limit) {
+  ExtMove* partial_insertion_sort(ExtMove* begin, ExtMove* end, int limit) {
 
-    for (ExtMove *sortedEnd = begin, *p = begin + 1; p < end; ++p)
+    ExtMove *sortedEnd, *p;
+    for (sortedEnd = begin, p = begin + 1; p < end; ++p)
         if (p->value >= limit)
         {
             ExtMove tmp = *p, *q;
@@ -44,6 +45,8 @@ namespace {
                 *q = *(q - 1);
             *q = tmp;
         }
+
+    return sortedEnd;
   }
 
 } // namespace
@@ -199,7 +202,27 @@ top:
       if (!skipQuiets)
       {
           cur = endBadCaptures;
-          endMoves = generate<QUIETS>(pos, cur);
+          endQuiets = endMoves = generate<QUIETS>(pos, cur);
+
+          score<QUIETS>();
+          endMoves = partial_insertion_sort(cur, endMoves, 0);
+      }
+
+      ++stage;
+      [[fallthrough]];
+
+  case QUIET:
+      if (   !skipQuiets
+          && select<Next>([&](){return   *cur != refutations[0].move
+                                      && *cur != refutations[1].move
+                                      && *cur != refutations[2].move;}))
+          return *(cur - 1);
+
+      // Prepare the pointers to loop over the rest of the quiets
+      if (!skipQuiets)
+      {
+          cur = endMoves;
+          endMoves = endQuiets;
 
           score<QUIETS>();
           partial_insertion_sort(cur, endMoves, -3000 * depth);
@@ -208,7 +231,7 @@ top:
       ++stage;
       [[fallthrough]];
 
-  case QUIET:
+  case QUIET2:
       if (   !skipQuiets
           && select<Next>([&](){return   *cur != refutations[0].move
                                       && *cur != refutations[1].move
