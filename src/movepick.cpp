@@ -205,7 +205,7 @@ top:
           endQuiets = endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          endMoves = partial_insertion_sort(cur, endMoves, 0);
+          endMoves = partial_insertion_sort(cur, endMoves, -3000 * depth);
       }
 
       ++stage;
@@ -225,7 +225,7 @@ top:
           endMoves = endQuiets;
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, -3000 * depth);
+          partial_insertion_sort(cur, endMoves, std::numeric_limits<int>::min());
       }
 
       ++stage;
