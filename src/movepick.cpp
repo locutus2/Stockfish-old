@@ -184,7 +184,7 @@ top:
           || refutations[1].move == refutations[2].move)
           --endMoves;
 
-      else if (cutNode)
+      else if (!cutNode)
           std::swap(refutations[1], refutations[2]);
 
       ++stage;
