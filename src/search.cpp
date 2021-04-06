@@ -1826,6 +1826,9 @@ moves_loop: // When in check, search starts from here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[bool(pos.captured_piece())][pos.piece_on(prevSq)][prevSq] = move;
+
+        if (!thisThread->counterMoves[!pos.captured_piece()][pos.piece_on(prevSq)][prevSq])
+            thisThread->counterMoves[!pos.captured_piece()][pos.piece_on(prevSq)][prevSq] = move;
     }
 
     // Update low ply history
