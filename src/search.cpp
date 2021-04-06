@@ -313,6 +313,7 @@ void Thread::search() {
 
   ss->pv = pv;
 
+  staticEval = rootPos.checkers() ? VALUE_NONE : evaluate(rootPos);
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
 
@@ -994,7 +995,7 @@ moves_loop: // When in check, search starts from here
                                           nullptr                   , (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
 
-    Move countermove = thisThread->counterMoves[ss->staticEval > 0][pos.piece_on(prevSq)][prevSq];
+    Move countermove = thisThread->counterMoves[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->lowPlyHistory,
@@ -1825,10 +1826,10 @@ moves_loop: // When in check, search starts from here
     if (is_ok((ss-1)->currentMove))
     {
         Square prevSq = to_sq((ss-1)->currentMove);
-        thisThread->counterMoves[ss->staticEval > 0][pos.piece_on(prevSq)][prevSq] = move;
+        thisThread->counterMoves[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][pos.piece_on(prevSq)][prevSq] = move;
 
-        if (!thisThread->counterMoves[ss->staticEval <= 0][pos.piece_on(prevSq)][prevSq])
-            thisThread->counterMoves[ss->staticEval <= 0][pos.piece_on(prevSq)][prevSq] = move;
+        if (!thisThread->counterMoves[ss->staticEval <= thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][pos.piece_on(prevSq)][prevSq])
+            thisThread->counterMoves[ss->staticEval <= thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][pos.piece_on(prevSq)][prevSq] = move;
     }
 
     // Update low ply history
