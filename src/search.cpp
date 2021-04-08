@@ -715,7 +715,9 @@ namespace {
             else if (!pos.capture_or_promotion(ttMove))
             {
                 int penalty = -stat_bonus(depth);
-                thisThread->mainHistory[ttValue > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][us][from_to(ttMove)] << penalty;
+                bool better = ttValue > thisThread->staticEval * (ss->ply & 1 ? -1 : 1);
+                thisThread->mainHistory[better][us][from_to(ttMove)] << penalty;
+                thisThread->mainHistory[!better][us][from_to(ttMove)] << penalty / 2;
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
@@ -821,7 +823,9 @@ namespace {
     if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorCapture)
     {
         int bonus = std::clamp(-depth * 4 * int((ss-1)->staticEval + ss->staticEval - 2 * Tempo), -1000, 1000);
-        thisThread->mainHistory[(ss-1)->staticEval > thisThread->staticEval * (ss->ply & 1 ? 1 : -1)][~us][from_to((ss-1)->currentMove)] << bonus;
+        bool better = (ss-1)->staticEval > thisThread->staticEval * (ss->ply & 1 ? 1 : -1);
+        thisThread->mainHistory[better][~us][from_to((ss-1)->currentMove)] << bonus;
+        thisThread->mainHistory[!better][~us][from_to((ss-1)->currentMove)] << bonus / 2;
     }
 
     // Set up improving flag that is used in various pruning heuristics
@@ -995,8 +999,9 @@ moves_loop: // When in check, search starts from here
                                           nullptr                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    auto &mainHistory = thisThread->mainHistory[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)],
+    MovePicker mp(pos, ttMove, depth, &mainHistory,
                                       &thisThread->lowPlyHistory,
                                       &captureHistory,
                                       contHist,
@@ -1255,7 +1260,7 @@ moves_loop: // When in check, search starts from here
                        && !pos.see_ge(reverse_move(move)))
                   r -= 2 + ss->ttPv - (type_of(movedPiece) == PAWN);
 
-              ss->statScore =  thisThread->mainHistory[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][us][from_to(move)]
+              ss->statScore =  mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
@@ -1272,7 +1277,7 @@ moves_loop: // When in check, search starts from here
               // If we are not in check use statScore, but if we are in check we use
               // the sum of main history and first continuation history with an offset.
               if (ss->inCheck)
-                  r -= (thisThread->mainHistory[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][us][from_to(move)]
+                  r -= (mainHistory[us][from_to(move)]
                      + (*contHist[0])[movedPiece][to_sq(move)] - 3833) / 16384;
               else
                   r -= ss->statScore / 14790;
@@ -1756,10 +1761,13 @@ moves_loop: // When in check, search starts from here
         // Increase stats for the best move in case it was a quiet move
         update_quiet_stats(pos, ss, bestMove, bonus2, depth);
 
+        bool better = ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1);
+
         // Decrease stats for all non-best quiet moves
         for (int i = 0; i < quietCount; ++i)
         {
-            thisThread->mainHistory[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][us][from_to(quietsSearched[i])] << -bonus2;
+            thisThread->mainHistory[better][us][from_to(quietsSearched[i])] << -bonus2;
+            thisThread->mainHistory[!better][us][from_to(quietsSearched[i])] << -bonus2 / 2;
             update_continuation_histories(ss, pos.moved_piece(quietsSearched[i]), to_sq(quietsSearched[i]), -bonus2);
         }
     }
@@ -1812,12 +1820,17 @@ moves_loop: // When in check, search starts from here
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
-    thisThread->mainHistory[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][us][from_to(move)] << bonus;
+    bool better = ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1);
+    thisThread->mainHistory[better][us][from_to(move)] << bonus;
+    thisThread->mainHistory[!better][us][from_to(move)] << bonus / 2;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     // Penalty for reversed move in case of moved piece not being a pawn
     if (type_of(pos.moved_piece(move)) != PAWN)
-        thisThread->mainHistory[ss->staticEval > thisThread->staticEval * (ss->ply & 1 ? -1 : 1)][us][from_to(reverse_move(move))] << -bonus;
+    {
+        thisThread->mainHistory[better][us][from_to(reverse_move(move))] << -bonus;
+        thisThread->mainHistory[!better][us][from_to(reverse_move(move))] << -bonus / 2;
+    }
 
     // Update countermove history
     if (is_ok((ss-1)->currentMove))
