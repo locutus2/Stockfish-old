@@ -1804,7 +1804,7 @@ moves_loop: // When in check, search starts from here
         if (is_ok((ss-i)->currentMove))
         {
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
-            (*(ss-i)->continuationHistory2)[pc][to] << bonus / 2;
+            (*(ss-i)->continuationHistory2)[pc][to] << bonus / 8;
         }
     }
   }
