@@ -1793,7 +1793,7 @@ moves_loop: // When in check, search starts from here
         if (ss->inCheck && i > 2)
             break;
         if (is_ok((ss-i)->currentMove))
-            (*(ss-i)->continuationHistory)[pc][to] << (i == 3 ? bonus / 8 : bonus);
+            (*(ss-i)->continuationHistory)[pc][to] << (i == 3 ? bonus / 32 : bonus);
     }
   }
 
