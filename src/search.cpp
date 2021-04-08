@@ -990,7 +990,7 @@ moves_loop: // When in check, search starts from here
 
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
-                                          nullptr                   , (ss-4)->continuationHistory,
+                                         (ss-3)->continuationHistory, (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
@@ -1257,6 +1257,7 @@ moves_loop: // When in check, search starts from here
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
+                             + (*contHist[2])[movedPiece][to_sq(move)] / 16
                              + (*contHist[3])[movedPiece][to_sq(move)]
                              - 4741;
 
