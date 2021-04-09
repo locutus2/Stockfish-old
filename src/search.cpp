@@ -1234,7 +1234,7 @@ moves_loop: // When in check, search starts from here
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
 
-              if (type_of(movedPiece) == QUEEN && type_of(pos.captured_piece()) == QUEEN)
+              if (type_of(movedPiece) == type_of(pos.captured_piece()))
                   r++;
           }
           else
