@@ -994,6 +994,7 @@ moves_loop: // When in check, search starts from here
                                           nullptr                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move counterCapture = thisThread->captureCounterMoves[pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->lowPlyHistory,
@@ -1001,7 +1002,8 @@ moves_loop: // When in check, search starts from here
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      ss->ply);
+                                      ss->ply,
+                                      counterCapture);
 
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
@@ -1763,8 +1765,14 @@ moves_loop: // When in check, search starts from here
         }
     }
     else
+    {
         // Increase stats for the best move in case it was a capture move
         captureHistory[moved_piece][to_sq(bestMove)][captured] << bonus1;
+
+        // Update countermove history
+        if (is_ok((ss-1)->currentMove) && pos.capture(bestMove))
+            thisThread->captureCounterMoves[pos.piece_on(prevSq)][prevSq] = bestMove;
+    }
 
     // Extra penalty for a quiet early move that was not a TT move or
     // main killer move in previous ply when it gets refuted.
