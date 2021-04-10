@@ -170,8 +170,7 @@ top:
 
   case GOOD_CAPTURE:
       if (select<Best>([&](){
-                       return *cur == counterCapture                           ? (counterCapture = MOVE_NONE, true) :
-                              pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
+                       return *cur == counterCapture || pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
           return *(cur - 1);
@@ -186,13 +185,6 @@ top:
           --endMoves;
 
       ++stage;
-
-      // try capture counter move
-      if (   counterCapture != MOVE_NONE
-          && counterCapture != ttMove
-          && pos.capture(counterCapture)
-          && pos.pseudo_legal(counterCapture))
-          return counterCapture;
 
       [[fallthrough]];
 
