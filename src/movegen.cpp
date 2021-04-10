@@ -35,7 +35,9 @@ namespace {
             *moveList++ = make<PROMOTION>(to - D, to, KNIGHT);
     }
 
-    if (Type == QUIETS || Type == EVASIONS || Type == NON_EVASIONS)
+    if (    Type == EVASIONS ||  Type == NON_EVASIONS
+        || (Type == QUIETS   && (D == NORTH || D == SOUTH))
+        || (Type == CAPTURES &&  D != NORTH && D != SOUTH))
     {
         *moveList++ = make<PROMOTION>(to - D, to, ROOK);
         *moveList++ = make<PROMOTION>(to - D, to, BISHOP);
