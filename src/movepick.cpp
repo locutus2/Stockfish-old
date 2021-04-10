@@ -25,7 +25,7 @@ namespace Stockfish {
 namespace {
 
   enum Stages {
-    MAIN_TT, CAPTURE_INIT, CAPTURE_COUNTER, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
+    MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
     EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
     QSEARCH_TT, QCAPTURE_INIT, QCAPTURE, QCHECK_INIT, QCHECK
@@ -168,19 +168,9 @@ top:
       ++stage;
       goto top;
 
-  case CAPTURE_COUNTER:
-      ++stage;
-      if (   counterCapture != MOVE_NONE
-          && counterCapture != ttMove
-          && pos.pseudo_legal(counterCapture)
-          && pos.capture(counterCapture))
-          return counterCapture;
-
-      [[fallthrough]];
-
   case GOOD_CAPTURE:
       if (select<Best>([&](){
-                       return *cur == counterCapture                           ? false :
+                       return *cur == counterCapture                           ? (counterCapture = MOVE_NONE, true) :
                               pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
@@ -196,6 +186,14 @@ top:
           --endMoves;
 
       ++stage;
+
+      // try capture counter move
+      if (   counterCapture != MOVE_NONE
+          && counterCapture != ttMove
+          && pos.capture(counterCapture)
+          && pos.pseudo_legal(counterCapture))
+          return counterCapture;
+
       [[fallthrough]];
 
   case REFUTATION:
