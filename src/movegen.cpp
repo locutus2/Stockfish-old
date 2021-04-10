@@ -28,16 +28,15 @@ namespace {
   template<GenType Type, Direction D>
   ExtMove* make_promotions(ExtMove* moveList, Square to, Square ksq) {
 
-    if (Type == CAPTURES || Type == EVASIONS || Type == NON_EVASIONS)
+    if (Type == CAPTURES || Type == QCAPTURES || Type == EVASIONS || Type == NON_EVASIONS)
     {
         *moveList++ = make<PROMOTION>(to - D, to, QUEEN);
         if (attacks_bb<KNIGHT>(to) & ksq)
             *moveList++ = make<PROMOTION>(to - D, to, KNIGHT);
     }
 
-    if (    Type == EVASIONS ||  Type == NON_EVASIONS
-        || (Type == QUIETS   && (D == NORTH || D == SOUTH))
-        || (Type == CAPTURES &&  D != NORTH && D != SOUTH))
+    if (    Type == QUIETS || Type == EVASIONS ||  Type == NON_EVASIONS
+        || (Type == QCAPTURES && D != NORTH && D != SOUTH))
     {
         *moveList++ = make<PROMOTION>(to - D, to, ROOK);
         *moveList++ = make<PROMOTION>(to - D, to, BISHOP);
@@ -66,10 +65,10 @@ namespace {
     Bitboard pawnsNotOn7 = pos.pieces(Us, PAWN) & ~TRank7BB;
 
     Bitboard enemies = (Type == EVASIONS ? pos.checkers():
-                        Type == CAPTURES ? target : pos.pieces(Them));
+                        Type == CAPTURES || Type == QCAPTURES ? target : pos.pieces(Them));
 
     // Single and double pawn pushes, no promotions
-    if (Type != CAPTURES)
+    if (Type != CAPTURES && Type != QCAPTURES)
     {
         emptySquares = (Type == QUIETS || Type == QUIET_CHECKS ? target : ~pos.pieces());
 
@@ -118,7 +117,7 @@ namespace {
     // Promotions and underpromotions
     if (pawnsOn7)
     {
-        if (Type == CAPTURES)
+        if (Type == CAPTURES || Type == QCAPTURES)
             emptySquares = ~pos.pieces();
 
         if (Type == EVASIONS)
@@ -139,7 +138,7 @@ namespace {
     }
 
     // Standard and en passant captures
-    if (Type == CAPTURES || Type == EVASIONS || Type == NON_EVASIONS)
+    if (Type == CAPTURES || Type == QCAPTURES || Type == EVASIONS || Type == NON_EVASIONS)
     {
         Bitboard b1 = shift<UpRight>(pawnsNotOn7) & enemies;
         Bitboard b2 = shift<UpLeft >(pawnsNotOn7) & enemies;
@@ -214,6 +213,7 @@ namespace {
     switch (Type)
     {
         case CAPTURES:
+        case QCAPTURES:
             target =  pos.pieces(~Us);
             break;
         case QUIETS:
@@ -241,7 +241,7 @@ namespace {
         while (b)
             *moveList++ = make_move(ksq, pop_lsb(b));
 
-        if ((Type != CAPTURES) && pos.can_castle(Us & ANY_CASTLING))
+        if (Type != CAPTURES && Type != QCAPTURES && pos.can_castle(Us & ANY_CASTLING))
             for (CastlingRights cr : { Us & KING_SIDE, Us & QUEEN_SIDE } )
                 if (!pos.castling_impeded(cr) && pos.can_castle(cr))
                     *moveList++ = make<CASTLING>(ksq, pos.castling_rook_square(cr));
@@ -262,7 +262,7 @@ namespace {
 template<GenType Type>
 ExtMove* generate(const Position& pos, ExtMove* moveList) {
 
-  static_assert(Type == CAPTURES || Type == QUIETS || Type == NON_EVASIONS, "Unsupported type in generate()");
+  static_assert(Type == CAPTURES || Type == QCAPTURES || Type == QUIETS || Type == NON_EVASIONS, "Unsupported type in generate()");
   assert(!pos.checkers());
 
   Color us = pos.side_to_move();
@@ -273,6 +273,7 @@ ExtMove* generate(const Position& pos, ExtMove* moveList) {
 
 // Explicit template instantiations
 template ExtMove* generate<CAPTURES>(const Position&, ExtMove*);
+template ExtMove* generate<QCAPTURES>(const Position&, ExtMove*);
 template ExtMove* generate<QUIETS>(const Position&, ExtMove*);
 template ExtMove* generate<NON_EVASIONS>(const Position&, ExtMove*);
 

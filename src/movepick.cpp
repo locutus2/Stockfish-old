@@ -162,7 +162,11 @@ top:
   case PROBCUT_INIT:
   case QCAPTURE_INIT:
       cur = endBadCaptures = moves;
-      endMoves = generate<CAPTURES>(pos, cur);
+
+      if (stage == QCAPTURE_INIT)
+          endMoves = generate<QCAPTURES>(pos, cur);
+      else
+          endMoves = generate<CAPTURES>(pos, cur);
 
       score<CAPTURES>();
       ++stage;
