@@ -272,14 +272,14 @@ std::string compiler_info() {
 static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], cramer[DBG_N][5],
                             chi2[DBG_N][5];
 
-void dbg_hit_on(bool b, int n) { ++hits[n][0]; if (b) ++hits[n][1]; }
-void dbg_hit_on(bool c, bool b, int n) { if (c) dbg_hit_on(b, n); }
-void dbg_mean_of(int v, int n) { ++means[n][0]; means[n][1] += v; }
-void dbg_std_of(int v, int n) { ++stds[n][0]; stds[n][1] += v; stds[n][2] += v * v; }
-void dbg_cov_of(int v, int w, int n) { ++covs[n][0]; covs[n][1] += v; covs[n][2] += w; covs[n][3] += v*v; covs[n][4] += w*w; covs[n][5] += v*w;}
-void dbg_corr_of(int v, int w, int n) { ++corrs[n][0]; corrs[n][1] += v; corrs[n][2] += w; corrs[n][3] += v*v; corrs[n][4] += w*w; corrs[n][5] += v*w;}
-void dbg_cramer_of(bool v, bool w, int n) { ++cramer[n][0]; ++cramer[n][2*v+w+1];}
-void dbg_chi2_of(bool v, bool w, int n) { ++chi2[n][0]; ++chi2[n][2*v+w+1];}
+void dbg_hit_on(bool b, int n, int w) { hits[n][0] += w; if (b) hits[n][1] += w; }
+void dbg_hit_on(bool c, bool b, int n, int w) { if (c) dbg_hit_on(b, n, w); }
+void dbg_mean_of(int v, int n, int w) { means[n][0] += w; means[n][1] += w*v; }
+void dbg_std_of(int v, int n, int w) { stds[n][0] += w; stds[n][1] += w*v; stds[n][2] += w*v*v; }
+void dbg_cov_of(int x, int y, int n, int w) { covs[n][0] += w; covs[n][1] += w*x; covs[n][2] += w*y; covs[n][3] += w*x*x; covs[n][4] += w*y*y; covs[n][5] += w*x*y;}
+void dbg_corr_of(int x, int y, int n, int w) { corrs[n][0] += w; corrs[n][1] += w*x; corrs[n][2] += w*y; corrs[n][3] += w*x*x; corrs[n][4] += w*y*y; corrs[n][5] += w*x*y;}
+void dbg_cramer_of(int x, int y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
+void dbg_chi2_of(int x, int y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
 
 void dbg_print() {
 
