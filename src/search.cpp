@@ -1198,6 +1198,9 @@ moves_loop: // When in check, search starts from here
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
 
+          if (givesCheck && depth < 4)
+              r--;
+
           // Increase reduction if other threads are searching this position
           if (th.marked())
               r++;
@@ -1232,9 +1235,6 @@ moves_loop: // When in check, search starts from here
               // Increase reduction for non-checking captures likely to be bad
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
-                  r++;
-
-              if (depth >= 7 && depth <= 10)
                   r++;
           }
           else
