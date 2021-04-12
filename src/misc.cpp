@@ -336,16 +336,29 @@ void printCondition(int k, std::ostream& out = std::cerr)
 
 void dbg_printc() {
 
+  const bool SORT = true;
+  int x[DBG_C3];
+
   for(int n = 0; n < DBG_N; ++n)
+  {
       for(int k = 0; k < DBG_C3; ++k)
-          if (Chits[n][k][0])   
-	  {
-              cerr << "[" << n << "," << k << "] Total " << Chits[n][k][0] << " Chits " << Chits[n][k][1]
-                   << " hit rate (%) " << 100. * Chits[n][k][1] / Chits[n][k][0];
+              x[k] = k;
+
+      if(SORT)
+              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (Chits[n][a][0]?Chits[n][a][1]/(double)Chits[n][a][0]:0.0)
+                                                                    > (Chits[n][b][0]?Chits[n][b][1]/(double)Chits[n][b][0]:0.0);} );
+
+      for(int k = 0; k < DBG_C3; ++k)
+          if (Chits[n][x[k]][0])
+          {
+              cerr << "[" << n << "," << x[k] << "] Total " << Chits[n][x[k]][0] << " Chits " << Chits[n][x[k]][1]
+                   << " hit rate (%) " << 100. * Chits[n][x[k]][1] / Chits[n][x[k]][0];
               cerr << " => ";
-	      printCondition(k, cerr);
-	      cerr << std::endl;
-	  }
+              printCondition(x[k], cerr);
+              cerr << std::endl;
+          }
+  }
+
 }
 
 void dbg_print() {
