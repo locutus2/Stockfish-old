@@ -305,14 +305,43 @@ void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) {
 	for(int i = 0; i  < CN; ++i)
 	{
 		int k = 0;
-		for(int j = cn; j > 0; --j)
+		for(int j = cn-1; j >= 0; --j)
 		{
 			k *= 3;
 			if(i & (1<<j))
 				k += 2 - c[j];
 		}
+		assert(k < DBG_C3);
 		Chits[n][k][0] += w; if (b) Chits[n][k][1] += w; 
 	}	
+}
+
+void dbg_printc() {
+
+  for(int n = 0; n < DBG_N; ++n)
+      for(int k = 0; k < DBG_C3; ++k)
+          if (Chits[n][k][0])   
+	  {
+              cerr << "[" << n << "," << k << "] Total " << Chits[n][k][0] << " Chits " << Chits[n][k][1]
+                   << " hit rate (%) " << 100. * Chits[n][k][1] / Chits[n][k][0];
+              cerr << " => ";
+	      int x = k;
+              bool first = true;
+	      for(int i = 0; i < DBG_C; ++i)
+	      {
+		      if(x % 3)
+		      {
+		         if(!first) cerr << " & ";
+			 first = false;
+			 if(x % 3 == 1)
+				 cerr << "c" << i;
+			 else
+				 cerr << "!c" << i;
+		      }
+                      x /= 3;
+	      }
+	      cerr << std::endl;
+	  }
 }
 
 void dbg_print() {
@@ -411,12 +440,6 @@ void dbg_print() {
 		else			
 			cerr <<  " => H0 accepted" << endl;
     }
-
-  for(int n = 0; n < DBG_N; ++n)
-      for(int k = 0; k < DBG_C3; ++k)
-          if (Chits[n][k][0])   
-              cerr << "[" << n << "," << k << "] Total " << Chits[n][k][0] << " Chits " << Chits[n][k][1]
-                   << " hit rate (%) " << 100. * Chits[n][k][1] / Chits[n][k][0] << endl;
 }
 
 

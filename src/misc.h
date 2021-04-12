@@ -51,6 +51,7 @@ void dbg_chi2_of(bool x, bool y, int n = 0, int w = 1);
 void dbg_hit_on(std::vector<bool>& c, bool b, int n = 0, int w = 1);
 
 void dbg_print();
+void dbg_printc();
 
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
