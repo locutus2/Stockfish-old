@@ -66,7 +66,7 @@ namespace Stockfish {
 namespace {
 
 const int DBG_N = 16384;
-const int DBG_C = 4;
+const int DBG_C = 6;
 
 /// Version number. If Version is left empty, then compile date in the format
 /// DD-MM-YY and show in engine_info.
