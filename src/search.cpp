@@ -1227,7 +1227,7 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
-          if (ss->inCheck && (ss-1)->inCheck)
+          if (ss->inCheck && (ss-1)->inCheck && (ss-2)->inCheck)
               r++;
 
           if (captureOrPromotion)
