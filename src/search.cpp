@@ -1227,6 +1227,9 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
+          if (ss->inCheck && (ss-1)->inCheck)
+              r++;
+
           if (captureOrPromotion)
           {
               // Increase reduction for non-checking captures likely to be bad
