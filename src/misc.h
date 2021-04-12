@@ -47,7 +47,11 @@ void dbg_cov_of(int x, int y, int n = 0, int w = 1);
 void dbg_corr_of(int x, int y, int n = 0, int w = 1);
 void dbg_cramer_of(bool x, bool y, int n = 0, int w = 1);
 void dbg_chi2_of(bool x, bool y, int n = 0, int w = 1);
+
+void dbg_hit_on(std::vector<bool>& c, bool b, int n = 0, int w = 1);
+
 void dbg_print();
+
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
 static_assert(sizeof(TimePoint) == sizeof(int64_t), "TimePoint should be 64 bits");

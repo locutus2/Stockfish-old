@@ -6,7 +6,6 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
   Stockfish is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -66,7 +65,8 @@ namespace Stockfish {
 
 namespace {
 
-const int DBG_N = 2048;
+const int DBG_N = 16384;
+const int DBG_C = 4;
 
 /// Version number. If Version is left empty, then compile date in the format
 /// DD-MM-YY and show in engine_info.
@@ -267,10 +267,26 @@ std::string compiler_info() {
   return compiler;
 }
 
+template<int a, int b>
+struct POW
+{
+    enum { value = a * POW<a, b-1>::value };
+};
+
+template<int a>
+struct POW<a, 0>
+{
+    enum { value = 1 };
+};
+
+const int DBG_C2 = POW<2, DBG_C>::value;
+const int DBG_C3 = POW<3, DBG_C>::value;
 
 /// Debug functions used mainly to collect run-time statistics
 static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], cramer[DBG_N][5],
                             chi2[DBG_N][5];
+
+static std::atomic<int64_t> Chits[DBG_N][DBG_C3][2];
 
 void dbg_hit_on(bool b, int n, int w) { hits[n][0] += w; if (b) hits[n][1] += w; }
 void dbg_hit_on(bool c, bool b, int n, int w) { if (c) dbg_hit_on(b, n, w); }
@@ -280,6 +296,24 @@ void dbg_cov_of(int x, int y, int n, int w) { covs[n][0] += w; covs[n][1] += w*x
 void dbg_corr_of(int x, int y, int n, int w) { corrs[n][0] += w; corrs[n][1] += w*x; corrs[n][2] += w*y; corrs[n][3] += w*x*x; corrs[n][4] += w*y*y; corrs[n][5] += w*x*y;}
 void dbg_cramer_of(int x, int y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
 void dbg_chi2_of(int x, int y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
+
+void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) { 
+	const int cn = (int)c.size();
+	const int CN = 1 << cn;
+	assert(CN <= DBG_C2);
+
+	for(int i = 0; i  < CN; ++i)
+	{
+		int k = 0;
+		for(int j = cn; j > 0; --j)
+		{
+			k *= 3;
+			if(i & (1<<j))
+				k += 2 - c[j];
+		}
+		Chits[n][k][0] += w; if (b) Chits[n][k][1] += w; 
+	}	
+}
 
 void dbg_print() {
 
@@ -377,6 +411,12 @@ void dbg_print() {
 		else			
 			cerr <<  " => H0 accepted" << endl;
     }
+
+  for(int n = 0; n < DBG_N; ++n)
+      for(int k = 0; k < DBG_C3; ++k)
+          if (Chits[n][k][0])   
+              cerr << "[" << n << "," << k << "] Total " << Chits[n][k][0] << " Chits " << Chits[n][k][1]
+                   << " hit rate (%) " << 100. * Chits[n][k][1] / Chits[n][k][0] << endl;
 }
 
 
