@@ -316,6 +316,24 @@ void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) {
 	}	
 }
 
+void printCondition(int k, std::ostream& out = std::cerr)
+{
+              bool first = true;
+	      for(int i = 0; i < DBG_C; ++i)
+	      {
+		      if(k % 3)
+		      {
+		         if(!first) out << " & ";
+			 first = false;
+			 if(k % 3 == 1)
+				 out << "c" << i;
+			 else
+				 out << "!c" << i;
+		      }
+                      k /= 3;
+	      }
+}
+
 void dbg_printc() {
 
   for(int n = 0; n < DBG_N; ++n)
@@ -325,21 +343,7 @@ void dbg_printc() {
               cerr << "[" << n << "," << k << "] Total " << Chits[n][k][0] << " Chits " << Chits[n][k][1]
                    << " hit rate (%) " << 100. * Chits[n][k][1] / Chits[n][k][0];
               cerr << " => ";
-	      int x = k;
-              bool first = true;
-	      for(int i = 0; i < DBG_C; ++i)
-	      {
-		      if(x % 3)
-		      {
-		         if(!first) cerr << " & ";
-			 first = false;
-			 if(x % 3 == 1)
-				 cerr << "c" << i;
-			 else
-				 cerr << "!c" << i;
-		      }
-                      x /= 3;
-	      }
+	      printCondition(k, cerr);
 	      cerr << std::endl;
 	  }
 }
