@@ -390,6 +390,7 @@ void Thread::search() {
          searchAgainCounter++;
 
       int tempoNNUE = std::clamp( (rootDepth + 8)  * 14 / 17, 18, 30);
+      //std::cerr << std::log((int)Time.optimum()) << std::endl;
 
       // MultiPV loop. We perform a full root search for each PV line
       for (pvIdx = 0; pvIdx < multiPV && !Threads.stop; ++pvIdx)
@@ -553,6 +554,14 @@ void Thread::search() {
       mainThread->iterValue[iterIdx] = bestValue;
       iterIdx = (iterIdx + 1) & 3;
   }
+
+      //dbg_corr_of(rootDepth, 60*(std::log((int)Time.optimum()/10)));
+      int t = (60 * std::log((int)Time.optimum() / 10) + 264) / 24;
+      dbg_corr_of(rootDepth, t);
+      dbg_mean_of(t,1);
+      dbg_std_of(t,1);
+      dbg_mean_of(rootDepth,0);
+      dbg_std_of(rootDepth,0);
 
   if (!mainThread)
       return;
