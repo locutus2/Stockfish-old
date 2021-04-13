@@ -389,6 +389,8 @@ void Thread::search() {
       if (!Threads.increaseDepth)
          searchAgainCounter++;
 
+      int tempoNNUE = std::clamp( (rootDepth + 8)  * 14 / 17, 18, 30);
+
       // MultiPV loop. We perform a full root search for each PV line
       for (pvIdx = 0; pvIdx < multiPV && !Threads.stop; ++pvIdx)
       {
