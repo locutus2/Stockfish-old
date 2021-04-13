@@ -30,7 +30,6 @@ namespace Stockfish {
 
 ThreadPool Threads; // Global object
 
-
 /// Thread constructor launches the thread and waits until it goes to sleep
 /// in idle_loop(). Note that 'searching' and 'exit' should be already set.
 
@@ -163,6 +162,7 @@ void ThreadPool::clear() {
   main()->callsCnt = 0;
   main()->bestPreviousScore = VALUE_INFINITE;
   main()->previousTimeReduction = 1.0;
+  main()->previousDepth = 0;
 }
 
 

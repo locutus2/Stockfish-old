@@ -273,6 +273,7 @@ void MainThread::search() {
       bestThread = Threads.get_best_thread();
 
   bestPreviousScore = bestThread->rootMoves[0].score;
+  previousDepth = completedDepth;
 
   // Send again PV info if we have a new best thread
   if (bestThread != this)

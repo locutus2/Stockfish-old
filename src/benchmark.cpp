@@ -120,7 +120,10 @@ vector<string> setup_bench(const Position& current, istream& is) {
   string limitType = (is >> token) ? token : "depth";
   string evalType  = (is >> token) ? token : "mixed";
 
-  go = limitType == "eval" ? "eval" : "go " + limitType + " " + limit;
+  go = limitType == "eval"   ? "eval" :
+       limitType == "fisher" ? "go wtime " + limit +  " winc " + std::to_string(std::stoi(limit) / 100)
+	                      +  " btime " + limit +  " binc " + std::to_string(std::stoi(limit) / 100)
+			     : "go " + limitType + " " + limit;
 
   if (fenFile == "default")
       fens = Defaults;
