@@ -1126,7 +1126,12 @@ Value Eval::evaluate(const Position& pos) {
               || (   pos.opposite_bishops()
                   && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
                   && !(pos.this_thread()->nodes & 0xB))))
-          v = adjusted_NNUE();
+      {
+          if (largePsq)
+              v = adjusted_NNUE();
+          else
+              v = v * 11 / 14 + 22;
+      }
   }
 
   // Damp down the evaluation linearly when shuffling
