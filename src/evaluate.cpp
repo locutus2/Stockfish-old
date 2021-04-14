@@ -1112,8 +1112,9 @@ Value Eval::evaluate(const Position& pos) {
 
       // Use classical evaluation for really low piece endgames.
       // The most critical case is a bishop + A/H file pawn vs naked king draw.
-      bool strongClassical = pos.non_pawn_material() == BishopValueMg || (
-							pos.non_pawn_material() < 2 * RookValueMg && pos.count<PAWN>() < 2);
+      bool strongClassical =    pos.non_pawn_material() == BishopValueMg
+                            ||  pos.non_pawn_material() == KnightValueMg
+                            || (pos.non_pawn_material() < 2 * RookValueMg && pos.count<PAWN>() < 2);
 
       v = classical || strongClassical ? Evaluation<NO_TRACE>(pos).value() : adjusted_NNUE();
 
