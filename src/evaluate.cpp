@@ -1130,7 +1130,7 @@ Value Eval::evaluate(const Position& pos) {
           if (largePsq)
               v = adjusted_NNUE();
           else
-              v = v * 11 / 14 + 22;
+              v = v * 4 / 5;
       }
   }
 
