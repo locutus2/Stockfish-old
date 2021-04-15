@@ -1115,7 +1115,7 @@ Value Eval::evaluate(const Position& pos) {
       // One critical case is the draw for bishop + A/H file pawn vs naked king.
       bool lowPieceEndgame =   pos.non_pawn_material() == BishopValueMg
                             || (pos.non_pawn_material() < 2 * RookValueMg && pos.count<PAWN>() < 2)
-                            || (pos.non_pawn_material(WHITE) == BishopValueMg && pos.non_pawn_material(BLACK) == BishopValueMg);
+                            || (pos.non_pawn_material() == 2 * BishopValueMg && pos.opposite_bishops());
 
       v = classical || lowPieceEndgame ? Evaluation<NO_TRACE>(pos).value() 
                                        : adjusted_NNUE();
