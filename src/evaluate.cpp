@@ -1141,7 +1141,7 @@ Value Eval::evaluate(const Position& pos) {
       else if (classical)
       {
           Color us = pos.side_to_move();
-          v += pos.this_thread()->evalDiffAverage[us] / 32;
+          v += pos.this_thread()->evalDiffAverage[us] / 128;
       }
   }
 
