@@ -1131,19 +1131,21 @@ Value Eval::evaluate(const Position& pos) {
                   && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
                   && !(pos.this_thread()->nodes & 0xB))))
       {
-          int index = pos.side_to_move();
+          Color us = pos.side_to_move();
+          int index = pos.opposite_bishops();
+
           Value vClassical = v;
           v = adjusted_NNUE();
 
-          if (!pos.opposite_bishops())
-              pos.this_thread()->evalDiffAverage[index] = (EvalDiffAverageWindow - 1) * pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageWindow
+          pos.this_thread()->evalDiffAverage[us][index] = (EvalDiffAverageWindow - 1) * pos.this_thread()->evalDiffAverage[us][index] / EvalDiffAverageWindow
                                                          + v - vClassical;
       }
 
-      else if (classical && !pos.opposite_bishops())
+      else if (classical)
       {
-          int index = pos.side_to_move();
-          v += pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageWindow;
+          Color us = pos.side_to_move();
+          int index = pos.opposite_bishops();
+          v += pos.this_thread()->evalDiffAverage[us][index] / EvalDiffAverageWindow;
       }
   }
 
