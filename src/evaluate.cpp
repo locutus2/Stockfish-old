@@ -1141,7 +1141,7 @@ Value Eval::evaluate(const Position& pos) {
       else if (classical)
       {
           int index = pos.side_to_move();
-          v += pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageWindow;
+          v += pos.this_thread()->evalDiffAverage[index] / (2 * EvalDiffAverageWindow);
       }
   }
 
