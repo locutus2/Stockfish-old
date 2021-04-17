@@ -189,6 +189,7 @@ using namespace Trace;
 namespace {
 
   constexpr int64_t EvalDiffAverageWindow     = 4096;
+  constexpr int64_t EvalDiffAverageResolution = 1024;
 
   // Threshold for lazy and space evaluation
   constexpr Value LazyThreshold1 =  Value(1565);
@@ -1131,17 +1132,17 @@ Value Eval::evaluate(const Position& pos) {
                   && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
                   && !(pos.this_thread()->nodes & 0xB))))
       {
-          int index = pos.opposite_bishops();
+          int index = pos.side_to_move();
           Value vClassical = v;
           v = adjusted_NNUE();
-          pos.this_thread()->evalDiffAverage[index] = (EvalDiffAverageWindow - 1) * pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageWindow
-                                                     + v - vClassical;
+          pos.this_thread()->evalDiffAverage[index] +=  (int64_t(v - vClassical) - pos.this_thread()->evalDiffAverage[index])
+                                                      * EvalDiffAverageResolution / EvalDiffAverageWindow;
       }
 
       else if (classical)
       {
-          int index = pos.opposite_bishops();
-          v += pos.this_thread()->evalDiffAverage[index] / 128;
+          int index = pos.side_to_move();
+          v += pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageResolution;
       }
   }
 
