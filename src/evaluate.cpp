@@ -1110,7 +1110,7 @@ Value Eval::evaluate(const Position& pos) {
       int   r50 = 16 + pos.rule50_count();
       bool  largePsq = psq * 16 > (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50;
       bool  classical =   (largePsq || (psq > PawnValueMg / 4 && !(pos.this_thread()->nodes & 0xB)))
-                       && (pos.non_pawn_material(WHITE) != BishopValueMg || pos.non_pawn_material(BLACK) != BishopValueMg);
+                       && !pos.opposite_bishops();
 
       // Use classical evaluation for really low piece endgames.
       // One critical case is the draw for bishop + A/H file pawn vs naked king.
@@ -1125,10 +1125,7 @@ Value Eval::evaluate(const Position& pos) {
       // probability if the classical eval is less than the threshold.
       if (    largePsq
           && !lowPieceEndgame
-          && (   abs(v) * 16 < NNUEThreshold2 * r50
-              || (   pos.opposite_bishops()
-                  && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
-                  && !(pos.this_thread()->nodes & 0xB))))
+          &&  abs(v) * 16 < NNUEThreshold2 * r50)
           v = adjusted_NNUE();
   }
 
