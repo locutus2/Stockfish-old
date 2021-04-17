@@ -1134,14 +1134,16 @@ Value Eval::evaluate(const Position& pos) {
           int index = pos.side_to_move();
           Value vClassical = v;
           v = adjusted_NNUE();
-          pos.this_thread()->evalDiffAverage[index] = (EvalDiffAverageWindow - 1) * pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageWindow
-                                                     + v - vClassical;
+
+          if (pos.opposite_bishops())
+              pos.this_thread()->evalDiffAverage[index] = (EvalDiffAverageWindow - 1) * pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageWindow
+                                                         + v - vClassical;
       }
 
-      else if (classical)
+      else if (classical && pos.opposite_bishops())
       {
           int index = pos.side_to_move();
-          v += pos.this_thread()->evalDiffAverage[index] / (4 * EvalDiffAverageWindow);
+          v += pos.this_thread()->evalDiffAverage[index] / EvalDiffAverageWindow;
       }
   }
 
