@@ -922,12 +922,14 @@ namespace {
         bool ttPv = ss->ttPv;
         ss->ttPv = false;
 
-        while (   (move = mp.next_move()) != MOVE_NONE
-               && (probCutCount < 2 + 2 * cutNode || priorCapture))
+        while ((move = mp.next_move()) != MOVE_NONE)
             if (move != excludedMove && pos.legal(move))
             {
                 assert(pos.capture_or_promotion(move));
                 assert(depth >= 5);
+
+                if (probCutCount >= 2 + 2 * cutNode && !pos.gives_check(move))
+                    continue;
 
                 captureOrPromotion = true;
                 probCutCount++;
