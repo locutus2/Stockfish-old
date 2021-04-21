@@ -397,7 +397,7 @@ void dbg_printc() {
           {
               cerr << "[" << n << "," << x[k] << "] Total " << ChitsCmp[n][x[k]][0] << " ChitsCmp1 " << ChitsCmp[n][x[k]][1]
                    << " hit rate (%) " << 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0]
-                   << " ChitsCmp2 " << ChitsCmp[m][x[k]][1]
+                   << " Total " << ChitsCmp[m][x[k]][0] << " ChitsCmp2 " << ChitsCmp[m][x[k]][1]
                    << " hit rate (%) " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0]
                    << " diff " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0] - 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0];
               cerr << " => ";
