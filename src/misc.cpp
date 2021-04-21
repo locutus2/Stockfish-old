@@ -387,11 +387,13 @@ void dbg_printc() {
               x[k] = k;
 
       if(SORT)
-              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (Chits[n][a][0]?Chits[n][a][1]/(double)Chits[n][a][0]:0.0)
-                                                                    > (Chits[n][b][0]?Chits[n][b][1]/(double)Chits[n][b][0]:0.0);} );
+              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (ChitsCmp[ChitsCmp[n][a][2]][a][0] ? ChitsCmp[ChitsCmp[n][a][2]][a][1]/(double)ChitsCmp[ChitsCmp[n][a][2]][a][0] :0.0)
+                                                                     -(ChitsCmp[n][a][0]                 ? ChitsCmp[n][a][1]/(double)ChitsCmp[n][a][0]                                 :0.0)
+                                                                    > (ChitsCmp[ChitsCmp[n][b][2]][b][0] ? ChitsCmp[ChitsCmp[n][b][2]][b][1]/(double)ChitsCmp[ChitsCmp[n][b][2]][b][0] :0.0)
+                                                                     -(ChitsCmp[n][b][0]                 ? ChitsCmp[n][b][1]/(double)ChitsCmp[n][b][0]                                  :0.0);} );
 
       for(int k = 0; k < DBG_C3; ++k)
-          if (ChitsCmp[n][x[k]][0] && n < (m = ChitsCmp[n][x[k]][2]))
+          if (ChitsCmp[n][x[k]][0] && ChitsCmp[ChitsCmp[n][x[k]][2]][x[k]][0] && n < (m = ChitsCmp[n][x[k]][2]))
           {
               cerr << "[" << n << "," << x[k] << "] Total " << ChitsCmp[n][x[k]][0] << " ChitsCmp1 " << ChitsCmp[n][x[k]][1]
                    << " hit rate (%) " << 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0]
