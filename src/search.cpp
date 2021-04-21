@@ -1174,6 +1174,11 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false;
+      std::vector<bool> C = {PvNode, cutNode};
+      int c = thisThread->nodes & 1;
+      int R = c;
+ 
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1188,6 +1193,9 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
+          CC = true;
+          
+          if(CC) r += R;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1355,6 +1363,13 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+      
+      if (CC)
+      {
+          bool T = value > alpha;
+          dbg_hit_on_cmp(C, T, c, 1-c);
+
       }
 
       if (value > bestValue)
