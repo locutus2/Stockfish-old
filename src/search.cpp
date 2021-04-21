@@ -1222,15 +1222,15 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
+          if (cutNode && ss->inCheck && !givesCheck)
+              r--;
+
           if (captureOrPromotion)
           {
               // Increase reduction for non-checking captures likely to be bad
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
-
-              if (!PvNode && ss->inCheck)
-                  r--;
           }
           else
           {
