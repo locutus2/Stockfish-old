@@ -1228,6 +1228,9 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
+
+              if (cutNode && ss->ttHit && (tte->bound() & BOUND_LOWER))
+                  r--;
           }
           else
           {
@@ -1240,7 +1243,7 @@ moves_loop: // When in check, search starts from here
 
               // Increase reduction for cut nodes (~10 Elo)
               if (cutNode)
-                  r += 2 - (ss->inCheck && !givesCheck);
+                  r += 2;
 
               // Decrease reduction for moves that escape a capture. Filter out
               // castling moves, because they are coded as "king captures rook" and
