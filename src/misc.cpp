@@ -287,6 +287,7 @@ static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], cov
                             chi2[DBG_N][5];
 
 static std::atomic<int64_t> Chits[DBG_N][DBG_C3][2];
+static std::atomic<int64_t> ChitsCmp[DBG_N][DBG_C3][3];
 
 void dbg_hit_on(bool b, int n, int w) { hits[n][0] += w; if (b) hits[n][1] += w; }
 void dbg_hit_on(bool c, bool b, int n, int w) { if (c) dbg_hit_on(b, n, w); }
@@ -316,6 +317,27 @@ void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) {
 	}	
 }
 
+void dbg_hit_on_cmp(std::vector<bool>& c, bool b, int n, int m, int w) { 
+	const int cn = (int)c.size();
+	const int CN = 1 << cn;
+	assert(CN <= DBG_C2);
+
+	for(int i = 0; i  < CN; ++i)
+	{
+		int k = 0;
+		for(int j = cn-1; j >= 0; --j)
+		{
+			k *= 3;
+			if(i & (1<<j))
+				k += 2 - c[j];
+		}
+		assert(k < DBG_C3);
+		ChitsCmp[n][k][0] += w; 
+        if (b) ChitsCmp[n][k][1] += w;
+        ChitsCmp[n][k][2] = m;         
+	}	
+}
+
 void printCondition(int k, std::ostream& out = std::cerr)
 {
               bool first = true;
@@ -337,7 +359,7 @@ void printCondition(int k, std::ostream& out = std::cerr)
 void dbg_printc() {
 
   const bool SORT = true;
-  int x[DBG_C3];
+  int x[DBG_C3], m;
 
   for(int n = 0; n < DBG_N; ++n)
   {
@@ -353,6 +375,29 @@ void dbg_printc() {
           {
               cerr << "[" << n << "," << x[k] << "] Total " << Chits[n][x[k]][0] << " Chits " << Chits[n][x[k]][1]
                    << " hit rate (%) " << 100. * Chits[n][x[k]][1] / Chits[n][x[k]][0];
+              cerr << " => ";
+              printCondition(x[k], cerr);
+              cerr << std::endl;
+          }
+  }
+
+  for(int n = 0; n < DBG_N; ++n)
+  {
+      for(int k = 0; k < DBG_C3; ++k)
+              x[k] = k;
+
+      if(SORT)
+              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (Chits[n][a][0]?Chits[n][a][1]/(double)Chits[n][a][0]:0.0)
+                                                                    > (Chits[n][b][0]?Chits[n][b][1]/(double)Chits[n][b][0]:0.0);} );
+
+      for(int k = 0; k < DBG_C3; ++k)
+          if (ChitsCmp[n][x[k]][0] && n < (m = ChitsCmp[n][x[k]][2]))
+          {
+              cerr << "[" << n << "," << x[k] << "] Total " << ChitsCmp[n][x[k]][0] << " ChitsCmp1 " << ChitsCmp[n][x[k]][1]
+                   << " hit rate (%) " << 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0]
+                   << " ChitsCmp2 " << ChitsCmp[m][x[k]][1]
+                   << " hit rate (%) " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0]
+                   << " diff " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0] - 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0];
               cerr << " => ";
               printCondition(x[k], cerr);
               cerr << std::endl;
