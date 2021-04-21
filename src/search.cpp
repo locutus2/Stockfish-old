@@ -1226,11 +1226,9 @@ moves_loop: // When in check, search starts from here
           {
               // Increase reduction for non-checking captures likely to be bad
               if (   !givesCheck
+                  && type_of(move) != PROMOTION
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
-
-              if (cutNode && ss->inCheck)
-                  r--;
           }
           else
           {
