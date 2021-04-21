@@ -1175,9 +1175,9 @@ moves_loop: // When in check, search starts from here
       pos.do_move(move, st, givesCheck);
 
       bool CC = false;
-      std::vector<bool> C = {PvNode, cutNode, captureOrPromotion, givesCheck, ss->inCheck};
+      std::vector<bool> C = {PvNode, cutNode, captureOrPromotion, tte->bound() & BOUND_LOWER, tte->bound() & BOUND_UPPER};
       int c = thisThread->nodes & 1;
-      int R = -c;
+      int R = c;
  
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1193,7 +1193,7 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
-          CC = true;
+          CC = ss->ttHit;
           
           if(CC) r += R;
 
