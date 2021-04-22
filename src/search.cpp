@@ -1228,6 +1228,9 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
+
+              if (relative_rank(us, from_sq(move)) < RANK_4 && !(KingFlank[file_of(pos.square<KING>(us))] & to_sq(move)))
+                  r--;
           }
           else
           {
@@ -1247,7 +1250,7 @@ moves_loop: // When in check, search starts from here
               // hence break reverse_move() (~2 Elo)
               else if (    type_of(move) == NORMAL
                        && !pos.see_ge(reverse_move(move)))
-                  r -= 2 + ss->ttPv - (type_of(movedPiece) == PAWN) + (relative_rank(us, from_sq(move)) < RANK_4);
+                  r -= 2 + ss->ttPv - (type_of(movedPiece) == PAWN);
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
