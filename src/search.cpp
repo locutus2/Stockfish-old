@@ -1229,7 +1229,7 @@ moves_loop: // When in check, search starts from here
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
 
-              if (cutNode && ss->ttHit && (tte->bound() & BOUND_LOWER))
+              if (relative_rank(us, to_sq(move)) < RANK_4)
                   r--;
           }
           else
