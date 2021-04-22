@@ -1195,7 +1195,7 @@ moves_loop: // When in check, search starts from here
               || thisThread->ttHitAverage < 432 * TtHitAverageResolution * TtHitAverageWindow / 1024))
       {
           Depth r = reduction(improving, depth, moveCount);
-          CC = ss->ttHit;
+          CC = true;
           
           if(CC) r += R;
 
