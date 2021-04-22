@@ -1175,9 +1175,11 @@ moves_loop: // When in check, search starts from here
       pos.do_move(move, st, givesCheck);
 
       bool CC = false;
-      std::vector<bool> C = {PvNode, cutNode, captureOrPromotion, tte->bound() & BOUND_LOWER, tte->bound() & BOUND_UPPER};
+      //std::vector<bool> C = {PvNode, cutNode, captureOrPromotion, tte->bound() & BOUND_LOWER, tte->bound() & BOUND_UPPER};
+      std::vector<bool> C = {relative_rank(us, to_sq(move)) < RANK_4, relative_rank(us, to_sq(move)) > RANK_5, 
+                             file_of(to_sq(move)) < FILE_D, file_of(to_sq(move)) > FILE_E, captureOrPromotion};
       int c = thisThread->nodes & 1;
-      int R = c;
+      int R = -c;
  
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
