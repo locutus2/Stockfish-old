@@ -1176,10 +1176,22 @@ moves_loop: // When in check, search starts from here
 
       bool CC = false;
       //std::vector<bool> C = {PvNode, cutNode, captureOrPromotion, tte->bound() & BOUND_LOWER, tte->bound() & BOUND_UPPER};
-      std::vector<bool> C = {relative_rank(us, to_sq(move)) < RANK_4, relative_rank(us, to_sq(move)) > RANK_5, 
-                             file_of(to_sq(move)) < FILE_D, file_of(to_sq(move)) > FILE_E, captureOrPromotion};
+      //std::vector<bool> C = {relative_rank(us, to_sq(move)) < RANK_4, relative_rank(us, to_sq(move)) > RANK_5, 
+      /*
+      std::vector<bool> C = {
+                             bool(KingFlank[file_of(pos.square<KING>(us))] & file_of(from_sq(move))) , 
+                             bool(KingFlank[file_of(pos.square<KING>(~us))] & file_of(from_sq(move))) , 
+                             bool(KingFlank[file_of(pos.square<KING>(us))] & file_of(to_sq(move))) , 
+                             bool(KingFlank[file_of(pos.square<KING>(~us))] & file_of(to_sq(move))) , 
+			     captureOrPromotion};
+                 */
+       std::vector<bool> C = {relative_rank(us, to_sq(move)) < RANK_4, relative_rank(us, to_sq(move)) > RANK_5, 
+                             bool(KingFlank[file_of(pos.square<KING>(us))] & to_sq(move)) , 
+                             bool(KingFlank[file_of(pos.square<KING>(~us))] & to_sq(move)) , 
+			     captureOrPromotion};
+                             //file_of(to_sq(move)) < FILE_D, file_of(to_sq(move)) > FILE_E, captureOrPromotion};
       int c = thisThread->nodes & 1;
-      int R = -c;
+      int R = c;
  
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
