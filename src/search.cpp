@@ -1746,15 +1746,17 @@ moves_loop: // When in check, search starts from here
     bonus2 = bestValue > beta + PawnValueMg ? bonus1                                 // larger bonus
                                             : std::min(bonus1, stat_bonus(depth));   // smaller bonus
 
-    if (secondBestMove)
+    if (secondBestMove && depth > 1)
     {
+        int bonus3 = stat_bonus(depth - 1);
+
         if (pos.capture_or_promotion(secondBestMove))
             // Increase stats for the second best move in case it was a capture move
-            captureHistory[pos.moved_piece(secondBestMove)][to_sq(secondBestMove)][type_of(pos.piece_on(to_sq(secondBestMove)))] << bonus1;
+            captureHistory[pos.moved_piece(secondBestMove)][to_sq(secondBestMove)][type_of(pos.piece_on(to_sq(secondBestMove)))] << bonus3;
 
         else
             // Increase stats for the second best move in case it was a quiet move
-            update_quiet_stats(pos, ss, secondBestMove, bonus2, depth);
+            update_quiet_stats(pos, ss, secondBestMove, bonus3, depth);
     }
 
     if (!pos.capture_or_promotion(bestMove))
