@@ -300,7 +300,6 @@ void Thread::search() {
   Stack stack[MAX_PLY+10], *ss = stack+7;
   Move  pv[MAX_PLY+1];
   Value bestValue, alpha, beta, delta;
-  Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = 0;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1, totBestMoveChanges = 0;
@@ -519,6 +518,9 @@ void Thread::search() {
           {
               totBestMoveChanges += th->bestMoveChanges;
               th->bestMoveChanges = 0;
+
+              if (lastBestMove != th->lastBestMove)
+                  totBestMoveChanges++;
           }
           double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
 
