@@ -521,7 +521,7 @@ void Thread::search() {
               th->bestMoveChanges = 0;
 
               if (lastBestMove != th->lastBestMove)
-                  totBestMoveChanges += 0.2;
+                  totBestMoveChanges += 0.4;
           }
           double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
 
