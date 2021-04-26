@@ -1063,15 +1063,14 @@ moves_loop: // When in check, search starts from here
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
           moveCountPruning = moveCount >= futility_move_count(improving, depth);
 
-          // Reduced depth of the next LMR search
-          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount), 0);
-
           if (   captureOrPromotion
               || givesCheck)
           {
+              int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount), 0);
+
               // Capture history based pruning when the move doesn't give check
               if (   !givesCheck
-                  && lmrDepth - ttCapture < 1
+                  && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
                   continue;
 
@@ -1081,6 +1080,8 @@ moves_loop: // When in check, search starts from here
           }
           else
           {
+              int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount) - (!ss->ttPv && ttCapture), 0);
+
               // Countermoves based pruning (~20 Elo)
               if (   lmrDepth < 4 + ((ss-1)->statScore > 0 || (ss-1)->moveCount == 1)
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
