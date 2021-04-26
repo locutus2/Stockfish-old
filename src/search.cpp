@@ -513,16 +513,17 @@ void Thread::search() {
           // If the bestMove is stable over several iterations, reduce time accordingly
           timeReduction = lastBestMoveDepth + 9 < completedDepth ? 1.92 : 0.95;
           double reduction = (1.47 + mainThread->previousTimeReduction) / (2.32 * timeReduction);
-          std::set<Move> threadMoves;
 
           // Use part of the gained time from a previous stable move for the current move
           for (Thread* th : Threads)
           {
               totBestMoveChanges += th->bestMoveChanges;
               th->bestMoveChanges = 0;
-              threadMoves.insert(th->lastBestMove);
+
+              if (lastBestMove != th->lastBestMove)
+                  totBestMoveChanges += 0.2;
           }
-          double bestMoveInstability = 1 + 2 * (totBestMoveChanges + threadMoves.size() - 1) / Threads.size();
+          double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
 
           double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability;
 
