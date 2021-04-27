@@ -1092,10 +1092,10 @@ Value Eval::evaluate(const Position& pos) {
       auto  adjusted_NNUE = [&]()
       {
          int material = pos.non_pawn_material() + 4 * PawnValueMg * pos.count<PAWN>();
-         int r = pos.rule50_count() * (200 - pos.rule50_count()) / 100;
+         int r = pos.rule50_count() * (300 - pos.rule50_count()) / 200;
          int scale =  580
                     + material / 32
-                    - r * (300 - r) / 50;
+                    - r * (200 - r) / 25;
 
          Value nnue = NNUE::evaluate(pos) * scale / 1024 + Tempo;
 
