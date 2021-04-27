@@ -1095,7 +1095,7 @@ Value Eval::evaluate(const Position& pos) {
          int r = pos.rule50_count() * (200 - pos.rule50_count()) / 100;
          int scale =  580
                     + material / 32
-                    - r * (200 - r) / 25;
+                    - r * (300 - r) / 50;
 
          Value nnue = NNUE::evaluate(pos) * scale / 1024 + Tempo;
 
