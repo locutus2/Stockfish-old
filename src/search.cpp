@@ -21,7 +21,6 @@
 #include <cmath>
 #include <cstring>   // For std::memset
 #include <iostream>
-#include <set>
 #include <sstream>
 
 #include "evaluate.h"
@@ -521,8 +520,9 @@ void Thread::search() {
               th->bestMoveChanges = 0;
 
               if (lastBestMove != th->lastBestMove)
-                  totBestMoveChanges += 0.05;
+                  totBestMoveChanges += 0.15;
           }
+          totBestMoveChanges -= 0.25 * std::log(Threads.size());
           double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
 
           double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability;
