@@ -520,7 +520,7 @@ void Thread::search() {
               th->bestMoveChanges = 0;
 
               if (lastBestMove != th->lastBestMove)
-                  totBestMoveChanges += std::min(1.0, 0.0644 * std::exp(0.057 * rootDepth));
+                  totBestMoveChanges += 1 / std::max(1.0, 0.54 * (26.53 - rootDepth));
           }
           double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
 
