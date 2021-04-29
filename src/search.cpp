@@ -1154,7 +1154,7 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          else
+          else if (value >= beta)
               goodMove = ss->currentMove;
       }
 
