@@ -1146,7 +1146,7 @@ moves_loop: // When in check, search starts from here
           // move that pushes it over beta, if so also produce a cutoff.
           else if (ttValue >= beta)
           {
-              if (value >= beta)
+              if (value >= beta && !likelyFailLow)
                   goodMove = ss->currentMove;
 
               ss->excludedMove = move;
@@ -1196,7 +1196,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
           if (move == goodMove)
-              r -= 2;
+              r--;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
