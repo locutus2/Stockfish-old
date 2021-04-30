@@ -1351,7 +1351,7 @@ moves_loop: // When in check, search starts from here
               // We record how often the best move has been changed in each
               // iteration. This information is used for time management and LMR
               if (moveCount > 1)
-                  thisThread->bestMoveChanges += moveCount / 2;
+                  thisThread->bestMoveChanges += (moveCount + 2) / 4;
           }
           else
               // All other moves but the PV are set to the lowest value: this
