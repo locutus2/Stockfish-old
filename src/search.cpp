@@ -1146,6 +1146,9 @@ moves_loop: // When in check, search starts from here
           // move that pushes it over beta, if so also produce a cutoff.
           else if (ttValue >= beta)
           {
+              if (value >= beta)
+                  goodMove = ss->currentMove;
+
               ss->excludedMove = move;
               value = search<NonPV>(pos, ss, beta - 1, beta, (depth + 3) / 2, cutNode);
               ss->excludedMove = MOVE_NONE;
@@ -1153,9 +1156,6 @@ moves_loop: // When in check, search starts from here
               if (value >= beta)
                   return beta;
           }
-
-          else
-              goodMove = ss->currentMove;
       }
 
       // Check extension (~2 Elo)
