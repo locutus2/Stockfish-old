@@ -1195,6 +1195,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
+          if (move == goodMove)
+              r -= 2;
+
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1275,7 +1278,7 @@ moves_loop: // When in check, search starts from here
                   r -= (thisThread->mainHistory[us][from_to(move)]
                      + (*contHist[0])[movedPiece][to_sq(move)] - 3833) / 16384;
               else
-                  r -= (ss->statScore + 7395 * (move == goodMove)) / 14790;
+                  r -= ss->statScore / 14790;
           }
 
           // In general we want to cap the LMR depth search at newDepth. But if
