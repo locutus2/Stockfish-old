@@ -1146,6 +1146,9 @@ moves_loop: // When in check, search starts from here
           // move that pushes it over beta, if so also produce a cutoff.
           else if (ttValue >= beta)
           {
+              if (value >= beta)
+                  goodMove = ss->currentMove;
+
               ss->excludedMove = move;
               value = search<NonPV>(pos, ss, beta - 1, beta, (depth + 3) / 2, cutNode);
               ss->excludedMove = MOVE_NONE;
@@ -1153,9 +1156,6 @@ moves_loop: // When in check, search starts from here
               if (value >= beta)
                   return beta;
           }
-
-          else if (!likelyFailLow)
-              goodMove = ss->currentMove;
       }
 
       // Check extension (~2 Elo)
@@ -1194,9 +1194,6 @@ moves_loop: // When in check, search starts from here
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
-
-          if (move == goodMove)
-              r--;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1278,7 +1275,7 @@ moves_loop: // When in check, search starts from here
                   r -= (thisThread->mainHistory[us][from_to(move)]
                      + (*contHist[0])[movedPiece][to_sq(move)] - 3833) / 16384;
               else
-                  r -= ss->statScore / 14790;
+                  r -= (ss->statScore + 7395 * (move == goodMove)) / 14790;
           }
 
           // In general we want to cap the LMR depth search at newDepth. But if
