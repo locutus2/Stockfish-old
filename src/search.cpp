@@ -375,7 +375,7 @@ void Thread::search() {
   {
       // Age out PV variability metric
       if (mainThread)
-          totBestMoveChanges /= 2.6;
+          totBestMoveChanges *= 0.35;
 
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
@@ -517,7 +517,7 @@ void Thread::search() {
           // Use part of the gained time from a previous stable move for the current move
           for (Thread* th : Threads)
           {
-              totBestMoveChanges += th->bestMoveChanges;
+              totBestMoveChanges += 1.3 * th->bestMoveChanges;
               th->bestMoveChanges = 0;
           }
           double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
