@@ -1187,7 +1187,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          if (givesCheck)
+          if (more_than_one(pos.checkers()))
               r--;
 
           // Decrease reduction if the ttHit running average is large
