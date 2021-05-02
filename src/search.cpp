@@ -1187,9 +1187,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          if (more_than_one(pos.checkers()))
-              r--;
-
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1225,9 +1222,11 @@ moves_loop: // When in check, search starts from here
 
           if (captureOrPromotion)
           {
+              if (givesCheck)
+                  r--;
+
               // Increase reduction for non-checking captures likely to be bad
-              if (   !givesCheck
-                  && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
+              else if (ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
           }
           else
