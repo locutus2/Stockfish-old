@@ -1220,7 +1220,7 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
-          if (givesCheck && cutNode)
+          if (givesCheck && !cutNode)
               r--;
 
           if (captureOrPromotion)
