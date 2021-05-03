@@ -1199,7 +1199,7 @@ moves_loop: // When in check, search starts from here
           // and node is not likely to fail low. (~10 Elo)
           if (   ss->ttPv
               && !likelyFailLow)
-              r -= 2;
+              r -= 2 + givesCheck;
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
@@ -1222,11 +1222,9 @@ moves_loop: // When in check, search starts from here
 
           if (captureOrPromotion)
           {
-              if (givesCheck)
-                  r--;
-
               // Increase reduction for non-checking captures likely to be bad
-              else if (ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
+              if (   !givesCheck
+                  && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
           }
           else
