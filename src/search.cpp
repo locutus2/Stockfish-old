@@ -1199,7 +1199,7 @@ moves_loop: // When in check, search starts from here
           // and node is not likely to fail low. (~10 Elo)
           if (   ss->ttPv
               && !likelyFailLow)
-              r -= 2 + givesCheck;
+              r -= 2;
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
@@ -1218,6 +1218,9 @@ moves_loop: // When in check, search starts from here
 
           // Decrease reduction if ttMove has been singularly extended (~3 Elo)
           if (singularQuietLMR)
+              r--;
+
+          if (givesCheck && cutNode)
               r--;
 
           if (captureOrPromotion)
