@@ -1220,9 +1220,6 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
-          if (givesCheck && !cutNode)
-              r--;
-
           if (captureOrPromotion)
           {
               // Increase reduction for non-checking captures likely to be bad
@@ -1232,6 +1229,9 @@ moves_loop: // When in check, search starts from here
           }
           else
           {
+              if (givesCheck)
+                  r--;
+
               // Increase reduction if ttMove is a capture (~5 Elo)
               if (ttCapture)
                   r++;
