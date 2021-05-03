@@ -1157,7 +1157,7 @@ moves_loop: // When in check, search starts from here
 
       // Add extension to new depth
       newDepth += extension;
-      safeMove = pos.see_ge(move);
+      safeMove = pos.see_ge(move, KnightValueMg - BishopValueMg);
 
       // Speculative prefetch as early as possible
       prefetch(TT.first_entry(pos.key_after(move)));
