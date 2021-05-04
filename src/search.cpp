@@ -1220,6 +1220,9 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
+          if (givesCheck && depth < 12)
+              r--;
+
           if (captureOrPromotion)
           {
               // Increase reduction for non-checking captures likely to be bad
