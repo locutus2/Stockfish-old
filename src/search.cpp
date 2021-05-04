@@ -1155,7 +1155,7 @@ moves_loop: // When in check, search starts from here
           }
       }
 
-      goodCheck = givesCheck && cutNode && pos.see_ge(move);
+      goodCheck = givesCheck && !cutNode && pos.see_ge(move);
 
       // Add extension to new depth
       newDepth += extension;
