@@ -604,7 +604,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool formerPv, givesCheck, goodCheck, improving, didLMR, priorCapture;
+    bool formerPv, givesCheck, badCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
@@ -1155,7 +1155,7 @@ moves_loop: // When in check, search starts from here
           }
       }
 
-      goodCheck = givesCheck && pos.see_ge(move);
+      badCheck = givesCheck && !pos.see_ge(move);
 
       // Add extension to new depth
       newDepth += extension;
@@ -1222,8 +1222,8 @@ moves_loop: // When in check, search starts from here
           if (singularQuietLMR)
               r--;
 
-          if (goodCheck)
-              r--;
+          if (badCheck)
+              r++;
 
           if (captureOrPromotion)
           {
