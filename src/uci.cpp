@@ -165,6 +165,8 @@ namespace {
 
     TimePoint elapsed = now();
 
+    for(int epoch = 0; epoch < 1000; ++epoch)
+    {
     for (const auto& cmd : list)
     {
         istringstream is(cmd);
@@ -185,6 +187,8 @@ namespace {
         else if (token == "setoption")  setoption(is);
         else if (token == "position")   position(pos, is, states);
         else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+    }
+	       Learn::print();
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'

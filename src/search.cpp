@@ -37,6 +37,117 @@
 
 namespace Stockfish {
 
+namespace Learn {
+  constexpr int BATCH_SIZE = 1024;
+  constexpr double LAMBDA = 1/1024.;
+  constexpr double LR = 0.001;
+  constexpr int N = SQUARE_NB * 13 * SQUARE_NB * 6;
+  double B;
+  double W[N];
+  double cumError[N];
+  int I[N];
+  bool isInitialized = false;
+  double loss = 0;
+  int usedIndex[SQUARE_NB];
+  int batch_size = 0;
+
+  void init_rnd()
+  {
+	  std::srand(std::time(nullptr));
+  }
+
+  double rnd()
+  {
+	  return std::rand()/(double)RAND_MAX*2-1;
+  }
+
+  void init()
+  {
+      B = 0.1*rnd();
+      for(int i = 0; i < N; ++i)
+          W[i] = 0.1*rnd();
+      for(int i = 0; i < N; ++i)
+          cumError[i] = 0;
+
+      isInitialized = true;
+      batch_size = 0;
+  }
+
+  void learn(bool label, const Position& pos, Move move)
+  {
+      if(!isInitialized)
+      {
+          init_rnd();
+          init();
+      }
+
+      // inti input vector
+      //for(int i = 0; i < N; ++i)
+      //    I[i] = 0;
+      
+
+      // set input vector from position
+      Color us = pos.side_to_move();
+      int offset = (type_of(pos.moved_piece(move))-1) * 64 + to_sq(move);
+      for(Square s = SQ_A1; s <= SQ_H8; ++s)
+      {
+	   Piece p = pos.piece_on(relative_square(us, s));
+	   int index = 13 * s;
+	   if(p)
+	   {
+	       index += color_of(p) == us ? 0 : 6;
+	       index += type_of(p);
+	   }
+	   //I[offset + index] = 1;
+	   usedIndex[s] = offset + index;
+      }
+
+      // forward propagation
+      double sum = B;
+      //for(int i = 0; i < N; ++i)
+      //    sum += I[i] * W[i];
+      for(int i = 0; i < SQUARE_NB; ++i)
+          sum += W[usedIndex[i]];
+
+      // activation of output
+      double a = 1 / (1 + std::exp(-sum));
+
+      // error
+      double error = a - double(label);
+
+      // learning via backward propagation
+      //for(int i = 0; i < N; ++i)
+     // {
+//	      double delta = error * I[i];
+//	      W[i] -= LR * delta;
+ //     }
+      for(int i = 0; i < SQUARE_NB; ++i)
+      {
+	          double delta = error;
+	          cumError[usedIndex[i]] += delta;
+      }
+      loss = (1-LAMBDA) * loss + LAMBDA * std::pow(error, 2);
+
+      if(batch_size >= BATCH_SIZE)
+      {
+          for(int i = 0; i < N; ++i)
+          {
+	          //double delta = cumError / batch_size;
+	          W[i] -= LR * cumError[i];
+          }
+	  batch_size = 0;
+          for(int i = 0; i < N; ++i)
+              cumError[i] = 0;
+      }
+  }
+
+  void print(std::ostream & out)
+  {
+	  out << "loss: " << loss << std::endl << std::flush;
+  }
+}
+
+
 namespace Search {
 
   LimitsType Limits;
@@ -1170,6 +1281,7 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1185,6 +1297,8 @@ moves_loop: // When in check, search starts from here
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+	  CC = true;
 
           // Decrease reduction if the ttHit running average is large
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1352,6 +1466,12 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      	bool T = value > alpha;
+		Learn::learn(T, pos, move);
       }
 
       if (value > bestValue)

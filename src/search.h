@@ -27,6 +27,10 @@
 
 namespace Stockfish {
 
+	namespace Learn {
+		void print(std::ostream& out = std::cerr);
+	}
+
 class Position;
 
 namespace Search {
