@@ -1221,7 +1221,7 @@ moves_loop: // When in check, search starts from here
 
           if (captureOrPromotion)
           {
-              if (improving && (PvNode || cutNode))
+              if (depth < 13 && improving && (PvNode || cutNode))
                   r--;
 
               // Increase reduction for non-checking captures likely to be bad
