@@ -309,8 +309,12 @@ void Thread::search() {
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
+  {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
+      (ss-i)->excludedSquare = SQ_NONE;
+  }
 
+  ss->excludedSquare = SQ_NONE;
   ss->pv = pv;
 
   bestValue = delta = alpha = -VALUE_INFINITE;
@@ -601,7 +605,8 @@ namespace {
 
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove;
+    Move ttMove, move, bestMove;
+    Square excludedSquare;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool formerPv, givesCheck, improving, didLMR, priorCapture;
@@ -652,7 +657,8 @@ namespace {
 
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->ttPv = false;
-    (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    (ss+1)->excludedSquare = SQ_NONE;
+    bestMove = MOVE_NONE;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -667,13 +673,13 @@ namespace {
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
     // position key in case of an excluded move.
-    excludedMove = ss->excludedMove;
-    posKey = excludedMove == MOVE_NONE ? pos.key() : pos.key() ^ make_key(excludedMove);
+    excludedSquare = ss->excludedSquare;
+    posKey = excludedSquare == SQ_NONE ? pos.key() : pos.key() ^ make_key(excludedSquare);
     tte = TT.probe(posKey, ss->ttHit);
     ttValue = ss->ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ss->ttHit    ? tte->move() : MOVE_NONE;
-    if (!excludedMove)
+    if (excludedSquare == SQ_NONE)
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
     formerPv = ss->ttPv && !PvNode;
 
@@ -845,7 +851,7 @@ namespace {
         &&  eval >= beta
         &&  eval >= ss->staticEval
         &&  ss->staticEval >= beta - 24 * depth - 34 * improving + 162 * ss->ttPv + 159
-        && !excludedMove
+        &&  excludedSquare == SQ_NONE
         &&  pos.non_pawn_material(us)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
@@ -924,7 +930,7 @@ namespace {
 
         while (   (move = mp.next_move()) != MOVE_NONE
                && probCutCount < 2 + 2 * cutNode)
-            if (move != excludedMove && pos.legal(move))
+            if (from_sq(move) != excludedSquare && pos.legal(move))
             {
                 assert(pos.capture_or_promotion(move));
                 assert(depth >= 5);
@@ -1022,7 +1028,7 @@ moves_loop: // When in check, search starts from here
     {
       assert(is_ok(move));
 
-      if (move == excludedMove)
+      if (from_sq(move) == excludedSquare)
           continue;
 
       // At root obey the "searchmoves" option and skip moves not listed in Root
@@ -1112,7 +1118,7 @@ moves_loop: // When in check, search starts from here
       if (    depth >= 7
           &&  move == ttMove
           && !rootNode
-          && !excludedMove // Avoid recursive singular search
+          &&  excludedSquare == SQ_NONE // Avoid recursive singular search
        /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
           &&  abs(ttValue) < VALUE_KNOWN_WIN
           && (tte->bound() & BOUND_LOWER)
@@ -1121,9 +1127,9 @@ moves_loop: // When in check, search starts from here
           Value singularBeta = ttValue - ((formerPv + 4) * depth) / 2;
           Depth singularDepth = (depth - 1 + 3 * formerPv) / 2;
 
-          ss->excludedMove = move;
+          ss->excludedSquare = from_sq(move);
           value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
-          ss->excludedMove = MOVE_NONE;
+          ss->excludedSquare = SQ_NONE;
 
           if (value < singularBeta)
           {
@@ -1145,9 +1151,9 @@ moves_loop: // When in check, search starts from here
           // move that pushes it over beta, if so also produce a cutoff.
           else if (ttValue >= beta)
           {
-              ss->excludedMove = move;
+              ss->excludedSquare = from_sq(move);
               value = search<NonPV>(pos, ss, beta - 1, beta, (depth + 3) / 2, cutNode);
-              ss->excludedMove = MOVE_NONE;
+              ss->excludedSquare = SQ_NONE;
 
               if (value >= beta)
                   return beta;
@@ -1400,12 +1406,12 @@ moves_loop: // When in check, search starts from here
     // must be a mate or a stalemate. If we are in a singular extension search then
     // return a fail low score.
 
-    assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
+    assert(moveCount || !ss->inCheck || excludedSquare != SQ_NONE || !MoveList<LEGAL>(pos).size());
 
     if (!moveCount)
-        bestValue = excludedMove ? alpha :
-                    ss->inCheck  ? mated_in(ss->ply)
-                                 : VALUE_DRAW;
+        bestValue = excludedSquare != SQ_NONE ? alpha :
+                    ss->inCheck               ? mated_in(ss->ply)
+                                              : VALUE_DRAW;
 
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
@@ -1430,7 +1436,7 @@ moves_loop: // When in check, search starts from here
         ss->ttPv = ss->ttPv && (ss+1)->ttPv;
 
     // Write gathered information in transposition table
-    if (!excludedMove && !(rootNode && thisThread->pvIdx))
+    if (excludedSquare == SQ_NONE && !(rootNode && thisThread->pvIdx))
         tte->save(posKey, value_to_tt(bestValue, ss->ply), ss->ttPv,
                   bestValue >= beta ? BOUND_LOWER :
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
