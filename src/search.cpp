@@ -604,7 +604,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool formerPv, givesCheck, improving, didLMR, priorCapture;
+    bool formerPv, givesCheck, improving, didLMR, priorCapture, excludeQuiets;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
@@ -653,6 +653,7 @@ namespace {
     (ss+1)->ply = ss->ply + 1;
     (ss+1)->ttPv = false;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
+    (ss+1)->excludeQuiets = false;
     (ss+2)->killers[0] = (ss+2)->killers[1] = MOVE_NONE;
     Square prevSq = to_sq((ss-1)->currentMove);
 
@@ -668,6 +669,7 @@ namespace {
     // search to overwrite a previous full search TT value, so we use a different
     // position key in case of an excluded move.
     excludedMove = ss->excludedMove;
+    excludeQuiets = ss->excludeQuiets;
     posKey = excludedMove == MOVE_NONE ? pos.key() : pos.key() ^ make_key(excludedMove);
     tte = TT.probe(posKey, ss->ttHit);
     ttValue = ss->ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
@@ -1051,7 +1053,7 @@ moves_loop: // When in check, search starts from here
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
 
-      if (   excludedMove
+      if (   excludeQuiets
           && bestValue > VALUE_TB_LOSS_IN_MAX_PLY
           && !(captureOrPromotion || givesCheck || ss->inCheck))
           continue;
@@ -1157,6 +1159,17 @@ moves_loop: // When in check, search starts from here
               if (value >= beta)
                   return beta;
           }
+
+          singularBeta = ttValue - (formerPv + 4) * depth;
+
+          ss->excludedMove = move;
+          ss->excludeQuiets = true;
+          value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
+          ss->excludeQuiets = false;
+          ss->excludedMove = MOVE_NONE;
+
+          if (value < singularBeta)
+              extension = 1;
       }
 
       // Add extension to new depth
