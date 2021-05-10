@@ -1160,16 +1160,19 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          singularBeta = ttValue - (formerPv + 4) * depth;
+          else
+          {
+              singularBeta = ttValue - (formerPv + 4) * depth;
 
-          ss->excludedMove = move;
-          ss->excludeQuiets = true;
-          value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
-          ss->excludeQuiets = false;
-          ss->excludedMove = MOVE_NONE;
+              ss->excludedMove = move;
+              ss->excludeQuiets = true;
+              value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
+              ss->excludeQuiets = false;
+              ss->excludedMove = MOVE_NONE;
 
-          if (value < singularBeta)
-              extension = 1;
+              if (value < singularBeta)
+                  extension = 1;
+          }
       }
 
       // Add extension to new depth
