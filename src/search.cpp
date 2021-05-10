@@ -1109,6 +1109,7 @@ moves_loop: // When in check, search starts from here
           }
       }
 
+      double CC = false, C = false;
       // Step 14. Extensions (~75 Elo)
 
       // Singular extension search (~70 Elo). If all moves but one fail low on a
@@ -1160,16 +1161,21 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          singularBeta = ttValue - (formerPv + 4) * depth;
+	  else
+	  {
+              singularBeta = ttValue - (formerPv + 4) * depth;
 
-          ss->excludedMove = move;
-          ss->excludeQuiets = true;
-          value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
-          ss->excludeQuiets = false;
-          ss->excludedMove = MOVE_NONE;
+              ss->excludedMove = move;
+              ss->excludeQuiets = true;
+              value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
+              ss->excludeQuiets = false;
+              ss->excludedMove = MOVE_NONE;
 
-          if (value < singularBeta)
-              extension = 1;
+	      CC = true;
+	      C = value < singularBeta;
+              //if (value < singularBeta)
+              //    extension = 1;
+	  }
       }
 
       // Add extension to new depth
