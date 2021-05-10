@@ -1051,6 +1051,11 @@ moves_loop: // When in check, search starts from here
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
 
+      if (   excludedMove
+          && bestValue > VALUE_TB_LOSS_IN_MAX_PLY
+          && !(captureOrPromotion || givesCheck || ss->inCheck))
+          continue;
+
       // Calculate new depth for this move
       newDepth = depth - 1;
 
