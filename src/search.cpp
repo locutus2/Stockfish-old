@@ -1378,6 +1378,13 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      dbg_hit_on(T, 10+int(C));
+      }
+
       if (value > bestValue)
       {
           bestValue = value;
