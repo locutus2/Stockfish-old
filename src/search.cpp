@@ -613,7 +613,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount;
+    int moveCount, captureCount, quietCount, excludedCount;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -623,6 +623,7 @@ namespace {
     moveCount          = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
+    excludedCount      = 0;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -1028,7 +1029,7 @@ moves_loop: // When in check, search starts from here
     {
       assert(is_ok(move));
 
-      if (from_sq(move) == excludedSquare)
+      if (from_sq(move) == excludedSquare && excludedCount++ < 2)
           continue;
 
       // At root obey the "searchmoves" option and skip moves not listed in Root
