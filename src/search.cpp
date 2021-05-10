@@ -930,7 +930,7 @@ namespace {
 
         while (   (move = mp.next_move()) != MOVE_NONE
                && probCutCount < 2 + 2 * cutNode)
-            if (from_sq(move) != excludedSquare && pos.legal(move))
+            if (to_sq(move) != excludedSquare && pos.legal(move))
             {
                 assert(pos.capture_or_promotion(move));
                 assert(depth >= 5);
@@ -1028,7 +1028,7 @@ moves_loop: // When in check, search starts from here
     {
       assert(is_ok(move));
 
-      if (from_sq(move) == excludedSquare)
+      if (to_sq(move) == excludedSquare)
           continue;
 
       // At root obey the "searchmoves" option and skip moves not listed in Root
@@ -1127,7 +1127,7 @@ moves_loop: // When in check, search starts from here
           Value singularBeta = ttValue - ((formerPv + 4) * depth) / 2;
           Depth singularDepth = (depth - 1 + 3 * formerPv) / 2;
 
-          ss->excludedSquare = from_sq(move);
+          ss->excludedSquare = to_sq(move);
           value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
           ss->excludedSquare = SQ_NONE;
 
@@ -1151,7 +1151,7 @@ moves_loop: // When in check, search starts from here
           // move that pushes it over beta, if so also produce a cutoff.
           else if (ttValue >= beta)
           {
-              ss->excludedSquare = from_sq(move);
+              ss->excludedSquare = to_sq(move);
               value = search<NonPV>(pos, ss, beta - 1, beta, (depth + 3) / 2, cutNode);
               ss->excludedSquare = SQ_NONE;
 
