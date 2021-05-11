@@ -1153,7 +1153,7 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          else if (value <= alpha)
+          else if (!PvNode)
               singularFailed = true;
       }
 
