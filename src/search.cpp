@@ -1384,7 +1384,7 @@ moves_loop: // When in check, search starts from here
       {
 	      //bool C = captureOrPromotion;
 	      //bool C = cutNode;
-	      bool C = givesCheck;
+	      bool C = cutNode && !captureOrPromotion;
 	      bool T = value > alpha;
 	      dbg_hit_on(T, 0);
 	      dbg_hit_on(T, 0+depth);
@@ -1393,8 +1393,8 @@ moves_loop: // When in check, search starts from here
 	      /*
 	       * bench 128 1 22 pos1000.fen
 
-	      bool C = givesCheck;
 
+	      bool C = cutNode && !captureOrPromotion;
 
 	      bool C = cutNode;
 	       [0] Total 6627590 Hits 332705 hit rate (%) 5.02
