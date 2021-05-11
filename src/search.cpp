@@ -1382,7 +1382,8 @@ moves_loop: // When in check, search starts from here
 
       if(CC&&didLMR)
       {
-	      bool C = captureOrPromotion;
+	      //bool C = captureOrPromotion;
+	      bool C = cutNode;
 	      bool T = value > alpha;
 	      dbg_hit_on(T, 0);
 	      dbg_hit_on(T, 0+depth);
@@ -1390,6 +1391,59 @@ moves_loop: // When in check, search starts from here
 	      dbg_hit_on(T, 1000+100*C+depth);
 	      /*
 	       * bench 128 1 22 pos1000.fen
+
+	      bool C = cutNode;
+	       [0] Total 6627590 Hits 332705 hit rate (%) 5.02
+	       [7] Total 1143037 Hits 105686 hit rate (%) 9.24607
+	       [8] Total 1068130 Hits 75308 hit rate (%) 7.05045
+	       [9] Total 918884 Hits 50454 hit rate (%) 5.49079
+	       [10] Total 809023 Hits 33530 hit rate (%) 4.14451
+	       [11] Total 652068 Hits 23073 hit rate (%) 3.53843
+	       [12] Total 538712 Hits 16062 hit rate (%) 2.98156
+	       [13] Total 421268 Hits 10825 hit rate (%) 2.56962
+	       [14] Total 318012 Hits 7038 hit rate (%) 2.21312
+	       [15] Total 242322 Hits 4549 hit rate (%) 1.87725
+	       [16] Total 178740 Hits 2728 hit rate (%) 1.52624
+	       [17] Total 134865 Hits 1722 hit rate (%) 1.27683
+	       [18] Total 90835 Hits 888 hit rate (%) 0.977597
+	       [19] Total 60490 Hits 512 hit rate (%) 0.846421
+	       [20] Total 33943 Hits 239 hit rate (%) 0.704122
+	       [21] Total 17180 Hits 86 hit rate (%) 0.500582
+	       [22] Total 81 Hits 5 hit rate (%) 6.17284
+	       [1000] Total 2861722 Hits 66428 hit rate (%) 2.32126
+	       [1007] Total 394285 Hits 22542 hit rate (%) 5.71718
+	       [1008] Total 365370 Hits 14612 hit rate (%) 3.99923
+	       [1009] Total 342283 Hits 9377 hit rate (%) 2.73955
+	       [1010] Total 339316 Hits 6093 hit rate (%) 1.79567
+	       [1011] Total 285802 Hits 4167 hit rate (%) 1.458
+	       [1012] Total 248064 Hits 2879 hit rate (%) 1.16059
+	       [1013] Total 206161 Hits 2004 hit rate (%) 0.972056
+	       [1014] Total 170476 Hits 1472 hit rate (%) 0.863465
+	       [1015] Total 139716 Hits 1070 hit rate (%) 0.765839
+	       [1016] Total 112733 Hits 737 hit rate (%) 0.653757
+	       [1017] Total 93157 Hits 614 hit rate (%) 0.659102
+	       [1018] Total 69484 Hits 382 hit rate (%) 0.549767
+	       [1019] Total 50320 Hits 267 hit rate (%) 0.530604
+	       [1020] Total 29566 Hits 149 hit rate (%) 0.503957
+	       [1021] Total 14989 Hits 63 hit rate (%) 0.420308
+	       [1100] Total 3765868 Hits 266277 hit rate (%) 7.0708
+	       [1107] Total 748752 Hits 83144 hit rate (%) 11.1043
+	       [1108] Total 702760 Hits 60696 hit rate (%) 8.6368
+	       [1109] Total 576601 Hits 41077 hit rate (%) 7.12399
+	       [1110] Total 469707 Hits 27437 hit rate (%) 5.8413
+	       [1111] Total 366266 Hits 18906 hit rate (%) 5.16182
+	       [1112] Total 290648 Hits 13183 hit rate (%) 4.53573
+	       [1113] Total 215107 Hits 8821 hit rate (%) 4.10075
+	       [1114] Total 147536 Hits 5566 hit rate (%) 3.77264
+	       [1115] Total 102606 Hits 3479 hit rate (%) 3.39064
+	       [1116] Total 66007 Hits 1991 hit rate (%) 3.01635
+	       [1117] Total 41708 Hits 1108 hit rate (%) 2.65656
+	       [1118] Total 21351 Hits 506 hit rate (%) 2.36991
+	       [1119] Total 10170 Hits 245 hit rate (%) 2.40905
+	       [1120] Total 4377 Hits 90 hit rate (%) 2.0562
+	       [1121] Total 2191 Hits 23 hit rate (%) 1.04975
+	       [1122] Total 81 Hits 5 hit rate (%) 6.17284
+
 	      bool C = captureOrPromotion;
 	       * [0] Total 6627590 Hits 332705 hit rate (%) 5.02
 	       * [7] Total 1143037 Hits 105686 hit rate (%) 9.24607
