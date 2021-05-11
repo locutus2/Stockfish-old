@@ -1153,7 +1153,7 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          else if (pos.capture_or_promotion(ss->currentMove))
+          else if (value <= alpha)
               singularFailed = true;
       }
 
