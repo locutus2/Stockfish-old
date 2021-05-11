@@ -1235,7 +1235,7 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r++;
 
-              if (singularFailed)
+              if (singularFailed && depth < 11)
                   r++;
 
               // Increase reduction at root if failing high
