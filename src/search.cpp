@@ -1018,6 +1018,7 @@ moves_loop: // When in check, search starts from here
     // Mark this node as being searched
     ThreadHolding th(thisThread, posKey, ss->ply);
 
+    bool CC = false;
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1109,7 +1110,7 @@ moves_loop: // When in check, search starts from here
           }
       }
 
-      double CC = false, C = false;
+      bool C = false;
       // Step 14. Extensions (~75 Elo)
 
       // Singular extension search (~70 Elo). If all moves but one fail low on a
@@ -1163,6 +1164,7 @@ moves_loop: // When in check, search starts from here
 
 	  else
 	  {
+		  /*
               singularBeta = ttValue - (formerPv + 4) * depth;
 
               ss->excludedMove = move;
@@ -1170,9 +1172,9 @@ moves_loop: // When in check, search starts from here
               value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
               ss->excludeQuiets = false;
               ss->excludedMove = MOVE_NONE;
-
+*/
 	      CC = true;
-	      C = value < singularBeta;
+	      //C = value < singularBeta;
               //if (value < singularBeta)
               //    extension = 1;
 	  }
@@ -1378,11 +1380,68 @@ moves_loop: // When in check, search starts from here
               rm.score = -VALUE_INFINITE;
       }
 
-      if(CC)
+      if(CC&&didLMR)
       {
+	      bool C = captureOrPromotion;
 	      bool T = value > alpha;
 	      dbg_hit_on(T, 0);
-	      dbg_hit_on(T, 10+int(C));
+	      dbg_hit_on(T, 0+depth);
+	      dbg_hit_on(T, 1000+100*C);
+	      dbg_hit_on(T, 1000+100*C+depth);
+	      /*
+	      bool C = captureOrPromotion;
+	       * [0] Total 6627590 Hits 332705 hit rate (%) 5.02
+	       * [7] Total 1143037 Hits 105686 hit rate (%) 9.24607
+	       * [8] Total 1068130 Hits 75308 hit rate (%) 7.05045
+	       * [9] Total 918884 Hits 50454 hit rate (%) 5.49079
+	       * [10] Total 809023 Hits 33530 hit rate (%) 4.14451
+	       * [11] Total 652068 Hits 23073 hit rate (%) 3.53843
+	       * [12] Total 538712 Hits 16062 hit rate (%) 2.98156
+	       * [13] Total 421268 Hits 10825 hit rate (%) 2.56962
+	       * [14] Total 318012 Hits 7038 hit rate (%) 2.21312
+	       * [15] Total 242322 Hits 4549 hit rate (%) 1.87725
+	       * [16] Total 178740 Hits 2728 hit rate (%) 1.52624
+	       * [17] Total 134865 Hits 1722 hit rate (%) 1.27683
+	       * [18] Total 90835 Hits 888 hit rate (%) 0.977597
+	       * [19] Total 60490 Hits 512 hit rate (%) 0.846421
+	       * [20] Total 33943 Hits 239 hit rate (%) 0.704122
+	       * [21] Total 17180 Hits 86 hit rate (%) 0.500582
+	       * [22] Total 81 Hits 5 hit rate (%) 6.17284
+	       * [1000] Total 6177374 Hits 292766 hit rate (%) 4.73933
+	       * [1007] Total 1016675 Hits 93642 hit rate (%) 9.21061
+	       * [1008] Total 969096 Hits 66489 hit rate (%) 6.86093
+	       * [1009] Total 857192 Hits 44389 hit rate (%) 5.17842
+	       * [1010] Total 766391 Hits 29270 hit rate (%) 3.8192
+	       * [1011] Total 620177 Hits 20011 hit rate (%) 3.22666
+	       * [1012] Total 510657 Hits 13876 hit rate (%) 2.71728
+	       * [1013] Total 400811 Hits 9432 hit rate (%) 2.35323
+	       * [1014] Total 303970 Hits 6102 hit rate (%) 2.00743
+	       * [1015] Total 232224 Hits 4008 hit rate (%) 1.72592
+	       * [1016] Total 172085 Hits 2434 hit rate (%) 1.41442
+	       * [1017] Total 130497 Hits 1541 hit rate (%) 1.18087
+	       * [1018] Total 88365 Hits 796 hit rate (%) 0.900809
+	       * [1019] Total 59044 Hits 464 hit rate (%) 0.785855
+	       * [1020] Total 33269 Hits 227 hit rate (%) 0.682317
+	       * [1021] Total 16847 Hits 81 hit rate (%) 0.480798
+	       * [1022] Total 74 Hits 4 hit rate (%) 5.40541
+	       * [1100] Total 450216 Hits 39939 hit rate (%) 8.87108
+	       * [1107] Total 126362 Hits 12044 hit rate (%) 9.53135
+	       * [1108] Total 99034 Hits 8819 hit rate (%) 8.90502
+	       * [1109] Total 61692 Hits 6065 hit rate (%) 9.8311
+	       * [1110] Total 42632 Hits 4260 hit rate (%) 9.99249
+	       * [1111] Total 31891 Hits 3062 hit rate (%) 9.60145
+	       * [1112] Total 28055 Hits 2186 hit rate (%) 7.79184
+	       * [1113] Total 20457 Hits 1393 hit rate (%) 6.80941
+	       * [1114] Total 14042 Hits 936 hit rate (%) 6.66572
+	       * [1115] Total 10098 Hits 541 hit rate (%) 5.3575
+	       * [1116] Total 6655 Hits 294 hit rate (%) 4.41773
+	       * [1117] Total 4368 Hits 181 hit rate (%) 4.14377
+	       * [1118] Total 2470 Hits 92 hit rate (%) 3.7247
+	       * [1119] Total 1446 Hits 48 hit rate (%) 3.3195
+	       * [1120] Total 674 Hits 12 hit rate (%) 1.78042
+	       * [1121] Total 333 Hits 5 hit rate (%) 1.5015
+	       * [1122] Total 7 Hits 1 hit rate (%) 14.2857
+	       * */
       }
 
       if (value > bestValue)
