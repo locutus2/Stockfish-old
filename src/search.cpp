@@ -1153,7 +1153,7 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          else if (!PvNode)
+          else if (cutNode)
               singularFailed = true;
       }
 
