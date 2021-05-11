@@ -477,7 +477,7 @@ void Thread::search() {
               totBestMoveChanges += th->bestMoveChanges;
               th->bestMoveChanges = 0;
           }
-          double bestMoveInstability = 1 + 0.9 * totBestMoveChanges / Threads.size();
+          double bestMoveInstability = 1 + 0.67 * totBestMoveChanges / Threads.size();
 
           double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability;
 
@@ -1153,7 +1153,7 @@ moves_loop: // When in check, search starts from here
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
               && thisThread->rootDepth > 10
-              && thisThread->bestMoveChanges <= 4)
+              && thisThread->bestMoveChanges <= 6)
               r++;
 
           // Decrease reduction if opponent's move count is high (~5 Elo)
@@ -1283,7 +1283,7 @@ moves_loop: // When in check, search starts from here
               // We record how often the best move has been changed in each
               // iteration. This information is used for time management and LMR
               if (moveCount > 1)
-                  ++thisThread->bestMoveChanges;
+                  thisThread->bestMoveChanges += 2;
           }
           else
               // All other moves but the PV are set to the lowest value: this
