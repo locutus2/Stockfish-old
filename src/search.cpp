@@ -1395,6 +1395,57 @@ moves_loop: // When in check, search starts from here
 
 
 	      bool C = cutNode && !captureOrPromotion;
+[0] Total 6627590 Hits 332705 hit rate (%) 5.02
+[7] Total 1143037 Hits 105686 hit rate (%) 9.24607
+[8] Total 1068130 Hits 75308 hit rate (%) 7.05045
+[9] Total 918884 Hits 50454 hit rate (%) 5.49079
+[10] Total 809023 Hits 33530 hit rate (%) 4.14451
+[11] Total 652068 Hits 23073 hit rate (%) 3.53843
+[12] Total 538712 Hits 16062 hit rate (%) 2.98156
+[13] Total 421268 Hits 10825 hit rate (%) 2.56962
+[14] Total 318012 Hits 7038 hit rate (%) 2.21312
+[15] Total 242322 Hits 4549 hit rate (%) 1.87725
+[16] Total 178740 Hits 2728 hit rate (%) 1.52624
+[17] Total 134865 Hits 1722 hit rate (%) 1.27683
+[18] Total 90835 Hits 888 hit rate (%) 0.977597
+[19] Total 60490 Hits 512 hit rate (%) 0.846421
+[20] Total 33943 Hits 239 hit rate (%) 0.704122
+[21] Total 17180 Hits 86 hit rate (%) 0.500582
+[22] Total 81 Hits 5 hit rate (%) 6.17284
+[1000] Total 3194456 Hits 101915 hit rate (%) 3.19037
+[1007] Total 486734 Hits 32986 hit rate (%) 6.77701
+[1008] Total 438899 Hits 22366 hit rate (%) 5.09593
+[1009] Total 389572 Hits 14763 hit rate (%) 3.78954
+[1010] Total 371820 Hits 9915 hit rate (%) 2.66661
+[1011] Total 309897 Hits 6968 hit rate (%) 2.24849
+[1012] Total 269034 Hits 4916 hit rate (%) 1.82728
+[1013] Total 221239 Hits 3304 hit rate (%) 1.49341
+[1014] Total 180651 Hits 2353 hit rate (%) 1.30251
+[1015] Total 146895 Hits 1575 hit rate (%) 1.07219
+[1016] Total 117119 Hits 1005 hit rate (%) 0.858102
+[1017] Total 95837 Hits 774 hit rate (%) 0.807621
+[1018] Total 70834 Hits 459 hit rate (%) 0.647994
+[1019] Total 50975 Hits 304 hit rate (%) 0.596371
+[1020] Total 29825 Hits 159 hit rate (%) 0.53311
+[1021] Total 15118 Hits 67 hit rate (%) 0.44318
+[1022] Total 7 Hits 1 hit rate (%) 14.2857
+[1100] Total 3433134 Hits 230790 hit rate (%) 6.72243
+[1107] Total 656303 Hits 72700 hit rate (%) 11.0772
+[1108] Total 629231 Hits 52942 hit rate (%) 8.41376
+[1109] Total 529312 Hits 35691 hit rate (%) 6.7429
+[1110] Total 437203 Hits 23615 hit rate (%) 5.40138
+[1111] Total 342171 Hits 16105 hit rate (%) 4.70671
+[1112] Total 269678 Hits 11146 hit rate (%) 4.13308
+[1113] Total 200029 Hits 7521 hit rate (%) 3.75995
+[1114] Total 137361 Hits 4685 hit rate (%) 3.41072
+[1115] Total 95427 Hits 2974 hit rate (%) 3.11652
+[1116] Total 61621 Hits 1723 hit rate (%) 2.79612
+[1117] Total 39028 Hits 948 hit rate (%) 2.42903
+[1118] Total 20001 Hits 429 hit rate (%) 2.14489
+[1119] Total 9515 Hits 208 hit rate (%) 2.18602
+[1120] Total 4118 Hits 80 hit rate (%) 1.94269
+[1121] Total 2062 Hits 19 hit rate (%) 0.921435
+[1122] Total 74 Hits 4 hit rate (%) 5.40541
 
 	      bool C = cutNode;
 	       [0] Total 6627590 Hits 332705 hit rate (%) 5.02
