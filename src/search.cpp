@@ -606,7 +606,7 @@ namespace {
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool formerPv, givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
-         ttCapture, singularQuietLMR;
+         ttCapture, singularQuietLMR, singularFailed;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
 
@@ -1004,7 +1004,7 @@ moves_loop: // When in check, search starts from here
                                       ss->ply);
 
     value = bestValue;
-    singularQuietLMR = moveCountPruning = false;
+    singularFailed = singularQuietLMR = moveCountPruning = false;
 
     // Indicate PvNodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -1152,6 +1152,9 @@ moves_loop: // When in check, search starts from here
               if (value >= beta)
                   return beta;
           }
+
+          else
+              singularFailed = true;
       }
 
       // Add extension to new depth
@@ -1225,6 +1228,9 @@ moves_loop: // When in check, search starts from here
               if (   !givesCheck
                   && ss->staticEval + PieceValue[EG][pos.captured_piece()] + 210 * depth <= alpha)
                   r++;
+
+              if (singularFailed && depth < 12)
+                  r--;
           }
           else
           {
