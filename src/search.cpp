@@ -1153,7 +1153,7 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          else
+          else if (pos.capture_or_promotion(ss->currentMove))
               singularFailed = true;
       }
 
@@ -1235,7 +1235,7 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r++;
 
-              if (singularFailed && depth < 11)
+              if (singularFailed)
                   r++;
 
               // Increase reduction at root if failing high
