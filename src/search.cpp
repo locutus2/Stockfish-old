@@ -1006,7 +1006,7 @@ moves_loop: // When in check, search starts from here
       givesCheck = pos.gives_check(move);
 
       // Calculate new depth for this move
-      newDepth = depth - 1 - extension;
+      newDepth = depth - 1;
 
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
@@ -1055,6 +1055,8 @@ moves_loop: // When in check, search starts from here
                   continue;
           }
       }
+
+      newDepth -= extension;
 
       // Step 14. Extensions (~75 Elo)
 
