@@ -962,6 +962,7 @@ moves_loop: // When in check, search starts from here
 
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
+    extension = 0;
 
     // Indicate PvNodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -1000,7 +1001,6 @@ moves_loop: // When in check, search starts from here
       if (PvNode)
           (ss+1)->pv = nullptr;
 
-      extension = 0;
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
@@ -1085,6 +1085,7 @@ moves_loop: // When in check, search starts from here
               singularQuietLMR = !ttCapture;
               if (!PvNode && value < singularBeta - 140)
                   extension = 2;
+              newDepth += extension;
           }
 
           // Multi-cut pruning
@@ -1107,9 +1108,6 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
       }
-
-      // Add extension to new depth
-      newDepth += extension;
 
       // Speculative prefetch as early as possible
       prefetch(TT.first_entry(pos.key_after(move)));
@@ -1182,7 +1180,7 @@ moves_loop: // When in check, search starts from here
 
               // Increase reduction for cut nodes (~10 Elo)
               if (cutNode)
-                  r += 2;
+                  r += 2 + extension;
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
