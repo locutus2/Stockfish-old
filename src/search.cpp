@@ -1389,6 +1389,7 @@ moves_loop: // When in check, search starts from here
 	      dbg_hit_on(T, 1000+100*C);
 	      dbg_hit_on(T, 1000+100*C+depth);
 	      /*
+	       * bench 128 1 22 pos1000.fen
 	      bool C = captureOrPromotion;
 	       * [0] Total 6627590 Hits 332705 hit rate (%) 5.02
 	       * [7] Total 1143037 Hits 105686 hit rate (%) 9.24607
