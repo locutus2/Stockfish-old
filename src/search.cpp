@@ -1107,7 +1107,7 @@ moves_loop: // When in check, search starts from here
                   return beta;
           }
 
-          else if (cutNode)
+          else if (pos.capture_or_promotion(ss->currentMove))
               singularFailed = true;
       }
 
@@ -1180,15 +1180,12 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r++;
 
-              if (singularFailed)
-                  r++;
-
               // Increase reduction at root if failing high
               r += rootNode ? thisThread->failedHighCnt * thisThread->failedHighCnt * moveCount / 512 : 0;
 
               // Increase reduction for cut nodes (~10 Elo)
               if (cutNode)
-                  r += 2;
+                  r += 2 + singularFailed;
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
