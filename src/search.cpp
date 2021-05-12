@@ -959,7 +959,7 @@ moves_loop: // When in check, search starts from here
                                       countermove,
                                       ss->killers,
                                       ss->ply,
-                                      ss->ply <= 1);
+                                      rootNode);
 
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
