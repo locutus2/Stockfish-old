@@ -959,7 +959,7 @@ moves_loop: // When in check, search starts from here
                                       countermove,
                                       ss->killers,
                                       ss->ply,
-                                      PvNode);
+                                      depth > 6);
 
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
