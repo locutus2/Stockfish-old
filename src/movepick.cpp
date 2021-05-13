@@ -202,7 +202,7 @@ top:
           endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, (depth - ply < 10 ? -3000 * depth : std::numeric_limits<int>::min()));
+          partial_insertion_sort(cur, endMoves, (ply > 6 ? -3000 * depth : std::numeric_limits<int>::min()));
       }
 
       ++stage;
