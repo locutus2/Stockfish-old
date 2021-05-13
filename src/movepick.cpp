@@ -19,7 +19,6 @@
 #include <cassert>
 
 #include "movepick.h"
-#include "thread.h"
 
 namespace Stockfish {
 
@@ -203,7 +202,7 @@ top:
           endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, (ply > 5 ? -3000 * depth : std::numeric_limits<int>::min()));
+          partial_insertion_sort(cur, endMoves, (ply > 4 ? -3000 * depth : std::numeric_limits<int>::min()));
       }
 
       ++stage;
