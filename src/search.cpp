@@ -322,7 +322,7 @@ void MainThread::search() {
 
   std::cout << sync_endl;
 
-  //Node::getRoot()->print();
+  //tree.print();
 }
 
 

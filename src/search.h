@@ -59,7 +59,7 @@ class Tree
     Node *freeNodes;
 };
 
-typedef Tree<1024> BestMoveTree;
+typedef Tree<16384> BestMoveTree;
 
 /// Stack struct keeps track of the information we need to remember from nodes
 /// shallower and deeper in the tree during the search. Each search thread has
