@@ -59,102 +59,81 @@ using namespace Search;
 
 namespace Search {
 
-  struct Node
+  template <int Size>
+  typename Tree<Size>::Node* Tree<Size>::do_move(Tree<Size>::Node* node, Move move) const
   {
-      static constexpr int TREE_SIZE = 65536;
+      auto it = node->childs.find(move);
+      if (it == node->childs.end())
+          return nullptr;
+      else
+          return it->second;
+  }
 
-      static Node nodesBuffer[TREE_SIZE];
-      static Node *freeNodes;
-
-      std::map<Move, Node*> childs;
-
-      bool is_empty() const { return this == nodesBuffer + TREE_SIZE; }
-
-      Node* do_move(Move move) const
+  template <int Size>
+  typename Tree<Size>::Node* Tree<Size>::add_move(Tree<Size>::Node* node, Move move)
+  {
+      auto it = node->childs.find(move);
+      if (it == node->childs.end())
       {
-          auto it = childs.find(move);
-          if (it == childs.end())
-              return nullptr;
-          else
-          {
-              return it->second;
-          }
+          Node *newNode = createNode();
+          if(newNode)
+              node->childs[move] = newNode;
+          return newNode;
       }
+      else
+          return it->second;
+  }
 
-      Node* add_move(Move move)
+  template <int Size>
+  typename Tree<Size>::Node* Tree<Size>::createNode()
+  {
+      Node* node = getFreeNode();
+      if (node)
+          node->childs.clear();
+      return node;
+  }
+
+  template <int Size>
+  typename Tree<Size>::Node* Tree<Size>::getFreeNode()
+  {
+      if (freeNodes == nodesBuffer + Size)
+          return nullptr;
+      else
+          return freeNodes++;
+  }
+
+  template <int Size>
+  void Tree<Size>::print(std::ostream &out)
+  {
+      print(getRoot(), out, "");
+  }
+
+  template <int Size>
+  void Tree<Size>::print(Node *node, std::ostream &out, std::string indent) const
+  {
+      bool first = true;
+      for(const auto m : node->childs)
       {
-          auto it = childs.find(move);
-          if (it == childs.end())
-          {
-              Node *node = createNode();
-	      //std::cout << UCI::move(move, Threads.main()->rootPos.is_chess960())  << "/" << node << std::endl;
-              if(node)
-                  childs[move] = node;
-              return node;
-          }
-          else
-          {
-              return it->second;
-          }
+          if(!first) out << indent;
+          out << std::setw(5) << UCI::move(m.first, Threads.main()->rootPos.is_chess960()) << ' ';
+          print(m.second, out, indent + "      ");
+          first = false;
       }
+      if(node->childs.empty()) out << std::endl;
+  }
 
-      Node* createNode()
-      {
-          Node* node = getFreeNode();
-          if (node)
-          {
-              node->childs.clear();
-          }
-          return node;
-      }
+  template <int Size>
+  typename Tree<Size>::Node* Tree<Size>::getRoot()
+  {
+      return nodesBuffer;
+  }
 
-      Node* getFreeNode()
-      {
-              if (freeNodes->is_empty())
-              {
-                  //std::cerr << "ERROR: NO FREE NODES" << std::endl;
-                  //std::exit(1);
-                  return nullptr;
-              }
-              else
-		  return freeNodes++;
-      }
-
-      void print(std::ostream &out = std::cerr, string indent = "")
-      {
-	      bool first = true;
-	      for(const auto m : childs)
-	      {
-		      if(!first) out << indent;
-		      out << std::setw(5) << UCI::move(m.first, Threads.main()->rootPos.is_chess960()) << ' ';
-		      m.second->print(out, indent + "      ");
-		      first = false;
-	      }
-	      if(childs.empty()) out << std::endl;
-      }
-
-      static Node* getRoot()
-      {
-          return nodesBuffer;
-      }
-
-      static void init_tree()
-      {
-          // init root node;
-          getRoot()->childs.clear();
-
-          // init free nodes;
-          freeNodes = nodesBuffer + 1;
-      }
-
-      static void clear_tree()
-      {
-          init_tree();
-      }
-  };
-
-  Node Node::nodesBuffer[TREE_SIZE];
-  Node *Node::freeNodes;
+  template <int Size>
+  void Tree<Size>::clear()
+  {
+      nodesBuffer->childs.clear();
+      freeNodes = nodesBuffer + 1;
+  }
 }
 
 namespace {
@@ -254,8 +233,6 @@ void Search::init() {
 
   for (int i = 1; i < MAX_MOVES; ++i)
       Reductions[i] = int((21.3 + 2 * std::log(Threads.size())) * std::log(i + 0.25 * std::log(i)));
-
-  Node::init_tree();
 }
 
 
@@ -287,7 +264,7 @@ void MainThread::search() {
   Color us = rootPos.side_to_move();
   Time.init(Limits, us, rootPos.game_ply());
   TT.new_search();
-  Node::clear_tree();
+  tree.clear();
 
   Eval::NNUE::verify();
 
@@ -375,7 +352,7 @@ void Thread::search() {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
 
   ss->pv = pv;
-  ss->node = Node::getRoot();
+  ss->node = tree.getRoot();
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -1229,7 +1206,7 @@ moves_loop: // When in check, search starts from here
                                                                 [captureOrPromotion]
                                                                 [movedPiece]
                                                                 [to_sq(move)];
-      (ss+1)->node = (ss->node ? ss->node->do_move(move) : nullptr);
+      (ss+1)->node = (ss->node ? thisThread->tree.do_move(ss->node, move) : nullptr);
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1404,7 +1381,7 @@ moves_loop: // When in check, search starts from here
               bestMove = move;
 
               if(ss->node)
-                  ss->node->add_move(bestMove);
+                  thisThread->tree.add_move(ss->node, bestMove);
 
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
