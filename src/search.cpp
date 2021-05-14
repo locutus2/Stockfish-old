@@ -21,6 +21,7 @@
 #include <cmath>
 #include <cstring>   // For std::memset
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 
 #include "evaluate.h"
@@ -55,6 +56,151 @@ namespace TB = Tablebases;
 using std::string;
 using Eval::evaluate;
 using namespace Search;
+
+namespace Search {
+
+  struct Node
+  {
+      static constexpr int TREE_SIZE = 100000;
+
+      static Node nodesMem[TREE_SIZE + 1];
+      static Node *sentinalNode;
+      static Node *freeNodes;
+      static Node *treeRoot;
+      static Node *oldestNode;
+      static Node *newestNode;
+      static int treeAge;
+
+      int age;
+      std::map<Move, Node*> childs;
+      Node *prev, *next;
+
+      bool is_sentinal() const { return this == next; }
+
+      Node* do_move(Move move) const
+      {
+          auto it = childs.find(move); 
+          if (it == childs.end())
+              return nullptr;
+          else
+          {
+              it->second->age = treeAge++;
+              return it->second;
+          }
+      }
+
+      Node* add_move(Move move)
+      {
+          auto it = childs.find(move); 
+          if (it == childs.end())
+          {
+              Node *node = createNode();
+	      //std::cout << UCI::move(move, Threads.main()->rootPos.is_chess960())  << "/" << node << std::endl;
+              if(node)
+                  childs[move] = node;
+              return node;
+          }
+          else
+          {
+              it->second->age = treeAge++;
+              return it->second;
+          }
+      }
+
+      Node* createNode()
+      {
+          Node* node = getFreeNode();
+          if (node)
+          {
+              node->age = treeAge++;
+              node->childs.clear();
+	      node->prev = newestNode;
+	      node->next = newestNode->next;
+	      newestNode->next = node;
+          }
+          return node;
+      }
+
+      Node* getFreeNode()
+      {
+              if (freeNodes->is_sentinal())
+              {
+                  std::cerr << "ERROR: NO FREE NODES" << std::endl;
+                  std::exit(1);
+                  return nullptr;
+              }
+              else
+              {
+                  Node *node = freeNodes;
+		  Node* nextFreeNodes = freeNodes->next;
+                  node->next->prev = node->prev;
+                  node->prev->next = node->next;
+		  freeNodes = nextFreeNodes;
+                  return node;
+              }
+      }
+
+      void print(std::ostream &out = std::cerr, string indent = "")
+      {
+	      bool first = true;
+	      for(const auto m : childs)
+	      {
+		      if(!first) out << indent;
+		      out << std::setw(5) << UCI::move(m.first, Threads.main()->rootPos.is_chess960()) << ' ';
+		      m.second->print(out, indent + "      ");
+		      first = false;
+	      }
+	      if(childs.empty()) out << std::endl;
+      }
+
+      static Node* getRoot()
+      {
+          return treeRoot;
+      }
+
+      static void age_tree()
+      {
+          treeAge++;
+      }
+
+      static void init_tree()
+      {
+          // init sentinal node
+          sentinalNode = nodesMem + TREE_SIZE;
+          sentinalNode->prev = sentinalNode; 
+          sentinalNode->next = sentinalNode; 
+
+          // init root node;
+          treeAge = 0;
+          treeRoot = oldestNode = newestNode = nodesMem;
+          treeRoot->age = treeAge;
+          treeRoot->prev = treeRoot->next = sentinalNode;
+          treeRoot->childs.clear();
+
+          // init free nodes;
+          freeNodes = nodesMem + 1;
+          for (int i = 1; i < TREE_SIZE; ++i)
+          {
+              (nodesMem + i)->next = (i < TREE_SIZE - 1 ? nodesMem + i + 1 : sentinalNode);
+              (nodesMem + i)->prev = (i > 1 ? nodesMem + i - 1 : sentinalNode);
+          }
+      }
+
+      static void clear_tree()
+      {
+          init_tree();
+      }
+  };
+
+  Node Node::nodesMem[TREE_SIZE + 1];
+  Node *Node::sentinalNode;
+  Node *Node::freeNodes;
+  Node *Node::treeRoot;
+  Node *Node::oldestNode;
+  Node *Node::newestNode;
+  int Node::treeAge;
+
+}
 
 namespace {
 
@@ -153,6 +299,8 @@ void Search::init() {
 
   for (int i = 1; i < MAX_MOVES; ++i)
       Reductions[i] = int((21.3 + 2 * std::log(Threads.size())) * std::log(i + 0.25 * std::log(i)));
+
+  Node::init_tree();
 }
 
 
@@ -184,6 +332,7 @@ void MainThread::search() {
   Color us = rootPos.side_to_move();
   Time.init(Limits, us, rootPos.game_ply());
   TT.new_search();
+  Node::clear_tree();
 
   Eval::NNUE::verify();
 
@@ -241,6 +390,8 @@ void MainThread::search() {
       std::cout << " ponder " << UCI::move(bestThread->rootMoves[0].pv[1], rootPos.is_chess960());
 
   std::cout << sync_endl;
+
+  Node::getRoot()->print();
 }
 
 
@@ -269,6 +420,7 @@ void Thread::search() {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
 
   ss->pv = pv;
+  ss->node = Node::getRoot();
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -814,6 +966,7 @@ namespace {
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
 
+	(ss+1)->node = (ss->node ? ss->node->do_move(MOVE_NULL) : nullptr);
         pos.do_null_move(st);
 
         Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
@@ -895,6 +1048,7 @@ namespace {
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
 
+		(ss+1)->node = (ss->node ? ss->node->do_move(move) : nullptr);
                 pos.do_move(move, st);
 
                 // Perform a preliminary qsearch to verify that the move holds
@@ -1121,6 +1275,7 @@ moves_loop: // When in check, search starts from here
                                                                 [movedPiece]
                                                                 [to_sq(move)];
 
+      (ss+1)->node = (ss->node ? ss->node->do_move(move) : nullptr);
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
@@ -1340,8 +1495,13 @@ moves_loop: // When in check, search starts from here
 
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
+    {
+        if(ss->node)
+            ss->node->add_move(bestMove);
+
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
                          quietsSearched, quietCount, capturesSearched, captureCount, depth);
+    }
 
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
@@ -1555,6 +1715,7 @@ moves_loop: // When in check, search starts from here
           && (*contHist[1])[pos.moved_piece(move)][to_sq(move)] < CounterMovePruneThreshold)
           continue;
 
+      //(ss+1)->node = (ss->node ? ss->node->do_move(move) : nullptr);
       // Make and search the move
       pos.do_move(move, st, givesCheck);
       value = -qsearch<NT>(pos, ss+1, -beta, -alpha, depth - 1);
