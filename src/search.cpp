@@ -125,8 +125,8 @@ namespace Search {
       {
               if (freeNodes->is_sentinal())
               {
-                  std::cerr << "ERROR: NO FREE NODES" << std::endl;
-                  std::exit(1);
+                  //std::cerr << "ERROR: NO FREE NODES" << std::endl;
+                  //std::exit(1);
                   return nullptr;
               }
               else
