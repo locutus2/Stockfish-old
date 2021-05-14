@@ -63,14 +63,12 @@ namespace Search {
   {
       static constexpr int TREE_SIZE = 65536;
 
-      static Node nodesMem[TREE_SIZE + 1];
-      static Node *sentinalNode;
+      static Node nodesBuffer[TREE_SIZE];
       static Node *freeNodes;
-      static Node *treeRoot;
 
       std::map<Move, Node*> childs;
 
-      bool is_sentinal() const { return this == sentinalNode; }
+      bool is_empty() const { return this == nodesBuffer + TREE_SIZE; }
 
       Node* do_move(Move move) const
       {
@@ -112,18 +110,14 @@ namespace Search {
 
       Node* getFreeNode()
       {
-              if (freeNodes->is_sentinal())
+              if (freeNodes->is_empty())
               {
                   //std::cerr << "ERROR: NO FREE NODES" << std::endl;
                   //std::exit(1);
                   return nullptr;
               }
               else
-              {
-                  Node *node = freeNodes;
-		  freeNodes++;
-                  return node;
-              }
+		  return freeNodes++;
       }
 
       void print(std::ostream &out = std::cerr, string indent = "")
@@ -141,20 +135,16 @@ namespace Search {
 
       static Node* getRoot()
       {
-          return treeRoot;
+          return nodesBuffer;
       }
 
       static void init_tree()
       {
-          // init sentinal node
-          sentinalNode = nodesMem + TREE_SIZE;
-
           // init root node;
-          treeRoot = nodesMem;
-          treeRoot->childs.clear();
+          getRoot()->childs.clear();
 
           // init free nodes;
-          freeNodes = nodesMem + 1;
+          freeNodes = nodesBuffer + 1;
       }
 
       static void clear_tree()
@@ -163,11 +153,8 @@ namespace Search {
       }
   };
 
-  Node Node::nodesMem[TREE_SIZE + 1];
-  Node *Node::sentinalNode;
+  Node Node::nodesBuffer[TREE_SIZE];
   Node *Node::freeNodes;
-  Node *Node::treeRoot;
-
 }
 
 namespace {
