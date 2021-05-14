@@ -61,7 +61,7 @@ namespace Search {
 
   struct Node
   {
-      static constexpr int TREE_SIZE = 100000;
+      static constexpr int TREE_SIZE = 65536;
 
       static Node nodesMem[TREE_SIZE + 1];
       static Node *sentinalNode;
@@ -84,7 +84,7 @@ namespace Search {
               return nullptr;
           else
           {
-              it->second->age = treeAge++;
+              //it->second->age = treeAge++;
               return it->second;
           }
       }
@@ -142,8 +142,13 @@ namespace Search {
 
       void print(std::ostream &out = std::cerr, string indent = "")
       {
-	      bool first = true;
+	      std::vector<std::pair<Move,Node*>> moves;
 	      for(const auto m : childs)
+                  moves.push_back(m);
+              std::stable_sort(moves.begin(), moves.end(), [&](auto& a, auto& b) { return a.second->age > b.second->age; } );
+
+	      bool first = true;
+	      for(const auto m : moves)
 	      {
 		      if(!first) out << indent;
 		      out << std::setw(5) << UCI::move(m.first, Threads.main()->rootPos.is_chess960()) << ' ';
@@ -391,7 +396,7 @@ void MainThread::search() {
 
   std::cout << sync_endl;
 
-  Node::getRoot()->print();
+  //Node::getRoot()->print();
 }
 
 
@@ -966,7 +971,7 @@ namespace {
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
 
-	(ss+1)->node = (ss->node ? ss->node->do_move(MOVE_NULL) : nullptr);
+	(ss+1)->node = nullptr;
         pos.do_null_move(st);
 
         Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
@@ -1048,7 +1053,7 @@ namespace {
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
 
-		(ss+1)->node = (ss->node ? ss->node->do_move(move) : nullptr);
+		(ss+1)->node = nullptr;
                 pos.do_move(move, st);
 
                 // Perform a preliminary qsearch to verify that the move holds
@@ -1274,8 +1279,8 @@ moves_loop: // When in check, search starts from here
                                                                 [captureOrPromotion]
                                                                 [movedPiece]
                                                                 [to_sq(move)];
-
       (ss+1)->node = (ss->node ? ss->node->do_move(move) : nullptr);
+
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
@@ -1715,7 +1720,6 @@ moves_loop: // When in check, search starts from here
           && (*contHist[1])[pos.moved_piece(move)][to_sq(move)] < CounterMovePruneThreshold)
           continue;
 
-      //(ss+1)->node = (ss->node ? ss->node->do_move(move) : nullptr);
       // Make and search the move
       pos.do_move(move, st, givesCheck);
       value = -qsearch<NT>(pos, ss+1, -beta, -alpha, depth - 1);
