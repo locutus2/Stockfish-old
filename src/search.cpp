@@ -264,7 +264,6 @@ void MainThread::search() {
   Color us = rootPos.side_to_move();
   Time.init(Limits, us, rootPos.game_ply());
   TT.new_search();
-  tree.clear();
 
   Eval::NNUE::verify();
 
@@ -352,6 +351,8 @@ void Thread::search() {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
 
   ss->pv = pv;
+
+  tree.clear();
   ss->node = tree.getRoot();
 
   bestValue = delta = alpha = -VALUE_INFINITE;
