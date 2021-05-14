@@ -72,7 +72,7 @@ namespace Search {
 
       Node* do_move(Move move) const
       {
-          auto it = childs.find(move); 
+          auto it = childs.find(move);
           if (it == childs.end())
               return nullptr;
           else
@@ -83,7 +83,7 @@ namespace Search {
 
       Node* add_move(Move move)
       {
-          auto it = childs.find(move); 
+          auto it = childs.find(move);
           if (it == childs.end())
           {
               Node *node = createNode();
@@ -920,8 +920,8 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
+        (ss+1)->node = nullptr;
 
-	(ss+1)->node = nullptr;
         pos.do_null_move(st);
 
         Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
@@ -1002,8 +1002,8 @@ namespace {
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
+                (ss+1)->node = nullptr;
 
-		(ss+1)->node = nullptr;
                 pos.do_move(move, st);
 
                 // Perform a preliminary qsearch to verify that the move holds
