@@ -41,7 +41,7 @@ class Tree
     public:
     struct Node
     {
-        std::map<Move, Node*> childs;
+        std::unordered_map<Move, Node*> childs;
     };
 
     Node* do_move(Node* node, Move move) const;
