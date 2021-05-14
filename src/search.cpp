@@ -1380,9 +1380,6 @@ moves_loop: // When in check, search starts from here
           {
               bestMove = move;
 
-              if(ss->node)
-                  thisThread->tree.add_move(ss->node, bestMove);
-
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
 
@@ -1430,8 +1427,13 @@ moves_loop: // When in check, search starts from here
 
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
+    {
+        if(ss->node)
+            thisThread->tree.add_move(ss->node, bestMove);
+
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
                          quietsSearched, quietCount, capturesSearched, captureCount, depth);
+    }
 
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
