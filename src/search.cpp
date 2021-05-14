@@ -67,15 +67,10 @@ namespace Search {
       static Node *sentinalNode;
       static Node *freeNodes;
       static Node *treeRoot;
-      static Node *oldestNode;
-      static Node *newestNode;
-      static int treeAge;
 
-      int age;
       std::map<Move, Node*> childs;
-      Node *prev, *next;
 
-      bool is_sentinal() const { return this == next; }
+      bool is_sentinal() const { return this == sentinalNode; }
 
       Node* do_move(Move move) const
       {
@@ -84,7 +79,6 @@ namespace Search {
               return nullptr;
           else
           {
-              //it->second->age = treeAge++;
               return it->second;
           }
       }
@@ -102,7 +96,6 @@ namespace Search {
           }
           else
           {
-              it->second->age = treeAge++;
               return it->second;
           }
       }
@@ -112,11 +105,7 @@ namespace Search {
           Node* node = getFreeNode();
           if (node)
           {
-              node->age = treeAge++;
               node->childs.clear();
-	      node->prev = newestNode;
-	      node->next = newestNode->next;
-	      newestNode->next = node;
           }
           return node;
       }
@@ -132,23 +121,15 @@ namespace Search {
               else
               {
                   Node *node = freeNodes;
-		  Node* nextFreeNodes = freeNodes->next;
-                  node->next->prev = node->prev;
-                  node->prev->next = node->next;
-		  freeNodes = nextFreeNodes;
+		  freeNodes++;
                   return node;
               }
       }
 
       void print(std::ostream &out = std::cerr, string indent = "")
       {
-	      std::vector<std::pair<Move,Node*>> moves;
-	      for(const auto m : childs)
-                  moves.push_back(m);
-              std::stable_sort(moves.begin(), moves.end(), [&](auto& a, auto& b) { return a.second->age > b.second->age; } );
-
 	      bool first = true;
-	      for(const auto m : moves)
+	      for(const auto m : childs)
 	      {
 		      if(!first) out << indent;
 		      out << std::setw(5) << UCI::move(m.first, Threads.main()->rootPos.is_chess960()) << ' ';
@@ -163,32 +144,17 @@ namespace Search {
           return treeRoot;
       }
 
-      static void age_tree()
-      {
-          treeAge++;
-      }
-
       static void init_tree()
       {
           // init sentinal node
           sentinalNode = nodesMem + TREE_SIZE;
-          sentinalNode->prev = sentinalNode; 
-          sentinalNode->next = sentinalNode; 
 
           // init root node;
-          treeAge = 0;
-          treeRoot = oldestNode = newestNode = nodesMem;
-          treeRoot->age = treeAge;
-          treeRoot->prev = treeRoot->next = sentinalNode;
+          treeRoot = nodesMem;
           treeRoot->childs.clear();
 
           // init free nodes;
           freeNodes = nodesMem + 1;
-          for (int i = 1; i < TREE_SIZE; ++i)
-          {
-              (nodesMem + i)->next = (i < TREE_SIZE - 1 ? nodesMem + i + 1 : sentinalNode);
-              (nodesMem + i)->prev = (i > 1 ? nodesMem + i - 1 : sentinalNode);
-          }
       }
 
       static void clear_tree()
@@ -201,9 +167,6 @@ namespace Search {
   Node *Node::sentinalNode;
   Node *Node::freeNodes;
   Node *Node::treeRoot;
-  Node *Node::oldestNode;
-  Node *Node::newestNode;
-  int Node::treeAge;
 
 }
 
