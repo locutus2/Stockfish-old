@@ -66,7 +66,7 @@ namespace Search {
       static Node nodesBuffer[TREE_SIZE];
       static Node *freeNodes;
 
-      std::map<Move, Node*> childs;
+      std::unordered_map<Move, Node*> childs;
 
       bool is_empty() const { return this == nodesBuffer + TREE_SIZE; }
 
