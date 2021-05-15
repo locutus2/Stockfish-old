@@ -1302,7 +1302,7 @@ moves_loop: // When in check, search starts from here
           didLMR = true;
 
           if (ss->node && doFullDepthSearch)
-              (ss+1)->node = ss->node->add_move(move);
+              ss->node->add_move(move);
       }
       else
       {
