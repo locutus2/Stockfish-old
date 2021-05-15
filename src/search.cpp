@@ -1185,9 +1185,6 @@ moves_loop: // When in check, search starts from here
               singularQuietLMR = !ttCapture;
               if (!PvNode && value < singularBeta - 140)
                   extension = 2;
-
-              if (ss->node)
-                  ss->node->add_move(move);
           }
 
           // Multi-cut pruning
@@ -1303,6 +1300,9 @@ moves_loop: // When in check, search starts from here
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
           didLMR = true;
+
+          if (ss->node && doFullDepthSearch)
+              (ss+1)->node = ss->node->add_move(move);
       }
       else
       {
