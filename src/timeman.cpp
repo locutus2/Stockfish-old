@@ -77,7 +77,7 @@ void TimeManagement::init(Search::LimitsType& limits, Color us, int ply) {
   // game time for the current move, so also cap to 20% of available game time.
   if (limits.movestogo == 0)
   {
-      optScale = std::min(0.0084 + std::pow(ply + 3.0, 0.5) * 0.0042,
+      optScale = std::min(0.00887 + std::pow(ply + 3.0, 0.5) * 0.004435,
                            0.2 * limits.time[us] / double(timeLeft));
       maxScale = std::min(7.0, 4.0 + ply / 12.0);
   }
@@ -85,7 +85,7 @@ void TimeManagement::init(Search::LimitsType& limits, Color us, int ply) {
   // x moves in y seconds (+ z increment)
   else
   {
-      optScale = std::min((0.8 + ply / 128.0) / mtg,
+      optScale = std::min((0.8448 + ply * 0.00825) / mtg,
                             0.8 * limits.time[us] / double(timeLeft));
       maxScale = std::min(6.3, 1.5 + 0.11 * mtg);
   }
