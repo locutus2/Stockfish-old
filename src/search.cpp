@@ -260,7 +260,7 @@ void Thread::search() {
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = 0;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
-  double timeReduction = 1, totBestMoveChanges = 0;
+  double timeReduction = 1;
   Color us = rootPos.side_to_move();
   int iterIdx = 0;
 
@@ -330,10 +330,6 @@ void Thread::search() {
          && !Threads.stop
          && !(Limits.depth && mainThread && rootDepth > Limits.depth))
   {
-      // Age out PV variability metric
-      if (mainThread)
-          totBestMoveChanges /= 2;
-
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
       for (RootMove& rm : rootMoves)
@@ -471,15 +467,7 @@ void Thread::search() {
           timeReduction = lastBestMoveDepth + 9 < completedDepth ? 1.92 : 0.95;
           double reduction = (1.47 + mainThread->previousTimeReduction) / (2.32 * timeReduction);
 
-          // Use part of the gained time from a previous stable move for the current move
-          for (Thread* th : Threads)
-          {
-              totBestMoveChanges += th->bestMoveChanges;
-              th->bestMoveChanges = 0;
-          }
-          double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
-
-          double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability;
+          double totalTime = Time.optimum() * fallingEval * reduction;
 
           // Cap used time in case of a single legal move for a better viewer experience in tournaments
           // yielding correct scores and sufficiently fast moves.
@@ -1141,12 +1129,6 @@ moves_loop: // When in check, search starts from here
               && !likelyFailLow)
               r -= 2;
 
-          // Increase reduction at root and non-PV nodes when the best move does not change frequently
-          if (   (rootNode || !PvNode)
-              && thisThread->rootDepth > 10
-              && thisThread->bestMoveChanges <= 2)
-              r++;
-
           // Decrease reduction if opponent's move count is high (~1 Elo)
           if ((ss-1)->moveCount > 13)
               r--;
@@ -1252,11 +1234,6 @@ moves_loop: // When in check, search starts from here
 
               for (Move* m = (ss+1)->pv; *m != MOVE_NONE; ++m)
                   rm.pv.push_back(*m);
-
-              // We record how often the best move has been changed in each
-              // iteration. This information is used for time management and LMR
-              if (moveCount > 1)
-                  ++thisThread->bestMoveChanges;
           }
           else
               // All other moves but the PV are set to the lowest value: this
