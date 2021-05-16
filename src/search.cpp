@@ -469,7 +469,7 @@ void Thread::search() {
 
           // If the bestMove is stable over several iterations, reduce time accordingly
           timeReduction = lastBestMoveDepth + 9 < completedDepth ? 1.92 : 0.95;
-          double reduction = (4.34 - mainThread->previousTimeReduction) / (2.32 * timeReduction);
+          double reduction = (1.47 + 1.824 / mainThread->previousTimeReduction) / (2.32 * timeReduction);
 
           // Use part of the gained time from a previous stable move for the current move
           for (Thread* th : Threads)
