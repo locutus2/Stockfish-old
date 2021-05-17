@@ -21,7 +21,6 @@
 #include <cmath>
 #include <cstring>   // For std::memset
 #include <iostream>
-#include <iomanip>
 #include <sstream>
 
 #include "evaluate.h"
@@ -59,80 +58,46 @@ using namespace Search;
 
 namespace Search {
 
-  template <int Size>
-  typename Tree<Size>::Node* Tree<Size>::do_move(Tree<Size>::Node* node, Move move) const
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::do_move(Tree<Size, Buckets>::Node node, Move move) const
   {
-      auto it = node->childs.find(move);
-      if (it == node->childs.end())
-          return nullptr;
+      const auto &next = (*this)[node][hash(move)];
+      return next.first == move ? next.second : 0;
+  }
+
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::add_move(Tree<Size, Buckets>::Node node, Move move)
+  {
+      auto &next = (*this)[node][hash(move)];
+      if (next.first == move)
+          return next.second;
+      else if (next.first)
+          return 0;
       else
-          return it->second;
+          return next.first = move, next.second = createNode();
   }
 
-  template <int Size>
-  typename Tree<Size>::Node* Tree<Size>::add_move(Tree<Size>::Node* node, Move move)
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::createNode()
   {
-      auto it = node->childs.find(move);
-      if (it == node->childs.end())
-      {
-          Node *newNode = createNode();
-          if(newNode)
-              node->childs[move] = newNode;
-          return newNode;
-      }
-      else
-          return it->second;
-  }
-
-  template <int Size>
-  typename Tree<Size>::Node* Tree<Size>::createNode()
-  {
-      Node* node = getFreeNode();
-      if (node)
-          node->childs.clear();
-      return node;
-  }
-
-  template <int Size>
-  typename Tree<Size>::Node* Tree<Size>::getFreeNode()
-  {
-      if (freeNodes == nodesBuffer + Size)
-          return nullptr;
+      if (freeNodes == Size)
+          return 0;
       else
           return freeNodes++;
   }
 
-  template <int Size>
-  void Tree<Size>::print(std::ostream &out)
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::getRoot()
   {
-      print(getRoot(), out, "");
+      return 0;
   }
 
-  template <int Size>
-  void Tree<Size>::print(Node *node, std::ostream &out, std::string indent) const
+  template <int Size, int Buckets>
+  void Tree<Size, Buckets>::clear()
   {
-      bool first = true;
-      for(const auto m : node->childs)
-      {
-          if(!first) out << indent;
-          out << std::setw(5) << UCI::move(m.first, Threads.main()->rootPos.is_chess960()) << ' ';
-          print(m.second, out, indent + "      ");
-          first = false;
-      }
-      if(node->childs.empty()) out << std::endl;
-  }
-
-  template <int Size>
-  typename Tree<Size>::Node* Tree<Size>::getRoot()
-  {
-      return nodesBuffer;
-  }
-
-  template <int Size>
-  void Tree<Size>::clear()
-  {
-      nodesBuffer->childs.clear();
-      freeNodes = nodesBuffer + 1;
+      for(auto bucket : *this)
+          bucket.fill({MOVE_NONE,0});
+      freeNodes = 1;
   }
 }
 
@@ -321,8 +286,6 @@ void MainThread::search() {
       std::cout << " ponder " << UCI::move(bestThread->rootMoves[0].pv[1], rootPos.is_chess960());
 
   std::cout << sync_endl;
-
-  //Node::getRoot()->print();
 }
 
 
@@ -898,7 +861,7 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
-        (ss+1)->node = nullptr;
+        (ss+1)->node = 0;
 
         pos.do_null_move(st);
 
@@ -970,7 +933,7 @@ namespace {
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
-                (ss+1)->node = nullptr;
+                (ss+1)->node = 0;
 
                 pos.do_move(move, st);
 
@@ -1197,7 +1160,7 @@ moves_loop: // When in check, search starts from here
                                                                 [captureOrPromotion]
                                                                 [movedPiece]
                                                                 [to_sq(move)];
-      (ss+1)->node = (ss->node ? thisThread->tree.do_move(ss->node, move) : nullptr);
+      (ss+1)->node = (ss->node ? thisThread->tree.do_move(ss->node, move) : 0);
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
