@@ -168,7 +168,7 @@ namespace Stockfish::Eval::NNUE {
         const auto [psqt2, lazy2] = featureTransformer->transform(pos, transformedFeatures, bucket2);
         if (!lazy2) {
           const auto output2 = network[bucket2]->propagate(transformedFeatures, buffer);
-          v = (3 * v + static_cast<Value>((output2[0] + psqt2) / OutputScale)) / 4;
+          v = (v + 3 * static_cast<Value>((output2[0] + psqt2) / OutputScale)) / 4;
         }
       }
     } else {
