@@ -159,13 +159,24 @@ namespace Stockfish::Eval::NNUE {
 
     const std::size_t bucket = (pos.count<ALL_PIECES>() - 1) / 4;
 
+    Value v;
     const auto [psqt, lazy] = featureTransformer->transform(pos, transformedFeatures, bucket);
     if (lazy) {
-      return static_cast<Value>(psqt / OutputScale);
+      v = static_cast<Value>(psqt / OutputScale);
     } else {
       const auto output = network[bucket]->propagate(transformedFeatures, buffer);
-      return static_cast<Value>((output[0] + psqt) / OutputScale);
+      v = static_cast<Value>((output[0] + psqt) / OutputScale);
+      if (bucket < 7) {
+        const std::size_t bucket2 = bucket + 1;
+        const auto [psqt2, lazy2] = featureTransformer->transform(pos, transformedFeatures, bucket2);
+        if (!lazy2) {
+          const auto output2 = network[bucket2]->propagate(transformedFeatures, buffer);
+          v = (v + static_cast<Value>((output2[0] + psqt2) / OutputScale)) / 2;
+        }
+      }
     }
+
+    return v;
   }
 
   // Load eval, from a file stream or a memory stream
