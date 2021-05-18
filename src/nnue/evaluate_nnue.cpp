@@ -163,9 +163,6 @@ namespace Stockfish::Eval::NNUE {
     const auto [psqt, lazy] = featureTransformer->transform(pos, transformedFeatures, bucket);
     if (lazy) {
       v = static_cast<Value>(psqt / OutputScale);
-    } else {
-      const auto output = network[bucket]->propagate(transformedFeatures, buffer);
-      v = static_cast<Value>((output[0] + psqt) / OutputScale);
       if (bucket < 7) {
         const std::size_t bucket2 = bucket + 1;
         const auto [psqt2, lazy2] = featureTransformer->transform(pos, transformedFeatures, bucket2);
@@ -174,6 +171,9 @@ namespace Stockfish::Eval::NNUE {
           v = (v + static_cast<Value>((output2[0] + psqt2) / OutputScale)) / 2;
         }
       }
+    } else {
+      const auto output = network[bucket]->propagate(transformedFeatures, buffer);
+      v = static_cast<Value>((output[0] + psqt) / OutputScale);
     }
 
     return v;
