@@ -1155,7 +1155,7 @@ Value Eval::evaluate(const Position& pos) {
   }
 
   // Damp down the evaluation logistic when shuffling
-  v -= int(v) / (1 + std::exp(4.595 - 0.1149 * pos.rule50_count()));
+  v -= int(v) / (1 + std::exp(6.907 - 0.17267 * pos.rule50_count()));
 
   // Guarantee evaluation does not hit the tablebase range
   v = std::clamp(v, VALUE_TB_LOSS_IN_MAX_PLY + 1, VALUE_TB_WIN_IN_MAX_PLY - 1);
