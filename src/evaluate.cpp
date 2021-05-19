@@ -114,24 +114,28 @@ namespace Eval {
         }
   }
 
+  /// NNUE::export_net() exports the currently loaded network to a file
   void NNUE::export_net(const std::optional<std::string>& filename) {
     std::string actualFilename;
-    if (filename.has_value()) {
-      actualFilename = filename.value();
-    } else {
-      if (eval_file_loaded != EvalFileDefaultName) {
-        sync_cout << "Failed to export a net. A non-embedded net can only be saved if the filename is specified." << sync_endl;
-        return;
-      }
-      actualFilename = EvalFileDefaultName;
+
+    if (filename.has_value())
+        actualFilename = filename.value();
+    else
+    {
+        if (eval_file_loaded != EvalFileDefaultName)
+        {
+             sync_cout << "Failed to export a net. A non-embedded net can only be saved if the filename is specified." << sync_endl;
+             return;
+        }
+        actualFilename = EvalFileDefaultName;
     }
 
     ofstream stream(actualFilename, std::ios_base::binary);
-    if (save_eval(stream)) {
+
+    if (save_eval(stream))
         sync_cout << "Network saved successfully to " << actualFilename << "." << sync_endl;
-    } else {
+    else
         sync_cout << "Failed to export a net." << sync_endl;
-    }
   }
 
   /// NNUE::verify() verifies that the last net used was loaded successfully
@@ -927,7 +931,7 @@ namespace {
     Color strongSide = eg > VALUE_DRAW ? WHITE : BLACK;
     int sf = me->scale_factor(pos, strongSide);
 
-    // If scale factor is not already specific, scale down via general heuristics
+    // If scale factor is not already specific, scale up/down via general heuristics
     if (sf == SCALE_FACTOR_NORMAL)
     {
         if (pos.opposite_bishops())
@@ -1112,10 +1116,8 @@ Value Eval::evaluate(const Position& pos) {
       // Scale and shift NNUE for compatibility with search and classical evaluation
       auto  adjusted_NNUE = [&]()
       {
-         int material = pos.non_pawn_material() + 4 * PawnValueMg * pos.count<PAWN>();
-         int scale =  580
-                    + material / 32
-                    - 4 * pos.rule50_count();
+
+         int scale = 903 + 28 * pos.count<PAWN>() + 28 * pos.non_pawn_material() / 1024;
 
          Value nnue = NNUE::evaluate(pos) * scale / 1024 + Time.tempoNNUE;
 
@@ -1130,7 +1132,7 @@ Value Eval::evaluate(const Position& pos) {
       Value psq = Value(abs(eg_value(pos.psq_score())));
       int   r50 = 16 + pos.rule50_count();
       bool  largePsq = psq * 16 > (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50;
-      bool  classical = largePsq || (psq > PawnValueMg / 4 && !(pos.this_thread()->nodes & 0xB));
+      bool  classical = largePsq;
 
       // Use classical evaluation for really low piece endgames.
       // One critical case is the draw for bishop + A/H file pawn vs naked king.
@@ -1147,8 +1149,7 @@ Value Eval::evaluate(const Position& pos) {
           && !lowPieceEndgame
           && (   abs(v) * 16 < NNUEThreshold2 * r50
               || (   pos.opposite_bishops()
-                  && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50
-                  && !(pos.this_thread()->nodes & 0xB))))
+                  && abs(v) * 16 < (NNUEThreshold1 + pos.non_pawn_material() / 64) * r50)))
           v = adjusted_NNUE();
   }
 
