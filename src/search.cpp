@@ -458,6 +458,137 @@ void Thread::search() {
       if (skill.enabled() && skill.time_to_pick(rootDepth))
           skill.pick_best(multiPV);
 
+      double fallingEval = (318 + 6 * (mainThread->bestPreviousScore - bestValue)
+                                + 6 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
+      fallingEval = std::clamp(fallingEval, 0.5, 1.5);
+
+      dbg_mean_of(1000 * fallingEval, 0);
+      dbg_mean_of(1000 * fallingEval, rootDepth);
+
+      timeReduction = lastBestMoveDepth + 9 < completedDepth ? 1.92 : 0.95;
+      double reduction = (1.47 + mainThread->previousTimeReduction) / (2.32 * timeReduction);
+
+      dbg_mean_of(1000 * reduction, 100);
+      dbg_mean_of(1000 * reduction, 100+rootDepth);
+
+      for (Thread* th : Threads)
+      {
+              totBestMoveChanges += th->bestMoveChanges;
+              th->bestMoveChanges = 0;
+      }
+      double bestMoveInstability = 1 + 2 * totBestMoveChanges / Threads.size();
+
+      dbg_mean_of(1000 * bestMoveInstability, 200);
+      dbg_mean_of(1000 * bestMoveInstability, 200+rootDepth);
+
+      /*
+       * bench 16 1 16 pos1000
+       *
+       * [0] Total 16000 Mean 884.081
+       * [1] Total 1000 Mean 866.596
+       * [2] Total 1000 Mean 805.605
+       * [3] Total 1000 Mean 845.342
+       * [4] Total 1000 Mean 828.41
+       * [5] Total 1000 Mean 807.851
+       * [6] Total 1000 Mean 879.637
+       * [7] Total 1000 Mean 901.849
+       * [8] Total 1000 Mean 928.513
+       * [9] Total 1000 Mean 946.927
+       * [10] Total 1000 Mean 963.632
+       * [11] Total 1000 Mean 925.198
+       * [12] Total 1000 Mean 906.162
+       * [13] Total 1000 Mean 892.261
+       * [14] Total 1000 Mean 885.844
+       * [15] Total 1000 Mean 879.568
+       * [16] Total 1000 Mean 881.902
+       * [100] Total 16000 Mean 1153.89
+       * [101] Total 1000 Mean 1200.54
+       * [102] Total 1000 Mean 1200.54
+       * [103] Total 1000 Mean 1200.54
+       * [104] Total 1000 Mean 1200.54
+       * [105] Total 1000 Mean 1200.54
+       * [106] Total 1000 Mean 1200.54
+       * [107] Total 1000 Mean 1200.54
+       * [108] Total 1000 Mean 1200.54
+       * [109] Total 1000 Mean 1200.54
+       * [110] Total 1000 Mean 1200.54
+       * [111] Total 1000 Mean 1091.54
+       * [112] Total 1000 Mean 1088.77
+       * [113] Total 1000 Mean 1082.11
+       * [114] Total 1000 Mean 1072.78
+       * [115] Total 1000 Mean 1063.35
+       * [116] Total 1000 Mean 1058.24
+       * [200] Total 16000 Mean 2596.12
+       * [201] Total 1000 Mean 4842
+       * [202] Total 1000 Mean 3675
+       * [203] Total 1000 Mean 3561.5
+       * [204] Total 1000 Mean 2830.75
+       * [205] Total 1000 Mean 2649.38
+       * [206] Total 1000 Mean 2376.41
+       * [207] Total 1000 Mean 2463.97
+       * [208] Total 1000 Mean 2485.72
+       * [209] Total 1000 Mean 2462.58
+       * [210] Total 1000 Mean 2418.98
+       * [211] Total 1000 Mean 2265.17
+       * [212] Total 1000 Mean 2104.27
+       * [213] Total 1000 Mean 1981.9
+       * [214] Total 1000 Mean 1898.73
+       * [215] Total 1000 Mean 1809.16
+       * [216] Total 1000 Mean 1712.38
+       *
+       * #################### pre new nnue #############
+      [0] Total 16000 Mean 882.093
+     [1] Total 1000 Mean 841.281
+    [2] Total 1000 Mean 791.079
+   [3] Total 1000 Mean 827.031
+  [4] Total 1000 Mean 830.065
+ [5] Total 1000 Mean 818.572
+[6] Total 1000 Mean 892.84
+[7] Total 1000 Mean 897.821
+[8] Total 1000 Mean 913.264
+[9] Total 1000 Mean 939.041
+[10] Total 1000 Mean 960.604
+[11] Total 1000 Mean 931.568
+[12] Total 1000 Mean 931.372
+[13] Total 1000 Mean 906.576
+[14] Total 1000 Mean 892.108
+[15] Total 1000 Mean 870.644
+[16] Total 1000 Mean 869.62
+[100] Total 16000 Mean 1158.1
+[101] Total 1000 Mean 1201.42
+[102] Total 1000 Mean 1201.42
+[103] Total 1000 Mean 1201.42
+[104] Total 1000 Mean 1201.42
+[105] Total 1000 Mean 1201.42
+[106] Total 1000 Mean 1201.42
+[107] Total 1000 Mean 1201.42
+[108] Total 1000 Mean 1201.42
+[109] Total 1000 Mean 1201.42
+[110] Total 1000 Mean 1201.42
+[111] Total 1000 Mean 1105.63
+[112] Total 1000 Mean 1104.85
+[113] Total 1000 Mean 1093.64
+[114] Total 1000 Mean 1085.65
+[115] Total 1000 Mean 1069.66
+[116] Total 1000 Mean 1056.01
+[200] Total 16000 Mean 2645.84
+[201] Total 1000 Mean 4850
+[202] Total 1000 Mean 3777
+[203] Total 1000 Mean 3590.5
+[204] Total 1000 Mean 2989.25
+[205] Total 1000 Mean 2762.62
+[206] Total 1000 Mean 2519.03
+[207] Total 1000 Mean 2491.28
+[208] Total 1000 Mean 2515.36
+[209] Total 1000 Mean 2569.4
+[210] Total 1000 Mean 2458.41
+[211] Total 1000 Mean 2246.9
+[212] Total 1000 Mean 2123.15
+[213] Total 1000 Mean 2005.34
+[214] Total 1000 Mean 1908.44
+[215] Total 1000 Mean 1814
+[216] Total 1000 Mean 1712.79
+       */
       // Do we have time for the next iteration? Can we stop searching now?
       if (    Limits.use_time_management()
           && !Threads.stop
