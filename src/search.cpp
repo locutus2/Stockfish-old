@@ -483,6 +483,60 @@ void Thread::search() {
 
       /*
        * bench 16 1 16 pos1000
+       *
+       * [0] Total 16000 Mean 884.081
+       * [1] Total 1000 Mean 866.596
+       * [2] Total 1000 Mean 805.605
+       * [3] Total 1000 Mean 845.342
+       * [4] Total 1000 Mean 828.41
+       * [5] Total 1000 Mean 807.851
+       * [6] Total 1000 Mean 879.637
+       * [7] Total 1000 Mean 901.849
+       * [8] Total 1000 Mean 928.513
+       * [9] Total 1000 Mean 946.927
+       * [10] Total 1000 Mean 963.632
+       * [11] Total 1000 Mean 925.198
+       * [12] Total 1000 Mean 906.162
+       * [13] Total 1000 Mean 892.261
+       * [14] Total 1000 Mean 885.844
+       * [15] Total 1000 Mean 879.568
+       * [16] Total 1000 Mean 881.902
+       * [100] Total 16000 Mean 1153.89
+       * [101] Total 1000 Mean 1200.54
+       * [102] Total 1000 Mean 1200.54
+       * [103] Total 1000 Mean 1200.54
+       * [104] Total 1000 Mean 1200.54
+       * [105] Total 1000 Mean 1200.54
+       * [106] Total 1000 Mean 1200.54
+       * [107] Total 1000 Mean 1200.54
+       * [108] Total 1000 Mean 1200.54
+       * [109] Total 1000 Mean 1200.54
+       * [110] Total 1000 Mean 1200.54
+       * [111] Total 1000 Mean 1091.54
+       * [112] Total 1000 Mean 1088.77
+       * [113] Total 1000 Mean 1082.11
+       * [114] Total 1000 Mean 1072.78
+       * [115] Total 1000 Mean 1063.35
+       * [116] Total 1000 Mean 1058.24
+       * [200] Total 16000 Mean 2596.12
+       * [201] Total 1000 Mean 4842
+       * [202] Total 1000 Mean 3675
+       * [203] Total 1000 Mean 3561.5
+       * [204] Total 1000 Mean 2830.75
+       * [205] Total 1000 Mean 2649.38
+       * [206] Total 1000 Mean 2376.41
+       * [207] Total 1000 Mean 2463.97
+       * [208] Total 1000 Mean 2485.72
+       * [209] Total 1000 Mean 2462.58
+       * [210] Total 1000 Mean 2418.98
+       * [211] Total 1000 Mean 2265.17
+       * [212] Total 1000 Mean 2104.27
+       * [213] Total 1000 Mean 1981.9
+       * [214] Total 1000 Mean 1898.73
+       * [215] Total 1000 Mean 1809.16
+       * [216] Total 1000 Mean 1712.38
+       *
+       * #################### pre new nnue #############
       [0] Total 16000 Mean 882.093
      [1] Total 1000 Mean 841.281
     [2] Total 1000 Mean 791.079
