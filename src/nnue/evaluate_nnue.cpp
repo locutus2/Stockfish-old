@@ -160,12 +160,123 @@ namespace Stockfish::Eval::NNUE {
     const std::size_t bucket = (pos.count<ALL_PIECES>() - 1) / 4;
 
     const auto [psqt, lazy] = featureTransformer->transform(pos, transformedFeatures, bucket);
+    dbg_hit_on(true, lazy, bucket);
     if (lazy) {
+      dbg_mean_of(int(psqt), 1000+bucket);
       return static_cast<Value>(psqt / OutputScale);
     } else {
       const auto output = network[bucket]->propagate(transformedFeatures, buffer);
+      dbg_mean_of(output[0]-psqt, bucket);
+      dbg_mean_of(int(output[0])-int(psqt), 100+bucket);
+      dbg_mean_of(int(output[0]), 200+bucket);
+      dbg_mean_of(int(psqt), 300+bucket);
+      dbg_mean_of(int(output[0])+int(psqt), 400+bucket);
+      dbg_corr_of(bucket, output[0]-psqt, 0);
+      dbg_corr_of(bucket, int(output[0])-int(psqt), 100);
       return static_cast<Value>((output[0] + psqt) / OutputScale);
     }
+    /*
+     * [0] Total 145227 Hits 9 hit rate (%) 0.00619719
+     * [1] Total 1933877 Hits 21 hit rate (%) 0.0010859
+     * [2] Total 1899974 Hits 2 hit rate (%) 0.000105265
+     * [3] Total 1412299 Hits 5 hit rate (%) 0.000354033
+     * [4] Total 1750074 Hits 10 hit rate (%) 0.000571404
+     * [5] Total 2245138 Hits 47 hit rate (%) 0.00209341
+     * [6] Total 2023430 Hits 4 hit rate (%) 0.000197684
+     * [7] Total 390815 Hits 0 hit rate (%) 0
+     * [0] Total 145218 Mean 403.87
+     * [1] Total 1933856 Mean 915.296
+     * [2] Total 1899972 Mean 1123.83
+     * [3] Total 1412294 Mean 1555.72
+     * [4] Total 1750064 Mean 1667.15
+     * [5] Total 2245091 Mean 1523.31
+     * [6] Total 2023426 Mean 1652.65
+     * [7] Total 390815 Mean 2006.28
+     * [100] Total 145218 Mean 403.87
+     * [101] Total 1933856 Mean 915.296
+     * [102] Total 1899972 Mean 1123.83
+     * [103] Total 1412294 Mean 1555.72
+     * [104] Total 1750064 Mean 1667.15
+     * [105] Total 2245091 Mean 1523.31
+     * [106] Total 2023426 Mean 1652.65
+     * [107] Total 390815 Mean 2006.28
+     * [200] Total 145218 Mean 416.422
+     * [201] Total 1933856 Mean 887.266
+     * [202] Total 1899972 Mean 1018.05
+     * [203] Total 1412294 Mean 1244.77
+     * [204] Total 1750064 Mean 1192.17
+     * [205] Total 2245091 Mean 935.174
+     * [206] Total 2023426 Mean 1043.99
+     * [207] Total 390815 Mean 1237.35
+     * [300] Total 145218 Mean 12.5513
+     * [301] Total 1933856 Mean -28.0307
+     * [302] Total 1899972 Mean -105.776
+     * [303] Total 1412294 Mean -310.944
+     * [304] Total 1750064 Mean -474.973
+     * [305] Total 2245091 Mean -588.134
+     * [306] Total 2023426 Mean -608.658
+     * [307] Total 390815 Mean -768.929
+     * [400] Total 145218 Mean 428.973
+     * [401] Total 1933856 Mean 859.235
+     * [402] Total 1899972 Mean 912.275
+     * [403] Total 1412294 Mean 933.83
+     * [404] Total 1750064 Mean 717.199
+     * [405] Total 2245091 Mean 347.041
+     * [406] Total 2023426 Mean 435.332
+     * [407] Total 390815 Mean 468.421
+     * [1000] Total 9 Mean -51038.7
+     * [1001] Total 21 Mean -35587.4
+     * [1002] Total 2 Mean -22654.5
+     * [1003] Total 5 Mean -23436.8
+     * [1004] Total 10 Mean -14271.7
+     * [1005] Total 47 Mean -16390.5
+     * [1006] Total 4 Mean 22985.8
+     * [0] Total 11800736 Correlation(x,y) = 0.0397905 y = 152.3 * x + 853.063 x = 1.03958e-05 * y + 3.63535 var_min with w(x) = 1.00001
+     * [100] Total 11800736 Correlation(x,y) = 0.0397905 y = 152.3 * x + 853.063 x = 1.03958e-05 * y + 3.63535 var_min with w(x) = 1.00001
+     *
+     * [0] Total 145218 Mean 403.87
+     * [1] Total 1933856 Mean 915.296
+     * [2] Total 1899972 Mean 1123.83
+     * [3] Total 1412294 Mean 1555.72
+     * [4] Total 1750064 Mean 1667.15
+     * [5] Total 2245091 Mean 1523.31
+     * [6] Total 2023426 Mean 1652.65
+     * [7] Total 390815 Mean 2006.28
+     * [100] Total 145218 Mean 403.87
+     * [101] Total 1933856 Mean 915.296
+     * [102] Total 1899972 Mean 1123.83
+     * [103] Total 1412294 Mean 1555.72
+     * [104] Total 1750064 Mean 1667.15
+     * [105] Total 2245091 Mean 1523.31
+     * [106] Total 2023426 Mean 1652.65
+     * [107] Total 390815 Mean 2006.28
+     * [200] Total 145218 Mean 416.422
+     * [201] Total 1933856 Mean 887.266
+     * [202] Total 1899972 Mean 1018.05
+     * [203] Total 1412294 Mean 1244.77
+     * [204] Total 1750064 Mean 1192.17
+     * [205] Total 2245091 Mean 935.174
+     * [206] Total 2023426 Mean 1043.99
+     * [207] Total 390815 Mean 1237.35
+     * [300] Total 145218 Mean 12.5513
+     * [301] Total 1933856 Mean -28.0307
+     * [302] Total 1899972 Mean -105.776
+     * [303] Total 1412294 Mean -310.944
+     * [304] Total 1750064 Mean -474.973
+     * [305] Total 2245091 Mean -588.134
+     * [306] Total 2023426 Mean -608.658
+     * [307] Total 390815 Mean -768.929
+     * [400] Total 145218 Mean 428.973
+     * [401] Total 1933856 Mean 859.235
+     * [402] Total 1899972 Mean 912.275
+     * [403] Total 1412294 Mean 933.83
+     * [404] Total 1750064 Mean 717.199
+     * [405] Total 2245091 Mean 347.041
+     * [406] Total 2023426 Mean 435.332
+     * [407] Total 390815 Mean 468.421
+     * [0] Total 11800736 Correlation(x,y) = 0.0397905 y = 152.3 * x + 853.063 x = 1.03958e-05 * y + 3.63535 var_min with w(x) = 1.00001
+     * [100] Total 11800736 Correlation(x,y) = 0.0397905 y = 152.3 * x + 853.063 x = 1.03958e-05 * y + 3.63535 var_min with w(x) = 1.00001
+     * */
   }
 
   // Load eval, from a file stream or a memory stream
