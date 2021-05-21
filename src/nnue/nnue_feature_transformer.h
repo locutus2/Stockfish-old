@@ -184,7 +184,7 @@ namespace Stockfish::Eval::NNUE {
           - psqtAccumulation[static_cast<int>(perspectives[1])][bucket]
         ) / 2;
 
-      if (abs(psqt) > LazyThreshold * OutputScale && bucket > 1)
+      if (abs(psqt) > LazyThreshold * OutputScale && bucket > 5)
         return { psqt, true };
 
   #if defined(USE_AVX512)
