@@ -157,7 +157,7 @@ namespace Stockfish::Eval::NNUE {
     ASSERT_ALIGNED(transformedFeatures, alignment);
     ASSERT_ALIGNED(buffer, alignment);
 
-    const std::size_t bucket = (pos.count<ALL_PIECES>() - 1) / 8 * 2 + 1;
+    const std::size_t bucket = (pos.count<ALL_PIECES>() - 1) / 8 * 2;
 
     const auto [psqt, lazy] = featureTransformer->transform(pos, transformedFeatures, bucket);
     if (lazy) {
