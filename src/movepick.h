@@ -148,14 +148,14 @@ private:
   const LowPlyHistory* lowPlyHistory;
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** continuationHistory;
-  Move ttMove;
   ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
+  ExtMove moves[MAX_MOVES];
+  Move ttMove;
   int stage;
   Square recaptureSquare;
   Value threshold;
   Depth depth;
   int ply;
-  ExtMove moves[MAX_MOVES];
 };
 
 } // namespace Stockfish
