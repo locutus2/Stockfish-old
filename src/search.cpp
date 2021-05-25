@@ -1131,15 +1131,15 @@ moves_loop: // When in check, search starts from here
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
 
+          // Decrease reduction if opponent's move count is high (~1 Elo)
+          if ((ss-1)->moveCount > 13)
+              r--;
+
           // Decrease reduction if position is or has been on the PV
           // and node is not likely to fail low. (~3 Elo)
-          if (   ss->ttPv
-              && !likelyFailLow)
+          else if (   ss->ttPv
+                   && !likelyFailLow)
               r -= 2;
-
-          // Decrease reduction if opponent's move count is high (~1 Elo)
-          else if ((ss-1)->moveCount > 13)
-              r--;
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
