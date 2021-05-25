@@ -1201,8 +1201,86 @@ moves_loop: // When in check, search starts from here
 		  bool T = value > alpha;
 		  for(int i = 0; i < (int)C.size(); ++i)
 		  {
-			  dbg_hit_on(T, 10*i+C[i]);
+			dbg_hit_on(T, 10*i+C[i]);
+		  	for(int j = i+1; j < (int)C.size(); ++j)
+			{
+			  dbg_hit_on(T, 1000+1000*i+100*j+10*C[i]+C[j]);
+			}
 		  }
+		  /*
+		   * [0] Total 8782657 Hits 138788 hit rate (%) 1.58025
+		   * [1] Total 4689578 Hits 42906 hit rate (%) 0.914922
+		   * [10] Total 7085357 Hits 114387 hit rate (%) 1.61441
+		   * [11] Total 6386878 Hits 67307 hit rate (%) 1.05383
+		   * [20] Total 12348060 Hits 167101 hit rate (%) 1.35326
+		   * [21] Total 1124175 Hits 14593 hit rate (%) 1.29811
+		   * [30] Total 9222667 Hits 142060 hit rate (%) 1.54034
+		   * [31] Total 4249568 Hits 39634 hit rate (%) 0.93266
+		   * [40] Total 12518064 Hits 165376 hit rate (%) 1.3211
+		   * [41] Total 954171 Hits 16318 hit rate (%) 1.71018
+		   * [50] Total 11266986 Hits 90762 hit rate (%) 0.805557
+		   * [51] Total 2205249 Hits 90932 hit rate (%) 4.12343
+		   * [1100] Total 4810080 Hits 88013 hit rate (%) 1.82976
+		   * [1101] Total 3972577 Hits 50775 hit rate (%) 1.27814
+		   * [1110] Total 2275277 Hits 26374 hit rate (%) 1.15916
+		   * [1111] Total 2414301 Hits 16532 hit rate (%) 0.684753
+		   * [1200] Total 8318648 Hits 131245 hit rate (%) 1.57772
+		   * [1201] Total 464009 Hits 7543 hit rate (%) 1.62562
+		   * [1210] Total 4029412 Hits 35856 hit rate (%) 0.889857
+		   * [1211] Total 660166 Hits 7050 hit rate (%) 1.06791
+		   * [1300] Total 6037242 Hits 107551 hit rate (%) 1.78146
+		   * [1301] Total 2745415 Hits 31237 hit rate (%) 1.13779
+		   * [1310] Total 3185425 Hits 34509 hit rate (%) 1.08334
+		   * [1311] Total 1504153 Hits 8397 hit rate (%) 0.558254
+		   * [1400] Total 8053163 Hits 125590 hit rate (%) 1.55951
+		   * [1401] Total 729494 Hits 13198 hit rate (%) 1.8092
+		   * [1410] Total 4464901 Hits 39786 hit rate (%) 0.891084
+		   * [1411] Total 224677 Hits 3120 hit rate (%) 1.38866
+		   * [1500] Total 6941769 Hits 66414 hit rate (%) 0.95673
+		   * [1501] Total 1840888 Hits 72374 hit rate (%) 3.93147
+		   * [1510] Total 4325217 Hits 24348 hit rate (%) 0.562931
+		   * [1511] Total 364361 Hits 18558 hit rate (%) 5.0933
+		   * [2200] Total 6559740 Hits 105517 hit rate (%) 1.60855
+		   * [2201] Total 525617 Hits 8870 hit rate (%) 1.68754
+		   * [2210] Total 5788320 Hits 61584 hit rate (%) 1.06394
+		   * [2211] Total 598558 Hits 5723 hit rate (%) 0.956131
+		   * [2300] Total 5559451 Hits 94813 hit rate (%) 1.70544
+		   * [2301] Total 1525906 Hits 19574 hit rate (%) 1.28278
+		   * [2310] Total 3663216 Hits 47247 hit rate (%) 1.28977
+		   * [2311] Total 2723662 Hits 20060 hit rate (%) 0.736508
+		   * [2400] Total 7011321 Hits 113061 hit rate (%) 1.61255
+		   * [2401] Total 74036 Hits 1326 hit rate (%) 1.79102
+		   * [2410] Total 5506743 Hits 52315 hit rate (%) 0.950017
+		   * [2411] Total 880135 Hits 14992 hit rate (%) 1.70338
+		   * [2500] Total 6079868 Hits 52109 hit rate (%) 0.857075
+		   * [2501] Total 1005489 Hits 62278 hit rate (%) 6.1938
+		   * [2510] Total 5187118 Hits 38653 hit rate (%) 0.745173
+		   * [2511] Total 1199760 Hits 28654 hit rate (%) 2.38831
+		   * [3300] Total 8462345 Hits 130534 hit rate (%) 1.54253
+		   * [3301] Total 3885715 Hits 36567 hit rate (%) 0.941062
+		   * [3310] Total 760322 Hits 11526 hit rate (%) 1.51594
+		   * [3311] Total 363853 Hits 3067 hit rate (%) 0.842923
+		   * [3400] Total 11451383 Hits 151888 hit rate (%) 1.32637
+		   * [3401] Total 896677 Hits 15213 hit rate (%) 1.6966
+		   * [3410] Total 1066681 Hits 13488 hit rate (%) 1.26448
+		   * [3411] Total 57494 Hits 1105 hit rate (%) 1.92194
+		   * [3500] Total 10354622 Hits 84876 hit rate (%) 0.819692
+		   * [3501] Total 1993438 Hits 82225 hit rate (%) 4.12478
+		   * [3510] Total 912364 Hits 5886 hit rate (%) 0.645137
+		   * [3511] Total 211811 Hits 8707 hit rate (%) 4.11074
+		   * [4400] Total 8343389 Hits 127174 hit rate (%) 1.52425
+		   * [4401] Total 879278 Hits 14886 hit rate (%) 1.69298
+		   * [4410] Total 4174675 Hits 38202 hit rate (%) 0.915089
+		   * [4411] Total 74893 Hits 1432 hit rate (%) 1.91206
+		   * [4500] Total 7286678 Hits 62343 hit rate (%) 0.855575
+		   * [4501] Total 1935989 Hits 79717 hit rate (%) 4.11764
+		   * [4510] Total 3980308 Hits 28419 hit rate (%) 0.71399
+		   * [4511] Total 269260 Hits 11215 hit rate (%) 4.16512
+		   * [5500] Total 10783080 Hits 84287 hit rate (%) 0.78166
+		   * [5501] Total 1734984 Hits 81089 hit rate (%) 4.67376
+		  * [5510] Total 483906 Hits 6475 hit rate (%) 1.33807
+			  * [5511] Total 470265 Hits 9843 hit rate (%) 2.09308
+		   */ 
 		  /*
 		   *[0] Total 8782657 Hits 138788 hit rate (%) 1.58025
 		   [1] Total 4689578 Hits 42906 hit rate (%) 0.914922
