@@ -1216,6 +1216,7 @@ moves_loop: // When in check, search starts from here
 		   [41] Total 954171 Hits 16318 hit rate (%) 1.71018
 		   [50] Total 11266986 Hits 90762 hit rate (%) 0.805557
 		   [51] Total 2205249 Hits 90932 hit rate (%) 4.12343
+		   */
 		  /*
 		  bool T = value <= alpha;
 		  for(int i = 0, k = 0; i < (int)C.size(); ++i)
