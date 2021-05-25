@@ -1130,7 +1130,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-	  CC = true;
+	  CC = depth >= 10;
 	  C = { 
               thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024,
               ss->ttPv && !likelyFailLow,
@@ -1198,6 +1198,12 @@ moves_loop: // When in check, search starts from here
 
 	  if (CC)
 	  {
+		  bool T = value > alpha;
+		  for(int i = 0; i < (int)C.size(); ++i)
+		  {
+			  dbg_hit_on(T, 10*i+C[i]);
+		  }
+		  /*
 		  bool T = value <= alpha;
 		  for(int i = 0, k = 0; i < (int)C.size(); ++i)
 		      for(int j = i+1; j < (int)C.size(); ++j)
@@ -1208,7 +1214,7 @@ moves_loop: // When in check, search starts from here
 			      dbg_hit_on(C[i]&&C[j], 10*k);
 			      dbg_hit_on(C[i]&&C[j], 10*k+T+1);
 		      }
-
+*/
 		  /*
 		   * [10] Total 22872564 Hits 2015080 hit rate (%) 8.81003
 		   * [11] Total 1469781 Hits 81733 hit rate (%) 5.5609
