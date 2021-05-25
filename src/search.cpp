@@ -1204,6 +1204,19 @@ moves_loop: // When in check, search starts from here
 			  dbg_hit_on(T, 10*i+C[i]);
 		  }
 		  /*
+		   *[0] Total 8782657 Hits 138788 hit rate (%) 1.58025
+		   [1] Total 4689578 Hits 42906 hit rate (%) 0.914922
+		   [10] Total 7085357 Hits 114387 hit rate (%) 1.61441
+		   [11] Total 6386878 Hits 67307 hit rate (%) 1.05383
+		   [20] Total 12348060 Hits 167101 hit rate (%) 1.35326
+		   [21] Total 1124175 Hits 14593 hit rate (%) 1.29811
+		   [30] Total 9222667 Hits 142060 hit rate (%) 1.54034
+		   [31] Total 4249568 Hits 39634 hit rate (%) 0.93266
+		   [40] Total 12518064 Hits 165376 hit rate (%) 1.3211
+		   [41] Total 954171 Hits 16318 hit rate (%) 1.71018
+		   [50] Total 11266986 Hits 90762 hit rate (%) 0.805557
+		   [51] Total 2205249 Hits 90932 hit rate (%) 4.12343
+		  /*
 		  bool T = value <= alpha;
 		  for(int i = 0, k = 0; i < (int)C.size(); ++i)
 		      for(int j = i+1; j < (int)C.size(); ++j)
