@@ -1114,6 +1114,9 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false;
+      std::vector<bool> C;
+
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1126,6 +1129,16 @@ moves_loop: // When in check, search starts from here
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+	  CC = true;
+	  C = { 
+              thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024,
+              ss->ttPv && !likelyFailLow,
+              (rootNode || !PvNode) && thisThread->rootDepth > 10 && thisThread->bestMoveChanges <= 2,
+              (ss-1)->moveCount > 13,
+              singularQuietLMR > 0,
+              cutNode
+          };
 
           // Decrease reduction if the ttHit running average is large (~0 Elo)
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
@@ -1182,6 +1195,114 @@ moves_loop: // When in check, search starts from here
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
           didLMR = true;
+
+	  if (CC)
+	  {
+		  bool T = value <= alpha;
+		  for(int i = 0, k = 0; i < (int)C.size(); ++i)
+		      for(int j = i+1; j < (int)C.size(); ++j)
+		      {
+			      int k = 10*i+j;
+			      dbg_cramer_of(C[i], C[j], 10*k);
+			      dbg_cramer_of(C[i], C[j], 10*k+T+1);
+			      dbg_hit_on(C[i]&&C[j], 10*k);
+			      dbg_hit_on(C[i]&&C[j], 10*k+T+1);
+		      }
+
+		  /*
+		   * [10] Total 22872564 Hits 2015080 hit rate (%) 8.81003
+		   * [11] Total 1469781 Hits 81733 hit rate (%) 5.5609
+		   * [12] Total 21402783 Hits 1933347 hit rate (%) 9.03316
+		   * [20] Total 22872564 Hits 1115881 hit rate (%) 4.87869
+		   * [21] Total 1469781 Hits 66222 hit rate (%) 4.50557
+		   * [22] Total 21402783 Hits 1049659 hit rate (%) 4.90431
+		   * [30] Total 22872564 Hits 674992 hit rate (%) 2.9511
+		   * [31] Total 1469781 Hits 43860 hit rate (%) 2.98412
+		   * [32] Total 21402783 Hits 631132 hit rate (%) 2.94883
+		   * [40] Total 22872564 Hits 171394 hit rate (%) 0.749343
+		   * [41] Total 1469781 Hits 5916 hit rate (%) 0.402509
+		   * [42] Total 21402783 Hits 165478 hit rate (%) 0.773161
+		   * [50] Total 22872564 Hits 2814026 hit rate (%) 12.3031
+		   * [51] Total 1469781 Hits 372421 hit rate (%) 25.3385
+		   * [52] Total 21402783 Hits 2441605 hit rate (%) 11.4079
+		   * [120] Total 22872564 Hits 355290 hit rate (%) 1.55335
+		   * [121] Total 1469781 Hits 11369 hit rate (%) 0.773517
+		   * [122] Total 21402783 Hits 343921 hit rate (%) 1.6069
+		   * [130] Total 22872564 Hits 895087 hit rate (%) 3.91337
+		   * [131] Total 1469781 Hits 19948 hit rate (%) 1.35721
+		   * [132] Total 21402783 Hits 875139 hit rate (%) 4.0889
+		   * [140] Total 22872564 Hits 423233 hit rate (%) 1.8504
+		   * [141] Total 1469781 Hits 12780 hit rate (%) 0.869517
+		   * [142] Total 21402783 Hits 410453 hit rate (%) 1.91776
+		   * [150] Total 22872564 Hits 1339824 hit rate (%) 5.85778
+		   * [151] Total 1469781 Hits 73779 hit rate (%) 5.01973
+		   * [152] Total 21402783 Hits 1266045 hit rate (%) 5.91533
+		   * [230] Total 22872564 Hits 166463 hit rate (%) 0.727785
+		   * [231] Total 1469781 Hits 10919 hit rate (%) 0.7429
+		   * [232] Total 21402783 Hits 155544 hit rate (%) 0.726747
+		   * [240] Total 22872564 Hits 35898 hit rate (%) 0.156948
+		   * [241] Total 1469781 Hits 1171 hit rate (%) 0.0796717
+		   * [242] Total 21402783 Hits 34727 hit rate (%) 0.162255
+		   * [250] Total 22872564 Hits 691969 hit rate (%) 3.02532
+		   * [251] Total 1469781 Hits 72294 hit rate (%) 4.91869
+		   * [252] Total 21402783 Hits 619675 hit rate (%) 2.8953
+		   * [340] Total 22872564 Hits 38310 hit rate (%) 0.167493
+		   * [341] Total 1469781 Hits 1449 hit rate (%) 0.0985861
+		   * [342] Total 21402783 Hits 36861 hit rate (%) 0.172225
+		   * [350] Total 22872564 Hits 620379 hit rate (%) 2.71233
+		   * [351] Total 1469781 Hits 105370 hit rate (%) 7.1691
+		   * [352] Total 21402783 Hits 515009 hit rate (%) 2.40627
+		   * [450] Total 22872564 Hits 309218 hit rate (%) 1.35192
+		   * [451] Total 1469781 Hits 12388 hit rate (%) 0.842847
+		   * [452] Total 21402783 Hits 296830 hit rate (%) 1.38688
+		   *
+		   * [10] Total 22872564 CramersV(x,y) = 0.0436324 error% =42.3923
+		   * [11] Total 1469781 CramersV(x,y) = 0.0277516 error% =41.9161
+		   * [12] Total 21402783 CramersV(x,y) = 0.0446703 error% =42.425
+		   * [20] Total 22872564 CramersV(x,y) = 0.121084 error% =38.5756
+		   * [21] Total 1469781 CramersV(x,y) = 0.111906 error% =38.9405
+		   * [22] Total 21402783 CramersV(x,y) = 0.121705 error% =38.5505
+		   * [30] Total 22872564 CramersV(x,y) = -0.0395031 error% =43.0224
+		   * [31] Total 1469781 CramersV(x,y) = -0.058502 error% =43.8914
+		   * [32] Total 21402783 CramersV(x,y) = -0.0381522 error% =42.9627
+		   * [40] Total 22872564 CramersV(x,y) = -0.0327332 error% =41.218
+		   * [41] Total 1469781 CramersV(x,y) = -0.0242604 error% =40.9205
+		   * [42] Total 21402783 CramersV(x,y) = -0.0332259 error% =41.2384
+		   * [50] Total 22872564 CramersV(x,y) = -0.0621372 error% =49.7984
+		   * [51] Total 1469781 CramersV(x,y) = 0.0155613 error% =51.5288
+		   * [52] Total 21402783 CramersV(x,y) = -0.0686185 error% =49.6796
+		   * [120] Total 22872564 CramersV(x,y) = -0.00447924 error% =24.7719
+		   * [121] Total 1469781 CramersV(x,y) = -0.0207947 error% =18.6611
+		   * [122] Total 21402783 CramersV(x,y) = -0.00384812 error% =25.1916
+		   * [130] Total 22872564 CramersV(x,y) = 0.195548 error% =20.6436
+		   * [131] Total 1469781 CramersV(x,y) = 0.0164054 error% =19.4017
+		   * [132] Total 21402783 CramersV(x,y) = 0.207038 error% =20.7289
+		   * [140] Total 22872564 CramersV(x,y) = 0.219273 error% =18.5616
+		   * [141] Total 1469781 CramersV(x,y) = 0.183704 error% =12.2429
+		   * [142] Total 21402783 CramersV(x,y) = 0.220161 error% =18.9955
+		   * [150] Total 22872564 CramersV(x,y) = -0.0476888 error% =42.2347
+		   * [151] Total 1469781 CramersV(x,y) = -0.173278 error% =64.4229
+		   * [152] Total 21402783 CramersV(x,y) = -0.0333067 error% =40.7109
+		   * [230] Total 22872564 CramersV(x,y) = 0.00309966 error% =15.3353
+		   * [231] Total 1469781 CramersV(x,y) = 0.00348287 error% =15.5441
+		   * [232] Total 21402783 CramersV(x,y) = 0.00311386 error% =15.321
+		   * [240] Total 22872564 CramersV(x,y) = -0.0104089 error% =10.2691
+		   * [241] Total 1469781 CramersV(x,y) = -0.00700363 error% =8.73634
+		   * [242] Total 21402783 CramersV(x,y) = -0.0107002 error% =10.3743
+		   * [250] Total 22872564 CramersV(x,y) = 0.0199065 error% =36.2202
+		   * [251] Total 1469781 CramersV(x,y) = 0.0190668 error% =59.5387
+		   * [252] Total 21402783 CramersV(x,y) = 0.0210758 error% =34.6188
+		   * [340] Total 22872564 CramersV(x,y) = -0.011027 error% =10.8396
+		   * [341] Total 1469781 CramersV(x,y) = -0.00827437 error% =10.6065
+		   * [342] Total 21402783 CramersV(x,y) = -0.0110608 error% =10.8556
+		   * [350] Total 22872564 CramersV(x,y) = -0.0192794 error% =37.4378
+		   * [351] Total 1469781 CramersV(x,y) = 0.0925042 error% =56.9459
+		   * [352] Total 21402783 CramersV(x,y) = -0.0290412 error% =36.0982
+		   * [450] Total 22872564 CramersV(x,y) = 0.0681958 error% =33.9507
+		   * [451] Total 1469781 CramersV(x,y) = 0.00318634 error% =61.4642
+		   * [452] Total 21402783 CramersV(x,y) = 0.0758052 error% =32.0613
+		   */
+	  }
       }
       else
       {
