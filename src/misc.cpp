@@ -307,8 +307,8 @@ void dbg_mean_of(int v, int n, int w) { means[n][0] += w; means[n][1] += w*v; }
 void dbg_std_of(int v, int n, int w) { stds[n][0] += w; stds[n][1] += w*v; stds[n][2] += w*v*v; }
 void dbg_cov_of(int x, int y, int n, int w) { covs[n][0] += w; covs[n][1] += w*x; covs[n][2] += w*y; covs[n][3] += w*x*x; covs[n][4] += w*y*y; covs[n][5] += w*x*y;}
 void dbg_corr_of(int x, int y, int n, int w) { corrs[n][0] += w; corrs[n][1] += w*x; corrs[n][2] += w*y; corrs[n][3] += w*x*x; corrs[n][4] += w*y*y; corrs[n][5] += w*x*y;}
-void dbg_cramer_of(int x, int y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
-void dbg_chi2_of(int x, int y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
+void dbg_cramer_of(bool x, bool y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
+void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
 
 void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) { 
 	const int cn = (int)c.size();
