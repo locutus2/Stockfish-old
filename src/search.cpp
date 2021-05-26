@@ -1120,7 +1120,7 @@ moves_loop: // When in check, search starts from here
       // cases where we extend a son if it has good chances to be "interesting".
       if (    depth >= 3
           &&  moveCount > 1 + 2 * rootNode
-          && (!captureOrPromotion || !ss->ttPv)
+          && (!captureOrPromotion || (!PvNode && (!formerPv || (ss-1)->moveCount > 1)))
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
