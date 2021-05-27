@@ -773,6 +773,7 @@ namespace {
         tte->save(posKey, VALUE_NONE, ss->ttPv, BOUND_NONE, DEPTH_NONE, MOVE_NONE, eval);
     }
 
+
     // Use static evaluation difference to improve quiet move ordering
     if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorCapture)
     {
@@ -1304,6 +1305,38 @@ moves_loop: // When in check, search starts from here
     // return a fail low score.
 
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
+
+    if(ss->staticEval != VALUE_NONE)
+    {
+	    bool T = bestMove;
+	    bool C = ss->staticEval >= -245;
+	    bool C2 = ss->staticEval >= -1431;
+	    dbg_mean_of(ss->staticEval, 0);
+	    dbg_mean_of(ss->staticEval, 1+T);
+	    dbg_std_of(ss->staticEval, 0);
+	    dbg_std_of(ss->staticEval, 1+T);
+	    dbg_hit_on(T, 0);
+	    dbg_hit_on(T, 1+C);
+	    dbg_cramer_of(T, C, 0);
+	    dbg_hit_on(T, 10+C2);
+	    dbg_cramer_of(T, C2, 10);
+
+	    /*
+	     * [0] Total 83649961 Hits 46021429 hit rate (%) 55.0167
+	     * [1] Total 31517080 Hits 12606942 hit rate (%) 40.0003
+	     * [2] Total 52132881 Hits 33414487 hit rate (%) 64.0948
+	     * [10] Total 5314927 Hits 1161962 hit rate (%) 21.8622
+	     * [11] Total 78335034 Hits 44859467 hit rate (%) 57.2662
+	     * [0] Total 83649961 Mean -286.402
+	     * [1] Total 37628532 Mean -529.819
+	     * [2] Total 46021429 Mean -87.3774
+	     * [0] Total 83649961 Std 976.012
+	     * [1] Total 37628532 Std 1207.42
+	     * [2] Total 46021429 Std 671.88
+	     * [0] Total 83649961 CramersV(x,y) = 0.234697 error% =37.4481
+	     * [10] Total 83649961 CramersV(x,y) = 0.173596 error% =41.4077
+	     * */
+    }
 
     if (!moveCount)
         bestValue = excludedMove ? alpha :
