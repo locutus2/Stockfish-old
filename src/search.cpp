@@ -1155,11 +1155,11 @@ moves_loop: // When in check, search starts from here
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
-          if (ss->staticEval < -BishopValueEg)
-              r++;
-
           if (!captureOrPromotion)
           {
+              if (ss->staticEval < -RookValueEg)
+                  r++;
+
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
                   r++;
