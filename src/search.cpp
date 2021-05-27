@@ -1155,7 +1155,7 @@ moves_loop: // When in check, search starts from here
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
-          if (ss->staticEval < -RookValueEg)
+          if (ss->staticEval < -BishopValueEg)
               r++;
 
           if (!captureOrPromotion)
