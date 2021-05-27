@@ -1157,7 +1157,7 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              if (ss->staticEval < -RookValueEg)
+              if (ss->staticEval < -RookValueEg && !givesCheck)
                   r++;
 
               // Increase reduction if ttMove is a capture (~3 Elo)
