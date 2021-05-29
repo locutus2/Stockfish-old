@@ -19,6 +19,7 @@
 #ifndef SEARCH_H_INCLUDED
 #define SEARCH_H_INCLUDED
 
+#include <map>
 #include <vector>
 
 #include "misc.h"
@@ -34,6 +35,23 @@ namespace Search {
 /// Threshold used for countermoves based pruning
 constexpr int CounterMovePruneThreshold = 0;
 
+template <int Size, int Buckets>
+struct Tree : public std::array<std::array<std::pair<Move, int>, Buckets>, Size>
+{
+    typedef int Node;
+
+    Node do_move(Node node, Move move) const;
+    Node add_move(Node node, Move move);
+    void clear();
+    Node getRoot();
+
+    private:
+    Node createNode();
+    Node freeNodes;
+    std::hash<Move> hash;
+};
+
+typedef Tree<65536, 8> BestMoveTree;
 
 /// Stack struct keeps track of the information we need to remember from nodes
 /// shallower and deeper in the tree during the search. Each search thread has
@@ -52,6 +70,7 @@ struct Stack {
   bool inCheck;
   bool ttPv;
   bool ttHit;
+  BestMoveTree::Node node;
 };
 
 

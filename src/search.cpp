@@ -56,6 +56,51 @@ using std::string;
 using Eval::evaluate;
 using namespace Search;
 
+namespace Search {
+
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::do_move(Tree<Size, Buckets>::Node node, Move move) const
+  {
+      const auto &next = (*this)[node][hash(move)];
+      return next.first == move ? next.second : 0;
+  }
+
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::add_move(Tree<Size, Buckets>::Node node, Move move)
+  {
+      auto &next = (*this)[node][hash(move)];
+      if (next.first == move)
+          return next.second;
+      else if (next.first)
+          return 0;
+      else
+          return next.first = move, next.second = createNode();
+  }
+
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::createNode()
+  {
+      if (freeNodes == Size)
+          return 0;
+      else
+          return freeNodes++;
+  }
+
+  template <int Size, int Buckets>
+  typename Tree<Size, Buckets>::Node Tree<Size, Buckets>::getRoot()
+  {
+      return 1;
+  }
+
+  template <int Size, int Buckets>
+  void Tree<Size, Buckets>::clear()
+  {
+      for(auto bucket : *this)
+          bucket.fill({MOVE_NONE,0});
+      freeNodes = 2;
+  }
+}
+
 namespace {
 
   // Different node types, used as a template parameter
@@ -269,6 +314,9 @@ void Thread::search() {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
 
   ss->pv = pv;
+
+  tree.clear();
+  ss->node = tree.getRoot();
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -631,7 +679,7 @@ namespace {
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     if (!excludedMove)
-        ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
+        ss->ttPv = PvNode || (ss->ttHit && tte->is_pv()) || ss->node;
     formerPv = ss->ttPv && !PvNode;
 
     // Update low ply history for previous move if we are near root and position is or has been in PV
@@ -813,6 +861,7 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
+        (ss+1)->node = 0;
 
         pos.do_null_move(st);
 
@@ -884,6 +933,7 @@ namespace {
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
+                (ss+1)->node = 0;
 
                 pos.do_move(move, st);
 
@@ -1110,6 +1160,7 @@ moves_loop: // When in check, search starts from here
                                                                 [captureOrPromotion]
                                                                 [movedPiece]
                                                                 [to_sq(move)];
+      (ss+1)->node = (ss->node ? thisThread->tree.do_move(ss->node, move) : 0);
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1211,6 +1262,9 @@ moves_loop: // When in check, search starts from here
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
+
+          if(ss->node)
+              thisThread->tree.add_move(ss->node, move);
 
           value = -search<PV>(pos, ss+1, -beta, -alpha,
                               std::min(maxNextDepth, newDepth), false);
