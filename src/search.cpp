@@ -1123,7 +1123,7 @@ moves_loop: // When in check, search starts from here
           && (  !captureOrPromotion
               || (cutNode && (ss-1)->moveCount > 1)
               || (!PvNode && !formerPv))
-          && (captureOrPromotion || !ss->ttPv || !givesCheck)
+          && (!ss->ttPv || !givesCheck)
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
