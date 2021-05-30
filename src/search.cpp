@@ -1263,11 +1263,11 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          if(ss->node)
-              thisThread->tree.add_move(ss->node, move);
-
           value = -search<PV>(pos, ss+1, -beta, -alpha,
                               std::min(maxNextDepth, newDepth), false);
+
+          if(ss->node && value > alpha)
+              thisThread->tree.add_move(ss->node, move);
       }
 
       // Step 18. Undo move
