@@ -1130,62 +1130,72 @@ moves_loop: // When in check, search starts from here
               || !ss->ttPv)
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
-          Depth r = reduction(improving, depth, moveCount);
+          Value lmrBound = alpha - 200;
+          value = -qsearch<NonPV>(pos, ss+1, -lmrBound-1, -lmrBound);
 
-          // Decrease reduction if the ttHit running average is large (~0 Elo)
-          if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
-              r--;
+          if (value <= lmrBound)
+              doFullDepthSearch = false;
 
-          // Decrease reduction if position is or has been on the PV
-          // and node is not likely to fail low. (~3 Elo)
-          if (   ss->ttPv
-              && !likelyFailLow)
-              r -= 2;
-
-          // Increase reduction at root and non-PV nodes when the best move does not change frequently
-          if (   (rootNode || !PvNode)
-              && thisThread->rootDepth > 10
-              && thisThread->bestMoveChanges <= 2)
-              r++;
-
-          // Decrease reduction if opponent's move count is high (~1 Elo)
-          if ((ss-1)->moveCount > 13)
-              r--;
-
-          // Decrease reduction if ttMove has been singularly extended (~1 Elo)
-          if (singularQuietLMR)
-              r--;
-
-          // Increase reduction for cut nodes (~3 Elo)
-          if (cutNode)
-              r += 1 + !captureOrPromotion;
-
-          if (!captureOrPromotion)
+          else
           {
-              // Increase reduction if ttMove is a capture (~3 Elo)
-              if (ttCapture)
+              Depth r = reduction(improving, depth, moveCount);
+
+              // Decrease reduction if the ttHit running average is large (~0 Elo)
+              if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
+                  r--;
+
+              // Decrease reduction if position is or has been on the PV
+              // and node is not likely to fail low. (~3 Elo)
+              if (   ss->ttPv
+                  && !likelyFailLow)
+                  r -= 2;
+
+              // Increase reduction at root and non-PV nodes when the best move does not change frequently
+              if (   (rootNode || !PvNode)
+                  && thisThread->rootDepth > 10
+                  && thisThread->bestMoveChanges <= 2)
                   r++;
 
-              ss->statScore =  thisThread->mainHistory[us][from_to(move)]
-                             + (*contHist[0])[movedPiece][to_sq(move)]
-                             + (*contHist[1])[movedPiece][to_sq(move)]
-                             + (*contHist[3])[movedPiece][to_sq(move)]
-                             - 4923;
+              // Decrease reduction if opponent's move count is high (~1 Elo)
+              if ((ss-1)->moveCount > 13)
+                  r--;
 
-              // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
-              if (!ss->inCheck)
-                  r -= ss->statScore / 14721;
+              // Decrease reduction if ttMove has been singularly extended (~1 Elo)
+              if (singularQuietLMR)
+                  r--;
+
+              // Increase reduction for cut nodes (~3 Elo)
+              if (cutNode)
+                  r += 1 + !captureOrPromotion;
+
+              if (!captureOrPromotion)
+              {
+                  // Increase reduction if ttMove is a capture (~3 Elo)
+                  if (ttCapture)
+                      r++;
+
+                  ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+                                 + (*contHist[0])[movedPiece][to_sq(move)]
+                                 + (*contHist[1])[movedPiece][to_sq(move)]
+                                 + (*contHist[3])[movedPiece][to_sq(move)]
+                                 - 4923;
+
+                  // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
+                  if (!ss->inCheck)
+                      r -= ss->statScore / 14721;
+              }
+
+              // In general we want to cap the LMR depth search at newDepth. But if
+              // reductions are really negative and movecount is low, we allow this move
+              // to be searched deeper than the first move.
+              Depth d = std::clamp(newDepth - r, 1, newDepth + (r < -1 && moveCount <= 5));
+
+              value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+
+              // If the son is reduced and fails high it will be re-searched at full depth
+              doFullDepthSearch = value > alpha && d < newDepth;
           }
 
-          // In general we want to cap the LMR depth search at newDepth. But if
-          // reductions are really negative and movecount is low, we allow this move
-          // to be searched deeper than the first move.
-          Depth d = std::clamp(newDepth - r, 1, newDepth + (r < -1 && moveCount <= 5));
-
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-
-          // If the son is reduced and fails high it will be re-searched at full depth
-          doFullDepthSearch = value > alpha && d < newDepth;
           didLMR = true;
       }
       else
