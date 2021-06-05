@@ -889,7 +889,7 @@ namespace {
                 pos.do_move(move, st);
 
                 // Perform a preliminary qsearch to verify that the move holds
-                value = -search<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1, depth - 13, !cutNode);
+                value = -search<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1, depth - 11, !cutNode);
 
                 // If the qsearch held, perform the regular search
                 if (value >= probCutBeta)
