@@ -1130,11 +1130,11 @@ moves_loop: // When in check, search starts from here
               || !ss->ttPv)
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
-          Value lmrBound = alpha - 400;
+          Value lmrBound = alpha + 200;
           value = -qsearch<NonPV>(pos, ss+1, -lmrBound-1, -lmrBound);
 
-          if (value <= lmrBound)
-              doFullDepthSearch = false;
+          if (value > lmrBound)
+              doFullDepthSearch = true;
 
           else
           {
