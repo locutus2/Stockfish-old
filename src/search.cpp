@@ -737,6 +737,8 @@ namespace {
 
     CapturePieceToHistory& captureHistory = thisThread->captureHistory;
 
+    ttCapture = ttMove && pos.capture_or_promotion(ttMove);
+
     // Step 6. Static evaluation of the position
     if (ss->inCheck)
     {
@@ -791,7 +793,7 @@ namespace {
 
     // Step 7. Futility pruning: child node (~50 Elo)
     if (   !PvNode
-        &&  depth < 9
+        &&  depth < 9 + ttCapture
         &&  eval - futility_margin(depth, improving) >= beta
         &&  eval < VALUE_KNOWN_WIN) // Do not return unproven wins
         return eval;
@@ -919,8 +921,6 @@ namespace {
         depth -= 2;
 
 moves_loop: // When in check, search starts from here
-
-    ttCapture = ttMove && pos.capture_or_promotion(ttMove);
 
     // Step 11. A small Probcut idea, when we are in check
     probCutBeta = beta + 409;
