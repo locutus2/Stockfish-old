@@ -813,8 +813,10 @@ namespace {
         Depth R = (1090 + 81 * depth) / 256 + std::min(int(eval - beta) / 205, 3);
 
         ss->currentMove = MOVE_NULL;
-        (ss+1)->excludedMove = priorCapture ? MOVE_NONE : reverse_move((ss-1)->currentMove);
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
+
+        if (!priorCapture && type_of((ss-1)->currentMove) == NORMAL)
+            (ss+1)->excludedMove = reverse_move((ss-1)->currentMove);
 
         pos.do_null_move(st);
 
