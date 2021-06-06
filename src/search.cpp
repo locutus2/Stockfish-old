@@ -815,7 +815,7 @@ namespace {
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
 
-        if (!priorCapture && type_of((ss-1)->currentMove) == NORMAL)
+        if (!priorCapture && type_of(pos.piece_on(prevSq)) != PAWN)
             (ss+1)->excludedMove = reverse_move((ss-1)->currentMove);
 
         pos.do_null_move(st);
