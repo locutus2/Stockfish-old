@@ -813,11 +813,13 @@ namespace {
         Depth R = (1090 + 81 * depth) / 256 + std::min(int(eval - beta) / 205, 3);
 
         ss->currentMove = MOVE_NULL;
+        (ss+1)->excludedMove = priorCapture ? MOVE_NONE : reverse_move((ss-1)->currentMove);
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
 
         pos.do_null_move(st);
 
         Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
+        (ss+1)->excludedMove = MOVE_NONE;
 
         pos.undo_null_move();
 
