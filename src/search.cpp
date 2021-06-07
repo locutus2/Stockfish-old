@@ -1163,6 +1163,10 @@ moves_loop: // When in check, search starts from here
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
+          // Decrease reduction if previous position was in check
+          if ((ss-1)->inCheck)
+              r--;
+
           if (!captureOrPromotion)
           {
               // Increase reduction if ttMove is a capture (~3 Elo)
