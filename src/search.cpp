@@ -827,7 +827,7 @@ namespace {
             if (nullValue >= VALUE_TB_WIN_IN_MAX_PLY)
                 nullValue = beta;
 
-            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 7 + 7 * cutNode))
+            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14 - 7 * priorCapture))
                 return nullValue;
 
             assert(!thisThread->nmpMinPly); // Recursive verification is not allowed
