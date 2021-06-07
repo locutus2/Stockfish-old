@@ -1163,8 +1163,8 @@ moves_loop: // When in check, search starts from here
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
-          // Decrease reduction if second previous position was in check
-          if ((ss-2)->inCheck)
+          // Decrease reduction after null move if second previous position was in check
+          if ((ss-1)->currentMove == MOVE_NULL && (ss-2)->inCheck)
               r--;
 
           if (!captureOrPromotion)
