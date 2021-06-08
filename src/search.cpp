@@ -1060,7 +1060,7 @@ moves_loop: // When in check, search starts from here
           && !excludedMove // Avoid recursive singular search
        /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
           &&  abs(ttValue) < VALUE_KNOWN_WIN
-          && (ss-1)->extension + (ss-2)->extension + (ss-3)->extension < 2
+          && (ss-1)->extension + (ss-2)->extension + (ss-3)->extension < 3
           && (tte->bound() & BOUND_LOWER)
           &&  tte->depth() >= depth - 3)
       {
