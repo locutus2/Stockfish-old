@@ -562,7 +562,7 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
-    Depth extension, newDepth;
+    Depth newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
@@ -991,7 +991,7 @@ moves_loop: // When in check, search starts from here
       if (PvNode)
           (ss+1)->pv = nullptr;
 
-      extension = 0;
+      ss->extension = 0;
       captureOrPromotion = pos.capture_or_promotion(move);
       movedPiece = pos.moved_piece(move);
       givesCheck = pos.gives_check(move);
@@ -1060,6 +1060,7 @@ moves_loop: // When in check, search starts from here
           && !excludedMove // Avoid recursive singular search
        /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
           &&  abs(ttValue) < VALUE_KNOWN_WIN
+          && (ss-1)->extension + (ss-2)->extension < 2
           && (tte->bound() & BOUND_LOWER)
           &&  tte->depth() >= depth - 3)
       {
@@ -1072,10 +1073,10 @@ moves_loop: // When in check, search starts from here
 
           if (value < singularBeta)
           {
-              extension = 1;
+              ss->extension = 1;
               singularQuietLMR = !ttCapture;
               if (!PvNode && value < singularBeta - 93)
-                  extension = 2;
+                  ss->extension = 2;
           }
 
           // Multi-cut pruning
@@ -1101,10 +1102,10 @@ moves_loop: // When in check, search starts from here
       else if (   givesCheck
                && depth > 6
                && abs(ss->staticEval) > Value(100))
-          extension = 1;
+          ss->extension = 1;
 
       // Add extension to new depth
-      newDepth += extension;
+      newDepth += ss->extension;
 
       // Speculative prefetch as early as possible
       prefetch(TT.first_entry(pos.key_after(move)));
