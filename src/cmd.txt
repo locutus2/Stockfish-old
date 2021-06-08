@@ -1,0 +1,6 @@
+uci
+setoption name Hash value 4
+setoption name Contempt value 0
+ucinewgame
+position fen 8/Pk6/8/1p6/8/P1K5/8/6B1 w - - 37 130
+go depth 100
