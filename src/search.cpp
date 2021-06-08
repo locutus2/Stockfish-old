@@ -1060,6 +1060,7 @@ moves_loop: // When in check, search starts from here
           && !excludedMove // Avoid recursive singular search
        /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
           &&  abs(ttValue) < VALUE_KNOWN_WIN
+          &&  ss->ply + depth < 2 * thisThread->rootDepth
           && (tte->bound() & BOUND_LOWER)
           &&  tte->depth() >= depth - 3)
       {
@@ -1074,7 +1075,7 @@ moves_loop: // When in check, search starts from here
           {
               extension = 1;
               singularQuietLMR = !ttCapture;
-              if (!PvNode && captureOrPromotion && value < singularBeta - 93)
+              if (!PvNode && value < singularBeta - 93)
                   extension = 2;
           }
 
