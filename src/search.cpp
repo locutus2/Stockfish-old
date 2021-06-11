@@ -1119,6 +1119,8 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+       bool CC = false;
+       int V = 0;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1131,6 +1133,8 @@ moves_loop: // When in check, search starts from here
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
+	  Depth r0 = r;
+          CC = true;
 
           if (PvNode)
               r--;
@@ -1184,6 +1188,8 @@ moves_loop: // When in check, search starts from here
           // reductions are really negative and movecount is low, we allow this move
           // to be searched deeper than the first move.
           Depth d = std::clamp(newDepth - r, 1, newDepth + (r < -1 && moveCount <= 5));
+
+	  V = r - r0;
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
@@ -1263,6 +1269,39 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      dbg_hit_on(T, 100+V);
+
+	      /*
+	       * [0] Total 127123405 Hits 6121440 hit rate (%) 4.81535
+	       * [90] Total 58 Hits 9 hit rate (%) 15.5172
+	       * [91] Total 368 Hits 44 hit rate (%) 11.9565
+	       * [92] Total 1986 Hits 281 hit rate (%) 14.149
+	       * [93] Total 9972 Hits 1597 hit rate (%) 16.0148
+	       * [94] Total 48539 Hits 8989 hit rate (%) 18.5191
+	       * [95] Total 241957 Hits 37058 hit rate (%) 15.3159
+	       * [96] Total 1173119 Hits 125259 hit rate (%) 10.6774
+	       * [97] Total 3370503 Hits 277603 hit rate (%) 8.23625
+	       * [98] Total 6408630 Hits 459249 hit rate (%) 7.1661
+	       * [99] Total 18848409 Hits 1010723 hit rate (%) 5.36238
+	       * [100] Total 36595103 Hits 1515266 hit rate (%) 4.14063
+	       * [101] Total 26370417 Hits 1329794 hit rate (%) 5.04275
+	       * [102] Total 20211891 Hits 1047395 hit rate (%) 5.18207
+	       * [103] Total 9100926 Hits 248651 hit rate (%) 2.73215
+	       * [104] Total 3419353 Hits 49711 hit rate (%) 1.45381
+	       * [105] Total 1024542 Hits 8520 hit rate (%) 0.831591
+	       * [106] Total 242633 Hits 1161 hit rate (%) 0.4785
+	       * [107] Total 47475 Hits 119 hit rate (%) 0.250658
+	       * [108] Total 6918 Hits 11 hit rate (%) 0.159005
+	       * [109] Total 564 Hits 0 hit rate (%) 0
+	       * [110] Total 41 Hits 0 hit rate (%) 0
+	       * [111] Total 1 Hits 0 hit rate (%) 0
+	       * */
       }
 
       if (value > bestValue)
