@@ -1186,7 +1186,7 @@ moves_loop: // When in check, search starts from here
                   r -= ss->statScore / 14721;
           }
 
-          if(r - rBase > 5)
+          if(!cutNode && r - rBase > 4)
               r++;
 
           // In general we want to cap the LMR depth search at newDepth. But if
