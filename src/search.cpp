@@ -1134,7 +1134,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 	  Depth r0 = r;
-          CC = true;
+          CC = captureOrPromotion;
 
           if (PvNode)
               r--;
@@ -1184,12 +1184,14 @@ moves_loop: // When in check, search starts from here
                   r -= ss->statScore / 14721;
           }
 
+	  V = r - r0;
+	  if(V == -2 && captureOrPromotion)
+		  r++;
+
           // In general we want to cap the LMR depth search at newDepth. But if
           // reductions are really negative and movecount is low, we allow this move
           // to be searched deeper than the first move.
           Depth d = std::clamp(newDepth - r, 1, newDepth + (r < -1 && moveCount <= 5));
-
-	  V = r - r0;
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
@@ -1278,6 +1280,54 @@ moves_loop: // When in check, search starts from here
 	      dbg_hit_on(T, 100+V);
 
 	      /*
+	       * CC=captureOrPromotion
+	       * r++ if V=-2
+	       * [0] Total 14227532 Hits 672920 hit rate (%) 4.7297
+	       * [96] Total 499 Hits 39 hit rate (%) 7.81563
+	       * [97] Total 24181 Hits 1019 hit rate (%) 4.21405
+	       * [98] Total 231344 Hits 6058 hit rate (%) 2.61861
+	       * [99] Total 2495649 Hits 76335 hit rate (%) 3.05872
+	       * [100] Total 7909679 Hits 311783 hit rate (%) 3.94179
+	       * [101] Total 3421081 Hits 265758 hit rate (%) 7.76825
+	       * [102] Total 145099 Hits 11928 hit rate (%) 8.22059
+	       *
+	       * CC=captureOrPromotion
+	       * [0] Total 13865761 Hits 663959 hit rate (%) 4.78848
+	       * [96] Total 483 Hits 32 hit rate (%) 6.62526
+	       * [97] Total 23698 Hits 945 hit rate (%) 3.98768
+	       * [98] Total 224216 Hits 6054 hit rate (%) 2.70007
+	       * [99] Total 2406356 Hits 72953 hit rate (%) 3.03168
+	       * [100] Total 7672564 Hits 307124 hit rate (%) 4.00289
+	       * [101] Total 3371088 Hits 263674 hit rate (%) 7.82163
+	       * [102] Total 167356 Hits 13177 hit rate (%) 7.87363
+	       *
+	       * CC=!captureOrPromotion
+	       * [0] Total 113257644 Hits 5457481 hit rate (%) 4.81864
+	       * [90] Total 58 Hits 9 hit rate (%) 15.5172
+	       * [91] Total 368 Hits 44 hit rate (%) 11.9565
+	       * [92] Total 1986 Hits 281 hit rate (%) 14.149
+	       * [93] Total 9972 Hits 1597 hit rate (%) 16.0148
+	       * [94] Total 48539 Hits 8989 hit rate (%) 18.5191
+	       * [95] Total 241957 Hits 37058 hit rate (%) 15.3159
+	       * [96] Total 1172636 Hits 125227 hit rate (%) 10.6791
+	       * [97] Total 3346805 Hits 276658 hit rate (%) 8.26633
+	       * [98] Total 6184414 Hits 453195 hit rate (%) 7.32802
+	       * [99] Total 16442053 Hits 937770 hit rate (%) 5.70348
+	       * [100] Total 28922539 Hits 1208142 hit rate (%) 4.17716
+	       * [101] Total 22999329 Hits 1066120 hit rate (%) 4.63544
+	       * [102] Total 20044535 Hits 1034218 hit rate (%) 5.1596
+	       * [103] Total 9100926 Hits 248651 hit rate (%) 2.73215
+	       * [104] Total 3419353 Hits 49711 hit rate (%) 1.45381
+	       * [105] Total 1024542 Hits 8520 hit rate (%) 0.831591
+	       * [106] Total 242633 Hits 1161 hit rate (%) 0.4785
+	       * [107] Total 47475 Hits 119 hit rate (%) 0.250658
+	       * [108] Total 6918 Hits 11 hit rate (%) 0.159005
+	       * [109] Total 564 Hits 0 hit rate (%) 0
+	       * [110] Total 41 Hits 0 hit rate (%) 0
+	       * [111] Total 1 Hits 0 hit rate (%) 0
+	       *
+	       *
+	       * CC=true
 	       * [0] Total 127123405 Hits 6121440 hit rate (%) 4.81535
 	       * [90] Total 58 Hits 9 hit rate (%) 15.5172
 	       * [91] Total 368 Hits 44 hit rate (%) 11.9565
