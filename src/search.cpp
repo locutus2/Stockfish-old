@@ -1173,31 +1173,26 @@ moves_loop: // When in check, search starts from here
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
+          ss->statScore =  (*contHist[0])[movedPiece][to_sq(move)]
+                         + (*contHist[1])[movedPiece][to_sq(move)]
+                         + (*contHist[3])[movedPiece][to_sq(move)]
+                         - 4923;
+
           if (captureOrPromotion)
-		  /*
-              //ss->statScore = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())];
-*/
-	  {
-		  int v = thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] - 868;
-		  dbg_mean_of(v*v);
-		  // cap mean=867.525 std=5.718
-	  }
+              ss->statScore += thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] * 5 / 4 - 6070;
+
           else
           {
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
                   r++;
 
-              ss->statScore =  thisThread->mainHistory[us][from_to(move)]
-                             + (*contHist[0])[movedPiece][to_sq(move)]
-                             + (*contHist[1])[movedPiece][to_sq(move)]
-                             + (*contHist[3])[movedPiece][to_sq(move)]
-                             - 4923;
+              ss->statScore += thisThread->mainHistory[us][from_to(move)];
+          }
+
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           if (!ss->inCheck)
               r -= ss->statScore / 14721;
-          }
-
 
           // In general we want to cap the LMR depth search at newDepth. But if
           // reductions are really negative and movecount is low, we allow this move
