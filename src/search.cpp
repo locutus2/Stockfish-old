@@ -1146,9 +1146,6 @@ moves_loop: // When in check, search starts from here
           if (PvNode)
               r--;
 
-	  else if (!thisThread->rootPvMove)
-              r++;
-
           // Decrease reduction if the ttHit running average is large (~0 Elo)
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
               r--;
@@ -1179,6 +1176,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              if (!PvNode && !thisThread->rootPvMove)
+                  r++;
+
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
                   r++;
