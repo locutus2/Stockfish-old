@@ -1176,9 +1176,6 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              if (!PvNode && !thisThread->rootPvMove)
-                  r++;
-
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
                   r++;
@@ -1193,6 +1190,9 @@ moves_loop: // When in check, search starts from here
               if (!ss->inCheck)
                   r -= ss->statScore / 14721;
           }
+          else if (!PvNode && !thisThread->rootPvMove)
+              r++;
+
 
           // In general we want to cap the LMR depth search at newDepth. But if
           // reductions are really negative and movecount is low, we allow this move
