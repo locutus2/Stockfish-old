@@ -272,6 +272,7 @@ void Thread::search() {
       (ss+i)->ply = i;
 
   ss->pv = pv;
+  rootPvMove = false;
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
@@ -1230,8 +1231,14 @@ moves_loop: // When in check, search starts from here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
+          if (rootNode)
+              thisThread->rootPvMove = true;
+
           value = -search<PV>(pos, ss+1, -beta, -alpha,
                               std::min(maxNextDepth, newDepth), false);
+
+          if (rootNode)
+              thisThread->rootPvMove = false;
       }
 
       // Step 18. Undo move
