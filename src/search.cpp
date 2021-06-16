@@ -1179,7 +1179,7 @@ moves_loop: // When in check, search starts from here
 
           if (captureOrPromotion)
               ss->statScore = (  thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]
-                               + ss->statScore) * 27 / 32 - 12095;
+                               + ss->statScore) * 27 / 32 + 3086;
 
           else
           {
