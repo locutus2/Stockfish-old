@@ -1180,7 +1180,7 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r++;
 
-              if (!PvNode && !thisThread->rootPvMove && (pos.key() & 1))
+              if (!PvNode && !thisThread->rootPvMove && !givesCheck)
                   r++;
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
