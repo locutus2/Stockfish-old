@@ -1081,7 +1081,8 @@ moves_loop: // When in check, search starts from here
               // Avoid search explosion by limiting the number of double extensions to at most 3
               if (   !PvNode
                   && value < singularBeta - 93
-                  && ss->doubleExtensions < 3)
+                  && ss->doubleExtensions < 3
+                  && thisThread->rootPvMove)
               {
                   extension = 2;
                   doubleExtension = true;
@@ -1175,9 +1176,6 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
-              if (!PvNode && !thisThread->rootPvMove && depth < 14)
-                  r++;
-
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
                   r++;
