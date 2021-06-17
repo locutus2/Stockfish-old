@@ -1154,7 +1154,7 @@ bool CC = false, C = false;
           // and node is not likely to fail low. (~3 Elo)
           if (   ss->ttPv
               && !likelyFailLow)
-              r -= 2,CC=true;
+              r -= 2;
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
@@ -1173,6 +1173,7 @@ bool CC = false, C = false;
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
+	  CC = !PvNode&&!cutNode;
 	  C = thisThread->rootPvMove;
 
           if (!captureOrPromotion)
