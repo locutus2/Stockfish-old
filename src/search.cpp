@@ -1129,7 +1129,7 @@ moves_loop: // When in check, search starts from here
 
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
-
+bool CC = false, C = false;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1154,7 +1154,7 @@ moves_loop: // When in check, search starts from here
           // and node is not likely to fail low. (~3 Elo)
           if (   ss->ttPv
               && !likelyFailLow)
-              r -= 2;
+              r -= 2,CC=true;
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
@@ -1173,11 +1173,13 @@ moves_loop: // When in check, search starts from here
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
+	  C = thisThread->rootPvMove;
+
           if (!captureOrPromotion)
           {
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
-                  r += 2 - thisThread->rootPvMove;
+                  r++;
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
@@ -1279,6 +1281,15 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      	bool T = value > alpha;
+		dbg_hit_on(T, 0);
+		dbg_cramer_of(T, C);
+		dbg_hit_on(T, 10+C);
+		dbg_hit_on(T, 10*depth+C);
       }
 
       if (value > bestValue)
