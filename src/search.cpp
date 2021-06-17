@@ -1154,7 +1154,7 @@ moves_loop: // When in check, search starts from here
           // and node is not likely to fail low. (~3 Elo)
           if (   ss->ttPv
               && !likelyFailLow)
-              r -= 3 - thisThread->rootPvMove;
+              r -= 2;
 
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
@@ -1177,6 +1177,9 @@ moves_loop: // When in check, search starts from here
           {
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
+                  r++;
+
+              if (!PvNode && !thisThread->rootPvMove && (thisThread->nodes & 1))
                   r++;
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
