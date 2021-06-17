@@ -1176,7 +1176,7 @@ moves_loop: // When in check, search starts from here
           if (!captureOrPromotion)
           {
               // Increase reduction if ttMove is a capture (~3 Elo)
-              if (ttCapture && !thisThread->rootPvMove)
+              if (ttCapture && thisThread->rootPvMove)
                   r++;
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
