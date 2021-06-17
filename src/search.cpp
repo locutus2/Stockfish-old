@@ -964,6 +964,7 @@ moves_loop: // When in check, search starts from here
                          && (tte->bound() & BOUND_UPPER)
                          && tte->depth() >= depth;
 
+    bool failHigh = false;
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1173,7 +1174,7 @@ bool CC = false, C = false;
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
-	  CC = !PvNode&&!cutNode;
+	  CC = type_of(movedPiece) == PAWN;
 	  C = thisThread->rootPvMove;
 
           if (!captureOrPromotion)
@@ -1203,6 +1204,7 @@ bool CC = false, C = false;
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
           didLMR = true;
+	  if(value > alpha) failHigh = true;
       }
       else
       {
