@@ -1082,7 +1082,7 @@ moves_loop: // When in check, search starts from here
               if (   !PvNode
                   && value < singularBeta - 93
                   && ss->doubleExtensions < 3
-                  && thisThread->rootPvMove)
+                  && !thisThread->rootPvMove)
               {
                   extension = 2;
                   doubleExtension = true;
