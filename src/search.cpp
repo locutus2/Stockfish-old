@@ -106,15 +106,15 @@ namespace {
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode);
 
   template <NodeType nodeType>
-  Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth = 0);
+  Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth = 0, bool cutNode = false);
 
   Value value_to_tt(Value v, int ply);
   Value value_from_tt(Value v, int ply, int r50c);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, int depth);
+  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, int depth, bool cutNode);
   void update_all_stats(const Position& pos, Stack* ss, Move bestMove, Value bestValue, Value beta, Square prevSq,
-                        Move* quietsSearched, int quietCount, Move* capturesSearched, int captureCount, Depth depth);
+                        Move* quietsSearched, int quietCount, Move* capturesSearched, int captureCount, Depth depth, bool cutNode);
 
   // perft() is our utility to verify move generation. All the leaf nodes up
   // to the given depth are generated and counted, and the sum is returned.
@@ -548,7 +548,7 @@ namespace {
 
     // Dive into quiescence search when the depth reaches zero
     if (depth <= 0)
-        return qsearch<PvNode ? PV : NonPV>(pos, ss, alpha, beta);
+        return qsearch<PvNode ? PV : NonPV>(pos, ss, alpha, beta, 0, cutNode);
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
@@ -663,7 +663,7 @@ namespace {
             {
                 // Bonus for a quiet ttMove that fails high
                 if (!pos.capture_or_promotion(ttMove))
-                    update_quiet_stats(pos, ss, ttMove, stat_bonus(depth), depth);
+                    update_quiet_stats(pos, ss, ttMove, stat_bonus(depth), depth, cutNode);
 
                 // Extra penalty for early quiet moves of the previous ply
                 if ((ss-1)->moveCount <= 2 && !priorCapture)
@@ -673,7 +673,7 @@ namespace {
             else if (!pos.capture_or_promotion(ttMove))
             {
                 int penalty = -stat_bonus(depth);
-                thisThread->mainHistory[us][from_to(ttMove)] << penalty;
+                thisThread->mainHistory[cutNode][us][from_to(ttMove)] << penalty;
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
         }
@@ -779,7 +779,7 @@ namespace {
     if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorCapture)
     {
         int bonus = std::clamp(-depth * 4 * int((ss-1)->staticEval + ss->staticEval), -1000, 1000);
-        thisThread->mainHistory[~us][from_to((ss-1)->currentMove)] << bonus;
+        thisThread->mainHistory[!cutNode][~us][from_to((ss-1)->currentMove)] << bonus;
     }
 
     // Set up improving flag that is used in various pruning heuristics
@@ -890,7 +890,7 @@ namespace {
                 pos.do_move(move, st);
 
                 // Perform a preliminary qsearch to verify that the move holds
-                value = -qsearch<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1);
+                value = -qsearch<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1, 0, !cutNode);
 
                 // If the qsearch held, perform the regular search
                 if (value >= probCutBeta)
@@ -944,7 +944,7 @@ moves_loop: // When in check, search starts from here
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory[cutNode],
                                       &thisThread->lowPlyHistory,
                                       &captureHistory,
                                       contHist,
@@ -1178,7 +1178,7 @@ moves_loop: // When in check, search starts from here
               if (ttCapture)
                   r++;
 
-              ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+              ss->statScore =  thisThread->mainHistory[cutNode][us][from_to(move)]
                              + (*contHist[0])[movedPiece][to_sq(move)]
                              + (*contHist[1])[movedPiece][to_sq(move)]
                              + (*contHist[3])[movedPiece][to_sq(move)]
@@ -1329,7 +1329,7 @@ moves_loop: // When in check, search starts from here
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
-                         quietsSearched, quietCount, capturesSearched, captureCount, depth);
+                         quietsSearched, quietCount, capturesSearched, captureCount, depth, cutNode);
 
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
@@ -1364,7 +1364,7 @@ moves_loop: // When in check, search starts from here
   // qsearch() is the quiescence search function, which is called by the main search
   // function with zero depth, or recursively with further decreasing depth per call.
   template <NodeType nodeType>
-  Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
+  Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
     static_assert(nodeType != Root);
     constexpr bool PvNode = nodeType == PV;
@@ -1475,7 +1475,7 @@ moves_loop: // When in check, search starts from here
     // to search the moves. Because the depth is <= 0 here, only captures,
     // queen promotions, and other checks (only if depth >= DEPTH_QS_CHECKS)
     // will be generated.
-    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
+    MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory[cutNode],
                                       &thisThread->captureHistory,
                                       contHist,
                                       to_sq((ss-1)->currentMove));
@@ -1545,7 +1545,7 @@ moves_loop: // When in check, search starts from here
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
-      value = -qsearch<nodeType>(pos, ss+1, -beta, -alpha, depth - 1);
+      value = -qsearch<nodeType>(pos, ss+1, -beta, -alpha, depth - 1, !cutNode);
       pos.undo_move(move);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
@@ -1648,7 +1648,7 @@ moves_loop: // When in check, search starts from here
   // update_all_stats() updates stats at the end of search() when a bestMove is found
 
   void update_all_stats(const Position& pos, Stack* ss, Move bestMove, Value bestValue, Value beta, Square prevSq,
-                        Move* quietsSearched, int quietCount, Move* capturesSearched, int captureCount, Depth depth) {
+                        Move* quietsSearched, int quietCount, Move* capturesSearched, int captureCount, Depth depth, bool cutNode) {
 
     int bonus1, bonus2;
     Color us = pos.side_to_move();
@@ -1664,12 +1664,12 @@ moves_loop: // When in check, search starts from here
     if (!pos.capture_or_promotion(bestMove))
     {
         // Increase stats for the best move in case it was a quiet move
-        update_quiet_stats(pos, ss, bestMove, bonus2, depth);
+        update_quiet_stats(pos, ss, bestMove, bonus2, depth, cutNode);
 
         // Decrease stats for all non-best quiet moves
         for (int i = 0; i < quietCount; ++i)
         {
-            thisThread->mainHistory[us][from_to(quietsSearched[i])] << -bonus2;
+            thisThread->mainHistory[cutNode][us][from_to(quietsSearched[i])] << -bonus2;
             update_continuation_histories(ss, pos.moved_piece(quietsSearched[i]), to_sq(quietsSearched[i]), -bonus2);
         }
     }
@@ -1711,7 +1711,7 @@ moves_loop: // When in check, search starts from here
 
   // update_quiet_stats() updates move sorting heuristics
 
-  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, int depth) {
+  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, int depth, bool cutNode) {
 
     // Update killers
     if (ss->killers[0] != move)
@@ -1722,12 +1722,12 @@ moves_loop: // When in check, search starts from here
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
-    thisThread->mainHistory[us][from_to(move)] << bonus;
+    thisThread->mainHistory[cutNode][us][from_to(move)] << bonus;
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     // Penalty for reversed move in case of moved piece not being a pawn
     if (type_of(pos.moved_piece(move)) != PAWN)
-        thisThread->mainHistory[us][from_to(reverse_move(move))] << -bonus;
+        thisThread->mainHistory[cutNode][us][from_to(reverse_move(move))] << -bonus;
 
     // Update countermove history
     if (is_ok((ss-1)->currentMove))
