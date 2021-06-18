@@ -1159,7 +1159,7 @@ moves_loop: // When in check, search starts from here
           // Increase reduction at root and non-PV nodes when the best move does not change frequently
           if (   (rootNode || !PvNode)
               && thisThread->bestMoveChanges <= 2)
-              r++;
+              r += 1 + thisThread->rootPvMove;
 
           // Decrease reduction if opponent's move count is high (~1 Elo)
           if ((ss-1)->moveCount > 13)
@@ -1177,9 +1177,6 @@ moves_loop: // When in check, search starts from here
           {
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
-                  r++;
-
-              if (!PvNode && !thisThread->rootPvMove && (pos.key() & 1))
                   r++;
 
               ss->statScore =  thisThread->mainHistory[us][from_to(move)]
