@@ -91,7 +91,6 @@ enum StatsType { NoCaptures, Captures };
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
 typedef Stats<int16_t, 13365, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
-typedef Stats<int16_t, 13365, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory2;
 
 /// At higher depths LowPlyHistory records successful quiet moves near the root
 /// and quiet moves which are/were in the PV (ttPv). It is cleared with each new
@@ -117,7 +116,7 @@ typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory
 struct MainHistory
 {
   ButterflyHistory table[3];
-  ButterflyHistory2 weight;
+  ButterflyHistory weight[2];
 
   struct Table
   {
@@ -136,15 +135,15 @@ struct MainHistory
   MainHistory() : currentTable(this) {}
 
   int operator ()(bool C, Color us, int from_to) const {
-    int entry = (  table[0][us][from_to] * (weight.MaxValue - weight[us][from_to])
-                 + table[1+C][us][from_to] * weight[us][from_to]) / weight.MaxValue;
+    int entry = (  table[0][us][from_to] * (weight[0].MaxValue - weight[C][us][from_to])
+                 + table[1+C][us][from_to] * weight[C][us][from_to]) / weight[0].MaxValue;
     return entry;
   }
 
   void add(bool C, Color us, int from_to, int bonus) {
     table[0][us][from_to] << bonus;
     table[1+C][us][from_to] << bonus;
-    weight[us][from_to] << 2;
+    weight[C][us][from_to] << 1;
   }
 
   void clear()
@@ -152,7 +151,8 @@ struct MainHistory
     table[0].fill(0);
     table[1].fill(0);
     table[2].fill(0);
-    weight.fill(0);
+    weight[0].fill(0);
+    weight[1].fill(0);
   }
 
   const Table& operator()(bool C) {
