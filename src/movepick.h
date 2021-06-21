@@ -91,6 +91,7 @@ enum StatsType { NoCaptures, Captures };
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
 typedef Stats<int16_t, 13365, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
+typedef Stats<int16_t, 26730, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistoryWeight;
 
 /// At higher depths LowPlyHistory records successful quiet moves near the root
 /// and quiet moves which are/were in the PV (ttPv). It is cleared with each new
@@ -116,7 +117,7 @@ typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory
 struct MainHistory
 {
   ButterflyHistory table[3];
-  ButterflyHistory weight[2];
+  ButterflyHistoryWeight weight[2];
 
   struct Table
   {
@@ -143,7 +144,7 @@ struct MainHistory
   void add(bool C, Color us, int from_to, int bonus) {
     table[0][us][from_to] << bonus;
     table[1+C][us][from_to] << bonus;
-    weight[C][us][from_to] << std::abs(bonus);
+    weight[C][us][from_to] << 1;
   }
 
   void clear()
