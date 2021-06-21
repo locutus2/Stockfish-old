@@ -91,7 +91,7 @@ enum StatsType { NoCaptures, Captures };
 /// ordering decisions. It uses 2 tables (one for each color) indexed by
 /// the move's from and to squares, see www.chessprogramming.org/Butterfly_Boards
 typedef Stats<int16_t, 13365, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistory;
-typedef Stats<int16_t, 26730, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistoryWeight;
+typedef Stats<int16_t, 6683, COLOR_NB, int(SQUARE_NB) * int(SQUARE_NB)> ButterflyHistoryWeight;
 
 /// At higher depths LowPlyHistory records successful quiet moves near the root
 /// and quiet moves which are/were in the PV (ttPv). It is cleared with each new
