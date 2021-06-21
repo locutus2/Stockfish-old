@@ -143,7 +143,7 @@ struct MainHistory
   void add(bool C, Color us, int from_to, int bonus) {
     table[0][us][from_to] << bonus;
     table[1+C][us][from_to] << bonus;
-    weight[C][us][from_to] << 1;
+    weight[C][us][from_to] << 2;
   }
 
   void clear()
