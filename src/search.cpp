@@ -1130,9 +1130,6 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          if (eval <= alpha2)
-              r++;
-
           if (PvNode)
               r--;
 
@@ -1165,6 +1162,9 @@ moves_loop: // When in check, search starts from here
 
           if (!captureOrPromotion)
           {
+              if (eval <= alpha2)
+                  r++;
+
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
                   r++;
