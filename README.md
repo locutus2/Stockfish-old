@@ -1,6 +1,6 @@
 ## Overview
 
-[![Build Status](https://travis-ci.org/official-stockfish/Stockfish.svg?branch=master)](https://travis-ci.org/official-stockfish/Stockfish)
+[![Build Status](https://github.com/official-stockfish/Stockfish/actions/workflows/stockfish.yml/badge.svg)](https://github.com/official-stockfish/Stockfish/actions)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/official-stockfish/Stockfish?branch=master&svg=true)](https://ci.appveyor.com/project/mcostalba/stockfish/branch/master)
 
 [Stockfish](https://stockfishchess.org) is a free, powerful UCI chess engine
@@ -119,14 +119,6 @@ change them via a chess GUI. This is a list of available UCI options in Stockfis
   * #### SyzygyProbeLimit
     Limit Syzygy tablebase probing to positions with at most this many pieces left
     (including kings and pawns).
-
-  * #### Contempt
-    A positive value for contempt favors middle game positions and avoids draws,
-    effective for the classical evaluation only.
-
-  * #### Analysis Contempt
-    By default, contempt is set to prefer the side to move. Set this option to "White"
-    or "Black" to analyse with contempt for that side, or "Off" to disable contempt.
 
   * #### Move Overhead
     Assume a time delay of x ms due to network and GUI overheads. This is useful to
