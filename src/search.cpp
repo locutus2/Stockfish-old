@@ -1017,7 +1017,7 @@ moves_loop: // When in check, search starts from here
           {
               // Continuation history based pruning (~20 Elo)
               if (   lmrDepth < 5
-                  && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold - 800 * improving
+                  && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold + 1000 * doubleExtension
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
                   continue;
 
