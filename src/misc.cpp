@@ -421,6 +421,14 @@ void dbg_printc() {
 
 }
 
+double gain_ratio(double p)
+{
+	if(p > 0 && p < 1)
+		return -(p*std::log(p)+(1-p)*std::log(1-p))/std::log(2);
+	else
+		return 0;
+}
+
 void dbg_print() {
 
   for(int n = 0; n < DBG_N; ++n)
@@ -525,12 +533,16 @@ void dbg_print() {
 	double p = (gain[n][2]+gain[n][4])/m;
 	double p1 = gain[n][4]/double(gain[n][3]+gain[n][4]);
 	double p0 = gain[n][2]/double(gain[n][1]+gain[n][2]);
-	double entropybase = -(p*std::log(p)+(1-p)*std::log(1-p))/std::log(2);
-	double entropy0 = -(p0*std::log(p0)+(1-p0)*std::log(1-p0))/std::log(2);
-	double entropy1 = -(p1*std::log(p1)+(1-p1)*std::log(1-p1))/std::log(2);
+	double entropybase = gain_ratio(p);
+	double entropy0 = gain_ratio(p0);
+	double entropy1 = gain_ratio(p1);
 	double gr = entropybase - (entropy0 * (gain[n][1] + gain[n][2]) + entropy1 * (gain[n][3] + gain[n][4]))/m;
+	double gr_rel = gr/entropybase;
         cerr << "[" << n << "] Total " << gain[n][0] << " GainRatio(x,y) = "
-             << gr << endl;
+             << gr 
+             << " " << gr_rel
+	     //<< " " << p << " " << p0 << " " << p1 << " " << entropybase << " " << entropy0 << " " << entropy1
+	     << endl;
     }
 	
 }
