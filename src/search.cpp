@@ -37,6 +37,90 @@
 
 namespace Stockfish {
 
+FUNC func;
+
+template <int N, int NC>
+void Function<N,NC>::randomInit()
+{
+    std::srand(std::time(nullptr));
+    for(int i = 0; i < NC; ++i)
+    {
+	    //mask[i] = std::rand() * (RAND_MAX + 1) + std::rand();
+	    //positive[i] = std::rand() * (RAND_MAX + 1) + std::rand();
+	    mask[i] = std::rand();
+	    positive[i] = std::rand();
+    }
+}
+
+template <int N, int NC>
+std::ostream& Function<N, NC>::print(std::ostream& out) const
+{
+    for(int i = 0; i < NC; ++i)
+    {
+        bool found = false;
+        for(int j = 0; j < N; ++j)
+        {
+		if ((mask[i] >> j) & 1)
+		{
+		     if(found) out << '*';
+		     found = true;
+
+		     if (!((positive[i] >> j) & 1))
+		     {
+		         out << '!';
+		     }
+		     out << 'c' << j;
+                }
+        }
+
+	if(found && i < NC - 1)
+		out << ' ';
+    }
+    return out << std::endl;
+}
+
+template <int N, int NC>
+std::ostream& operator<<(std::ostream& out, const Function<N, NC> &f)
+{
+    return f.print(out);
+}
+
+// DNF disjunctive normal form
+template <int N, int NC>
+bool Function<N,NC>::operator()(const std::vector<bool>& x) const
+{
+    bool C = false;
+    for(int i = 0; i < NC && !C; ++i)
+    {
+        C = true;
+        for(int j = 0; j < N; ++j)
+	{
+		if ((mask[i] >> j) & 1)
+		{
+		     if ((positive[i] >> j) & 1)
+		     {
+			     if(!x[j]) 
+			     {
+				     C = false;
+				     break;
+			     }
+		     }
+		     else
+		     {
+			     if(x[j])
+			     {
+				     C = false;
+				     break;
+			     }
+		     }
+		}
+	}
+    }
+    return C;
+}
+
+template class Function<8, 32>;
+
 namespace Search {
 
   LimitsType Limits;
@@ -1117,6 +1201,7 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1129,6 +1214,9 @@ moves_loop: // When in check, search starts from here
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+	  CC = true;
+          C = func({PvNode, cutNode, captureOrPromotion, givesCheck, ss->inCheck, improving, likelyFailLow, ttCapture});
 
           if (PvNode)
               r--;
@@ -1260,6 +1348,12 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+              dbg_cramer_of(C, T);
       }
 
       if (value > bestValue)

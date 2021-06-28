@@ -429,6 +429,30 @@ double gain_ratio(double p)
 		return 0;
 }
 
+void dbg_reset() {
+  for(int n = 0; n < DBG_N; ++n)
+  {
+	  for(int i = 0; i < 5; ++i)
+		  cramer[n][i] = 0;
+  }
+}
+
+double get_cramer(int n)
+{
+    if (cramer[n][0])
+    {
+        double a = cramer[n][1];
+        double b = cramer[n][2];
+        double c = cramer[n][3];
+        double d = cramer[n][4];
+        double cr = (a*d-b*c)/std::sqrt((a+b)*(c+d)*(a+c)*(b+d));
+        //double ce = 100.*(cramer[n][2]+cramer[n][3])/(double)cramer[n][0];
+	return cr;
+    }
+    else
+        return 0;
+}
+
 void dbg_print() {
 
   for(int n = 0; n < DBG_N; ++n)

@@ -165,37 +165,57 @@ namespace {
 
     TimePoint elapsed = now();
 
-    for (const auto& cmd : list)
-    {
-        istringstream is(cmd);
-        is >> skipws >> token;
+    FUNC best;
+    double bestVal = 0;
 
-        if (token == "go" || token == "eval")
+    for(int it = 0;true;++it)
+    {
+	dbg_reset();
+        func.randomInit();
+
+        for (const auto& cmd : list)
         {
-            cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
-            if (token == "go")
+            istringstream is(cmd);
+            is >> skipws >> token;
+
+            if (token == "go" || token == "eval")
             {
-               go(pos, is, states);
-               Threads.main()->wait_for_search_finished();
-               nodes += Threads.nodes_searched();
+            //cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                if (token == "go")
+                {
+                   go(pos, is, states);
+                   Threads.main()->wait_for_search_finished();
+                   nodes += Threads.nodes_searched();
+                }
+                else
+                   trace_eval(pos);
             }
-            else
-               trace_eval(pos);
+            else if (token == "setoption")  setoption(is);
+            else if (token == "position")   position(pos, is, states);
+            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
-        else if (token == "setoption")  setoption(is);
-        else if (token == "position")   position(pos, is, states);
-        else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+
+	double val = std::abs(get_cramer());
+	if(it == 0 || val > bestVal)
+	{
+		bestVal = val;
+		best = func;
+		cerr << "it=" << it << " cramer=" << bestVal << " => ";
+                best.print(cerr);
+	}
     }
 
-    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
 
-    dbg_print(); // Just before exiting
-    dbg_printc(); // Just before exiting
+    //elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
 
-    cerr << "\n==========================="
-         << "\nTotal time (ms) : " << elapsed
-         << "\nNodes searched  : " << nodes
-         << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+    //dbg_print(); // Just before exiting
+    //dbg_printc(); // Just before exiting
+
+    //cerr << "\n==========================="
+    //     << "\nTotal time (ms) : " << elapsed
+    //     << "\nNodes searched  : " << nodes
+    //     << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+
   }
 
   // The win rate model returns the probability (per mille) of winning given an eval

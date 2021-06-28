@@ -27,6 +27,20 @@
 
 namespace Stockfish {
 
+template <int N, int NC>
+struct Function {
+    uint64_t positive[NC], mask[NC];
+
+    void randomInit();
+    std::ostream& print(std::ostream& out) const;
+
+    bool operator()(const std::vector<bool>& x) const;
+};
+
+typedef Function<8, 32> FUNC;
+
+extern FUNC func;
+
 class Position;
 
 namespace Search {
