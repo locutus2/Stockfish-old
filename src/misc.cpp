@@ -296,7 +296,7 @@ const int DBG_C3 = POW<3, DBG_C>::value;
 
 /// Debug functions used mainly to collect run-time statistics
 static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], cramer[DBG_N][5],
-                            chi2[DBG_N][5];
+                            chi2[DBG_N][5], gain[DBG_N][5];
 
 static std::atomic<int64_t> Chits[DBG_N][DBG_C3][2];
 static std::atomic<int64_t> ChitsCmp[DBG_N][DBG_C3][3];
@@ -309,6 +309,7 @@ void dbg_cov_of(int x, int y, int n, int w) { covs[n][0] += w; covs[n][1] += w*x
 void dbg_corr_of(int x, int y, int n, int w) { corrs[n][0] += w; corrs[n][1] += w*x; corrs[n][2] += w*y; corrs[n][3] += w*x*x; corrs[n][4] += w*y*y; corrs[n][5] += w*x*y;}
 void dbg_cramer_of(bool x, bool y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
 void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
+void dbg_gain_ratio(bool x, bool y, int n, int w) { gain[n][0] += w; gain[n][2*x+y+1] += w;}
 
 void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) { 
 	const int cn = (int)c.size();
@@ -516,6 +517,22 @@ void dbg_print() {
 		else			
 			cerr <<  " => H0 accepted" << endl;
     }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (gain[n][0])
+    {
+        double m = gain[n][0];
+	double p = (gain[n][2]+gain[n][4])/m;
+	double p1 = gain[n][4]/double(gain[n][3]+gain[n][4]);
+	double p0 = gain[n][2]/double(gain[n][1]+gain[n][2]);
+	double entropybase = -(p*std::log(p)+(1-p)*std::log(1-p))/std::log(2);
+	double entropy0 = -(p0*std::log(p0)+(1-p0)*std::log(1-p0))/std::log(2);
+	double entropy1 = -(p1*std::log(p1)+(1-p1)*std::log(1-p1))/std::log(2);
+	double gr = entropybase - (entropy0 * (gain[n][1] + gain[n][2]) + entropy1 * (gain[n][3] + gain[n][4]))/m;
+        cerr << "[" << n << "] Total " << gain[n][0] << " GainRatio(x,y) = "
+             << gr << endl;
+    }
+	
 }
 
 
