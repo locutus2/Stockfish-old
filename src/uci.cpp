@@ -186,6 +186,7 @@ namespace {
                    go(pos, is, states);
                    Threads.main()->wait_for_search_finished();
                    nodes += Threads.nodes_searched();
+		   //dbg_print();
                 }
                 else
                    trace_eval(pos);
