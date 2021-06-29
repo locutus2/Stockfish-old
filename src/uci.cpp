@@ -165,13 +165,30 @@ namespace {
 
     TimePoint elapsed = now();
 
+    /*
+     * it=0 cramer=0.0223331 => !c1*c2*c4*!c6*!c7 c2*!c4*c5*c6*!c7 c0*c4*c6*!c7 c0*c1*!c5*c6 !c4*!c5*c7 c0*c2*!c3*!c4*!c6*!c7 !c5*!c6*!c7 !c0*c2*c3*!c5*c7 !c1*c2*c3*c4 c4*!c5*c7 c4*c5*!c6*!c7 c0*!c3*c5*!c6*!c7 c1*!c4*c6*c7 !c0*!c1*!c2*!c3*c4*c7 !c0*!c1*c4 c1*c3 c2*c4*c5*c6*c7 !c0*c1*c2*!c3*c6 !c3*c4*c5*!c6 !c0*c3 c0*c1*!c4*c5*c6 !c1*c2*!c3*!c5 c0*c1 c1*c5*!c6*!c7 !c3*c4*c7 !c1*!c2*!c4*!c5*c7 c1*c3*!c6*c7 c0*!c1*c3*!c5*c7 !c0*!c2*c3*!c7 !c0*!c2*!c3*c5 !c0*!c1 c1*!c3*c7
+     * it=16 cramer=0.0832873 => c1*c5 c0*c1*c4*!c5*c6 c0*c3*!c4*c5*c6 c5*!c7 c0*c2*c3*!c4*c5*c7 c0*!c1*c4*!c7 c2*c3*c4*!c6 c2*!c5 c2*c6*!c7 c0*c2*c5*!c6 c0*c2*!c3*!c5*c6*c7 !c1*c2*!c3*c4*!c5*!c6*c7 c0*c2*!c6*c7 !c0*c2*!c3*c5*c7 c1*!c2*!c4*c5 c0*!c2*c6 c0*!c2*c3 c2*!c3*!c5 !c1*c2*!c5 c1 !c1*!c3*c4*!c5*!c6 c0*!c3*c4*!c5*c6*c7 !c1*c4*!c5 !c0*c2*c5*c6*c7 c1*!c7 c2*!c4*c5 !c0*c5 c2 c0*!c1*!c2*c5*!c6*c7 c0*c2*c3*!c6*!c7 !c2*!c3*c4*!c7 c1*!c2*!c4*c5*!c6
+     * it=77 cramer=0.085573 => !c1*!c2*!c7 !c0*!c1*!c2*!c4*!c5*c7 c0*c1*c4*c5*c6*!c7 c0*!c1*!c4*c6*c7 !c2*!c3*c5*c6*!c7 c4*!c6 !c0*!c2*!c3*c4 !c0*!c1*c4*!c5*!c6*c7 c0*!c1*c2*!c5*c7 c2*!c3 c1*!c3*!c4*c5*c7 !c0*!c3*!c5*!c6*!c7 c2*!c6 !c0*!c2*!c4*!c5*!c7 c4*c5*!c6*c7 c1*c4*c6*!c7 !c2*c3*!c4*!c5*!c6*c7 c1*c2*c3*!c4*c5 c0*!c2 !c2*c4*c5*c7 c0*!c1*!c4*!c5*!c6 c0*!c3*!c5*c7 !c0*c2*c4 !c0*c2*c3*c5 c0*c5*!c6 !c0*!c1*c4*!c6*!c7 c2*c3*c4 !c2*!c3*!c4 c0*!c1*!c3*c6 c0*c1*c3*c5*!c6 !c1*c2*c3*!c7 !c0*!c4*!c5*c7
+     * it=156 cramer=0.0950918 => !c1*!c3*!c7 !c1*!c2*!c4*!c5*!c7 c1*c3*c4*!c5 !c0*!c1*!c5 c1*!c2*c3*!c4*c5*c6 !c1*c5 !c0*!c1*c3*c6*!c7 c1*!c4*!c5 c3*!c4 c0*c5*!c7 c0*!c3*!c7 !c1*c5*c6 c0*c1*!c2*c6 !c0*!c1*!c4*!c5*!c6*c7 c4*!c6*c7 !c0*!c2*c6*!c7 c1*c3*c5*!c7 !c0*!c1*!c3*!c4*c7 c1*c3*c4*!c6*c7 !c2*c3*c4*!c5*c6*!c7 c3*!c5*!c7 !c2*c6 !c0*c1*c2*c4*!c7 c1*c3*!c4*c5*!c6 c0*!c2*!c5*!c7 c1*c3*!c4 !c1*c2*c3*c5 c0*!c1*!c3*c4*!c7 c3*!c6*c7 !c0*!c2*c3*c4*!c5*!c6*c7 !c3*!c5 !c0*c1*c4*!c5*c6*c7
+     * it=207 cramer=0.105246 => !c1*c3*!c4*!c5 c1*!c2*c3*!c5*!c6*!c7 c0*c1*!c4*c5*c7 !c0*!c2*c3*c5 !c1*!c3*c7 !c1*!c2*c5*c6*c7 c0*c2*c3*!c6 c1*c5*c7 c2*c3*c4*!c6*!c7 c2*c3*!c5 c0*!c1*!c4*!c5*!c7 c0*c5*!c6*!c7 c0*c1*!c3*c5*c6*!c7 !c1*!c4*c7 c1*c5*!c6 !c1*c3*c4*!c5*!c6 !c2*c6*!c7 !c3*c4*c5*!c7 !c4*c6 c4*!c5*c6 c1*!c3*!c7 c1*!c3*c4*!c5*c7 c0*c2*!c7 c0*!c2*!c3*!c7 !c1*c3*c4*c5*!c6 !c0*c2*c3*c5*!c7 c1*c3*!c4*!c5*!c6*c7 c0*!c1*!c3*!c4*c6 !c1*!c4*c5*c6*c7 !c0*c2*c6*!c7 c0*c1*c2*c5 c0*!c4*c5*c6*c7
+     * it=278 cramer=0.117186 => c0*!c1*c2*!c4*!c5*c7 !c0*c2 c0*!c2*c3*c4*c6*!c7 !c2*!c4*c5*c7 !c0*c1*!c2*c6*c7 !c1 c4*c6*!c7 !c0*!c1*!c3 c0*!c2*c4 !c1*!c3*c6*c7 !c2*c5*!c6*c7 c0*!c2*c3*!c4*c5*!c6*!c7 c0*!c1*c2*c3*c4 !c2*c3*c4*c5*c7 !c4*!c5*!c6 c1*c2*c5 c0*!c2*c3*!c7 c0*c1*!c4*c5 c1*c2*c7 c0*!c1*!c4 c0*!c6*!c7 !c1*!c3*c4*!c5*!c6 !c0*!c4*!c5*!c6 c1*c2 !c0*!c1*!c2*c4*c7 c3*c4*c5*c6 c0*!c3*!c7 c0*!c1*!c2*c5*c7 c1*!c4*c6*!c7 c1*!c5*c6 c0*!c1*c3*!c5*!c6 !c0*c3*c5*c6
+     * */
     FUNC best;
     double bestVal = 0;
+
+    func.randomInit();
 
     for(int it = 0;true;++it)
     {
 	dbg_reset();
-        func.randomInit();
+        if(HILL_CLIMBING)
+        {
+            func.mutate();
+        }
+        else
+        {
+            func.randomInit();
+        }
 
         for (const auto& cmd : list)
         {

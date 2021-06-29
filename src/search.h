@@ -27,11 +27,14 @@
 
 namespace Stockfish {
 
+constexpr bool HILL_CLIMBING = true;
+
 template <int N, int NC>
 struct Function {
     uint64_t positive[NC], mask[NC];
 
     void randomInit();
+    void mutate();
     std::ostream& print(std::ostream& out) const;
 
     bool operator()(const std::vector<bool>& x) const;

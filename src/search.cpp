@@ -53,6 +53,13 @@ void Function<N,NC>::randomInit()
 }
 
 template <int N, int NC>
+void Function<N,NC>::mutate()
+{
+	mask[std::rand() % NC] ^= 1 << (std::rand() % N);
+	positive[std::rand() % NC] ^= 1 << (std::rand() % N);
+}
+
+template <int N, int NC>
 std::ostream& Function<N, NC>::print(std::ostream& out) const
 {
     for(int i = 0; i < NC; ++i)
