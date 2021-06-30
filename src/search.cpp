@@ -1132,9 +1132,7 @@ bool CC = false, C = false;
 
 	  CC = true;
 	  //C = cutNode && (captureOrPromotion || ss->inCheck || !ttCapture);
-	  C = !(   (!PvNode && !cutNode && !likelyFailLow)
-               || (!givesCheck && !ss->inCheck  && !improving)
-               || (PvNode && !ss->inCheck && improving));
+	  C = cutNode && givesCheck && bool(type_of(movedPiece) & 4);
           if (PvNode)
               r--;
 
