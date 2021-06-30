@@ -178,6 +178,13 @@ namespace {
      * it=3156 cramer=0.130392 => c0*c4*!c5*c7 !c0*c3*!c5*!c7 c0*c2*!c3*!c5 c0*!c1*!c4*!c5*c6 c0*!c1*!c3*!c4*!c6*c7 c3*c4*!c5 !c0*!c1*c2*!c3*!c4*!c5*!c6*!c7 c3*!c7 !c2*c3*c4 c1*!c3*c6*!c7 !c1*c2*c5 !c1*!c2*c4*c5 c1*c2*c3*!c4*!c5*c6 c1*c3*!c4*!c7 c1*c3*c6 !c0*c3*c4 c1*!c2*!c3*c7 c0*c1*!c2*!c6*!c7 !c0*c1*c2*c3*c5*!c6*!c7 !c2*!c4*!c5*!c7 !c1*!c4*c5*c6*c7 !c0*!c1*!c2*c7 c4*c5*c6*!c7 !c0*c1*c3*!c6*!c7 !c1*c3*!c5*!c6*c7 c0*c2*c3*!c5*!c6 !c1*c2*c6*!c7 c0*!c1*c2*!c3*!c4*!c7 !c2*c3*!c6*!c7 !c0*c1*c2*!c3*c6 !c1*!c2*!c5*!c6 !c1*!c4
      *
      * it=131 cramer=0.111711 msteps=2 => c1*c6*c7 !c0*c2*c4*!c7 c2*c3*!c4*c5*!c6 !c2*c4*c5*c6 c0*!c1*c2 !c2*c3*!c4*!c6*!c7 !c0*c1*!c2*!c4*!c5 !c0*!c1*!c4*c5*!c7 c3*c5 c1*c2*c3*c7 c3*c5*c6 !c0*c1*c3*!c4*!c7 c2*c5*c6 c0*!c3*!c4*!c5*!c7 c0*!c1*c2 c0*!c2*c3*!c6*c7 !c0*c1*!c3*c4*!c6 c0*!c1*c2*!c3*c4*c6*c7 !c0*!c1*!c3*c4*!c6*!c7 c1*!c6 c0*c3*c6*!c7 !c0*!c1*c2*!c3*!c5*!c7 !c0*c3*c4*c5 c3*!c4*c5*c6 c1*c4*!c5*!c6*!c7 !c0*c1*c2*c3*!c4*!c5*!c6*!c7 c0*!c2*c4*!c7 !c2*c3*c5*c6 !c1*c2*!c3*c4*c7 !c1*c2*c6*c7 c1*!c2*c3*c4*c7 c0*!c1*!c2*c3*c5*c6
+     *
+     * it=0 cramer=0 msteps=1 => c1*!c4*c6*!c7
+     * it=6 cramer=0.0198077 msteps=1 => !c4*c6*!c7
+     * it=8 cramer=0.0205214 msteps=1 => !c4*!c6*!c7
+     * it=9 cramer=0.106422 msteps=1 => !c4*c5*!c6*!c7
+     * it=43 cramer=0.12846 msteps=11 => !c0*c1*!c4*c5*!c6*!c7
+     * it=67 cramer=0.128563 msteps=6 => c1*!c7
      * */
     FUNC best, tmp;
     double bestVal = 0;
