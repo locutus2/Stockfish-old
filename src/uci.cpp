@@ -257,9 +257,21 @@ namespace {
     /* SA11_1 less neutral
      * !it=87 cramer=0.0902212 T=0.0928123 msteps=1 => c1*!c2*!c3*c5*!c6*!c7*!c8
      * !it=105 cramer=0.118283 T=0.0848049 msteps=1 => c0*!c2*!c7
+     * !it=245 cramer=0.128563 T=0.042039 msteps=1 => c0*!c6*!c7
      */
     /*
      * SA17_1 (+ all squares)
+     *
+     * !it=13 cramer=-0.0154655 T=0.134492 msteps=1 => !c5*!c10*!c11*!c12*c15
+     * !it=131 cramer=0.0256613 T=0.0744425 msteps=1 => c0*!c2*!c4*c8*!c9*!c12*!c13*c14*!c15*c16
+     * !it=159 cramer=0.0695837 T=0.0646945 msteps=1 => c0*!c2*!c3*c5*!c6*!c8*!c15
+     *
+     * !it=27 cramer=-0.0401729 T=0.125378 msteps=1 => !c0*!c2*!c4*!c6*!c8*!c9*!c16
+     * !it=141 cramer=0.0639901 T=0.0708031 msteps=1 => !c2*c5*!c7*c10*!c11*!c12*c13*!c14
+     * !it=144 cramer=0.0642419 T=0.0697463 msteps=1 => !c2*c5*!c7*c10*!c11*c13*!c14
+     *
+     * !it=13 cramer=0.0397511 T=0.134492 msteps=1 => c0*c1*c8*!c10*!c15*c16
+     * !it=101 cramer=0.0621644 T=0.0865224 msteps=1 => c1*!c3*c5*!c7*c9*!c12
      * */
     FUNC best, tmp;
     double bestVal = 0;
@@ -362,6 +374,15 @@ namespace {
 	{
 		func = tmp;
 		fails++;
+	}
+
+	if(it && it % 100 == 0)
+	{
+	            if(SIMULATED_ANNEALING)
+		        cerr << "BEST it=" << it << " cramer=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		    else
+		        cerr << "BEST it=" << it << " cramer=" << bestVal << " msteps=" << steps << " => ";
+                    best.print(cerr);
 	}
     }
 
