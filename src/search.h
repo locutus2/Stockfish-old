@@ -29,7 +29,7 @@ namespace Stockfish {
 
 constexpr bool HILL_CLIMBING = true;
 constexpr int F_N = 14;
-constexpr int F_NC = 8;
+constexpr int F_NC = 1;
 
 template <int N, int NC>
 struct Function {
