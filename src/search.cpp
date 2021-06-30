@@ -57,14 +57,17 @@ void Function<N,NC>::randomInit()
 template <int N, int NC>
 void Function<N,NC>::mutate(int m)
 {
-	while(m--)
+	while(m)
 	{
             int nc = std::rand() % NC;
             int n = std::rand() % N;
             if (std::rand() & 1)
 	        mask[nc] ^= 1 << n;
-            else
+            else if(mask[nc] & (1 << n))
 	        positive[nc] ^= 1 << n;
+	    else
+                continue;
+	    m--;
 	}
 }
 
