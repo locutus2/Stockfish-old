@@ -28,6 +28,8 @@
 namespace Stockfish {
 
 constexpr bool HILL_CLIMBING = true;
+constexpr int F_N = 14;
+constexpr int F_NC = 8;
 
 template <int N, int NC>
 struct Function {
@@ -40,7 +42,7 @@ struct Function {
     bool operator()(const std::vector<bool>& x) const;
 };
 
-typedef Function<8, 8> FUNC;
+typedef Function<F_N, F_NC> FUNC;
 
 extern FUNC func;
 

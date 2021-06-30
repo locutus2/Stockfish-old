@@ -166,6 +166,7 @@ namespace {
     TimePoint elapsed = now();
 
     /*
+     * {PvNode, cutNode, captureOrPromotion, givesCheck, ss->inCheck, improving, likelyFailLow, ttCapture}
      * it=0 cramer=0.0223331 => !c1*c2*c4*!c6*!c7 c2*!c4*c5*c6*!c7 c0*c4*c6*!c7 c0*c1*!c5*c6 !c4*!c5*c7 c0*c2*!c3*!c4*!c6*!c7 !c5*!c6*!c7 !c0*c2*c3*!c5*c7 !c1*c2*c3*c4 c4*!c5*c7 c4*c5*!c6*!c7 c0*!c3*c5*!c6*!c7 c1*!c4*c6*c7 !c0*!c1*!c2*!c3*c4*c7 !c0*!c1*c4 c1*c3 c2*c4*c5*c6*c7 !c0*c1*c2*!c3*c6 !c3*c4*c5*!c6 !c0*c3 c0*c1*!c4*c5*c6 !c1*c2*!c3*!c5 c0*c1 c1*c5*!c6*!c7 !c3*c4*c7 !c1*!c2*!c4*!c5*c7 c1*c3*!c6*c7 c0*!c1*c3*!c5*c7 !c0*!c2*c3*!c7 !c0*!c2*!c3*c5 !c0*!c1 c1*!c3*c7
      * it=16 cramer=0.0832873 => c1*c5 c0*c1*c4*!c5*c6 c0*c3*!c4*c5*c6 c5*!c7 c0*c2*c3*!c4*c5*c7 c0*!c1*c4*!c7 c2*c3*c4*!c6 c2*!c5 c2*c6*!c7 c0*c2*c5*!c6 c0*c2*!c3*!c5*c6*c7 !c1*c2*!c3*c4*!c5*!c6*c7 c0*c2*!c6*c7 !c0*c2*!c3*c5*c7 c1*!c2*!c4*c5 c0*!c2*c6 c0*!c2*c3 c2*!c3*!c5 !c1*c2*!c5 c1 !c1*!c3*c4*!c5*!c6 c0*!c3*c4*!c5*c6*c7 !c1*c4*!c5 !c0*c2*c5*c6*c7 c1*!c7 c2*!c4*c5 !c0*c5 c2 c0*!c1*!c2*c5*!c6*c7 c0*c2*c3*!c6*!c7 !c2*!c3*c4*!c7 c1*!c2*!c4*c5*!c6
      * it=77 cramer=0.085573 => !c1*!c2*!c7 !c0*!c1*!c2*!c4*!c5*c7 c0*c1*c4*c5*c6*!c7 c0*!c1*!c4*c6*c7 !c2*!c3*c5*c6*!c7 c4*!c6 !c0*!c2*!c3*c4 !c0*!c1*c4*!c5*!c6*c7 c0*!c1*c2*!c5*c7 c2*!c3 c1*!c3*!c4*c5*c7 !c0*!c3*!c5*!c6*!c7 c2*!c6 !c0*!c2*!c4*!c5*!c7 c4*c5*!c6*c7 c1*c4*c6*!c7 !c2*c3*!c4*!c5*!c6*c7 c1*c2*c3*!c4*c5 c0*!c2 !c2*c4*c5*c7 c0*!c1*!c4*!c5*!c6 c0*!c3*!c5*c7 !c0*c2*c4 !c0*c2*c3*c5 c0*c5*!c6 !c0*!c1*c4*!c6*!c7 c2*c3*c4 !c2*!c3*!c4 c0*!c1*!c3*c6 c0*c1*c3*c5*!c6 !c1*c2*c3*!c7 !c0*!c4*!c5*c7
@@ -199,6 +200,13 @@ namespace {
      * it=135 cramer=0.128154 msteps=3 => !c0*!c1*!c6 c0*!c4*!c5 c0*c5
      * it=150 cramer=0.133232 msteps=2 => !c0*!c1*!c6 !c4*!c5 c0*!c4*c5
      * it=153 cramer=0.135885 msteps=1 => !c0*!c1*!c6 !c3*!c4*!c5 c0*!c4*c5
+     *
+     *it=0 cramer=0.0839565 msteps=1 => !c0*!c1*!c2 c4
+     it=2 cramer=0.0850625 msteps=1 => !c0*!c1*!c2 !c2*c4
+     it=9 cramer=0.100589 msteps=1 => !c0*!c1 !c2*c4
+     it=10 cramer=0.106029 msteps=1 => !c0*!c1 !c2*c4*c7
+     it=12 cramer=0.11576 msteps=1 => !c0*!c1 !c2*!c4*c7
+     it=19 cramer=0.131894 msteps=1 => !c1 !c2*!c4*c7
      * */
     FUNC best, tmp;
     double bestVal = 0;
