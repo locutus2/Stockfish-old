@@ -208,6 +208,8 @@ namespace {
      it=12 cramer=0.11576 msteps=1 => !c0*!c1 !c2*!c4*c7
      it=19 cramer=0.131894 msteps=1 => !c1 !c2*!c4*c7
      * */
+    /* SA
+     * */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;
@@ -287,7 +289,7 @@ namespace {
 	}
 	else if(SIMULATED_ANNEALING)
         {
-		double p = std::exp(-(val - curVal)/T);
+		double p = std::exp(-(std::abs(curVal) - std::abs(val))/T);
 		double r = std::rand()/double(RAND_MAX);
 		if(r <= p) // accept
 		{
