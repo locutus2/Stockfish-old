@@ -213,7 +213,7 @@ namespace {
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    double T = 100;
+    double T = 10;
 
     func.randomInit();
 
@@ -222,7 +222,7 @@ namespace {
 	dbg_reset();
         if(SIMULATED_ANNEALING)
         {
-	    T *= 0.99;
+	    T *= 0.995;
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
@@ -282,7 +282,7 @@ namespace {
 		else if(SIMULATED_ANNEALING)
 		{
 		    cerr << "+it=" << it << " cramer=" << curVal << " T=" << T << " msteps=" << steps << " => ";
-                    best.print(cerr);
+                    func.print(cerr);
 		}
 	}
 	else if(SIMULATED_ANNEALING)
@@ -293,7 +293,7 @@ namespace {
 		{
 		    curVal = val;
 		    cerr << "-it=" << it << " cramer=" << curVal << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
-                    best.print(cerr);
+                    func.print(cerr);
 		}
 		else //reject
 		{
