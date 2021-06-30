@@ -185,6 +185,20 @@ namespace {
      * it=9 cramer=0.106422 msteps=1 => !c4*c5*!c6*!c7
      * it=43 cramer=0.12846 msteps=11 => !c0*c1*!c4*c5*!c6*!c7
      * it=67 cramer=0.128563 msteps=6 => c1*!c7
+     *
+     * it=0 cramer=0.00819133 msteps=1 => !c0*c5*c7 c0*!c1*c2*!c3*!c5 !c0*c4*!c6*!c7
+     * it=3 cramer=0.110463 msteps=1 => !c0*c5 c0*!c1*c2*!c3*!c5 !c0*c4*!c6*!c7
+     * it=27 cramer=0.11831 msteps=6 => !c1*!c5 c0*!c1*c2*!c3*!c5 c0*c4*!c6
+     * it=29 cramer=0.120865 msteps=1 => !c1*!c5 c0*!c1*c2*!c3*!c5 c0*!c6
+     * it=30 cramer=0.123473 msteps=1 => !c1*!c5 c0*!c1*c2*!c3*!c5 c0*c6
+     * it=56 cramer=0.12355 msteps=7 => !c0*!c1*!c5 c0*!c1*!c3*!c4*!c5 c0*!c2*c6
+     * it=64 cramer=0.123592 msteps=1 => !c0*!c1*!c5 c0*!c1*!c4*!c5 c0*!c2*c6
+     * it=96 cramer=0.127924 msteps=10 => !c0*!c1*!c6 c0*!c4*!c5 c0*!c2
+     * it=102 cramer=0.127926 msteps=1 => !c0*!c1*!c6 c0*!c4*!c5 c0
+     * it=118 cramer=0.128083 msteps=3 => !c1*!c6 c0*!c4*!c5 c0*c5
+     * it=135 cramer=0.128154 msteps=3 => !c0*!c1*!c6 c0*!c4*!c5 c0*c5
+     * it=150 cramer=0.133232 msteps=2 => !c0*!c1*!c6 !c4*!c5 c0*!c4*c5
+     * it=153 cramer=0.135885 msteps=1 => !c0*!c1*!c6 !c3*!c4*!c5 c0*!c4*c5
      * */
     FUNC best, tmp;
     double bestVal = 0;
