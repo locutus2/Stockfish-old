@@ -176,6 +176,8 @@ namespace {
      * it=17972 cramer=0.19789 => c0*!c2*c3 c2*!c4*!c5*c6 !c0*!c1*!c6 c4*!c5*c6*c7 !c0*c3*c4*!c5 !c0*c1*!c2*c3*!c5*c6*c7 !c0*!c3*!c6 !c0*!c2*c3*!c4*!c5*c6 c2*c3*!c6 !c0*c3*c4*!c7 !c0*!c1*!c2*!c3*c7 c1*c2*!c3*!c6*!c7 !c0*!c1*!c2*!c3*c4*!c5*c7 !c0*c3*c4*!c5*c6 !c0*c1*c3*c4*c5 !c0*!c1*c2*!c4*c5*!c6*!c7 c1*c3*c4*c5*c6*c7 !c1*!c3*!c5 c1*!c2*c4*c5*!c6 c1*c3*c5*c6*c7 !c2*c6 !c0*!c1*!c2*c4*!c5*!c7 c1*!c2*!c3*c4*c6 c0*!c2*!c6*!c7 !c1*!c2*c4*!c5*c6 !c1*c2*c4*!c5*c7 !c0*!c1*!c2*c4*c5*c6 !c1*c7 c0*!c3*!c4*!c6 !c1*c2*c6 c0*!c1*c3*c6*c7 c0*c2*!c4*!c6*c7
      *
      * it=3156 cramer=0.130392 => c0*c4*!c5*c7 !c0*c3*!c5*!c7 c0*c2*!c3*!c5 c0*!c1*!c4*!c5*c6 c0*!c1*!c3*!c4*!c6*c7 c3*c4*!c5 !c0*!c1*c2*!c3*!c4*!c5*!c6*!c7 c3*!c7 !c2*c3*c4 c1*!c3*c6*!c7 !c1*c2*c5 !c1*!c2*c4*c5 c1*c2*c3*!c4*!c5*c6 c1*c3*!c4*!c7 c1*c3*c6 !c0*c3*c4 c1*!c2*!c3*c7 c0*c1*!c2*!c6*!c7 !c0*c1*c2*c3*c5*!c6*!c7 !c2*!c4*!c5*!c7 !c1*!c4*c5*c6*c7 !c0*!c1*!c2*c7 c4*c5*c6*!c7 !c0*c1*c3*!c6*!c7 !c1*c3*!c5*!c6*c7 c0*c2*c3*!c5*!c6 !c1*c2*c6*!c7 c0*!c1*c2*!c3*!c4*!c7 !c2*c3*!c6*!c7 !c0*c1*c2*!c3*c6 !c1*!c2*!c5*!c6 !c1*!c4
+     *
+     * it=131 cramer=0.111711 msteps=2 => c1*c6*c7 !c0*c2*c4*!c7 c2*c3*!c4*c5*!c6 !c2*c4*c5*c6 c0*!c1*c2 !c2*c3*!c4*!c6*!c7 !c0*c1*!c2*!c4*!c5 !c0*!c1*!c4*c5*!c7 c3*c5 c1*c2*c3*c7 c3*c5*c6 !c0*c1*c3*!c4*!c7 c2*c5*c6 c0*!c3*!c4*!c5*!c7 c0*!c1*c2 c0*!c2*c3*!c6*c7 !c0*c1*!c3*c4*!c6 c0*!c1*c2*!c3*c4*c6*c7 !c0*!c1*!c3*c4*!c6*!c7 c1*!c6 c0*c3*c6*!c7 !c0*!c1*c2*!c3*!c5*!c7 !c0*c3*c4*c5 c3*!c4*c5*c6 c1*c4*!c5*!c6*!c7 !c0*c1*c2*c3*!c4*!c5*!c6*!c7 c0*!c2*c4*!c7 !c2*c3*c5*c6 !c1*c2*!c3*c4*c7 !c1*c2*c6*c7 c1*!c2*c3*c4*c7 c0*!c1*!c2*c3*c5*c6
      * */
     FUNC best, tmp;
     double bestVal = 0;
@@ -191,7 +193,8 @@ namespace {
         {
 	    tmp = func;
 	    //steps = fails / 20 + 1;
-	    steps = 100.0 * (1.0 / (1 + std::exp(-0.01 * fails)) - 0.5) * 2 + 1;
+	    //steps = 100.0 * (1.0 / (1 + std::exp(-0.01 * fails)) - 0.5) * 2 + 1;
+	    steps = std::min(100.0, fails * fails / 100.0 + 1.0);
             func.mutate(steps);
         }
         else
