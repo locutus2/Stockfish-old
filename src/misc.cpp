@@ -447,6 +447,8 @@ double get_cramer(int n)
         double d = cramer[n][4];
         double cr = (a*d-b*c)/std::sqrt((a+b)*(c+d)*(a+c)*(b+d));
         //double ce = 100.*(cramer[n][2]+cramer[n][3])/(double)cramer[n][0];
+	if(std::isnan(cr))
+	    cr = 0;
 	return cr;
     }
     else

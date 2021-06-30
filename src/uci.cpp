@@ -190,7 +190,7 @@ namespace {
         if(HILL_CLIMBING)
         {
 	    tmp = func;
-	    steps = fails + 1;
+	    steps = fails / 20 + 1;
             func.mutate(steps);
         }
         else
