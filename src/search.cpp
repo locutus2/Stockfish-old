@@ -1158,7 +1158,10 @@ moves_loop: // When in check, search starts from here
 
           // Increase reduction for cut nodes (~3 Elo)
           if (cutNode)
-              r += 2 - captureOrPromotion - (captureOrPromotion || ss->inCheck || !ttCapture);
+              r += 1 + !captureOrPromotion;
+
+          if (givesCheck && !improving)
+              r--;
 
           if (!captureOrPromotion)
           {
