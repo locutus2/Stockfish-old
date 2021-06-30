@@ -254,8 +254,8 @@ namespace {
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
 
-	double val = std::abs(get_cramer());
-	if(it == 0 || val > bestVal)
+	double val = (get_cramer());
+	if(it == 0 || std::abs(val) > std::abs(bestVal))
 	{
 		bestVal = val;
 		best = func;
