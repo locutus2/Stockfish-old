@@ -210,15 +210,25 @@ namespace {
      * */
     FUNC best, tmp;
     double bestVal = 0;
+    double curVal = 0;
     int fails = 0;
     int steps = 0;
+    double T = 100;
 
     func.randomInit();
 
     for(int it = 0;true;++it)
     {
 	dbg_reset();
-        if(HILL_CLIMBING)
+        if(SIMULATED_ANNEALING)
+        {
+	    T *= 0.99;
+	    tmp = func;
+	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
+	    steps = 1;
+            func.mutate(steps);
+        }
+	else if(HILL_CLIMBING)
         {
 	    tmp = func;
 	    //steps = fails / 20 + 1;
@@ -255,13 +265,40 @@ namespace {
         }
 
 	double val = (get_cramer());
-	if(it == 0 || std::abs(val) > std::abs(bestVal))
+	if(it == 0 || std::abs(val) > std::abs(curVal))
 	{
-		bestVal = val;
-		best = func;
-		cerr << "it=" << it << " cramer=" << bestVal << " msteps=" << steps << " => ";
-                best.print(cerr);
-		fails = 0;
+		curVal = val;
+	        if(!SIMULATED_ANNEALING || it == 0 || std::abs(curVal) > std::abs(bestVal))
+		{
+		    best = func;
+		    bestVal = curVal;
+	            if(SIMULATED_ANNEALING)
+		        cerr << "!it=" << it << " cramer=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		    else
+		        cerr << "it=" << it << " cramer=" << bestVal << " msteps=" << steps << " => ";
+                    best.print(cerr);
+		    fails = 0;
+		}
+		else if(SIMULATED_ANNEALING)
+		{
+		    cerr << "+it=" << it << " cramer=" << curVal << " T=" << T << " msteps=" << steps << " => ";
+                    best.print(cerr);
+		}
+	}
+	else if(SIMULATED_ANNEALING)
+        {
+		double p = std::exp(-(val - curVal)/T);
+		double r = std::rand()/double(RAND_MAX);
+		if(r <= p) // accept
+		{
+		    curVal = val;
+		    cerr << "-it=" << it << " cramer=" << curVal << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
+                    best.print(cerr);
+		}
+		else //reject
+		{
+		    func = tmp;
+		}
 	}
 	else if(HILL_CLIMBING)
 	{

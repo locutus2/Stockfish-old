@@ -27,7 +27,8 @@
 
 namespace Stockfish {
 
-constexpr bool HILL_CLIMBING = true;
+constexpr bool HILL_CLIMBING = false;
+constexpr bool SIMULATED_ANNEALING = true;
 constexpr int F_N = 14;
 constexpr int F_NC = 1;
 
