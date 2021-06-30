@@ -350,15 +350,15 @@ namespace {
 		    best = func;
 		    bestVal = curVal;
 	            if(SIMULATED_ANNEALING)
-		        cerr << "!it=" << it << " cramer=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "!it=" << it << " score=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
 		    else
-		        cerr << "it=" << it << " cramer=" << bestVal << " msteps=" << steps << " => ";
+		        cerr << "it=" << it << " score=" << bestVal << " msteps=" << steps << " => ";
                     best.print(cerr);
 		    fails = 0;
 		}
 		else if(SIMULATED_ANNEALING)
 		{
-		    cerr << "+it=" << it << " cramer=" << curVal << " T=" << T << " msteps=" << steps << " => ";
+		    cerr << "+it=" << it << " score=" << curVal << " T=" << T << " msteps=" << steps << " => ";
                     func.print(cerr);
 		}
 	}
@@ -369,7 +369,7 @@ namespace {
 		if(r <= p) // accept
 		{
 		    curVal = val;
-		    cerr << "-it=" << it << " cramer=" << curVal << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
+		    cerr << "-it=" << it << " score=" << curVal << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
                     func.print(cerr);
 		}
 		else //reject
@@ -386,9 +386,9 @@ namespace {
 	if(it && it % 100 == 0)
 	{
 	            if(SIMULATED_ANNEALING)
-		        cerr << "BEST it=" << it << " cramer=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "BEST it=" << it << " score=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
 		    else
-		        cerr << "BEST it=" << it << " cramer=" << bestVal << " msteps=" << steps << " => ";
+		        cerr << "BEST it=" << it << " score=" << bestVal << " msteps=" << steps << " => ";
                     best.print(cerr);
 	}
     }
