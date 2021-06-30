@@ -174,9 +174,12 @@ namespace {
      * it=278 cramer=0.117186 => c0*!c1*c2*!c4*!c5*c7 !c0*c2 c0*!c2*c3*c4*c6*!c7 !c2*!c4*c5*c7 !c0*c1*!c2*c6*c7 !c1 c4*c6*!c7 !c0*!c1*!c3 c0*!c2*c4 !c1*!c3*c6*c7 !c2*c5*!c6*c7 c0*!c2*c3*!c4*c5*!c6*!c7 c0*!c1*c2*c3*c4 !c2*c3*c4*c5*c7 !c4*!c5*!c6 c1*c2*c5 c0*!c2*c3*!c7 c0*c1*!c4*c5 c1*c2*c7 c0*!c1*!c4 c0*!c6*!c7 !c1*!c3*c4*!c5*!c6 !c0*!c4*!c5*!c6 c1*c2 !c0*!c1*!c2*c4*c7 c3*c4*c5*c6 c0*!c3*!c7 c0*!c1*!c2*c5*c7 c1*!c4*c6*!c7 c1*!c5*c6 c0*!c1*c3*!c5*!c6 !c0*c3*c5*c6
      *
      * it=17972 cramer=0.19789 => c0*!c2*c3 c2*!c4*!c5*c6 !c0*!c1*!c6 c4*!c5*c6*c7 !c0*c3*c4*!c5 !c0*c1*!c2*c3*!c5*c6*c7 !c0*!c3*!c6 !c0*!c2*c3*!c4*!c5*c6 c2*c3*!c6 !c0*c3*c4*!c7 !c0*!c1*!c2*!c3*c7 c1*c2*!c3*!c6*!c7 !c0*!c1*!c2*!c3*c4*!c5*c7 !c0*c3*c4*!c5*c6 !c0*c1*c3*c4*c5 !c0*!c1*c2*!c4*c5*!c6*!c7 c1*c3*c4*c5*c6*c7 !c1*!c3*!c5 c1*!c2*c4*c5*!c6 c1*c3*c5*c6*c7 !c2*c6 !c0*!c1*!c2*c4*!c5*!c7 c1*!c2*!c3*c4*c6 c0*!c2*!c6*!c7 !c1*!c2*c4*!c5*c6 !c1*c2*c4*!c5*c7 !c0*!c1*!c2*c4*c5*c6 !c1*c7 c0*!c3*!c4*!c6 !c1*c2*c6 c0*!c1*c3*c6*c7 c0*c2*!c4*!c6*c7
+     *
+     * it=3156 cramer=0.130392 => c0*c4*!c5*c7 !c0*c3*!c5*!c7 c0*c2*!c3*!c5 c0*!c1*!c4*!c5*c6 c0*!c1*!c3*!c4*!c6*c7 c3*c4*!c5 !c0*!c1*c2*!c3*!c4*!c5*!c6*!c7 c3*!c7 !c2*c3*c4 c1*!c3*c6*!c7 !c1*c2*c5 !c1*!c2*c4*c5 c1*c2*c3*!c4*!c5*c6 c1*c3*!c4*!c7 c1*c3*c6 !c0*c3*c4 c1*!c2*!c3*c7 c0*c1*!c2*!c6*!c7 !c0*c1*c2*c3*c5*!c6*!c7 !c2*!c4*!c5*!c7 !c1*!c4*c5*c6*c7 !c0*!c1*!c2*c7 c4*c5*c6*!c7 !c0*c1*c3*!c6*!c7 !c1*c3*!c5*!c6*c7 c0*c2*c3*!c5*!c6 !c1*c2*c6*!c7 c0*!c1*c2*!c3*!c4*!c7 !c2*c3*!c6*!c7 !c0*c1*c2*!c3*c6 !c1*!c2*!c5*!c6 !c1*!c4
      * */
     FUNC best, tmp;
     double bestVal = 0;
+    int fails = 0;
 
     func.randomInit();
 
@@ -186,7 +189,7 @@ namespace {
         if(HILL_CLIMBING)
         {
 	    tmp = func;
-            func.mutate();
+            func.mutate(fails + 1);
         }
         else
         {
@@ -223,9 +226,13 @@ namespace {
 		best = func;
 		cerr << "it=" << it << " cramer=" << bestVal << " => ";
                 best.print(cerr);
+		fails = 0;
 	}
 	else if(HILL_CLIMBING)
+	{
 		func = tmp;
+		fails++;
+	}
     }
 
 

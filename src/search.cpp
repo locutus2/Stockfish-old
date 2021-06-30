@@ -57,8 +57,12 @@ void Function<N,NC>::mutate(int m)
 {
 	while(m--)
 	{
-	    mask[std::rand() % NC] ^= 1 << (std::rand() % N);
-	    positive[std::rand() % NC] ^= 1 << (std::rand() % N);
+            int nc = std::rand() % NC;
+            int n = std::rand() % N;
+            if (std::rand() & 1)
+	        mask[nc] ^= 1 << n;
+            else
+	        positive[nc] ^= 1 << n;
 	}
 }
 
