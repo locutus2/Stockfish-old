@@ -133,7 +133,7 @@ bool Function<N,NC>::operator()(const std::vector<bool>& x) const
     return C;
 }
 
-template class Function<8, 32>;
+template class Function<8, 1>;
 
 namespace Search {
 
