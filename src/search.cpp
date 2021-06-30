@@ -53,10 +53,13 @@ void Function<N,NC>::randomInit()
 }
 
 template <int N, int NC>
-void Function<N,NC>::mutate()
+void Function<N,NC>::mutate(int m)
 {
-	mask[std::rand() % NC] ^= 1 << (std::rand() % N);
-	positive[std::rand() % NC] ^= 1 << (std::rand() % N);
+	while(m--)
+	{
+	    mask[std::rand() % NC] ^= 1 << (std::rand() % N);
+	    positive[std::rand() % NC] ^= 1 << (std::rand() % N);
+	}
 }
 
 template <int N, int NC>

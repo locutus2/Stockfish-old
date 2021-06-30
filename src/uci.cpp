@@ -172,8 +172,10 @@ namespace {
      * it=156 cramer=0.0950918 => !c1*!c3*!c7 !c1*!c2*!c4*!c5*!c7 c1*c3*c4*!c5 !c0*!c1*!c5 c1*!c2*c3*!c4*c5*c6 !c1*c5 !c0*!c1*c3*c6*!c7 c1*!c4*!c5 c3*!c4 c0*c5*!c7 c0*!c3*!c7 !c1*c5*c6 c0*c1*!c2*c6 !c0*!c1*!c4*!c5*!c6*c7 c4*!c6*c7 !c0*!c2*c6*!c7 c1*c3*c5*!c7 !c0*!c1*!c3*!c4*c7 c1*c3*c4*!c6*c7 !c2*c3*c4*!c5*c6*!c7 c3*!c5*!c7 !c2*c6 !c0*c1*c2*c4*!c7 c1*c3*!c4*c5*!c6 c0*!c2*!c5*!c7 c1*c3*!c4 !c1*c2*c3*c5 c0*!c1*!c3*c4*!c7 c3*!c6*c7 !c0*!c2*c3*c4*!c5*!c6*c7 !c3*!c5 !c0*c1*c4*!c5*c6*c7
      * it=207 cramer=0.105246 => !c1*c3*!c4*!c5 c1*!c2*c3*!c5*!c6*!c7 c0*c1*!c4*c5*c7 !c0*!c2*c3*c5 !c1*!c3*c7 !c1*!c2*c5*c6*c7 c0*c2*c3*!c6 c1*c5*c7 c2*c3*c4*!c6*!c7 c2*c3*!c5 c0*!c1*!c4*!c5*!c7 c0*c5*!c6*!c7 c0*c1*!c3*c5*c6*!c7 !c1*!c4*c7 c1*c5*!c6 !c1*c3*c4*!c5*!c6 !c2*c6*!c7 !c3*c4*c5*!c7 !c4*c6 c4*!c5*c6 c1*!c3*!c7 c1*!c3*c4*!c5*c7 c0*c2*!c7 c0*!c2*!c3*!c7 !c1*c3*c4*c5*!c6 !c0*c2*c3*c5*!c7 c1*c3*!c4*!c5*!c6*c7 c0*!c1*!c3*!c4*c6 !c1*!c4*c5*c6*c7 !c0*c2*c6*!c7 c0*c1*c2*c5 c0*!c4*c5*c6*c7
      * it=278 cramer=0.117186 => c0*!c1*c2*!c4*!c5*c7 !c0*c2 c0*!c2*c3*c4*c6*!c7 !c2*!c4*c5*c7 !c0*c1*!c2*c6*c7 !c1 c4*c6*!c7 !c0*!c1*!c3 c0*!c2*c4 !c1*!c3*c6*c7 !c2*c5*!c6*c7 c0*!c2*c3*!c4*c5*!c6*!c7 c0*!c1*c2*c3*c4 !c2*c3*c4*c5*c7 !c4*!c5*!c6 c1*c2*c5 c0*!c2*c3*!c7 c0*c1*!c4*c5 c1*c2*c7 c0*!c1*!c4 c0*!c6*!c7 !c1*!c3*c4*!c5*!c6 !c0*!c4*!c5*!c6 c1*c2 !c0*!c1*!c2*c4*c7 c3*c4*c5*c6 c0*!c3*!c7 c0*!c1*!c2*c5*c7 c1*!c4*c6*!c7 c1*!c5*c6 c0*!c1*c3*!c5*!c6 !c0*c3*c5*c6
+     *
+     * it=17972 cramer=0.19789 => c0*!c2*c3 c2*!c4*!c5*c6 !c0*!c1*!c6 c4*!c5*c6*c7 !c0*c3*c4*!c5 !c0*c1*!c2*c3*!c5*c6*c7 !c0*!c3*!c6 !c0*!c2*c3*!c4*!c5*c6 c2*c3*!c6 !c0*c3*c4*!c7 !c0*!c1*!c2*!c3*c7 c1*c2*!c3*!c6*!c7 !c0*!c1*!c2*!c3*c4*!c5*c7 !c0*c3*c4*!c5*c6 !c0*c1*c3*c4*c5 !c0*!c1*c2*!c4*c5*!c6*!c7 c1*c3*c4*c5*c6*c7 !c1*!c3*!c5 c1*!c2*c4*c5*!c6 c1*c3*c5*c6*c7 !c2*c6 !c0*!c1*!c2*c4*!c5*!c7 c1*!c2*!c3*c4*c6 c0*!c2*!c6*!c7 !c1*!c2*c4*!c5*c6 !c1*c2*c4*!c5*c7 !c0*!c1*!c2*c4*c5*c6 !c1*c7 c0*!c3*!c4*!c6 !c1*c2*c6 c0*!c1*c3*c6*c7 c0*c2*!c4*!c6*c7
      * */
-    FUNC best;
+    FUNC best, tmp;
     double bestVal = 0;
 
     func.randomInit();
@@ -183,6 +185,7 @@ namespace {
 	dbg_reset();
         if(HILL_CLIMBING)
         {
+	    tmp = func;
             func.mutate();
         }
         else
@@ -221,6 +224,8 @@ namespace {
 		cerr << "it=" << it << " cramer=" << bestVal << " => ";
                 best.print(cerr);
 	}
+	else if(HILL_CLIMBING)
+		func = tmp;
     }
 
 
