@@ -232,13 +232,19 @@ namespace {
      *                                                                                                                         bool(type_of(movedPiece) & 4)
      *                                                                                                                                             }
      * SA
+     * !it=7 cramer=-0.0566331 T=9.60693 msteps=1 => !c1*!c3*c5*!c9
      * */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    double T = 10;
+    constexpr double LAMBDA = 0.995;
+    constexpr double P0 = 0.5;
+    constexpr double LOSS_P0 = 0.1;
+    //double T0 = 10;
+    double T0 = -LOSS_P0/std::log(P0);
+    double T = T0;
 
     func.randomInit();
 
@@ -247,7 +253,7 @@ namespace {
 	dbg_reset();
         if(SIMULATED_ANNEALING)
         {
-	    T *= 0.995;
+	    T *= LAMBDA;
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
