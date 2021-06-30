@@ -1239,7 +1239,13 @@ moves_loop: // When in check, search starts from here
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
 		    bool(type_of(movedPiece) & 1),
 		    bool(type_of(movedPiece) & 2),
-		    bool(type_of(movedPiece) & 4)
+		    bool(type_of(movedPiece) & 4),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 4),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),
 		    });
 
           if (PvNode)

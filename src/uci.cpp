@@ -244,6 +244,7 @@ namespace {
      *
      * !it=246 cramer=0.139198 T=0.0418288 msteps=1 => c0*!c2*c3*!c7*c8*c10
      * !it=282 cramer=-0.159476 T=0.0349226 msteps=1 => !c0*!c3
+     * !it=789 cramer=0.212756 T=0.00275048 msteps=1 => c0*c3*c10
      *
      *
      * !it=69 cramer=0.133803 T=0.101576 msteps=1 => c1*c3*!c7*c8*!c9
@@ -252,6 +253,13 @@ namespace {
      * !it=285 cramer=0.208086 T=0.0344014 msteps=1 => c0*c3*!c4*c10
      * !it=311 cramer=0.21033 T=0.0301978 msteps=1 => c0*c1*c3*!c9
      *
+     * */
+    /* SA11_1 less neutral
+     * !it=87 cramer=0.0902212 T=0.0928123 msteps=1 => c1*!c2*!c3*c5*!c6*!c7*!c8
+     * !it=105 cramer=0.118283 T=0.0848049 msteps=1 => c0*!c2*!c7
+     */
+    /*
+     * SA17_1 (+ all squares)
      * */
     FUNC best, tmp;
     double bestVal = 0;
