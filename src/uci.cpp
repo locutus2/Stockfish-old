@@ -190,7 +190,8 @@ namespace {
         if(HILL_CLIMBING)
         {
 	    tmp = func;
-	    steps = fails / 20 + 1;
+	    //steps = fails / 20 + 1;
+	    steps = 100.0 * (1.0 / (1 + std::exp(-0.01 * fails)) - 0.5) * 2 + 1;
             func.mutate(steps);
         }
         else
