@@ -1131,7 +1131,7 @@ bool CC = false, C = false;
           Depth r = reduction(improving, depth, moveCount);
 
 	  CC = true;
-	  C = cutNode && !ttCapture;
+	  C = cutNode && (captureOrPromotion || ss->inCheck || !ttCapture);
           if (PvNode)
               r--;
 
