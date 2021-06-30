@@ -1131,7 +1131,10 @@ bool CC = false, C = false;
           Depth r = reduction(improving, depth, moveCount);
 
 	  CC = true;
-	  C = cutNode && (captureOrPromotion || ss->inCheck || !ttCapture);
+	  //C = cutNode && (captureOrPromotion || ss->inCheck || !ttCapture);
+	  C = !(   (!PvNode && !cutNode && !likelyFailLow)
+               || (!givesCheck && !ss->inCheck  && !improving)
+               || (PvNode && !ss->inCheck && improving));
           if (PvNode)
               r--;
 
