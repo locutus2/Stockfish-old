@@ -1230,14 +1230,14 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
 	  CC = true;
-          C = func({PvNode, cutNode, captureOrPromotion, givesCheck, 
+          C = func({
+	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+		    captureOrPromotion, givesCheck, 
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
-		    type_of(movedPiece) == PAWN,
-		    type_of(movedPiece) == KNIGHT,
-		    type_of(movedPiece) == BISHOP,
-		    type_of(movedPiece) == ROOK,
-		    type_of(movedPiece) == QUEEN,
-		    type_of(movedPiece) == KING});
+		    bool(type_of(movedPiece) & 1),
+		    bool(type_of(movedPiece) & 2),
+		    bool(type_of(movedPiece) & 4)
+		    });
 
           if (PvNode)
               r--;

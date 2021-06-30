@@ -29,7 +29,7 @@ namespace Stockfish {
 
 constexpr bool HILL_CLIMBING = false;
 constexpr bool SIMULATED_ANNEALING = true;
-constexpr int F_N = 14;
+constexpr int F_N = 11;
 constexpr int F_NC = 1;
 
 template <int N, int NC>

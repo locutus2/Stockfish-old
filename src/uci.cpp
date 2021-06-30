@@ -208,7 +208,30 @@ namespace {
      it=12 cramer=0.11576 msteps=1 => !c0*!c1 !c2*!c4*c7
      it=19 cramer=0.131894 msteps=1 => !c1 !c2*!c4*c7
      * */
+    /*
+     * {PvNode, cutNode, captureOrPromotion, givesCheck,
+     *                     ss->inCheck, improving, likelyFailLow, ttCapture,
+     *                                         type_of(movedPiece) == PAWN,
+     *                                                             type_of(movedPiece) == KNIGHT,
+     *                                                                                 type_of(movedPiece) == BISHOP,
+     *                                                                                                     type_of(movedPiece) == ROOK,
+     *                                                                                                                         type_of(movedPiece) == QUEEN,
+     *                                                                                                                                             type_of(movedPiece) == KING}
+     * */
     /* SA
+     * !it=37 cramer=0.0126155 T=8.26565 msteps=1 => c1*!c2*!c3*c4*c7*!c11*!c12*c13
+     * !it=70 cramer=-0.0289673 T=7.00549 msteps=1 => c0*!c1*!c3*!c4*!c10*!c11*!c13
+     * */
+    /*
+     * {
+     *                     cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     *                                         captureOrPromotion, givesCheck,
+     *                                                             ss->inCheck, improving, likelyFailLow, ttCapture,
+     *                                                                                 bool(type_of(movedPiece) & 1),
+     *                                                                                                     bool(type_of(movedPiece) & 2),
+     *                                                                                                                         bool(type_of(movedPiece) & 4)
+     *                                                                                                                                             }
+     * SA
      * */
     FUNC best, tmp;
     double bestVal = 0;
