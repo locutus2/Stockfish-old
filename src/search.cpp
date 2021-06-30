@@ -39,6 +39,8 @@ namespace Stockfish {
 
 FUNC func;
 
+template class Function<8, 3>;
+
 template <int N, int NC>
 void Function<N,NC>::randomInit()
 {
@@ -132,8 +134,6 @@ bool Function<N,NC>::operator()(const std::vector<bool>& x) const
     }
     return C;
 }
-
-template class Function<8, 2>;
 
 namespace Search {
 

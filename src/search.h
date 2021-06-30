@@ -40,7 +40,7 @@ struct Function {
     bool operator()(const std::vector<bool>& x) const;
 };
 
-typedef Function<8, 2> FUNC;
+typedef Function<8, 3> FUNC;
 
 extern FUNC func;
 
