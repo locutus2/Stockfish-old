@@ -180,6 +180,7 @@ namespace {
     FUNC best, tmp;
     double bestVal = 0;
     int fails = 0;
+    int steps = 0;
 
     func.randomInit();
 
@@ -189,7 +190,8 @@ namespace {
         if(HILL_CLIMBING)
         {
 	    tmp = func;
-            func.mutate(fails + 1);
+	    steps = fails + 1;
+            func.mutate(steps);
         }
         else
         {
@@ -224,7 +226,7 @@ namespace {
 	{
 		bestVal = val;
 		best = func;
-		cerr << "it=" << it << " cramer=" << bestVal << " => ";
+		cerr << "it=" << it << " cramer=" << bestVal << " msteps=" << steps << " => ";
                 best.print(cerr);
 		fails = 0;
 	}
