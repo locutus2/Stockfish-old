@@ -221,6 +221,9 @@ namespace {
     /* SA
      * !it=37 cramer=0.0126155 T=8.26565 msteps=1 => c1*!c2*!c3*c4*c7*!c11*!c12*c13
      * !it=70 cramer=-0.0289673 T=7.00549 msteps=1 => c0*!c1*!c3*!c4*!c10*!c11*!c13
+     *
+     * HC
+     * it=697 cramer=0.218433 msteps=1 => c1*c3*!c10
      * */
     /*
      * {
@@ -233,6 +236,22 @@ namespace {
      *                                                                                                                                             }
      * SA
      * !it=7 cramer=-0.0566331 T=9.60693 msteps=1 => !c1*!c3*c5*!c9
+     * !it=150 cramer=0.144986 T=0.0676799 msteps=1 => c3*c5*!c7*!c9*c10
+     * !it=174 cramer=0.165945 T=0.0600086 msteps=1 => c1*!c2*c3*c5*!c6*!c7*!c9*c10
+     * !it=188 cramer=0.206156 T=0.056223 msteps=1 => c0*c1*!c2*c3*!c6*!c9*c10
+     * !it=520 cramer=0.21261 T=0.0105925 msteps=1 => c0*c3*!c9*c10
+     * !it=536 cramer=0.212756 T=0.00977617 msteps=1 => c0*c3*c10
+     *
+     * !it=246 cramer=0.139198 T=0.0418288 msteps=1 => c0*!c2*c3*!c7*c8*c10
+     * !it=282 cramer=-0.159476 T=0.0349226 msteps=1 => !c0*!c3
+     *
+     *
+     * !it=69 cramer=0.133803 T=0.101576 msteps=1 => c1*c3*!c7*c8*!c9
+     * !it=135 cramer=0.147517 T=0.0729648 msteps=1 => c0*c1*c3*!c7*!c8
+     * !it=176 cramer=0.190269 T=0.05941 msteps=1 => c0*c3*c5*!c6
+     * !it=285 cramer=0.208086 T=0.0344014 msteps=1 => c0*c3*!c4*c10
+     * !it=311 cramer=0.21033 T=0.0301978 msteps=1 => c0*c1*c3*!c9
+     *
      * */
     FUNC best, tmp;
     double bestVal = 0;
