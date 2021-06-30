@@ -63,7 +63,7 @@ void Function<N,NC>::mutate(int m)
             int n = std::rand() % N;
             if (std::rand() & 1)
 	        mask[nc] ^= 1 << n;
-            else if(mask[nc] & (1 << n))
+            else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (1 << n)))
 	        positive[nc] ^= 1 << n;
 	    else
                 continue;
