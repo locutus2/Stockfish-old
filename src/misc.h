@@ -53,6 +53,7 @@ void dbg_hit_on(std::vector<bool>& c, bool b, int n = 0, int w = 1);
 void dbg_hit_on_cmp(std::vector<bool>& c, bool b, int n, int m, int w = 1);
 
 double get_cramer(int n = 0);
+double get_hit(int n = 0);
 
 void dbg_reset();
 void dbg_print();

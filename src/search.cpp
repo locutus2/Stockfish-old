@@ -1384,6 +1384,7 @@ moves_loop: // When in check, search starts from here
       {
 	      bool T = value > alpha;
               dbg_cramer_of(C, T);
+              dbg_hit_on(C, T);
       }
 
       if (value > bestValue)

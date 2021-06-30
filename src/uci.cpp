@@ -265,6 +265,8 @@ namespace {
      * !it=13 cramer=-0.0154655 T=0.134492 msteps=1 => !c5*!c10*!c11*!c12*c15
      * !it=131 cramer=0.0256613 T=0.0744425 msteps=1 => c0*!c2*!c4*c8*!c9*!c12*!c13*c14*!c15*c16
      * !it=159 cramer=0.0695837 T=0.0646945 msteps=1 => c0*!c2*!c3*c5*!c6*!c8*!c15
+     * !it=368 cramer=-0.105991 T=0.022693 msteps=1 => !c0*!c1
+     * !it=377 cramer=-0.127926 T=0.021692 msteps=1 => !c0
      *
      * !it=27 cramer=-0.0401729 T=0.125378 msteps=1 => !c0*!c2*!c4*!c6*!c8*!c9*!c16
      * !it=141 cramer=0.0639901 T=0.0708031 msteps=1 => !c2*c5*!c7*c10*!c11*!c12*c13*!c14
@@ -274,12 +276,15 @@ namespace {
      * !it=13 cramer=0.0397511 T=0.134492 msteps=1 => c0*c1*c8*!c10*!c15*c16
      * !it=101 cramer=0.0621644 T=0.0865224 msteps=1 => c1*!c3*c5*!c7*c9*!c12
      * !it=236 cramer=-0.127926 T=0.0439789 msteps=1 => !c0
+     * !it=361 cramer=0.073454 T=0.0235034 msteps=1 => c0*!c2*c5*!c8*!c12
+     *
      * */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;
     int fails = 0;
     int steps = 0;
+    constexpr bool USE_CRAMER = false;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
@@ -336,7 +341,7 @@ namespace {
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
 
-	double val = (get_cramer());
+	double val = (USE_CRAMER ? get_cramer() : get_hit());
 	if(it == 0 || std::abs(val) > std::abs(curVal))
 	{
 		curVal = val;

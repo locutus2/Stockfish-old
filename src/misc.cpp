@@ -455,6 +455,19 @@ double get_cramer(int n)
         return 0;
 }
 
+double get_hit(int n)
+{
+    if (hits[n][0])
+    {
+        double cr = hits[n][1]/double(hits[n][0]);
+	if(std::isnan(cr))
+	    cr = 0;
+	return cr;
+    }
+    else
+        return 0;
+}
+
 void dbg_print() {
 
   for(int n = 0; n < DBG_N; ++n)
