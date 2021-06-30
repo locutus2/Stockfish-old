@@ -39,7 +39,7 @@ namespace Stockfish {
 
 FUNC func;
 
-template class Function<8, 3>;
+template class Function<8, 8>;
 
 template <int N, int NC>
 void Function<N,NC>::randomInit()
