@@ -1186,8 +1186,8 @@ bool CC = false, C = false;
               r--;
 
           // Increase reduction for cut nodes (~3 Elo)
-          if (cutNode)
-              r += 1 + !captureOrPromotion;
+          if (cutNode && move != ss->killers[0])
+              r += 2;
 
           if (!captureOrPromotion)
           {
