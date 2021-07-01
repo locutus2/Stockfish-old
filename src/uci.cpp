@@ -331,6 +331,20 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
      * SA16_1 (+material)
      * BEST it=300 score=-0.132012 T=0.0319096 msteps=1 => !c0*!c4
      * */
+    /*
+     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     *                      captureOrPromotion, givesCheck,
+     *                                          ss->inCheck, improving, likelyFailLow, ttCapture,
+     *                                                              more_than_one(pos.checkers()),
+     *                                                                                  doubleExtension,
+     *                                                                                                      bool(extension),
+     *                                                                                                                          singularQuietLMR,
+     *                                                                                                                                              ss->ttPv && !PvNode,
+     *                                                                                                                                                                  move == ss->killers[0],
+     *                                                                                                                                                                                      move == ss->killers[1],
+     *                                                                                                                                                                                                          move == countermove
+     * SA16_1_mix
+     * */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;

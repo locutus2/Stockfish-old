@@ -1237,6 +1237,15 @@ moves_loop: // When in check, search starts from here
 	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
 		    captureOrPromotion, givesCheck, 
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
+		    more_than_one(pos.checkers()),
+		    doubleExtension,
+		    bool(extension),
+	            singularQuietLMR,
+	            ss->ttPv && !PvNode,
+		    move == ss->killers[0],    
+		    move == ss->killers[1],    
+		    move == countermove    
+		    /*
 		    bool(type_of(movedPiece) & 1),
 		    bool(type_of(movedPiece) & 2),
 		    bool(type_of(movedPiece) & 4),
@@ -1245,6 +1254,7 @@ moves_loop: // When in check, search starts from here
 		    bool(pos.count<ALL_PIECES>() & 4),
 		    bool(pos.count<ALL_PIECES>() & 8),
 		    bool(pos.count<ALL_PIECES>() & 16)
+		    */
 		    /*
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
