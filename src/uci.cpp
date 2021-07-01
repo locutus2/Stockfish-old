@@ -315,6 +315,18 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
      BEST it=8800 score=0.19103 T=1.00025e-20 msteps=1 => !c3*!c4*c5*!c6*c9*c10*!c12*c13*!c14*!c15
      */
     /*
+     * *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     *      *  captureOrPromotion, givesCheck,
+     *           *  ss->inCheck, improving, likelyFailLow, ttCapture,
+     *                *  bool(type_of(movedPiece) & 1),
+     *                     *  bool(type_of(movedPiece) & 2),
+     *                          *  bool(type_of(movedPiece) & 4),
+     *                               *bool(pos.count<ALL_PIECES>() & 1),
+     *                                    *bool(pos.count<ALL_PIECES>() & 2),
+     *                                         *bool(pos.count<ALL_PIECES>() & 4),
+     *                                              *bool(pos.count<ALL_PIECES>() & 8),
+     *                                                   *bool(pos.count<ALL_PIECES>() & 16),
+     *
      * bench 16 1 13 pos1000.fen
      * SA16_1 (+material)
      * BEST it=300 score=-0.132012 T=0.0319096 msteps=1 => !c0*!c4
