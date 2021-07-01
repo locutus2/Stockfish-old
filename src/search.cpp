@@ -1157,7 +1157,13 @@ bool CC = false, C = false;
 	      [0] Total 30668089 CramersV(x,y) = 0.0131346 error% =5.70782
 	      */
 	  //C = PvNode && !captureOrPromotion && ss->inCheck && likelyFailLow && type_of(movedPiece) == BISHOP && relative_rank(us, to_sq(move)) > RANK_4;
-	  C = cutNode || ss->inCheck;
+	  //C = cutNode || ss->inCheck;
+	  /*
+	  C = cutNode && !likelyFailLow && !ttCapture;
+	  [0] Total 30081378 Hits 1491170 hit rate (%) 4.95712
+	  [0] Total 9489172 Mean 9.25085
+	  [0] Total 30081378 CramersV(x,y) = 0.134284 error% =30.6658
+*/
 
           if (PvNode)
               r--;
