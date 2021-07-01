@@ -1161,7 +1161,7 @@ moves_loop: // When in check, search starts from here
               r += 1 + !captureOrPromotion;
 
           if (   type_of(movedPiece) == KING
-              && pos.count<ALL_PIECES>() <= 6
+              && pos.count<ALL_PIECES>() <= 8
               && !ss->inCheck)
               r--;
 
