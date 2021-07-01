@@ -1132,7 +1132,31 @@ bool CC = false, C = false;
 
 	  CC = true;
 	  //C = cutNode && (captureOrPromotion || ss->inCheck || !ttCapture);
-	  C = cutNode && givesCheck && bool(type_of(movedPiece) & 4);
+	  //C = cutNode && givesCheck && bool(type_of(movedPiece) & 4);
+	  /*
+	  C = !givesCheck && !ss->inCheck && improving && !likelyFailLow
+              && bool(type_of(movedPiece) & 2) && bool(type_of(movedPiece) & 4)
+              && !bool(pos.count<ALL_PIECES>() & 2) && bool(pos.count<ALL_PIECES>() & 4) && !bool(pos.count<ALL_PIECES>() & 8) && !bool(pos.count<ALL_PIECES>() & 16); 
+	 [0] Total 30668089 Hits 1534899 hit rate (%) 5.00487
+	[0] Total 232303 Mean 8.3206
+       [0] Total 30668089 CramersV(x,y) = 0.0132852 error% =5.6363	
+	  C = !givesCheck && !ss->inCheck && improving && !likelyFailLow
+              && type_of(movedPiece) == KING
+	      && pos.count<ALL_PIECES>() >= 4 
+	      && pos.count<ALL_PIECES>() <= 5 ;
+       [0] Total 30668089 Hits 1534899 hit rate (%) 5.00487
+       [0] Total 232303 Mean 8.3206
+       [0] Total 30668089 CramersV(x,y) = 0.0132852 error% =5.6363
+	  */
+	  /*
+	  C = !givesCheck && !ss->inCheck && improving && !likelyFailLow
+              && type_of(movedPiece) == KING
+	      && pos.count<ALL_PIECES>() <= 5 ;
+	      [0] Total 30668089 Hits 1534899 hit rate (%) 5.00487
+	      [0] Total 257365 Mean 8.11804
+	      [0] Total 30668089 CramersV(x,y) = 0.0131346 error% =5.70782
+	      */
+
           if (PvNode)
               r--;
 
@@ -1268,6 +1292,7 @@ bool CC = false, C = false;
       if(CC)
       {
 	      bool T = value > alpha;
+	      dbg_cramer_of(C, T);
 	      dbg_hit_on(T);
 	      if(C) dbg_mean_of(100*T);
       }
