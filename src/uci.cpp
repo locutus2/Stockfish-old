@@ -260,6 +260,18 @@ namespace {
      * !it=245 cramer=0.128563 T=0.042039 msteps=1 => c0*!c6*!c7
      */
     /*
+     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     *                      captureOrPromotion, givesCheck,
+     *                                          ss->inCheck, improving, likelyFailLow, ttCapture,
+     *                                                              bool(type_of(movedPiece) & 1),
+     *                                                                                  bool(type_of(movedPiece) & 2),
+     *                                                                                                      bool(type_of(movedPiece) & 4),
+     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
+     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
+     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 4),
+     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
+     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
+     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),
      * SA17_1 (+ all squares)
      *
      * !it=13 cramer=-0.0154655 T=0.134492 msteps=1 => !c5*!c10*!c11*!c12*c15
@@ -272,19 +284,42 @@ namespace {
      * !it=141 cramer=0.0639901 T=0.0708031 msteps=1 => !c2*c5*!c7*c10*!c11*!c12*c13*!c14
      * !it=144 cramer=0.0642419 T=0.0697463 msteps=1 => !c2*c5*!c7*c10*!c11*c13*!c14
      * !it=285 cramer=0.0681137 T=0.0344014 msteps=1 => c0*c1*!c7*c10*c11*!c15
+BEST it=1300 cramer=0.128563 T=0.000212326 msteps=1 => c0*!c7
      *
      * !it=13 cramer=0.0397511 T=0.134492 msteps=1 => c0*c1*c8*!c10*!c15*c16
      * !it=101 cramer=0.0621644 T=0.0865224 msteps=1 => c1*!c3*c5*!c7*c9*!c12
      * !it=236 cramer=-0.127926 T=0.0439789 msteps=1 => !c0
      * !it=361 cramer=0.073454 T=0.0235034 msteps=1 => c0*!c2*c5*!c8*!c12
-     *
+     *BEST it=1400 cramer=0.128563 T=0.000128621 msteps=1 => c0*c1*!c7
+
+     HIT
+     BEST it=9400 score=0.0392538 T=4.94261e-22 msteps=1 => !c0*!c1*c3*!c6*c8*c13
+
+     BEST it=9600 score=0.099455 T=1.81373e-22 msteps=1 => !c0*c1*!c2*c4*c6*c8*c9*c15
      * */
+    /*
+     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     *  captureOrPromotion, givesCheck,
+     *  ss->inCheck, improving, likelyFailLow, ttCapture,
+     *  bool(type_of(movedPiece) & 1),
+     *  bool(type_of(movedPiece) & 2),
+     *  bool(type_of(movedPiece) & 4),
+     *bool(pos.count<ALL_PIECES>() & 1),
+     *bool(pos.count<ALL_PIECES>() & 2),
+     *bool(pos.count<ALL_PIECES>() & 4),
+     *bool(pos.count<ALL_PIECES>() & 8),
+     *bool(pos.count<ALL_PIECES>() & 16),
+     * SA16_1 (+ material)
+     * BEST it=8700 score=0.19103 T=1.6512e-20 msteps=1 => !c3*!c4*c5*!c6*!c8*c9*c10*!c12*c13*!c14*!c15
+BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
+     BEST it=8800 score=0.19103 T=1.00025e-20 msteps=1 => !c3*!c4*c5*!c6*c9*c10*!c12*c13*!c14*!c15
+     */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    constexpr bool USE_CRAMER = false;
+    constexpr bool USE_CRAMER = true;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;

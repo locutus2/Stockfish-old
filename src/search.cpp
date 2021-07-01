@@ -1240,12 +1240,18 @@ moves_loop: // When in check, search starts from here
 		    bool(type_of(movedPiece) & 1),
 		    bool(type_of(movedPiece) & 2),
 		    bool(type_of(movedPiece) & 4),
+		    bool(pos.count<ALL_PIECES>() & 1),
+		    bool(pos.count<ALL_PIECES>() & 2),
+		    bool(pos.count<ALL_PIECES>() & 4),
+		    bool(pos.count<ALL_PIECES>() & 8),
+		    bool(pos.count<ALL_PIECES>() & 16)
+		    /*
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 4),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
-		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
 		    });
 
           if (PvNode)
