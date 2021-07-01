@@ -1160,6 +1160,14 @@ moves_loop: // When in check, search starts from here
           if (cutNode)
               r += 1 + !captureOrPromotion;
 
+          if (   type_of(movedPiece) == KING
+              && pos.count<ALL_PIECES>() <= 6
+              && !givesCheck
+              && !ss->inCheck
+              && improving
+              && !likelyFailLow)
+              r--;
+
           if (!captureOrPromotion)
           {
               // Increase reduction if ttMove is a capture (~3 Elo)
