@@ -401,7 +401,8 @@ c26  bool(moveCount & 64)
     int fails = 0;
     int steps = 0;
     constexpr bool WEIGHT_WITH_FREQ = true;
-    constexpr bool USE_CRAMER = true;
+    constexpr bool USE_CRAMER = false;
+    constexpr bool USE_CRAMER_AND_HIT = true;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
@@ -460,7 +461,8 @@ c26  bool(moveCount & 64)
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
 
-	double val = (USE_CRAMER               ? get_cramer() : 
+	double val = (USE_CRAMER_AND_HIT       ? (get_cramer() + (get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0))) / 2 :
+	              USE_CRAMER               ? get_cramer() : 
 	              get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0));
 
 	if (WEIGHT_WITH_FREQ)
