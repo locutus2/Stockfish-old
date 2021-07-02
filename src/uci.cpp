@@ -357,13 +357,15 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    constexpr bool USE_CRAMER = false;
+    constexpr bool USE_CRAMER = true;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
     //double T0 = 10;
     double T0 = -LOSS_P0/std::log(P0);
     double T = T0;
+
+    const std::string measure = (USE_CRAMER ? "cramer" : "fh");
 
     func.randomInit();
 
@@ -414,7 +416,6 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
 
-        std::string measure = (USE_CRAMER ? "cramer" : "fh");
 	double val = (USE_CRAMER               ? get_cramer() : 
 	              get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0));
 
@@ -426,7 +427,7 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
 		    best = func;
 		    bestVal = curVal;
 	            if(SIMULATED_ANNEALING)
-		        cerr << "!it=" << it << " " << measure << " =" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "!it=" << it << " " << measure << "=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
 		    else
 		        cerr << "it=" << it << " " << measure << "=" << bestVal << " msteps=" << steps << " => ";
                     best.print(cerr);
@@ -462,7 +463,7 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
 	if(it && it % 100 == 0)
 	{
 	            if(SIMULATED_ANNEALING)
-		        cerr << "BEST it=" << it << " " << measure << " =" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "BEST it=" << it << " " << measure << "=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
 		    else
 		        cerr << "BEST it=" << it << " " << measure << "=" << bestVal << " msteps=" << steps << " => ";
                     best.print(cerr);
