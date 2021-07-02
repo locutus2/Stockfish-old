@@ -432,6 +432,8 @@ double gain_ratio(double p)
 void dbg_reset() {
   for(int n = 0; n < DBG_N; ++n)
   {
+	  for(int i = 0; i < 2; ++i)
+		  hits[n][i] = 0;
 	  for(int i = 0; i < 5; ++i)
 		  cramer[n][i] = 0;
   }

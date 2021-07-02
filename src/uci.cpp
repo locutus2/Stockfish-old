@@ -357,7 +357,7 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    constexpr bool USE_CRAMER = true;
+    constexpr bool USE_CRAMER = false;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
@@ -414,7 +414,10 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
 
-	double val = (USE_CRAMER ? get_cramer() : get_hit());
+        std::string measure = (USE_CRAMER ? "cramer" : "fh");
+	double val = (USE_CRAMER               ? get_cramer() : 
+	              get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0));
+
 	if(it == 0 || std::abs(val) > std::abs(curVal))
 	{
 		curVal = val;
@@ -423,15 +426,15 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
 		    best = func;
 		    bestVal = curVal;
 	            if(SIMULATED_ANNEALING)
-		        cerr << "!it=" << it << " score=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "!it=" << it << " " << measure << " =" << bestVal << " T=" << T << " msteps=" << steps << " => ";
 		    else
-		        cerr << "it=" << it << " score=" << bestVal << " msteps=" << steps << " => ";
+		        cerr << "it=" << it << " " << measure << "=" << bestVal << " msteps=" << steps << " => ";
                     best.print(cerr);
 		    fails = 0;
 		}
 		else if(SIMULATED_ANNEALING)
 		{
-		    cerr << "+it=" << it << " score=" << curVal << " T=" << T << " msteps=" << steps << " => ";
+		    cerr << "+it=" << it << " " << measure << "=" << curVal << " T=" << T << " msteps=" << steps << " => ";
                     func.print(cerr);
 		}
 	}
@@ -442,7 +445,7 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
 		if(r <= p) // accept
 		{
 		    curVal = val;
-		    cerr << "-it=" << it << " score=" << curVal << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
+		    cerr << "-it=" << it << " " << measure << "=" << curVal << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
                     func.print(cerr);
 		}
 		else //reject
@@ -459,9 +462,9 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
 	if(it && it % 100 == 0)
 	{
 	            if(SIMULATED_ANNEALING)
-		        cerr << "BEST it=" << it << " score=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "BEST it=" << it << " " << measure << " =" << bestVal << " T=" << T << " msteps=" << steps << " => ";
 		    else
-		        cerr << "BEST it=" << it << " score=" << bestVal << " msteps=" << steps << " => ";
+		        cerr << "BEST it=" << it << " " << measure << "=" << bestVal << " msteps=" << steps << " => ";
                     best.print(cerr);
 	}
     }
