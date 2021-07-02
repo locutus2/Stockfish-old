@@ -402,7 +402,7 @@ c26  bool(moveCount & 64)
     int steps = 0;
     constexpr bool WEIGHT_WITH_FREQ = true;
     constexpr bool USE_CRAMER = false;
-    constexpr bool USE_CRAMER_AND_HIT = true;
+    constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
@@ -461,6 +461,44 @@ c26  bool(moveCount & 64)
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
 
+	double val = 0;
+	double w = get_hit(10);
+	auto wFunc = [](double x) { return x; };
+
+        if(USE_CRAMER_AND_HIT)
+        {
+            double valc = get_cramer();
+            double v1 = get_hit(1);
+            double v0 = get_hit(0);
+	    if (WEIGHT_WITH_FREQ)
+	    {
+		valc *= wFunc(val >= 0 ? w : 1-w);
+                v1 *= wFunc(w);
+                v0 *= wFunc(1-w);
+	    }
+            double valh = v1 >= v0 ? v1 : -v0;
+
+	    val = (valc + valh) / 2;
+        }	 
+	else if(USE_CRAMER)
+        {
+            val = get_cramer();
+	    if (WEIGHT_WITH_FREQ)
+		    val *= wFunc(val >= 0 ? w : 1-w);
+        }	 
+	else // HIT
+	{
+            double v1 = get_hit(1);
+            double v0 = get_hit(0);
+	    if (WEIGHT_WITH_FREQ)
+	    {
+                v1 *= wFunc(w);
+                v0 *= wFunc(1-w);
+	    }
+            val = v1 >= v0 ? v1 : -v0;
+	}
+
+		/*
 	double val = (USE_CRAMER_AND_HIT       ? (get_cramer() + (get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0))) / 2 :
 	              USE_CRAMER               ? get_cramer() : 
 	              get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0));
@@ -469,6 +507,7 @@ c26  bool(moveCount & 64)
 	{
 		val *= (val < 0 ? 1 - get_hit(10) : get_hit(10));
 	}
+	*/
 
 	if(it == 0 || std::abs(val) > std::abs(curVal))
 	{
