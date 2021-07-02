@@ -352,6 +352,49 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
      * !it=574 score=-0.171404 T=0.00808064 msteps=1 => !c9*!c13*!c14*!c15
      * C = doubleExtension || move == ss->killers[0] || move == ss->killers[1] || move == countermove;
      * */
+    /* SA27_1
+c0   cutNode, 
+c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+c2   captureOrPromotion, 
+c3   givesCheck,
+c4   ss->inCheck, 
+c5   improving, 
+c6   likelyFailLow, 
+c7   ttCapture,
+c8   more_than_one(pos.checkers()),
+c9   doubleExtension,
+c19  bool(extension),
+c11  singularQuietLMR,
+c12  ss->ttPv && !PvNode,
+c13  move == ss->killers[0],
+c14  move == ss->killers[1],
+c15  move == countermove,
+c16  bool(int(depth) & 1),
+c17  bool(int(depth) & 2),
+c18  bool(int(depth) & 4),
+c19  bool(int(depth) & 8),
+c20  bool(moveCount & 1),
+c21  bool(moveCount & 2),
+c22  bool(moveCount & 4),
+c23  bool(moveCount & 8),
+c24  bool(moveCount & 16),
+c25  bool(moveCount & 32),
+c26  bool(moveCount & 64)
+     * CRAMER:
+     *
+     * !it=26 cramer=0.00115979 T=0.126008 msteps=1 => c1*!c6*c8*c10*c13*!c20*c21*!c24*!c25*!c26
+     *
+     * !it=16 cramer=-0.000407983 T=0.132485 msteps=1 => c0*!c2*!c3*c5*!c9*!c10*!c12*!c13*!c15*c16*c20*!c21*c24*c25
+     *
+     * HIT:
+     *
+     * !it=19 fh=0.113071 T=0.130508 msteps=1 => c0*!c3*!c6*!c8*!c11*c14*!c16*!c20*!c21*!c26
+       C = cutNode && !givesCheck && !likelyFaillow && !more_than_one(pos.checkers())
+          && !singularQuietLMR && move == ss->killers[1] &&  !(int(depth) & 1)
+          && !(moveCount & 1) && !(moveCount & 2) && !(moveCount & 64)
+     *
+     * !it=36 fh=0.0847458 T=0.119847 msteps=1 => !c3*c4*c12*!c13*c15*!c16*!c18*c19*!c20*!c25
+     * */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;
