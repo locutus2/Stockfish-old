@@ -332,18 +332,25 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
      * BEST it=300 score=-0.132012 T=0.0319096 msteps=1 => !c0*!c4
      * */
     /*
-     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *                      captureOrPromotion, givesCheck,
-     *                                          ss->inCheck, improving, likelyFailLow, ttCapture,
-     *                                                              more_than_one(pos.checkers()),
-     *                                                                                  doubleExtension,
-     *                                                                                                      bool(extension),
-     *                                                                                                                          singularQuietLMR,
-     *                                                                                                                                              ss->ttPv && !PvNode,
-     *                                                                                                                                                                  move == ss->killers[0],
-     *                                                                                                                                                                                      move == ss->killers[1],
-     *                                                                                                                                                                                                          move == countermove
+     c0-c1 *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     c2-c3 *  captureOrPromotion, givesCheck,
+     c4-c7 *ss->inCheck, improving, likelyFailLow, ttCapture,
+     c8 *more_than_one(pos.checkers()),
+     c9 *doubleExtension,
+     c10 *bool(extension),
+     c11 *singularQuietLMR,
+     c12 *ss->ttPv && !PvNode,
+     c13 *move == ss->killers[0],
+     c14* move == ss->killers[1],
+     c15 *move == countermove
      * SA16_1_mix
+     * !it=559 score=-0.0938326 T=0.00871164 msteps=1 => !c0*!c5*!c7*!c11*!c13*!c14
+     *
+     * BEST it=500 score=0.147967 T=0.0117095 msteps=1 => c0*c1*!c11*c13
+     * C = cutNode && move == countermove && !singularQuietLMR
+     *
+     * !it=574 score=-0.171404 T=0.00808064 msteps=1 => !c9*!c13*!c14*!c15
+     * C = doubleExtension || move == ss->killers[0] || move == ss->killers[1] || move == countermove;
      * */
     FUNC best, tmp;
     double bestVal = 0;
