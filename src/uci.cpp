@@ -400,6 +400,7 @@ c26  bool(moveCount & 64)
     double curVal = 0;
     int fails = 0;
     int steps = 0;
+    constexpr bool WEIGHT_WITH_FREQ = true;
     constexpr bool USE_CRAMER = true;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
@@ -461,6 +462,11 @@ c26  bool(moveCount & 64)
 
 	double val = (USE_CRAMER               ? get_cramer() : 
 	              get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0));
+
+	if (WEIGHT_WITH_FREQ)
+	{
+		val *= (val < 0 ? 1 - get_hit(10) : get_hit(10));
+	}
 
 	if(it == 0 || std::abs(val) > std::abs(curVal))
 	{
