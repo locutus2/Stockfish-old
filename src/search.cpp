@@ -1157,7 +1157,9 @@ moves_loop: // When in check, search starts from here
               r--;
 
           // Increase reduction for cut nodes (~3 Elo)
-          if (cutNode && move != ss->killers[0] && (move != countermove || singularQuietLMR))
+          if (   cutNode
+              && move != ss->killers[0]
+              && (move != countermove || captureOrPromotion))
               r += 2;
 
           if (!captureOrPromotion)
