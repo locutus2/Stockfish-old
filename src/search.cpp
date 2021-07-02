@@ -1164,6 +1164,20 @@ bool CC = false, C = false;
 	  [0] Total 9489172 Mean 9.25085
 	  [0] Total 30081378 CramersV(x,y) = 0.134284 error% =30.6658
 */
+	  /*
+	  C = cutNode && !givesCheck && !likelyFailLow && !more_than_one(pos.checkers())
+		            && !singularQuietLMR && move == ss->killers[1] &&  !(int(depth) & 1)                                                    && !(moveCount & 1) && !(moveCount & 2) && !(moveCount & 64);
+[0] Total 30081378 Hits 1491170 hit rate (%) 4.95712
+[0] Total 4422 Mean 11.3071
+[0] Total 30081378 CramersV(x,y) = 0.00354724 error% =4.9685
+			    */
+	  /*
+	  C = cutNode && !givesCheck && !likelyFailLow && !more_than_one(pos.checkers())
+		            && !singularQuietLMR && move == ss->killers[1] &&  !(int(depth) & 1)                                                    && !(moveCount & 1) && !(moveCount & 2);
+	  [0] Total 30081378 Hits 1491170 hit rate (%) 4.95712
+		  [0] Total 4422 Mean 11.3071
+			  [0] Total 30081378 CramersV(x,y) = 0.00354724 error% =4.9685
+				  */
 
           if (PvNode)
               r--;
@@ -1301,8 +1315,8 @@ bool CC = false, C = false;
       {
 	      bool T = value > alpha;
 	      dbg_cramer_of(C, T);
-	      dbg_hit_on(T);
-	      if(C) dbg_mean_of(100*T);
+	      dbg_hit_on(T, 0);
+	      dbg_mean_of(C, T, 1);
       }
 
       if (value > bestValue)
