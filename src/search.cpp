@@ -1244,7 +1244,18 @@ moves_loop: // When in check, search starts from here
 	            ss->ttPv && !PvNode,
 		    move == ss->killers[0],    
 		    move == ss->killers[1],    
-		    move == countermove    
+		    move == countermove,
+		    bool(int(depth) & 1),
+		    bool(int(depth) & 2),
+		    bool(int(depth) & 4),
+		    bool(int(depth) & 8),
+		    bool(moveCount & 1),
+		    bool(moveCount & 2),
+		    bool(moveCount & 4),
+		    bool(moveCount & 8),
+		    bool(moveCount & 16),
+		    bool(moveCount & 32),
+		    bool(moveCount & 64)
 		    /*
 		    bool(type_of(movedPiece) & 1),
 		    bool(type_of(movedPiece) & 2),
