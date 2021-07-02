@@ -400,9 +400,9 @@ c26  bool(moveCount & 64)
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    constexpr bool WEIGHT_WITH_FREQ = true;
+    constexpr bool WEIGHT_WITH_FREQ = false;
     constexpr bool USE_CRAMER = false;
-    constexpr bool USE_CRAMER_AND_HIT = false;
+    constexpr bool USE_CRAMER_AND_HIT = true;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
