@@ -1090,6 +1090,20 @@ moves_loop: // When in check, search starts from here
       // Calculate new depth for this move
       newDepth = depth - 1;
 
+      bool CC = false, C = false;
+          C = func({
+	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+		    captureOrPromotion, givesCheck, 
+		    ss->inCheck, improving, likelyFailLow, ttCapture,
+		    more_than_one(pos.checkers()),
+		    doubleExtension,
+		    bool(extension),
+	            singularQuietLMR,
+	            ss->ttPv && !PvNode,
+		    move == ss->killers[0],    
+		    move == ss->killers[1],    
+		    move == countermove});
+
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1120,7 +1134,8 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 5
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-                  continue;
+	            CC = true;
+          //        continue;
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 7
@@ -1218,7 +1233,6 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
-      bool CC = false, C = false;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1232,19 +1246,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-	  CC = true;
-          C = func({
-	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-		    captureOrPromotion, givesCheck, 
-		    ss->inCheck, improving, likelyFailLow, ttCapture,
-		    more_than_one(pos.checkers()),
-		    doubleExtension,
-		    bool(extension),
-	            singularQuietLMR,
-	            ss->ttPv && !PvNode,
-		    move == ss->killers[0],    
-		    move == ss->killers[1],    
-		    move == countermove,
+		    /*
 		    bool(int(depth) & 1),
 		    bool(int(depth) & 2),
 		    bool(int(depth) & 4),
@@ -1256,6 +1258,7 @@ moves_loop: // When in check, search starts from here
 		    bool(moveCount & 16),
 		    bool(moveCount & 32),
 		    bool(moveCount & 64)
+		    */
 		    /*
 		    bool(type_of(movedPiece) & 1),
 		    bool(type_of(movedPiece) & 2),
@@ -1273,7 +1276,7 @@ moves_loop: // When in check, search starts from here
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
-		    });
+		    //});
 
           if (PvNode)
               r--;

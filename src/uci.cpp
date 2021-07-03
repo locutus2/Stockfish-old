@@ -402,7 +402,7 @@ c26  bool(moveCount & 64)
     int steps = 0;
     constexpr bool WEIGHT_WITH_FREQ = false;
     constexpr bool USE_CRAMER = false;
-    constexpr bool USE_CRAMER_AND_HIT = true;
+    constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
