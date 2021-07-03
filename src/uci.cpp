@@ -410,7 +410,7 @@ c26  bool(moveCount & 64)
     double T0 = -LOSS_P0/std::log(P0);
     double T = T0;
 
-    const std::string measure = (USE_CRAMER ? "cramer" : "fh");
+    const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "fh");
 
     func.randomInit();
 
