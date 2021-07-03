@@ -409,6 +409,8 @@ c26  bool(moveCount & 64)
     //double T0 = 10;
     double T0 = -LOSS_P0/std::log(P0);
     double T = T0;
+    double support = 0;
+    double bestSupport = 0;
 
     const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "fh");
 
@@ -498,6 +500,8 @@ c26  bool(moveCount & 64)
             val = v1 >= v0 ? v1 : -v0;
 	}
 
+	support = (val >= 0 ? get_hit(10) : 1 - get_hit(10) );
+
 		/*
 	double val = (USE_CRAMER_AND_HIT       ? (get_cramer() + (get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0))) / 2 :
 	              USE_CRAMER               ? get_cramer() : 
@@ -516,16 +520,17 @@ c26  bool(moveCount & 64)
 		{
 		    best = func;
 		    bestVal = curVal;
+		    bestSupport = support;
 	            if(SIMULATED_ANNEALING)
-		        cerr << "!it=" << it << " " << measure << "=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "!it=" << it << " " << measure << "=" << bestVal << " support=" << support << " T=" << T << " msteps=" << steps << " => ";
 		    else
-		        cerr << "it=" << it << " " << measure << "=" << bestVal << " msteps=" << steps << " => ";
+		        cerr << "it=" << it << " " << measure << "=" << bestVal << " support=" << support << " msteps=" << steps << " => ";
                     best.print(cerr);
 		    fails = 0;
 		}
 		else if(SIMULATED_ANNEALING)
 		{
-		    cerr << "+it=" << it << " " << measure << "=" << curVal << " T=" << T << " msteps=" << steps << " => ";
+		    cerr << "+it=" << it << " " << measure << "=" << curVal << " support=" << support << " T=" << T << " msteps=" << steps << " => ";
                     func.print(cerr);
 		}
 	}
@@ -536,7 +541,7 @@ c26  bool(moveCount & 64)
 		if(r <= p) // accept
 		{
 		    curVal = val;
-		    cerr << "-it=" << it << " " << measure << "=" << curVal << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
+		    cerr << "-it=" << it << " " << measure << "=" << curVal << " support=" << support << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
                     func.print(cerr);
 		}
 		else //reject
@@ -553,9 +558,9 @@ c26  bool(moveCount & 64)
 	if(it && it % 100 == 0)
 	{
 	            if(SIMULATED_ANNEALING)
-		        cerr << "BEST it=" << it << " " << measure << "=" << bestVal << " T=" << T << " msteps=" << steps << " => ";
+		        cerr << "BEST it=" << it << " " << measure << "=" << bestVal << " support=" << bestSupport << " T=" << T << " msteps=" << steps << " => ";
 		    else
-		        cerr << "BEST it=" << it << " " << measure << "=" << bestVal << " msteps=" << steps << " => ";
+		        cerr << "BEST it=" << it << " " << measure << "=" << bestVal << " support=" << bestSupport << " msteps=" << steps << " => ";
                     best.print(cerr);
 	}
     }
