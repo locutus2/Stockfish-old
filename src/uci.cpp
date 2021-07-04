@@ -352,7 +352,24 @@ BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
      * !it=574 score=-0.171404 T=0.00808064 msteps=1 => !c9*!c13*!c14*!c15
      * C = doubleExtension || move == ss->killers[0] || move == ss->killers[1] || move == countermove;
      * */
-    /* SA27_1
+
+    /* SA16_1
+     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     *                      captureOrPromotion, givesCheck,
+     *                                          ss->inCheck, improving, likelyFailLow, ttCapture,
+     *                                                              more_than_one(pos.checkers()),
+     *                                                                                  doubleExtension,
+     *                                                                                                      bool(extension),
+     *                                                                                                                          singularQuietLMR,
+     *                                                                                                                                              ss->ttPv && !PvNode,
+     *                                                                                                                                                                  move == ss->killers[0],
+     *                                                                                                                                                                                      move == ss->killers[1],
+     *                                                                                                                                                                                                          move == countermove
+     *
+     * HIT unweighted:
+     * BEST it=2200 fh=0.500691 T=2.33225e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
+     * */
+    /* SA27_1_w
 c0   cutNode, 
 c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
 c2   captureOrPromotion, 
@@ -363,7 +380,7 @@ c6   likelyFailLow,
 c7   ttCapture,
 c8   more_than_one(pos.checkers()),
 c9   doubleExtension,
-c19  bool(extension),
+c19  moveCountPruning, // CHANGED
 c11  singularQuietLMR,
 c12  ss->ttPv && !PvNode,
 c13  move == ss->killers[0],
@@ -379,31 +396,22 @@ c22  bool(moveCount & 4),
 c23  bool(moveCount & 8),
 c24  bool(moveCount & 16),
 c25  bool(moveCount & 32),
-c26  bool(moveCount & 64)
+c26  bool(moveCount & 64),
+c27  bool(type_of(movedPiece) & 1),
+c28  bool(type_of(movedPiece) & 2),
+c29  bool(type_of(movedPiece) & 4),
+c30  bool(pos.count<ALL_PIECES>() & 1),
+c31  bool(pos.count<ALL_PIECES>() & 2),
+c32  bool(pos.count<ALL_PIECES>() & 4),
+c33  bool(pos.count<ALL_PIECES>() & 8),
+c34  bool(pos.count<ALL_PIECES>() & 16)
+     *
      * CRAMER:
-     *
-     * !it=26 cramer=0.00115979 T=0.126008 msteps=1 => c1*!c6*c8*c10*c13*!c20*c21*!c24*!c25*!c26
-     * BEST it=2200 cramer=-0.182709 T=2.33225e-06 msteps=1 => !c13*!c14*!c15*!c26
-     *
-     * !it=16 cramer=-0.000407983 T=0.132485 msteps=1 => c0*!c2*!c3*c5*!c9*!c10*!c12*!c13*!c15*c16*c20*!c21*c24*c25
-     * BEST it=2200 cramer=0.236372 T=2.33225e-06 msteps=1 => c1*!c6*!c9*!c11*!c22*!c23*!c24*!c25
-     * C = (PvNode || cutNode) && !likelyFailLow &!doubleExtension & !singularQuietLMR & moveCount < 4
      *
      * HIT:
      *
-     * !it=19 fh=0.113071 T=0.130508 msteps=1 => c0*!c3*!c6*!c8*!c11*c14*!c16*!c20*!c21*!c26
-       C = cutNode && !givesCheck && !likelyFaillow && !more_than_one(pos.checkers())
-          && !singularQuietLMR && move == ss->killers[1] &&  !(int(depth) & 1)
-          && !(moveCount & 1) && !(moveCount & 2) && !(moveCount & 64)
-     *
-     * !it=36 fh=0.0847458 T=0.119847 msteps=1 => !c3*c4*c12*!c13*c15*!c16*!c18*c19*!c20*!c25
-     * BEST it=2200 fh=0.916667 T=2.33225e-06 msteps=1 => c1*!c2*c3*c5*!c6*!c7*!c12*c14*c15*c16*c17*!c18*!c20*c22*!c24*!c25
-     *
-     * BEST it=2200 fh=1 T=2.33225e-06 msteps=1 => c0*c1*!c4*c8*c10*c13*c15*!c20*c21*!c23*!c24
      *
      * CRAMER+HIT:
-     * BEST it=2200 cramer+hit=0.500691 T=2.33225e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
-     * C = cutNode && !captureOrPromotion && ttCapture && !more_than_one(pos.checkers())
      * */
     FUNC best, tmp;
     double bestVal = 0;
