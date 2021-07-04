@@ -405,6 +405,50 @@ c26  bool(moveCount & 64)
      * BEST it=2200 cramer+hit=0.500691 T=2.33225e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
      * C = cutNode && !captureOrPromotion && ttCapture && !more_than_one(pos.checkers())
      * */
+    /*
+     *   SA35_1_w
+     *  c0   cutNode,
+     *  c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+     *  c2   captureOrPromotion,
+     *  c3   givesCheck,
+     *  c4   ss->inCheck,
+     *  c5   improving,
+     *  c6   likelyFailLow,
+     *  c7   ttCapture,
+     *  c8   more_than_one(pos.checkers()),
+     *  c9   doubleExtension,
+     *  c19  moveCountPruning, // CHANGED
+     *  c11  singularQuietLMR,
+     *  c12  ss->ttPv && !PvNode,
+     *  c13  move == ss->killers[0],
+     *  c14  move == ss->killers[1],
+     *  c15  move == countermove,
+     *  c16  bool(int(depth) & 1),
+     *  c17  bool(int(depth) & 2),
+     *  c18  bool(int(depth) & 4),
+     *  c19  bool(int(depth) & 8),
+     *  c20  bool(moveCount & 1),
+     *  c21  bool(moveCount & 2),
+     *  c22  bool(moveCount & 4),
+     *  c23  bool(moveCount & 8),
+     *  c24  bool(moveCount & 16),
+     *  c25  bool(moveCount & 32),
+     *  c26  bool(moveCount & 64),
+     *  c27  bool(type_of(movedPiece) & 1),
+     *  c28  bool(type_of(movedPiece) & 2),
+     *  c29  bool(type_of(movedPiece) & 4),
+     *  c30  bool(pos.count<ALL_PIECES>() & 1),
+     *  c31  bool(pos.count<ALL_PIECES>() & 2),
+     *  c32  bool(pos.count<ALL_PIECES>() & 4),
+     *  c33  bool(pos.count<ALL_PIECES>() & 8),
+     *  c34  bool(pos.count<ALL_PIECES>() & 16),
+     *  c35  bool(extension)
+     *  *
+     *  * CRAMER:
+     *  *
+     *  * HIT:
+     *  *
+     * */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;
