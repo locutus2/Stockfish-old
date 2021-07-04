@@ -1178,6 +1178,71 @@ bool CC = false, C = false;
 		  [0] Total 4422 Mean 11.3071
 			  [0] Total 30081378 CramersV(x,y) = 0.00354724 error% =4.9685
 				  */
+	  /*
+	  C = (PvNode || cutNode) && !likelyFailLow && !doubleExtension && !singularQuietLMR && moveCount < 4;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 27529844 Hits 866086 hit rate (%) 3.14599
+	   * [11] Total 3456916 Hits 681556 hit rate (%) 19.7157
+	   * [100] Total 30986760 Hits 3456916 hit rate (%) 11.1561
+	   * [0] Total 30986760 CramersV(x,y) = 0.239477 error% =11.7516
+	   * */
+
+	  /*
+	  C = PvNode && !likelyFailLow && !doubleExtension && !singularQuietLMR && moveCount < 4;
+	  [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	  [10] Total 30794106 Hits 1525160 hit rate (%) 4.95277
+	  [11] Total 192654 Hits 22482 hit rate (%) 11.6696
+	  [100] Total 30986760 Hits 192654 hit rate (%) 0.62173
+	  [0] Total 30986760 CramersV(x,y) = 0.0242377 error% =5.47115
+	   * */
+	  /*
+	  C = cutNode && !likelyFailLow && !doubleExtension && !singularQuietLMR && moveCount < 4;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 27722498 Hits 888568 hit rate (%) 3.20522
+	   * [11] Total 3264262 Hits 659074 hit rate (%) 20.1906
+	   * [100] Total 30986760 Hits 3264262 hit rate (%) 10.5344
+	   * [0] Total 30986760 CramersV(x,y) = 0.239379 error% =11.275
+	   * */
+	  /*
+	  C = cutNode && !likelyFailLow && !doubleExtension && moveCount < 4;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 27670553 Hits 882712 hit rate (%) 3.19008
+	   * [11] Total 3316207 Hits 664930 hit rate (%) 20.0509
+	   * [100] Total 30986760 Hits 3316207 hit rate (%) 10.702
+	   * [0] Total 30986760 CramersV(x,y) = 0.239283 error% =11.4048
+	   * */
+	  /*
+	  C = cutNode && !likelyFailLow && !singularQuietLMR && moveCount < 4;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 27712502 Hits 888289 hit rate (%) 3.20537
+	   * [11] Total 3274258 Hits 659353 hit rate (%) 20.1375
+	   * [100] Total 30986760 Hits 3274258 hit rate (%) 10.5666
+	   * [0] Total 30986760 CramersV(x,y) = 0.23895 error% =11.3055
+	   * */
+	  /*
+            #C = cutNode && !doubleExtension && !singularQuietLMR && moveCount < 4;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 27722498 Hits 888568 hit rate (%) 3.20522
+	   * [11] Total 3264262 Hits 659074 hit rate (%) 20.1906
+	   * [100] Total 30986760 Hits 3264262 hit rate (%) 10.5344
+	   * [0] Total 30986760 CramersV(x,y) = 0.239379 error% =11.275
+	   * */
+	  /*
+	  C = cutNode && !doubleExtension && !singularQuietLMR;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 20707509 Hits 586556 hit rate (%) 2.83258
+	   * [11] Total 10279251 Hits 961086 hit rate (%) 9.34977
+	   * [100] Total 30986760 Hits 10279251 hit rate (%) 33.173
+	   * [0] Total 30986760 CramersV(x,y) = 0.140866 error% =31.9644
+	   * */
+	    /*
+            C = cutNode && moveCount < 4;
+	     * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	     * [10] Total 27642250 Hits 881197 hit rate (%) 3.18786
+	     * [11] Total 3344510 Hits 666445 hit rate (%) 19.9265
+	     * [100] Total 30986760 Hits 3344510 hit rate (%) 10.7934
+	     * [0] Total 30986760 CramersV(x,y) = 0.238438 error% =11.4864
+	     * */
 
           if (PvNode)
               r--;
@@ -1316,7 +1381,9 @@ bool CC = false, C = false;
 	      bool T = value > alpha;
 	      dbg_cramer_of(C, T);
 	      dbg_hit_on(T, 0);
-	      dbg_mean_of(C, T, 1);
+	      dbg_hit_on(T, 10+C);
+	      dbg_hit_on(C, 100);
+	      //dbg_mean_of(C, T, 1);
       }
 
       if (value > bestValue)
