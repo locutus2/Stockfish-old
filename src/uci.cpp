@@ -409,9 +409,10 @@ c26  bool(moveCount & 64)
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    constexpr bool WEIGHT_WITH_FREQ = false;
-    constexpr bool USE_CRAMER = false;
-    constexpr bool USE_CRAMER_AND_HIT = true;
+    constexpr bool WEIGHT_WITH_FREQ = true;
+    constexpr double MIN_FREQ = 0.01;
+    constexpr bool USE_CRAMER = true;
+    constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
@@ -421,7 +422,7 @@ c26  bool(moveCount & 64)
     double support = 0;
     double bestSupport = 0;
 
-    const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "fh");
+    const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
 
     func.randomInit();
 
@@ -474,7 +475,7 @@ c26  bool(moveCount & 64)
 
 	double val = 0;
 	double w = get_hit(10);
-	auto wFunc = [](double x) { return x; };
+	auto wFunc = [](double freq) { return freq < MIN_FREQ ? freq : 1.0; };
 
         if(USE_CRAMER_AND_HIT)
         {
