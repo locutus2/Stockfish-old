@@ -402,7 +402,8 @@ c26  bool(moveCount & 64)
      * BEST it=2200 fh=1 T=2.33225e-06 msteps=1 => c0*c1*!c4*c8*c10*c13*c15*!c20*c21*!c23*!c24
      *
      * CRAMER+HIT:
-     * BEST it=2000 cramer+hit=0.500691 T=6.35564e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
+     * BEST it=2200 cramer+hit=0.500691 T=2.33225e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
+     * C = cutNode && !captureOrPromotion && ttCapture && !more_than_one(pos.checkers())
      * */
     FUNC best, tmp;
     double bestVal = 0;
@@ -411,7 +412,7 @@ c26  bool(moveCount & 64)
     int steps = 0;
     constexpr bool WEIGHT_WITH_FREQ = true;
     constexpr double MIN_FREQ = 0.01;
-    constexpr bool USE_CRAMER = true;
+    constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
     constexpr double P0 = 0.5;
