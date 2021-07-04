@@ -1239,7 +1239,7 @@ moves_loop: // When in check, search starts from here
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
 		    more_than_one(pos.checkers()),
 		    doubleExtension,
-		    bool(extension),
+		    moveCountPruning,
 	            singularQuietLMR,
 	            ss->ttPv && !PvNode,
 		    move == ss->killers[0],    
@@ -1255,8 +1255,7 @@ moves_loop: // When in check, search starts from here
 		    bool(moveCount & 8),
 		    bool(moveCount & 16),
 		    bool(moveCount & 32),
-		    bool(moveCount & 64)
-		    /*
+		    bool(moveCount & 64),
 		    bool(type_of(movedPiece) & 1),
 		    bool(type_of(movedPiece) & 2),
 		    bool(type_of(movedPiece) & 4),
@@ -1264,8 +1263,7 @@ moves_loop: // When in check, search starts from here
 		    bool(pos.count<ALL_PIECES>() & 2),
 		    bool(pos.count<ALL_PIECES>() & 4),
 		    bool(pos.count<ALL_PIECES>() & 8),
-		    bool(pos.count<ALL_PIECES>() & 16)
-		    */
+		    bool(pos.count<ALL_PIECES>() & 16),
 		    /*
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
@@ -1273,6 +1271,7 @@ moves_loop: // When in check, search starts from here
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
+		    bool(extension)
 		    });
 
           if (PvNode)
