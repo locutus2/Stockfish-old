@@ -45,12 +45,23 @@ template <int N, int NC>
 void Function<N,NC>::randomInit()
 {
     std::srand(std::time(nullptr));
-    for(int i = 0; i < NC; ++i)
+    if (SPARSE_INIT)
     {
-	    //mask[i] = std::rand() * (RAND_MAX + 1) + std::rand();
+        for(int i = 0; i < NC; ++i)
+        {
+	    mask[i] = 1 << (std::rand() % N);
+	    positive[i] = std::rand();
+        }
+    }
+    else
+    {
+        for(int i = 0; i < NC; ++i)
+        {
+    	    //mask[i] = std::rand() * (RAND_MAX + 1) + std::rand();
 	    //positive[i] = std::rand() * (RAND_MAX + 1) + std::rand();
 	    mask[i] = std::rand();
 	    positive[i] = std::rand();
+        }
     }
 }
 

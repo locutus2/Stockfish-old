@@ -27,6 +27,7 @@
 
 namespace Stockfish {
 
+constexpr bool SPARSE_INIT = true;
 constexpr bool LESS_NEUTRAL_MUTATIONS = false;
 constexpr bool HILL_CLIMBING = false;
 constexpr bool SIMULATED_ANNEALING = true;
