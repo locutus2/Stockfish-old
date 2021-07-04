@@ -484,7 +484,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 
 	double val = 0;
 	double w = get_hit(10);
-	auto wFunc = [](double freq) { return freq < MIN_FREQ ? freq : 1.0; };
+	auto wFunc = [](double freq) { return std::min(1.0, freq / MIN_FREQ); };
 
         if(USE_CRAMER_AND_HIT)
         {
