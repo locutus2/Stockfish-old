@@ -383,8 +383,11 @@ c26  bool(moveCount & 64)
      * CRAMER:
      *
      * !it=26 cramer=0.00115979 T=0.126008 msteps=1 => c1*!c6*c8*c10*c13*!c20*c21*!c24*!c25*!c26
+     * BEST it=2200 cramer=-0.182709 T=2.33225e-06 msteps=1 => !c13*!c14*!c15*!c26
      *
      * !it=16 cramer=-0.000407983 T=0.132485 msteps=1 => c0*!c2*!c3*c5*!c9*!c10*!c12*!c13*!c15*c16*c20*!c21*c24*c25
+     * BEST it=2200 cramer=0.236372 T=2.33225e-06 msteps=1 => c1*!c6*!c9*!c11*!c22*!c23*!c24*!c25
+     * C = (PvNode || cutNode) && !likelyFailLow &!doubleExtension & !singularQuietLMR & moveCount < 4
      *
      * HIT:
      *
@@ -394,6 +397,12 @@ c26  bool(moveCount & 64)
           && !(moveCount & 1) && !(moveCount & 2) && !(moveCount & 64)
      *
      * !it=36 fh=0.0847458 T=0.119847 msteps=1 => !c3*c4*c12*!c13*c15*!c16*!c18*c19*!c20*!c25
+     * BEST it=2200 fh=0.916667 T=2.33225e-06 msteps=1 => c1*!c2*c3*c5*!c6*!c7*!c12*c14*c15*c16*c17*!c18*!c20*c22*!c24*!c25
+     *
+     * BEST it=2200 fh=1 T=2.33225e-06 msteps=1 => c0*c1*!c4*c8*c10*c13*c15*!c20*c21*!c23*!c24
+     *
+     * CRAMER+HIT:
+     * BEST it=2000 cramer+hit=0.500691 T=6.35564e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
      * */
     FUNC best, tmp;
     double bestVal = 0;
