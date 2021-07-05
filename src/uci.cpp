@@ -405,7 +405,7 @@ c26  bool(moveCount & 64)
      * BEST it=2200 cramer+hit=0.500691 T=2.33225e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
      * C = cutNode && !captureOrPromotion && ttCapture && !more_than_one(pos.checkers())
      * */
-    /*
+    /* prune
      *   SA35_1_w
      *  c0   cutNode,
      *  c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
@@ -447,7 +447,11 @@ c26  bool(moveCount & 64)
      *  * CRAMER:
      *  *
      *  * HIT:
-     *  *
+     *  *BEST it=300 hit=0.0504412 support=0.010036 T=0.0319096 msteps=1 => c0*c1*c5*!c7*c16*c28*c29
+     *  C = cutNode && improving && !ttCapture && bool(int(depth) & 1) && type_of(movedPiece) == KING
+     *
+     *  BEST it=300 hit=-0.0290207 support=0.997926 T=0.0319096 msteps=1 => c9*c24
+     *  C = !doubleExtension || 
      * */
     FUNC best, tmp;
     double bestVal = 0;
