@@ -407,10 +407,15 @@ c33  bool(pos.count<ALL_PIECES>() & 8),
 c34  bool(pos.count<ALL_PIECES>() & 16)
      *
      * CRAMER:
-     *
+     *BEST it=500 cramer=0.0845341 support=0.355078 T=0.0117095 msteps=1 => c0
+
+     BEST it=500 cramer=-0.0216342 support=0.93837 T=0.0117095 msteps=1 => !c0*c16*c17*!c28*c29
+
      * HIT:
-     *
-     *
+     *BEST it=500 hit=0.0504412 support=0.010036 T=0.0117095 msteps=1 => c0*c1*c5*!c7*c16*c28*c29
+
+     *BEST it=500 hit=-0.0290207 support=0.997926 T=0.0117095 msteps=1 => c9*c24
+
      * CRAMER+HIT:
      * */
     FUNC best, tmp;
