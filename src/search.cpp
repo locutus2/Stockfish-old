@@ -66,14 +66,26 @@ void Function<N,NC>::randomInit()
 }
 
 template <int N, int NC>
-void Function<N,NC>::mutate(int m)
+void Function<N,NC>::mutate(int m, bool avoidZero)
 {
 	while(m)
 	{
             int nc = std::rand() % NC;
             int n = std::rand() % N;
             if (std::rand() & 1)
+	    {
+                if (avoidZero && !(mask[n] & (1 << n)))
+		{
+			int i = 10;
+			do
+			{
+                            nc = std::rand() % NC;
+                            n = std::rand() % N;
+			}
+			while(i-- > 0 && !(mask[nc] & (1 << n)));
+		}
 	        mask[nc] ^= 1 << n;
+	    }
             else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (1 << n)))
 	        positive[nc] ^= 1 << n;
 	    else

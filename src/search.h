@@ -39,7 +39,7 @@ struct Function {
     uint64_t positive[NC], mask[NC];
 
     void randomInit();
-    void mutate(int m = 2);
+    void mutate(int m = 1, bool avoidZero = false);
     std::ostream& print(std::ostream& out) const;
 
     bool operator()(const std::vector<bool>& x) const;

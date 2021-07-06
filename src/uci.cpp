@@ -420,9 +420,10 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
      * */
     FUNC best, tmp;
     double bestVal = 0;
-    double curVal = 0;
+    double curVal = -1;
     int fails = 0;
     int steps = 0;
+    constexpr bool ESCAPE_ZERO = true;
     constexpr bool WEIGHT_WITH_FREQ = true;
     constexpr double MIN_FREQ = 0.01;
     constexpr bool USE_CRAMER = false;
@@ -449,7 +450,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
-            func.mutate(steps);
+            func.mutate(steps, ESCAPE_ZERO && curVal == 0);
         }
 	else if(HILL_CLIMBING)
         {
