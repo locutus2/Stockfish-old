@@ -43,6 +43,7 @@ struct Function {
     uint64_t positive[NC], mask[NC];
 
     void randomInit();
+    void init();
     void mutate(int m = 1, bool avoidZero = false);
     std::ostream& print(std::ostream& out) const;
 

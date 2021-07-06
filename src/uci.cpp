@@ -439,6 +439,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     double bestSupport = 0;
 
     const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
+    func.init();
 
         for (const auto& cmd : list)
         {
@@ -462,8 +463,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
             else if (token == "position")   position(pos, is, states);
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
-    func.randomInit();
 
+    func.randomInit();
     for(int it = 0;true;++it)
     {
 	dbg_reset();

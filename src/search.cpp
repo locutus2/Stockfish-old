@@ -49,14 +49,14 @@ void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
 	Record x = int(T);
 	for(int i = 0; i < N; ++i)
 		if (C[i])
-			x ^= 1 << (i+1);
+			x ^= Record(1) << (i+1);
 	samples.push_back(x);
 }
 
 template <int N, int NC>
 bool Function<N,NC>::getSampleClass(const Record& x) const
 {
-	return x & 1;
+	return x & Record(1);
 }
 
 template <int N, int NC>
@@ -64,15 +64,21 @@ bool Function<N,NC>::getSampleValue(const Record& x) const
 {
 	std::vector<bool> C(N);
 	for(int i = 0; i < N; ++i)
-		C[i] = x & (1 << (i+1));;
+		C[i] = x & (Record(1) << (i+1));;
 	return operator()(C);
 }
 
 
 template <int N, int NC>
-void Function<N,NC>::randomInit()
+void Function<N,NC>::init()
 {
     std::srand(std::time(nullptr));
+    //std::srand(1234);
+}
+
+template <int N, int NC>
+void Function<N,NC>::randomInit()
+{
     if (SPARSE_INIT)
     {
         for(int i = 0; i < NC; ++i)
