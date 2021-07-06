@@ -420,7 +420,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
      * */
     FUNC best, tmp;
     double bestVal = 0;
-    double curVal = -1;
+    double curVal = 0;
     int fails = 0;
     int steps = 0;
     constexpr bool ESCAPE_ZERO = true;
@@ -434,7 +434,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     //double T0 = 10;
     double T0 = -LOSS_P0/std::log(P0);
     double T = T0;
-    double support = 0;
+    double support = -1;
     double bestSupport = 0;
 
     const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
@@ -450,7 +450,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
-            func.mutate(steps, ESCAPE_ZERO && curVal == 0);
+            func.mutate(steps, ESCAPE_ZERO && (support == 0 || support == 1));
         }
 	else if(HILL_CLIMBING)
         {
