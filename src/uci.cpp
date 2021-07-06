@@ -426,6 +426,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     constexpr bool ESCAPE_ZERO = true;
     constexpr bool WEIGHT_WITH_FREQ = true;
     constexpr double MIN_FREQ = 0.01;
+    constexpr double MAX_FREQ = 0.99;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
@@ -450,7 +451,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
-            func.mutate(steps, ESCAPE_ZERO && (support == 0 || support == 1));
+            func.mutate(steps, ESCAPE_ZERO && (support == 0));
         }
 	else if(HILL_CLIMBING)
         {
@@ -490,7 +491,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 
 	double val = 0;
 	double w = get_hit(10);
-	auto wFunc = [](double freq) { return std::min(1.0, freq / MIN_FREQ); };
+	auto wFunc = [](double freq) { return std::min(std::min(1.0, freq / MIN_FREQ), std::min(1.0, (1-freq)/(1-MAX_FREQ))); };
 
         if(USE_CRAMER_AND_HIT)
         {
