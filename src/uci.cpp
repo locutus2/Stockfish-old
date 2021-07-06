@@ -440,6 +440,28 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 
     const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
 
+        for (const auto& cmd : list)
+        {
+            istringstream is(cmd);
+            is >> skipws >> token;
+
+            if (token == "go" || token == "eval")
+            {
+            //cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                if (token == "go")
+                {
+                   go(pos, is, states);
+                   Threads.main()->wait_for_search_finished();
+                   nodes += Threads.nodes_searched();
+		   //dbg_print();
+                }
+                else
+                   trace_eval(pos);
+            }
+            else if (token == "setoption")  setoption(is);
+            else if (token == "position")   position(pos, is, states);
+            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+        }
     func.randomInit();
 
     for(int it = 0;true;++it)
@@ -466,28 +488,15 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
             func.randomInit();
         }
 
-        for (const auto& cmd : list)
-        {
-            istringstream is(cmd);
-            is >> skipws >> token;
 
-            if (token == "go" || token == "eval")
-            {
-            //cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
-                if (token == "go")
-                {
-                   go(pos, is, states);
-                   Threads.main()->wait_for_search_finished();
-                   nodes += Threads.nodes_searched();
-		   //dbg_print();
-                }
-                else
-                   trace_eval(pos);
-            }
-            else if (token == "setoption")  setoption(is);
-            else if (token == "position")   position(pos, is, states);
-            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
-        }
+	for(const auto& x : samples)
+	{
+		bool TT = func.getSampleClass(x);
+		bool C = func.getSampleValue(x);
+              dbg_cramer_of(C, TT);
+              dbg_hit_on(TT, int(C));
+              dbg_hit_on(C, 10);
+	}
 
 	double val = 0;
 	double w = get_hit(10);

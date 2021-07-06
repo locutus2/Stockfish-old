@@ -37,9 +37,37 @@
 
 namespace Stockfish {
 
+std::vector<Record> samples;
+
 FUNC func;
 
 template class Function<F_N, F_NC>;
+
+template <int N, int NC>
+void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
+{
+	Record x = int(T);
+	for(int i = 0; i < N; ++i)
+		if (C[i])
+			x ^= 1 << (i+1);
+	samples.push_back(x);
+}
+
+template <int N, int NC>
+bool Function<N,NC>::getSampleClass(const Record& x) const
+{
+	return x & 1;
+}
+
+template <int N, int NC>
+bool Function<N,NC>::getSampleValue(const Record& x) const
+{
+	std::vector<bool> C(N);
+	for(int i = 0; i < N; ++i)
+		C[i] = x & (1 << (i+1));;
+	return operator()(C);
+}
+
 
 template <int N, int NC>
 void Function<N,NC>::randomInit()
@@ -1113,7 +1141,8 @@ moves_loop: // When in check, search starts from here
       // Calculate new depth for this move
       newDepth = depth - 1;
 
-      bool CC = false, C = false;
+      bool CC = false; 
+      std::vector<bool> C;
 
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
@@ -1123,7 +1152,7 @@ moves_loop: // When in check, search starts from here
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
           moveCountPruning = moveCount >= futility_move_count(improving, depth);
 
-          C = func({
+          C = {
 	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
 		    captureOrPromotion, givesCheck, 
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
@@ -1161,7 +1190,7 @@ moves_loop: // When in check, search starts from here
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
-      });
+      };
           // Reduced depth of the next LMR search
           int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount), 0);
 
@@ -1463,9 +1492,12 @@ moves_loop: // When in check, search starts from here
       if(CC)
       {
 	      bool T = value > alpha;
+	      /*
               dbg_cramer_of(C, T);
               dbg_hit_on(T, int(C));
               dbg_hit_on(C, 10);
+	      */
+	      func.addSample(T, C);
       }
 
       if (value > bestValue)
