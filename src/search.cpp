@@ -1450,6 +1450,14 @@ bool CC = false, C = false;
 	   * [100] Total 30986760 Hits 386871 hit rate (%) 1.2485
 	   * [0] Total 30986760 CramersV(x,y) = 0.121711 error% =5.52955
 	   * */
+	  /*
+	  C = !likelyFailLow && move == countermove;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 30047698 Hits 1351362 hit rate (%) 4.49739
+	   * [11] Total 939062 Hits 196280 hit rate (%) 20.9017
+	   * [100] Total 30986760 Hits 939062 hit rate (%) 3.03053
+	   * [0] Total 30986760 CramersV(x,y) = 0.129096 error% =6.75819
+	   * */
 
           if (PvNode)
               r--;
