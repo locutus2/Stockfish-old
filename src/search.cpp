@@ -1302,8 +1302,25 @@ bool CC = false, C = false;
 		 * [0] Total 30986760 CramersV(x,y) = 0.0359272 error% =13.5857
 		 * */
 	  /*
-	  C = cutNode && !doubleExtension && !extension && move == ss->killers[0] && (moveCount & 2) && !(moveCount & 8);
+	  C = cutNode && !doubleExtension && !moveCountPruning && move == ss->killers[0] && (moveCount & 2) && !(moveCount & 8);
 	   * BEST it=600 hit=0.355263 support=0.0110199 T=0.00709326 msteps=1 => c0*!c9*!c10*c13*c21*!c23
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 30645289 Hits 1426330 hit rate (%) 4.65432
+	   * [11] Total 341471 Hits 121312 hit rate (%) 35.5263
+	   * [100] Total 30986760 Hits 341471 hit rate (%) 1.10199
+	   * [0] Total 30986760 CramersV(x,y) = 0.147954 error% =5.31352
+	   * */
+	  /*
+	  C = cutNode && !doubleExtension && !moveCountPruning && move == ss->killers[0];
+	  [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	  [10] Total 30633746 Hits 1423538 hit rate (%) 4.64696
+	  [11] Total 353014 Hits 124104 hit rate (%) 35.1555
+	  [100] Total 30986760 Hits 353014 hit rate (%) 1.13924
+	  [0] Total 30986760 CramersV(x,y) = 0.148635 error% =5.33276
+	 */
+
+	  /*
+	  C = cutNode && !doubleExtension && !extension && move == ss->killers[0] && (moveCount & 2) && !(moveCount & 8);
 	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
 	   * [10] Total 30649572 Hits 1428227 hit rate (%) 4.65986
 	   * [11] Total 337188 Hits 119415 hit rate (%) 35.415
@@ -1366,6 +1383,73 @@ bool CC = false, C = false;
 	  [100] Total 30986760 Hits 358537 hit rate (%) 1.15707
 	  [0] Total 30986760 CramersV(x,y) = 0.14785 error% =5.34716
 	  */
+	/*
+	  C = cutNode && !ss->inCheck && !ttCapture && !singularQuietLMR && !(ss->ttPv && !PvNode) && move == countermove && !(int(depth) & 8) && (moveCount & 2) && !(moveCount & 32); 
+	 * BEST it=1400 hit=0.350634 support=0.00998556 T=0.000128621 msteps=1 => c0*!c4*!c7*!c11*!c12*c15*!c19*c21*!c25
+	 * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	 * [10] Total 30677340 Hits 1438992 hit rate (%) 4.69073
+	 * [11] Total 309420 Hits 108650 hit rate (%) 35.1141
+	 * [100] Total 30986760 Hits 309420 hit rate (%) 0.998556
+	 * [0] Total 30986760 CramersV(x,y) = 0.138865 error% =5.29181
+ 	* */
+
+	  /*
+	   * LMR
+	   *   SA36_1
+	   *  c0   cutNode,
+	   *  c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+	   *  c2   captureOrPromotion,                           
+	   *  c3   givesCheck,
+	   *  c4   ss->inCheck,
+	   *  c5   improving,
+	   *  c6   likelyFailLow,
+	   *  c7   ttCapture,
+	   *  c8   more_than_one(pos.checkers()),
+	   *  c9   doubleExtension,
+	   *  c10  moveCountPruning,
+	   *  c11  singularQuietLMR,
+	   *  c12  ss->ttPv && !PvNode,
+	   *  c13  move == ss->killers[0],
+	   *  c14  move == ss->killers[1],
+	   *  c15  move == countermove,
+	   *  c16  bool(int(depth) & 1),
+	   *  c17  bool(int(depth) & 2),
+	   *  c18  bool(int(depth) & 4),
+	   *  c19  bool(int(depth) & 8),
+	   *  c20  bool(moveCount & 1),
+	   *  c21  bool(moveCount & 2),
+	   *  c22  bool(moveCount & 4),
+	   *  c23  bool(moveCount & 8),
+	   *  c24  bool(moveCount & 16),
+	   *  c25  bool(moveCount & 32),
+	   *  c26  bool(moveCount & 64)
+	   *  c27  bool(type_of(movedPiece) & 1),
+	   *  c28  bool(type_of(movedPiece) & 2),
+	   *  c29  bool(type_of(movedPiece) & 4),
+	   *  c30  bool(pos.count<ALL_PIECES>() & 1),
+	   *  c31  bool(pos.count<ALL_PIECES>() & 2),
+	   *  c32  bool(pos.count<ALL_PIECES>() & 4),
+	   *  c33  bool(pos.count<ALL_PIECES>() & 8),
+	   *  c34  bool(pos.count<ALL_PIECES>() & 16)
+	   *  c35  bool(extension)
+	   * */
+	  /*
+	  C = improving && !likelyFailLow && !doubleExtension && !moveCountPruning && !singularQuietLMR && move == countermove && !(int(depth) & 8)  && !(moveCount & 8) && !(moveCount & 16);
+	   * BEST it=1900 hit=0.316886 support=0.0102391 T=1.04918e-05 msteps=1 => c5*!c6*!c9*!c10*!c11*c15*!c19*!c23*!c24
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 30669485 Hits 1447102 hit rate (%) 4.71838
+	   * [11] Total 317275 Hits 100540 hit rate (%) 31.6886
+	   * [100] Total 30986760 Hits 317275 hit rate (%) 1.02391
+	   * [0] Total 30986760 CramersV(x,y) = 0.12464 error% =5.36951
+	   * */
+	  /*
+	  C = improving && move == countermove;
+	   * [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   * [10] Total 30599889 Hits 1437099 hit rate (%) 4.69642
+	   * [11] Total 386871 Hits 110543 hit rate (%) 28.5736
+	   * [100] Total 30986760 Hits 386871 hit rate (%) 1.2485
+	   * [0] Total 30986760 CramersV(x,y) = 0.121711 error% =5.52955
+	   * */
 
           if (PvNode)
               r--;
