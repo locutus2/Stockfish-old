@@ -631,6 +631,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 		else //reject
 		{
 		    func = tmp;
+		cerr << "=it=" << it << " " << measure << "=" << curVal << " support=" << support << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
+                    func.print(cerr);
 		}
 	}
 	else if(HILL_CLIMBING)
