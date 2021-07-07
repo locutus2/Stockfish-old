@@ -46,6 +46,12 @@ template class Function<F_N, F_NC>;
 template <int N, int NC>
 void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
 {
+	if(N != (int)C.size()) 
+	{
+		std::cerr << "Error different number of conditions: N=" << N << " size(C)=" << C.size() << std::endl;
+		std::exit(1);
+	}
+
 	Record x = int(T);
 	for(int i = 0; i < N; ++i)
 		if (C[i])
@@ -1180,8 +1186,7 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 5
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-	            CC = true;
-          //        continue;
+                  continue;
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 7
