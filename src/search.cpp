@@ -37,14 +37,48 @@
 
 namespace Stockfish {
 
+std::vector<Record> samples;
+
 FUNC func;
 
 template class Function<F_N, F_NC>;
 
 template <int N, int NC>
-void Function<N,NC>::randomInit()
+void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
+{
+	Record x = int(T);
+	for(int i = 0; i < N; ++i)
+		if (C[i])
+			x ^= Record(1) << (i+1);
+	samples.push_back(x);
+}
+
+template <int N, int NC>
+bool Function<N,NC>::getSampleClass(const Record& x) const
+{
+	return x & Record(1);
+}
+
+template <int N, int NC>
+bool Function<N,NC>::getSampleValue(const Record& x) const
+{
+	std::vector<bool> C(N);
+	for(int i = 0; i < N; ++i)
+		C[i] = x & (Record(1) << (i+1));;
+	return operator()(C);
+}
+
+
+template <int N, int NC>
+void Function<N,NC>::init()
 {
     std::srand(std::time(nullptr));
+    //std::srand(1234);
+}
+
+template <int N, int NC>
+void Function<N,NC>::randomInit()
+{
     if (SPARSE_INIT)
     {
         for(int i = 0; i < NC; ++i)
@@ -66,14 +100,26 @@ void Function<N,NC>::randomInit()
 }
 
 template <int N, int NC>
-void Function<N,NC>::mutate(int m)
+void Function<N,NC>::mutate(int m, bool avoidZero)
 {
 	while(m)
 	{
             int nc = std::rand() % NC;
             int n = std::rand() % N;
             if (std::rand() & 1)
+	    {
+                if (avoidZero && !(mask[n] & (1 << n)))
+		{
+			int i = 10;
+			do
+			{
+                            nc = std::rand() % NC;
+                            n = std::rand() % N;
+			}
+			while(i-- > 0 && !(mask[nc] & (1 << n)));
+		}
 	        mask[nc] ^= 1 << n;
+	    }
             else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (1 << n)))
 	        positive[nc] ^= 1 << n;
 	    else
@@ -1101,6 +1147,9 @@ moves_loop: // When in check, search starts from here
       // Calculate new depth for this move
       newDepth = depth - 1;
 
+      bool CC = false; 
+      std::vector<bool> C;
+
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1131,7 +1180,8 @@ moves_loop: // When in check, search starts from here
               if (   lmrDepth < 5
                   && (*contHist[0])[movedPiece][to_sq(move)] < CounterMovePruneThreshold
                   && (*contHist[1])[movedPiece][to_sq(move)] < CounterMovePruneThreshold)
-                  continue;
+	            CC = true;
+          //        continue;
 
               // Futility pruning: parent node (~5 Elo)
               if (   lmrDepth < 7
@@ -1229,7 +1279,6 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
-      bool CC = false, C = false;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1244,7 +1293,7 @@ moves_loop: // When in check, search starts from here
           Depth r = reduction(improving, depth, moveCount);
 
 	  CC = true;
-          C = func({
+          C = {
 	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
 		    captureOrPromotion, givesCheck, 
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
@@ -1283,7 +1332,7 @@ moves_loop: // When in check, search starts from here
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
 		    bool(extension)
-		    });
+		    };
 
           if (PvNode)
               r--;
@@ -1420,9 +1469,12 @@ moves_loop: // When in check, search starts from here
       if(CC)
       {
 	      bool T = value > alpha;
+	      /*
               dbg_cramer_of(C, T);
               dbg_hit_on(T, int(C));
               dbg_hit_on(C, 10);
+	      */
+	      func.addSample(T, C);
       }
 
       if (value > bestValue)

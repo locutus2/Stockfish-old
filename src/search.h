@@ -27,6 +27,10 @@
 
 namespace Stockfish {
 
+typedef uint64_t Record;
+
+extern std::vector<Record> samples;
+
 constexpr bool SPARSE_INIT = true;
 constexpr bool LESS_NEUTRAL_MUTATIONS = false;
 constexpr bool HILL_CLIMBING = false;
@@ -39,10 +43,15 @@ struct Function {
     uint64_t positive[NC], mask[NC];
 
     void randomInit();
-    void mutate(int m = 2);
+    void init();
+    void mutate(int m = 1, bool avoidZero = false);
     std::ostream& print(std::ostream& out) const;
 
     bool operator()(const std::vector<bool>& x) const;
+
+    void addSample(bool T, const std::vector<bool>& C) const;
+    bool getSampleClass(const Record& x) const;
+    bool getSampleValue(const Record& x) const;
 };
 
 typedef Function<F_N, F_NC> FUNC;
