@@ -480,6 +480,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     constexpr bool WEIGHT_WITH_FREQ = true;
     double MIN_FREQ = Options["SA_minFreq"] / 1000.0;
     double MAX_FREQ = 1 - MIN_FREQ;
+    constexpr bool MAXIMIZE = false;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
@@ -490,6 +491,9 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     double T = T0;
     double support = -1;
     double bestSupport = 0;
+
+    //auto Greater = std::conditional<MAXIMIZE, std::greater<double>, std::less<double>>::type();
+    auto Greater = std::greater<double>();
 
     std::cerr << "Minimum frequency: " << MIN_FREQ << std::endl;
 
@@ -558,11 +562,14 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	double w = get_hit(10);
 	auto wFunc = [&](double freq) { return std::min(std::min(1.0, freq / MIN_FREQ), std::min(1.0, (1-freq)/(1-MAX_FREQ))); };
 
+	double get_hit1 = MAXIMIZE ? get_hit(1) : 1 - get_hit(1);
+	double get_hit0 = MAXIMIZE ? get_hit(0) : 1 - get_hit(0);
+
         if(USE_CRAMER_AND_HIT)
         {
             double valc = get_cramer();
-            double v1 = get_hit(1);
-            double v0 = get_hit(0);
+            double v1 = get_hit1;
+            double v0 = get_hit0;
 	    if (WEIGHT_WITH_FREQ)
 	    {
 		valc *= wFunc(val >= 0 ? w : 1-w);
@@ -581,8 +588,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
         }	 
 	else // HIT
 	{
-            double v1 = get_hit(1);
-            double v0 = get_hit(0);
+            double v1 = get_hit1;
+            double v0 = get_hit0;
 	    if (WEIGHT_WITH_FREQ)
 	    {
                 v1 *= wFunc(w);
@@ -607,7 +614,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	if(it == 0 || std::abs(val) > std::abs(curVal))
 	{
 		curVal = val;
-	        if(!SIMULATED_ANNEALING || it == 0 || std::abs(curVal) > std::abs(bestVal))
+	        if(!SIMULATED_ANNEALING || it == 0 || Greater(std::abs(curVal), std::abs(bestVal)))
 		{
 		    best = func;
 		    bestVal = curVal;
@@ -627,7 +634,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	}
 	else if(SIMULATED_ANNEALING)
         {
-		double p = std::exp(-(std::abs(curVal) - std::abs(val))/T);
+		double p = std::exp(-std::abs(std::abs(curVal) - std::abs(val))/T);
 		double r = std::rand()/double(RAND_MAX);
 		if(r <= p) // accept
 		{
