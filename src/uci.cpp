@@ -478,8 +478,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     int steps = 0;
     constexpr bool ESCAPE_ZERO = true;
     constexpr bool WEIGHT_WITH_FREQ = true;
-    constexpr double MIN_FREQ = 0.1;
-    constexpr double MAX_FREQ = 0.9;
+    double MIN_FREQ = Options["SA_minFreq"] / 1000.0;
+    double MAX_FREQ = 1 - MIN_FREQ;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
@@ -490,6 +490,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     double T = T0;
     double support = -1;
     double bestSupport = 0;
+
+    std::cerr << "Minimum frequency: " << MIN_FREQ << std::endl;
 
     const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
     func.init();
@@ -554,7 +556,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 
 	double val = 0;
 	double w = get_hit(10);
-	auto wFunc = [](double freq) { return std::min(std::min(1.0, freq / MIN_FREQ), std::min(1.0, (1-freq)/(1-MAX_FREQ))); };
+	auto wFunc = [&](double freq) { return std::min(std::min(1.0, freq / MIN_FREQ), std::min(1.0, (1-freq)/(1-MAX_FREQ))); };
 
         if(USE_CRAMER_AND_HIT)
         {

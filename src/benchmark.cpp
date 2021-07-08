@@ -22,6 +22,7 @@
 #include <vector>
 
 #include "position.h"
+#include "uci.h"
 
 using namespace std;
 
@@ -113,6 +114,7 @@ vector<string> setup_bench(const Position& current, istream& is) {
   string go, token;
 
   // Assign default values to missing arguments
+  string minFreq   = (is >> token) ? token : "10";
   string ttSize    = (is >> token) ? token : "16";
   string threads   = (is >> token) ? token : "1";
   string limit     = (is >> token) ? token : "13";
@@ -145,6 +147,8 @@ vector<string> setup_bench(const Position& current, istream& is) {
 
       file.close();
   }
+
+  Options["SA_minFreq"] = minFreq;
 
   list.emplace_back("setoption name Threads value " + threads);
   list.emplace_back("setoption name Hash value " + ttSize);
