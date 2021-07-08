@@ -465,6 +465,11 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
      *
      *  BEST it=300 hit=-0.0290207 support=0.997926 T=0.0319096 msteps=1 => c9*c24
      *  C = !doubleExtension || 
+     *
+     *  BEST it=19000 hit=0.31693 support=0.0102376 T=6.24499e-43 msteps=1 => c5*!c6*!c9*!c11*c15*!c19*!c23*!c24*!c25
+     *  BEST it=19500 hit=0.350634 support=0.00998556 T=5.09416e-44 msteps=1 => c0*!c4*!c7*!c11*!c12*c15*!c19*c21*!c25
+     *  BEST it=19100 hit=0.275892 support=0.0108136 T=3.78303e-43 msteps=1 => c0*!c2*!c4*!c7*!c11*!c12*!c19*!c20*c21*!c22*!c23*!c24*!c25*!c29*!c30
+     *  BEST it=19600 hit=0.369648 support=0.00996203 T=3.08589e-44 msteps=1 => c0*c1*!c6*!c12*c13:wq
      * */
     FUNC best, tmp;
     double bestVal = 0;
@@ -473,8 +478,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     int steps = 0;
     constexpr bool ESCAPE_ZERO = true;
     constexpr bool WEIGHT_WITH_FREQ = true;
-    constexpr double MIN_FREQ = 0.01;
-    constexpr double MAX_FREQ = 0.99;
+    constexpr double MIN_FREQ = 0.001;
+    constexpr double MAX_FREQ = 0.999;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
