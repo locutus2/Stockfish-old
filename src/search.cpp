@@ -1498,6 +1498,23 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 	   * BEST it=1600 hit=0.472238 support=0.00104387 T=4.71983e-05 msteps=1 => c0*c5*!c7*!c9*!c10*!c11*!c12*c15*c16*!c18*!c19*!c20*!c22*!c23*!c26*!c28
 	   * */
 
+	  /*
+	   BEST it=1100 hit=0.170308 support=0.0997138 T=0.000578611 msteps=1 => c0*c5*!c11*!c23*!c24*!c25;
+	  C = cutNode && improving && !singularQuietLMR && !(moveCount & 8) && !(moveCount & 16) && !(moveCount & 32);
+	   [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   [10] Total 27896951 Hits 1019913 hit rate (%) 3.656
+	   [11] Total 3089809 Hits 527729 hit rate (%) 17.0797
+	   [100] Total 30986760 Hits 3089809 hit rate (%) 9.97138
+	   [0] Total 30986760 CramersV(x,y) = 0.184637 error% =11.5598
+	   */
+	  /*
+	  C = cutNode && improving && !singularQuietLMR && moveCount < 8;
+	  [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	  [10] Total 27896953 Hits 1019913 hit rate (%) 3.656
+	  [11] Total 3089807 Hits 527729 hit rate (%) 17.0797
+	  [100] Total 30986760 Hits 3089807 hit rate (%) 9.97138
+	  [0] Total 30986760 CramersV(x,y) = 0.184637 error% =11.5597
+	  */
 
           if (PvNode)
               r--;
