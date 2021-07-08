@@ -1160,8 +1160,8 @@ moves_loop: // When in check, search starts from here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-          if (cutNode && improving && !singularQuietLMR && moveCount < 8)
-              --r;
+          if (!cutNode && depth >= 8 && moveCount >= 8 && type_of(movedPiece) == KING)
+              r++;
 
           if (!captureOrPromotion)
           {
