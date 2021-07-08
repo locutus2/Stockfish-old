@@ -478,8 +478,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     int steps = 0;
     constexpr bool ESCAPE_ZERO = true;
     constexpr bool WEIGHT_WITH_FREQ = true;
-    constexpr double MIN_FREQ = 0.001;
-    constexpr double MAX_FREQ = 0.999;
+    constexpr double MIN_FREQ = 0.1;
+    constexpr double MAX_FREQ = 0.9;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
