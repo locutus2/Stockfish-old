@@ -480,7 +480,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     constexpr bool WEIGHT_WITH_FREQ = true;
     double MIN_FREQ = Options["SA_minFreq"] / 1000.0;
     double MAX_FREQ = 1 - MIN_FREQ;
-    constexpr bool MAXIMIZE = false;
+    constexpr bool MAXIMIZE = true;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     constexpr double LAMBDA = 0.995;
@@ -549,13 +549,21 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
         }
 
 
-	for(const auto& x : samples)
+	//for(const auto& x : samples)
+	int nn = (int)samples.size();
+	for(int i = 0; i < nn; ++i)
 	{
+		const auto& x = samples[i];
 		bool TT = func.getSampleClass(x);
 		bool C = func.getSampleValue(x);
               dbg_cramer_of(C, TT);
               dbg_hit_on(TT, int(C));
               dbg_hit_on(C, 10);
+
+	      if(OPTIMIZE_DIFF)
+	      {
+		bool T2 = func.getSampleClass2(i);
+	      }
 	}
 
 	double val = 0;

@@ -38,10 +38,28 @@
 namespace Stockfish {
 
 std::vector<Record> samples;
+std::vector<bool> samples2;
 
 FUNC func;
 
 template class Function<F_N, F_NC>;
+
+template <int N, int NC>
+void Function<N,NC>::addSample(bool T, bool T2, const std::vector<bool>& C) const
+{
+	if(N != (int)C.size()) 
+	{
+		std::cerr << "Error different number of conditions: N=" << N << " size(C)=" << C.size() << std::endl;
+		std::exit(1);
+	}
+
+	Record x = int(T);
+	for(int i = 0; i < N; ++i)
+		if (C[i])
+			x ^= Record(1) << (i+1);
+	samples.push_back(x);
+	samples2.push_back(T2);
+}
 
 template <int N, int NC>
 void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
@@ -57,6 +75,12 @@ void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
 		if (C[i])
 			x ^= Record(1) << (i+1);
 	samples.push_back(x);
+}
+
+template <int N, int NC>
+bool Function<N,NC>::getSampleClass2(int i) const
+{
+	return samples2[i];
 }
 
 template <int N, int NC>
@@ -1155,6 +1179,7 @@ moves_loop: // When in check, search starts from here
 
       bool CC = false; 
       std::vector<bool> C;
+      Value value2 = VALUE_ZERO;
 
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
@@ -1396,6 +1421,16 @@ moves_loop: // When in check, search starts from here
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
           didLMR = true;
+
+	  if (OPTIMIZE_DIFF)
+	  {
+              Depth d2 = std::clamp(d + 1, 1, newDepth + (r < -1 && moveCount <= 5 && !doubleExtension));
+	      if(d != d2)
+	      {
+                  value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d2, true);
+	      }
+	      else CC = false;
+	  }
       }
       else
       {
@@ -1479,7 +1514,10 @@ moves_loop: // When in check, search starts from here
               dbg_hit_on(T, int(C));
               dbg_hit_on(C, 10);
 	      */
-	      func.addSample(T, C);
+	      if (OPTIMIZE_DIFF)
+	          func.addSample(T, value2 > alpha, C);
+	      else
+	          func.addSample(T, C);
       }
 
       if (value > bestValue)

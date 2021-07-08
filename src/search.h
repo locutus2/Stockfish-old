@@ -31,6 +31,7 @@ typedef uint64_t Record;
 
 extern std::vector<Record> samples;
 
+constexpr bool OPTIMIZE_DIFF = false; // true not implemented
 constexpr bool SPARSE_INIT = true;
 constexpr bool LESS_NEUTRAL_MUTATIONS = false;
 constexpr bool HILL_CLIMBING = false;
@@ -50,7 +51,9 @@ struct Function {
     bool operator()(const std::vector<bool>& x) const;
 
     void addSample(bool T, const std::vector<bool>& C) const;
+    void addSample(bool T, bool T2, const std::vector<bool>& C) const;
     bool getSampleClass(const Record& x) const;
+    bool getSampleClass2(int i) const;
     bool getSampleValue(const Record& x) const;
 };
 
