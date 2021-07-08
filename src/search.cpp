@@ -1534,14 +1534,29 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 	       [11] Total 330822 Hits 1398 hit rate (%) 0.422584
 	       [100] Total 30986760 Hits 330822 hit rate (%) 1.06762
 	       [0] Total 30986760 CramersV(x,y) = -0.0218031 error% =6.05313
+
+           * BEST it=2500 hit=0.997375 support=0.0108797 T=5.18441e-07 msteps=1 => !c0*!c1*!c3*!c4*!c11*!c13*!c15*c17*c19*c21*c22
+	   C = !PvNode && !cutNode && !givesCheck && !ss->inCheck && !singularQuietLMR && move != ss->killers[0] && move != countermove
+	       && (int(depth) & 2) && (int(depth) & 8) && (moveCount & 2) && (moveCount & 4);
 	   *
 	   * BEST it=800 hit=0.995603 support=0.0156191 T=0.00260293 msteps=1 => !c0*!c2*!c5*!c7*!c9*!c12*!c13*!c15*!c18*c19*c21*c22
+	   * BEST it=2500 hit=0.995603 support=0.0156191 T=5.18441e-07 msteps=1 => !c0*!c2*!c5*!c7*!c9*!c12*!c13*!c15*!c18*c19*c21*c22
 	   *
 	   * BEST it=800 hit=0.993803 support=0.0105825 T=0.00260293 msteps=1 => !c3*!c4*!c5*!c13*c16*c19*c20*!c26*!c28*c29
+	   * BEST it=2500 hit=0.995546 support=0.0100862 T=5.18441e-07 msteps=1 => !c1*!c2*!c3*!c5*!c10*!c11*!c14*!c15*c17*c21*c22*!c25*!c26*c30
 	   *
 	   * BEST it=800 hit=0.997737 support=0.0123518 T=0.00260293 msteps=1 => !c0*!c3*!c5*!c8*!c10*!c12*!c18*c19*c22*c23*!c25
-	   *
+	   * BEST it=2500 hit=0.997737 support=0.0123518 T=5.18441e-07 msteps=1 => !c0*!c3*!c5*!c8*!c10*!c12*!c18*c19*c22*c23*!c25
 	   * */
+	  /*
+	   C = !PvNode && !cutNode && !givesCheck && !ss->inCheck && !singularQuietLMR && move != ss->killers[0] && move != countermove
+	       && (int(depth) & 2) && (int(depth) & 8) && (moveCount & 2) && (moveCount & 4);
+	       [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	       [10] Total 30649632 Hits 1546757 hit rate (%) 5.04658
+	       [11] Total 337128 Hits 885 hit rate (%) 0.262512
+	       [100] Total 30986760 Hits 337128 hit rate (%) 1.08797
+	       [0] Total 30986760 CramersV(x,y) = -0.0227829 error% =6.07679
+	       */
 	  /*
 	   C = !cutNode && (int(depth) & 8) && !(moveCount & 2) && (moveCount & 8) && !(moveCount & 32) && (type_of(movedPiece) == ROOK || type_of(movedPiece) == KING);
 	   [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
@@ -1565,7 +1580,7 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 	   [11] Total 1707531 Hits 5620 hit rate (%) 0.32913
 	   [100] Total 30986760 Hits 1707531 hit rate (%) 5.51052
 	   [0] Total 30986760 CramersV(x,y) = -0.0517216 error% =10.4688
-	   */;
+	   */
 	  /*
 	   C = !cutNode && depth >= 8 && moveCount >= 8 && moveCount < 32 && (type_of(movedPiece) == ROOK || type_of(movedPiece) == KING);
 	   [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
