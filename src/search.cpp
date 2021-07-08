@@ -1458,7 +1458,14 @@ bool CC = false, C = false;
 	   * [100] Total 30986760 Hits 939062 hit rate (%) 3.03053
 	   * [0] Total 30986760 CramersV(x,y) = 0.129096 error% =6.75819
 	   * */
-
+	  /*
+C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->ttPv && pos.rule50_count() <= 11;
+[0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+[10] Total 30954397 Hits 1544282 hit rate (%) 4.98889
+[11] Total 32363 Hits 3360 hit rate (%) 10.3822
+[100] Total 30986760 Hits 32363 hit rate (%) 0.104441
+[0] Total 30986760 CramersV(x,y) = 0.00799733 error% =5.07728
+*/
           if (PvNode)
               r--;
 
