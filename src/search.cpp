@@ -1676,7 +1676,86 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 [0] Total 30986760 CramersV(x,y) = 0.155497 error% =5.88319
 
  * */
-  C = depth >= 10;
+
+  CC = depth >= 10;
+	  /*
+  CC = depth >= 10;
+	   * LMR
+	   *   SA36_1
+	   *  c0   cutNode,
+	   *  c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+	   *  c2   captureOrPromotion,                           
+	   *  c3   givesCheck,
+	   *  c4   ss->inCheck,
+	   *  c5   improving,
+	   *  c6   likelyFailLow,
+	   *  c7   ttCapture,
+	   *  c8   more_than_one(pos.checkers()),
+	   *  c9   doubleExtension,
+	   *  c10  moveCountPruning,
+	   *  c11  singularQuietLMR,
+	   *  c12  ss->ttPv && !PvNode,
+	   *  c13  move == ss->killers[0],
+	   *  c14  move == ss->killers[1],
+	   *  c15  move == countermove,
+	   *  c16  bool(int(depth) & 1),
+	   *  c17  bool(int(depth) & 2),
+	   *  c18  bool(int(depth) & 4),
+	   *  c19  bool(int(depth) & 8),
+	   *  c20  bool(moveCount & 1),
+	   *  c21  bool(moveCount & 2),
+	   *  c22  bool(moveCount & 4),
+	   *  c23  bool(moveCount & 8),
+	   *  c24  bool(moveCount & 16),
+	   *  c25  bool(moveCount & 32),
+	   *  c26  bool(moveCount & 64)
+	   *  c27  bool(type_of(movedPiece) & 1),
+	   *  c28  bool(type_of(movedPiece) & 2),
+	   *  c29  bool(type_of(movedPiece) & 4),
+	   *  c30  bool(pos.count<ALL_PIECES>() & 1),
+	   *  c31  bool(pos.count<ALL_PIECES>() & 2),
+	   *  c32  bool(pos.count<ALL_PIECES>() & 4),
+	   *  c33  bool(pos.count<ALL_PIECES>() & 8),
+	   *  c34  bool(pos.count<ALL_PIECES>() & 16)
+	   *  c35  bool(extension)
+	   * */
+	  /*
+	   * BEST it=1600 hit=0.181278 support=0.00987941 T=4.71983e-05 msteps=1 => c0*!c2*!c6*!c7*!c11*c19*!c22*!c23*!c24*!c25*!c26
+	   *
+	   * BEST it=1700 hit=0.195637 support=0.0100839 T=2.85914e-05 msteps=1 => c0*!c6*!c20*c21*!c22*!c23*!c24*!c25   
+	   C = cutNode && !likelyfailLow && !(moveCount & 1) && (moveCount & 2) && !(moveCount & 4) && !(moveCount & 8)
+	       && !(moveCount & 16) && !(moveCount & 32);
+	   *
+	   * BEST it=1900 hit=0.106508 support=0.0104801 T=1.04918e-05 msteps=1 => c13*!c30
+	   *
+	   * BEST it=2600 hit=0.132898 support=0.0099032 T=3.14056e-07 msteps=1 => c0*!c9*!c12*c19*!c20*c21*!c22*!c25
+* */
+  /*
+	   C = cutNode && !likelyFailLow && !(moveCount & 1) && (moveCount & 2) && !(moveCount & 4) && !(moveCount & 8)
+	       && !(moveCount & 16) && !(moveCount & 32);
+	       [0] Total 2899971 Hits 24759 hit rate (%) 0.853767
+	       [10] Total 2870728 Hits 19038 hit rate (%) 0.663177
+	       [11] Total 29243 Hits 5721 hit rate (%) 19.5637
+	       [100] Total 2899971 Hits 29243 hit rate (%) 1.00839
+	       [0] Total 2899971 CramersV(x,y) = 0.205248 error% =1.4676
+	       */
+  /*
+	   C = cutNode && !likelyFailLow && moveCount <= 2;
+	   [0] Total 2899971 Hits 24759 hit rate (%) 0.853767
+	   [10] Total 2870728 Hits 19038 hit rate (%) 0.663177
+	   [11] Total 29243 Hits 5721 hit rate (%) 19.5637
+	   [100] Total 2899971 Hits 29243 hit rate (%) 1.00839
+	   [0] Total 2899971 CramersV(x,y) = 0.205248 error% =1.4676
+	   */
+  /*
+  CC = true;
+	   C = depth >= 10 && cutNode && !likelyFailLow && moveCount <= 2;
+	   [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   [10] Total 30957517 Hits 1541921 hit rate (%) 4.98076
+	   [11] Total 29243 Hits 5721 hit rate (%) 19.5637
+	   [100] Total 30986760 Hits 29243 hit rate (%) 0.0943726
+	   [0] Total 30986760 CramersV(x,y) = 0.0205561 error% =5.05197
+	   */
           if (PvNode)
               r--;
 
