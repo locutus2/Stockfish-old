@@ -1721,14 +1721,18 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 	   * */
 	  /*
 	   * BEST it=1600 hit=0.181278 support=0.00987941 T=4.71983e-05 msteps=1 => c0*!c2*!c6*!c7*!c11*c19*!c22*!c23*!c24*!c25*!c26
+	   * BEST it=12900 hit=0.181278 support=0.00987941 T=1.18779e-29 msteps=1 => c0*!c2*!c6*!c7*!c11*c19*!c22*!c23*!c24*!c25*!c26
 	   *
 	   * BEST it=1700 hit=0.195637 support=0.0100839 T=2.85914e-05 msteps=1 => c0*!c6*!c20*c21*!c22*!c23*!c24*!c25   
 	   C = cutNode && !likelyfailLow && !(moveCount & 1) && (moveCount & 2) && !(moveCount & 4) && !(moveCount & 8)
 	       && !(moveCount & 16) && !(moveCount & 32);
+	       BEST it=12800 hit=0.195637 support=0.0100839 T=1.96079e-29 msteps=1 => c0*!c6*!c20*c21*!c22*!c23*!c24*!c25
 	   *
 	   * BEST it=1900 hit=0.106508 support=0.0104801 T=1.04918e-05 msteps=1 => c13*!c30
+	   * BEST it=12800 hit=0.171967 support=0.0105836 T=1.96079e-29 msteps=1 => c0*!c2*!c4*!c7*!c8*!c9*!c10*!c18*c21*!c22*!c23*!c24*!c25*!c26
 	   *
 	   * BEST it=2600 hit=0.132898 support=0.0099032 T=3.14056e-07 msteps=1 => c0*!c9*!c12*c19*!c20*c21*!c22*!c25
+	   * BEST it=12900 hit=0.132898 support=0.0099032 T=1.18779e-29 msteps=1 => c0*!c9*!c12*c19*!c20*c21*!c22*!c25
 * */
   /*
 	   C = cutNode && !likelyFailLow && !(moveCount & 1) && (moveCount & 2) && !(moveCount & 4) && !(moveCount & 8)
