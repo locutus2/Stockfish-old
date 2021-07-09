@@ -1760,6 +1760,15 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 	   [100] Total 30986760 Hits 29243 hit rate (%) 0.0943726
 	   [0] Total 30986760 CramersV(x,y) = 0.0205561 error% =5.05197
 	   */
+  /*
+  CC = true;
+	   C = depth >= 10 && cutNode && moveCount <= 2;
+	   [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+	   [10] Total 30957517 Hits 1541921 hit rate (%) 4.98076
+	   [11] Total 29243 Hits 5721 hit rate (%) 19.5637
+	   [100] Total 30986760 Hits 29243 hit rate (%) 0.0943726
+	   [0] Total 30986760 CramersV(x,y) = 0.0205561 error% =5.05197
+	   */
           if (PvNode)
               r--;
 
