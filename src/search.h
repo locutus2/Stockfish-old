@@ -31,6 +31,7 @@ typedef uint64_t Record;
 
 extern std::vector<Record> samples;
 
+constexpr bool AVOID_ZERO = true;
 constexpr bool OPTIMIZE_DIFF = false; // true not implemented
 constexpr bool SPARSE_INIT = true;
 constexpr bool LESS_NEUTRAL_MUTATIONS = false;
@@ -45,7 +46,7 @@ struct Function {
 
     void randomInit();
     void init();
-    void mutate(int m = 1, bool avoidZero = false);
+    void mutate(int m = 1, double aupport = 0.5);
     std::ostream& print(std::ostream& out) const;
 
     bool operator()(const std::vector<bool>& x) const;

@@ -533,7 +533,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
-            func.mutate(steps, ESCAPE_ZERO && (support == 0));
+            func.mutate(steps, support);
         }
 	else if(HILL_CLIMBING)
         {
