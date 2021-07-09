@@ -1665,7 +1665,18 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 	   [100] Total 30986760 Hits 1184839 hit rate (%) 3.82369
 	   [0] Total 30986760 CramersV(x,y) = -0.0422617 error% =8.78935
 	   */
+/*
+ * BEST it=2000 hit=0.283787 support=0.0205507 T=6.35564e-06 msteps=1 => c0*!c4*c5*!c9*!c10*!c11*!c12*c21*!c22*!c23*!c24*!c25*!c26*c27
+  C = cutNode && !ss->inCheck && improving && !doubleExtension && !moveCountPruning && !singularQuietLMR && !ss->ttPv && (moveCount & 2) && !(moveCount & 4) && !(moveCount & 8)
+	   && !(moveCount & 16) && !bool(moveCount & 32) && !(moveCount & 64) && (type_of(movedPiece) & 1);
+	   [0] Total 30986760 Hits 1547642 hit rate (%) 4.99453
+[10] Total 30349961 Hits 1366927 hit rate (%) 4.50388
+[11] Total 636799 Hits 180715 hit rate (%) 28.3787
+[100] Total 30986760 Hits 636799 hit rate (%) 2.05507
+[0] Total 30986760 CramersV(x,y) = 0.155497 error% =5.88319
 
+ * */
+  C = depth >= 10;
           if (PvNode)
               r--;
 
