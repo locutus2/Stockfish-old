@@ -32,7 +32,7 @@ typedef uint64_t Record;
 extern std::vector<Record> samples;
 
 constexpr bool AVOID_ZERO = true;
-constexpr bool OPTIMIZE_DIFF = false; // true not implemented
+constexpr bool OPTIMIZE_DIFF = true;
 constexpr bool SPARSE_INIT = true;
 constexpr bool LESS_NEUTRAL_MUTATIONS = false;
 constexpr bool HILL_CLIMBING = false;

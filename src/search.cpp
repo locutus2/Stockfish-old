@@ -1522,13 +1522,15 @@ moves_loop: // When in check, search starts from here
       if(CC)
       {
 	      bool T = value > alpha;
+	      bool T2 = value2 > alpha;
 	      /*
               dbg_cramer_of(C, T);
               dbg_hit_on(T, int(C));
               dbg_hit_on(C, 10);
 	      */
 	      if (OPTIMIZE_DIFF)
-	          func.addSample(T, value2 > alpha, C);
+	          //func.addSample(T, value2 > alpha, C);
+	          func.addSample(T != T2, C);
 	      else
 	          func.addSample(T, C);
       }

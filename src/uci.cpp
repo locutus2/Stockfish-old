@@ -559,10 +559,12 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
               dbg_hit_on(TT, int(C));
               dbg_hit_on(C, 10);
 
+	      /*
 	      if(OPTIMIZE_DIFF)
 	      {
 		bool T2 = func.getSampleClass2(i);
 	      }
+	      */
 	}
 
 	double val = 0;
