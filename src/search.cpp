@@ -1192,6 +1192,7 @@ moves_loop: // When in check, search starts from here
 
       bool CC = false; 
       std::vector<bool> C;
+      Value value1 = VALUE_ZERO;
       Value value2 = VALUE_ZERO;
 
       // Step 13. Pruning at shallow depth (~200 Elo)
@@ -1440,6 +1441,7 @@ moves_loop: // When in check, search starts from here
               Depth d2 = std::clamp(d + 1, 1, newDepth + (r < -1 && moveCount <= 5 && !doubleExtension));
 	      if(d != d2)
 	      {
+		  value1 = value;
                   value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d2, true);
 	      }
 	      else CC = false;
@@ -1522,6 +1524,7 @@ moves_loop: // When in check, search starts from here
       if(CC)
       {
 	      bool T = value > alpha;
+	      bool T1 = value1 > alpha;
 	      bool T2 = value2 > alpha;
 	      /*
               dbg_cramer_of(C, T);
@@ -1530,7 +1533,7 @@ moves_loop: // When in check, search starts from here
 	      */
 	      if (OPTIMIZE_DIFF)
 	          //func.addSample(T, value2 > alpha, C);
-	          func.addSample(T != T2, C);
+	          func.addSample(T1 != T2, C);
 	      else
 	          func.addSample(T, C);
       }
