@@ -1335,7 +1335,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-	  CC = true;
+	  CC = depth < 10;
           C = {
 	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
 		    captureOrPromotion, givesCheck, 

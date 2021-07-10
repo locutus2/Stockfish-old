@@ -476,7 +476,6 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     double curVal = 0;
     int fails = 0;
     int steps = 0;
-    constexpr bool ESCAPE_ZERO = true;
     constexpr bool WEIGHT_WITH_FREQ = true;
     double MIN_FREQ = Options["SA_minFreq"] / 1000.0;
     double MAX_FREQ = 1 - MIN_FREQ;
@@ -652,9 +651,9 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 		}
 		else //reject
 		{
-		    func = tmp;
-		cerr << "=it=" << it << " " << measure << "=" << curVal << " support=" << support << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
+		cerr << "=it=" << it << " " << measure << "=" << val << " support=" << support << " T=" << T << " p=" << p << " msteps=" << steps << " => ";
                     func.print(cerr);
+		    func = tmp;
 		}
 	}
 	else if(HILL_CLIMBING)
