@@ -1335,7 +1335,7 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-	  CC = depth < 10;
+	  CC = true;
           C = {
 	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
 		    captureOrPromotion, givesCheck, 
@@ -1435,7 +1435,7 @@ moves_loop: // When in check, search starts from here
           doFullDepthSearch = value > alpha && d < newDepth;
           didLMR = true;
 
-	  if (OPTIMIZE_DIFF)
+	  if (CC && OPTIMIZE_DIFF)
 	  {
               Depth d2 = std::clamp(d + 1, 1, newDepth + (r < -1 && moveCount <= 5 && !doubleExtension));
 	      if(d != d2)
