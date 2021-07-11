@@ -113,7 +113,7 @@ void Function<N,NC>::randomInit()
     {
         for(int i = 0; i < NC; ++i)
         {
-	    mask[i] = 1 << (std::rand() % N);
+	    mask[i] = Record(1) << (std::rand() % N);
 	    positive[i] = std::rand();
         }
     }
@@ -140,7 +140,7 @@ void Function<N,NC>::mutate(int m, double support)
 	    {
                 if (AVOID_ZERO)
 		{
-		       	if (support <= 0 && !(mask[n] & (1 << n)))
+		       	if (support <= 0 && !(mask[n] & (Record(1) << n)))
 			{
 			    int i = 10;
 			    do
@@ -148,9 +148,9 @@ void Function<N,NC>::mutate(int m, double support)
                                 nc = std::rand() % NC;
                                 n = std::rand() % N;
 			    }
-			    while(i-- > 0 && !(mask[nc] & (1 << n)));
+			    while(i-- > 0 && !(mask[nc] & (Record(1) << n)));
 			}
-			else if (support >= 1 && (mask[n] & (1 << n)))
+			else if (support >= 1 && (mask[n] & (Record(1) << n)))
 			{
 			    int i = 10;
 			    do
@@ -158,13 +158,13 @@ void Function<N,NC>::mutate(int m, double support)
                                 nc = std::rand() % NC;
                                 n = std::rand() % N;
 			    }
-			    while(i-- > 0 && (mask[nc] & (1 << n)));
+			    while(i-- > 0 && (mask[nc] & (Record(1) << n)));
 			}
 		}
-	        mask[nc] ^= 1 << n;
+	        mask[nc] ^= Record(1 )<< n;
 	    }
-            else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (1 << n)))
-	        positive[nc] ^= 1 << n;
+            else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (Record(1 )<< n)))
+	        positive[nc] ^= Record(1) << n;
 	    else
                 continue;
 	    m--;
@@ -179,12 +179,12 @@ std::ostream& Function<N, NC>::print(std::ostream& out) const
         bool found = false;
         for(int j = 0; j < N; ++j)
         {
-		if ((mask[i] >> j) & 1)
+		if (mask[i] & (Record(1) << j))
 		{
 		     if(found) out << '*';
 		     found = true;
 
-		     if (!((positive[i] >> j) & 1))
+		     if (!(positive[i] & (Record(1) << j)))
 		     {
 		         out << '!';
 		     }
@@ -1375,7 +1375,27 @@ moves_loop: // When in check, search starts from here
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
 		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
-		    bool(extension)
+		    bool(extension),
+
+		    ss->ttHit,
+		    bool(ttMove),
+		    bool(bestMove),
+		    eval >= beta,
+		    ss->staticEval >= beta,
+		    (ss-1)->inCheck,
+		    type_of(move) == PROMOTION,
+		    bool((ss-1)->moveCount & 1),
+		    bool((ss-1)->moveCount & 2),
+		    bool((ss-1)->moveCount & 4),
+		    bool((ss-1)->moveCount & 8),
+		    bool((ss-1)->moveCount & 16),
+		    bool((ss-1)->moveCount & 32),
+                    thisThread->mainHistory[us][from_to(move)] > 0,
+                    (*contHist[0])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[1])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[3])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[5])[movedPiece][to_sq(move)] > 0,
+                    thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0
 		    };
 
           if (PvNode)

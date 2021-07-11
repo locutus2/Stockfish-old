@@ -37,12 +37,12 @@ constexpr bool SPARSE_INIT = true;
 constexpr bool LESS_NEUTRAL_MUTATIONS = false;
 constexpr bool HILL_CLIMBING = false;
 constexpr bool SIMULATED_ANNEALING = true;
-constexpr int F_N = 16+4+7+3+5+1; // ++ depth + movecount + piece + piece count
+constexpr int F_N = 16+4+7+3+5+1 +7+6+6; // ++ depth + movecount + piece + piece count
 constexpr int F_NC = 1;
 
 template <int N, int NC>
 struct Function {
-    uint64_t positive[NC], mask[NC];
+    Record positive[NC], mask[NC];
 
     void randomInit();
     void init();
