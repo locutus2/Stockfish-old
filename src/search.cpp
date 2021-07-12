@@ -1474,6 +1474,7 @@ moves_loop: // When in check, search starts from here
 		      value1 = value;
                       value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d2, true);
 		      value = std::max(value1, value2);
+                      doFullDepthSearch = value > alpha && d2 < newDepth;
 	          }
 	      }
 	  }
