@@ -1464,13 +1464,18 @@ moves_loop: // When in check, search starts from here
 
 	  if (CC && OPTIMIZE_DIFF)
 	  {
-              Depth d2 = std::clamp(d + 1, 1, newDepth + (r < -1 && moveCount <= 5 && !doubleExtension));
-	      if(d != d2)
+   	      CC = false;
+              if(value <= alpha && d < newDepth)
 	      {
-		  value1 = value;
-                  value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d2, true);
+                  Depth d2 = std::clamp(d + 1, 1, newDepth + (r < -1 && moveCount <= 5 && !doubleExtension));
+	          if(d != d2)
+	          {
+	              CC = true;
+		      value1 = value;
+                      value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d2, true);
+		      value = std::max(value1, value2);
+	          }
 	      }
-	      else CC = false;
 	  }
       }
       else
