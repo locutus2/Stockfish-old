@@ -539,7 +539,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     constexpr bool MAXIMIZE = true;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
-    constexpr double LAMBDA = 0.995;
+    //constexpr double LAMBDA = 0.995;
+    constexpr double LAMBDA = 0.9975; // double halbwertzeit
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
     //double T0 = 10;
