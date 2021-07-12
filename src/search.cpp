@@ -114,7 +114,7 @@ void Function<N,NC>::randomInit()
         for(int i = 0; i < NC; ++i)
         {
 	    mask[i] = Record(1) << (std::rand() % N);
-	    positive[i] = std::rand();
+	    positive[i] = (Record(std::rand()) << 32) + std::rand();
         }
     }
     else
@@ -123,8 +123,8 @@ void Function<N,NC>::randomInit()
         {
     	    //mask[i] = std::rand() * (RAND_MAX + 1) + std::rand();
 	    //positive[i] = std::rand() * (RAND_MAX + 1) + std::rand();
-	    mask[i] = std::rand();
-	    positive[i] = std::rand();
+	    mask[i] = (std::rand() << 16) + std::rand();
+	    positive[i] = (Record(std::rand()) << 32) + std::rand();
         }
     }
 }
@@ -142,6 +142,8 @@ void Function<N,NC>::mutate(int m, double support)
 		{
 		       	if (support <= 0 && !(mask[n] & (Record(1) << n)))
 			{
+				continue;
+				/*
 			    int i = 10;
 			    do
 			    {
@@ -149,9 +151,12 @@ void Function<N,NC>::mutate(int m, double support)
                                 n = std::rand() % N;
 			    }
 			    while(i-- > 0 && !(mask[nc] & (Record(1) << n)));
+			    */
 			}
 			else if (support >= 1 && (mask[n] & (Record(1) << n)))
 			{
+				continue;
+				/*
 			    int i = 10;
 			    do
 			    {
@@ -159,9 +164,10 @@ void Function<N,NC>::mutate(int m, double support)
                                 n = std::rand() % N;
 			    }
 			    while(i-- > 0 && (mask[nc] & (Record(1) << n)));
+			    */
 			}
 		}
-	        mask[nc] ^= Record(1 )<< n;
+	        mask[nc] ^= Record(1)<< n;
 	    }
             else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (Record(1 )<< n)))
 	        positive[nc] ^= Record(1) << n;
