@@ -130,7 +130,7 @@ void Function<N,NC>::randomInit()
 }
 
 template <int N, int NC>
-void Function<N,NC>::mutate(int m, double support)
+void Function<N,NC>::mutate(int m, double support, double value)
 {
 	constexpr double EPS = 1.0e-6;
 	while(m)
@@ -140,14 +140,14 @@ void Function<N,NC>::mutate(int m, double support)
 	    bool avoidZero = false;
             if (AVOID_ZERO)
 	    {
-		       	if (support <= EPS)
+		       	if ((support <= EPS && value >= 0) || (support >= 1-EPS && value < 0))
 			{
 				if(!(mask[nc] & (Record(1) << n)))
 				    continue;
 				avoidZero = true;
 			    
 			}
-			else if (support >= 1-EPS)
+			else if ((support >= 1-EPS && value >= 0) ||(support <= EPS && value < 0))
 			{
 			       	if (mask[nc] & (Record(1) << n))
 				   continue;

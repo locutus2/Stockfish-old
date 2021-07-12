@@ -547,6 +547,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     double T = T0;
     double support = -1;
     double bestSupport = 0;
+    double val = 0;
 
     //auto Greater = std::conditional<MAXIMIZE, std::greater<double>, std::less<double>>::type();
     auto Greater = std::greater<double>();
@@ -589,7 +590,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
-            func.mutate(steps, support);
+            func.mutate(steps, support, val);
         }
 	else if(HILL_CLIMBING)
         {
@@ -624,7 +625,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	      */
 	}
 
-	double val = 0;
+	val = 0;
 	double w = get_hit(10);
 	auto wFunc = [&](double freq) { return std::min(std::min(1.0, freq / MIN_FREQ), std::min(1.0, (1-freq)/(1-MAX_FREQ))); };
 
