@@ -650,6 +650,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     std::cerr << "N: " << F_N << std::endl;
     std::cerr << "NC: " << F_NC << std::endl;
     std::cerr << "Lambda: " << LAMBDA << std::endl;
+    std::cerr << "T0: " << T0 << std::endl;
 
     const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
     func.init();
