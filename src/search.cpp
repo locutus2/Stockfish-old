@@ -1440,6 +1440,8 @@ moves_loop: // When in check, search starts from here
                     (*contHist[5])[movedPiece][to_sq(move)] > 0,
                     thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0,
 		    */
+		    priorCapture,
+
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  0)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  1)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  2)),
@@ -1455,7 +1457,22 @@ moves_loop: // When in check, search starts from here
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 12)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 13)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 14)),
-		    priorCapture,
+
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  0)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  1)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  2)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  3)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  4)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  5)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  6)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  7)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  8)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  9)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  11)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  12)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  13)),
+                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  14))
 		    };
 
           if (PvNode)
