@@ -622,11 +622,22 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
     //constexpr double LAMBDA = 0.995;
-    constexpr double LAMBDA = 0.9975; // double halbwertzeit
+    constexpr double LAMBDA0 = 0.9975; // double halbwertzeit
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
     //double T0 = 10;
+    double LAMBDA = LAMBDA0;
     double T0 = -LOSS_P0/std::log(P0);
+
+    constexpr double d0 = 1;
+    constexpr double p0 = 0.999;
+    T0 = -d0/std::log(p0);
+
+    constexpr int K = 2 * F_N * F_NC;
+    constexpr double L0 = 0.95;
+    double L = std::log(1-p0)/std::log(1 - 1.0/K);
+    LAMBDA = std::pow(L0, 1.0/L);
+
     double T = T0;
     double support = -1;
     double bestSupport = 0;
