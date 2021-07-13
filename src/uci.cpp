@@ -528,6 +528,13 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
         c53  (*contHist[5])[movedPiece][to_sq(move)] > 0,
         c54  thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0
 		    */
+    /* Sa55_1 stockfish_sa55d
+     * minfre=0.02 lambda=0.9975
+     * BEST it=8100 hit=0.0690513 support=0.0200232 T=2.25223e-10 msteps=1 => !c4*!c6*!c8*!c10*!c13*!c22*!c23*!c24*!c25*!c26*c34*!c35*c39*!c41*!c42
+     * BEST it=8400 hit=0.0642906 support=0.0199354 T=1.06288e-10 msteps=1 => c1*c16*!c18*!c19*c21*!c23*!c30*!c41*!c42*c50
+     * BEST it=8500 hit=0.0568897 support=0.0200512 T=8.27512e-11 msteps=1 => c0*c1*!c2*!c4*!c6*!c8*!c9*!c11*!c12*!c13*!c19*!c23*!c24*!c25*c27*c32*c34*!c35*!c41*!c42*!c48
+     * BEST it=8300 hit=0.0647959 support=0.0199354 T=1.36519e-10 msteps=1 => c1*!c2*!c19*c21*!c23*!c30*c34*!c42*c49
+     * */
     FUNC best, tmp;
     double bestVal = 0;
     double curVal = 0;
