@@ -1440,6 +1440,12 @@ moves_loop: // When in check, search starts from here
                     (*contHist[5])[movedPiece][to_sq(move)] > 0,
                     thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0,
 		    */
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  3)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  4)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  5)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  6)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  7)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  8)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  9)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 10)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 11)),

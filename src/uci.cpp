@@ -549,7 +549,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
      * BEST it=4500 hit=0.0973592 support=0.00113917 T=1.84568e-06 msteps=1 => c0*!c6*!c8*!c10*!c11*!c12*!c18*!c19*!c23*!c24*!c25*!c35*c39*!c41*!c42*c45*!c47*c49*c50*c51*!c54
      * */
     /*
-     * SA63 (mainhistory)
+     * SA63 (mainhistory most sig 13 bits of 15)
 	            cutNode, PvNode,
 		    captureOrPromotion, givesCheck, 
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
@@ -595,6 +595,12 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 		    bool((ss-1)->moveCount & 8),
 		    bool((ss-1)->moveCount & 16),
 		    bool((ss-1)->moveCount & 32),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  3)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  4)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  5)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  6)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  7)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  8)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  9)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 10)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 11)),
