@@ -27,8 +27,8 @@
 
 namespace Stockfish {
 
-typedef uint64_t Record;
-//typedef __uint128_t Record;
+//typedef uint64_t Record;
+typedef __uint128_t Record;
 
 extern std::vector<Record> samples;
 
@@ -39,7 +39,8 @@ constexpr bool LESS_NEUTRAL_MUTATIONS = false;
 constexpr bool HILL_CLIMBING = false;
 constexpr bool SIMULATED_ANNEALING = true;
 //constexpr int F_N = 16+4+7+3+5+1 +7+6+6; // 55 ++ depth + movecount + piece + piece count
-constexpr int F_N = 16+4+7+3+5+1 +7+6+1+13; // 63 ++ depth + movecount + piece + piece count + main history (7 most significant bits from 15)
+//constexpr int F_N = 16+4+7+3+5+1 +7+6+1+13; // 63 ++ depth + movecount + piece + piece count + main history (13 most significant bits from 15)
+constexpr int F_N = 16+4+7+3+5+1 +7+6+1+15; // 65 ++ depth + movecount + piece + piece count + main history (15 most significant bits from 15)
 constexpr int F_NC = 1;
 
 static_assert(sizeof(Record) * 8 >= 1 + F_N);
