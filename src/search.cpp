@@ -1379,7 +1379,8 @@ moves_loop: // When in check, search starts from here
 
 	  CC = true;
           C = {
-	            cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+	            //cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
+	            cutNode, PvNode,
 		    captureOrPromotion, givesCheck, 
 		    ss->inCheck, improving, likelyFailLow, ttCapture,
 		    more_than_one(pos.checkers()),
@@ -1431,12 +1432,22 @@ moves_loop: // When in check, search starts from here
 		    bool((ss-1)->moveCount & 8),
 		    bool((ss-1)->moveCount & 16),
 		    bool((ss-1)->moveCount & 32),
+		    /*
                     thisThread->mainHistory[us][from_to(move)] > 0,
                     (*contHist[0])[movedPiece][to_sq(move)] > 0,
                     (*contHist[1])[movedPiece][to_sq(move)] > 0,
                     (*contHist[3])[movedPiece][to_sq(move)] > 0,
                     (*contHist[5])[movedPiece][to_sq(move)] > 0,
-                    thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0
+                    thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0,
+		    */
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  9)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 10)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 11)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 12)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 13)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 14)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 15)),
+		    priorCapture,
 		    };
 
           if (PvNode)

@@ -537,10 +537,72 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
      *
      * BEST it=1500 hit=0.0976453 support=0.00106662 T=0.00336856 msteps=1 => c0*!c4*!c7*c15*c20*!c25*c34*!c35*!c36
      C = move == countermove && cutNode && !ss->inCheck && !ttCapture && (moveCount & 1) && !(moveCount & 32) && (pos.count<ALL_PIECES>() & 16) && !extension && !ss->ttHit;
+     BEST it=4600 hit=0.0976453 support=0.00106662 T=1.43697e-06 msteps=1 => c0*!c4*!c7*c15*c20*!c25*c34*!c35*!c36
 
      * BEST it=200 hit=-0.0194255 support=0.605756 T=0.0872305 msteps=1 => c23
+     * BEST it=3300 hit=0.0818704 support=0.000997348 T=3.7211e-05 msteps=1 => c4*!c8*c17*!c19*!c22*!c24*!c25*!c34*c39*c50*c51*c52
+     *
      * BEST it=1500 hit=0.0923174 support=0.000987029 T=0.00336856 msteps=1 => c1*!c3*!c6*!c12*c14*!c19*!c22*!c23*!c26*c30*c32*!c33*!c47
+     * BEST it=4500 hit=0.102871 support=0.000996367 T=1.84568e-06 msteps=1 => c1*!c8*!c10*!c11*!c12*c17*!c23*!c25*!c26*c37*!c38*c39*!c41*c45*c49*c53
+     *
      * BEST it=1500 hit=0.0867556 support=0.00143028 T=0.00336856 msteps=1 => !c8*!c12*!c16*!c17*c18*!c19*!c24*!c26*c33*!c38*c39*!c41*c45*!c47*!c48*c49*c50*!c54
+     * BEST it=4500 hit=0.0973592 support=0.00113917 T=1.84568e-06 msteps=1 => c0*!c6*!c8*!c10*!c11*!c12*!c18*!c19*!c23*!c24*!c25*!c35*c39*!c41*!c42*c45*!c47*c49*c50*c51*!c54
+     * */
+    /*
+     * SA63 (mainhistory)
+	            cutNode, PvNode,
+		    captureOrPromotion, givesCheck, 
+		    ss->inCheck, improving, likelyFailLow, ttCapture,
+		    more_than_one(pos.checkers()),
+		    doubleExtension,
+		    moveCountPruning,
+	            singularQuietLMR,
+	            ss->ttPv && !PvNode,
+		    move == ss->killers[0],    
+		    move == ss->killers[1],    
+		    move == countermove,
+		    bool(int(depth) & 1),
+		    bool(int(depth) & 2),
+		    bool(int(depth) & 4),
+		    bool(int(depth) & 8),
+		    bool(moveCount & 1),
+		    bool(moveCount & 2),
+		    bool(moveCount & 4),
+		    bool(moveCount & 8),
+		    bool(moveCount & 16),
+		    bool(moveCount & 32),
+		    bool(moveCount & 64),
+		    bool(type_of(movedPiece) & 1),
+		    bool(type_of(movedPiece) & 2),
+		    bool(type_of(movedPiece) & 4),
+		    bool(pos.count<ALL_PIECES>() & 1),
+		    bool(pos.count<ALL_PIECES>() & 2),
+		    bool(pos.count<ALL_PIECES>() & 4),
+		    bool(pos.count<ALL_PIECES>() & 8),
+		    bool(pos.count<ALL_PIECES>() & 16),
+		    bool(extension),
+
+		    ss->ttHit,
+		    bool(ttMove),
+		    bool(bestMove),
+		    eval >= beta,
+		    ss->staticEval >= beta,
+		    (ss-1)->inCheck,
+		    type_of(move) == PROMOTION,
+		    bool((ss-1)->moveCount & 1),
+		    bool((ss-1)->moveCount & 2),
+		    bool((ss-1)->moveCount & 4),
+		    bool((ss-1)->moveCount & 8),
+		    bool((ss-1)->moveCount & 16),
+		    bool((ss-1)->moveCount & 32),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  9)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 10)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 11)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 12)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 13)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 14)),
+                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 15)),
+		    priorCapture,
      * */
     FUNC best, tmp;
     double bestVal = 0;

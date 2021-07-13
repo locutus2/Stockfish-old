@@ -81,7 +81,7 @@ void init(OptionsMap& o) {
   o["SyzygyProbeLimit"]      << Option(7, 0, 7);
   o["Use NNUE"]              << Option(true, on_use_NNUE);
   o["EvalFile"]              << Option(EvalFileDefaultName, on_eval_file);
-  o["SA_minFreq"]            << Option(10, 0, 1000);
+  o["SA_minFreq"]            << Option(1, 1, 1000);
 }
 
 
