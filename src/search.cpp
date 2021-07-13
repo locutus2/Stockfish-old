@@ -1160,7 +1160,7 @@ moves_loop: // When in check, search starts from here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-          if (depth >= 10 && cutNode && moveCount <= 2)
+          if (move == countermove && cutNode && !ss->inCheck && !ttCapture && moveCount < 32 && pos.count<ALL_PIECES>() >= 16 && !extension && !ss->ttHit)
               r--;
 
           if (!captureOrPromotion)
