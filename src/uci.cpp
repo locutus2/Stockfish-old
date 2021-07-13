@@ -534,6 +534,13 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
      * BEST it=8400 hit=0.0642906 support=0.0199354 T=1.06288e-10 msteps=1 => c1*c16*!c18*!c19*c21*!c23*!c30*!c41*!c42*c50
      * BEST it=8500 hit=0.0568897 support=0.0200512 T=8.27512e-11 msteps=1 => c0*c1*!c2*!c4*!c6*!c8*!c9*!c11*!c12*!c13*!c19*!c23*!c24*!c25*c27*c32*c34*!c35*!c41*!c42*!c48
      * BEST it=8300 hit=0.0647959 support=0.0199354 T=1.36519e-10 msteps=1 => c1*!c2*!c19*c21*!c23*!c30*c34*!c42*c49
+     *
+     * BEST it=1500 hit=0.0976453 support=0.00106662 T=0.00336856 msteps=1 => c0*!c4*!c7*c15*c20*!c25*c34*!c35*!c36
+     C = move == countermove && cutNode && !ss->inCheck && !ttCapture && (moveCount & 1) && !(moveCount & 32) && (pos.count<ALL_PIECES>() & 16) && !extension && !ss->ttHit;
+
+     * BEST it=200 hit=-0.0194255 support=0.605756 T=0.0872305 msteps=1 => c23
+     * BEST it=1500 hit=0.0923174 support=0.000987029 T=0.00336856 msteps=1 => c1*!c3*!c6*!c12*c14*!c19*!c22*!c23*!c26*c30*c32*!c33*!c47
+     * BEST it=1500 hit=0.0867556 support=0.00143028 T=0.00336856 msteps=1 => !c8*!c12*!c16*!c17*c18*!c19*!c24*!c26*c33*!c38*c39*!c41*c45*!c47*!c48*c49*c50*!c54
      * */
     FUNC best, tmp;
     double bestVal = 0;
