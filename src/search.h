@@ -46,8 +46,10 @@ constexpr int F_NC = 1;
 
 static_assert(sizeof(Record) * 8 >= 1 + F_N);
 
-template <int N, int NC>
+template <int N, int NC, bool CNF = false>
 struct Function {
+    static constexpr bool isCNF = CNF;
+
     Record positive[NC], mask[NC];
 
     void randomInit();

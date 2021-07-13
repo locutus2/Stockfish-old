@@ -44,8 +44,8 @@ FUNC func;
 
 template class Function<F_N, F_NC>;
 
-template <int N, int NC>
-void Function<N,NC>::addSample(bool T, bool T2, const std::vector<bool>& C) const
+template <int N, int NC, bool CNF>
+void Function<N,NC,CNF>::addSample(bool T, bool T2, const std::vector<bool>& C) const
 {
 	if(N != (int)C.size()) 
 	{
@@ -61,8 +61,8 @@ void Function<N,NC>::addSample(bool T, bool T2, const std::vector<bool>& C) cons
 	samples2.push_back(T2);
 }
 
-template <int N, int NC>
-void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
+template <int N, int NC, bool CNF>
+void Function<N,NC,CNF>::addSample(bool T, const std::vector<bool>& C) const
 {
 	if(N != (int)C.size()) 
 	{
@@ -77,20 +77,20 @@ void Function<N,NC>::addSample(bool T, const std::vector<bool>& C) const
 	samples.push_back(x);
 }
 
-template <int N, int NC>
-bool Function<N,NC>::getSampleClass2(int i) const
+template <int N, int NC, bool CNF>
+bool Function<N,NC,CNF>::getSampleClass2(int i) const
 {
 	return samples2[i];
 }
 
-template <int N, int NC>
-bool Function<N,NC>::getSampleClass(const Record& x) const
+template <int N, int NC, bool CNF>
+bool Function<N,NC,CNF>::getSampleClass(const Record& x) const
 {
 	return x & Record(1);
 }
 
-template <int N, int NC>
-bool Function<N,NC>::getSampleValue(const Record& x) const
+template <int N, int NC, bool CNF>
+bool Function<N,NC,CNF>::getSampleValue(const Record& x) const
 {
 	std::vector<bool> C(N);
 	for(int i = 0; i < N; ++i)
@@ -99,15 +99,15 @@ bool Function<N,NC>::getSampleValue(const Record& x) const
 }
 
 
-template <int N, int NC>
-void Function<N,NC>::init()
+template <int N, int NC, bool CNF>
+void Function<N,NC,CNF>::init()
 {
     std::srand(std::time(nullptr));
     //std::srand(1234);
 }
 
-template <int N, int NC>
-void Function<N,NC>::randomInit()
+template <int N, int NC, bool CNF>
+void Function<N,NC,CNF>::randomInit()
 {
     if (SPARSE_INIT)
     {
@@ -129,8 +129,8 @@ void Function<N,NC>::randomInit()
     }
 }
 
-template <int N, int NC>
-void Function<N,NC>::mutate(int m, double support, double value)
+template <int N, int NC, bool CNF>
+void Function<N,NC,CNF>::mutate(int m, double support, double value)
 {
 	constexpr double EPS = 1.0e-6;
 	while(m)
@@ -213,8 +213,8 @@ void Function<N,NC>::mutate(int m, double support)
 	}
 }*/
 
-template <int N, int NC>
-std::ostream& Function<N, NC>::print(std::ostream& out) const
+template <int N, int NC, bool CNF>
+std::ostream& Function<N, NC,CNF>::print(std::ostream& out) const
 {
     for(int i = 0; i < NC; ++i)
     {
@@ -240,22 +240,55 @@ std::ostream& Function<N, NC>::print(std::ostream& out) const
     return out << std::endl;
 }
 
-template <int N, int NC>
-std::ostream& operator<<(std::ostream& out, const Function<N, NC> &f)
+template <int N, int NC, bool CNF>
+std::ostream& operator<<(std::ostream& out, const Function<N, NC,CNF> &f)
 {
     return f.print(out);
 }
 
 // DNF disjunctive normal form
-template <int N, int NC>
-bool Function<N,NC>::operator()(const std::vector<bool>& x) const
+template <int N, int NC, bool CNF>
+bool Function<N,NC,CNF>::operator()(const std::vector<bool>& x) const
 {
-    bool C = false;
-    for(int i = 0; i < NC && !C; ++i)
+    if(CNF)
     {
-        C = true;
-        for(int j = 0; j < N; ++j)
-	{
+        bool C = true;
+        for(int i = 0; i < NC && C; ++i)
+        {
+            C = false;
+            for(int j = 0; j < N; ++j)
+            {
+		if ((mask[i] >> j) & 1)
+		{
+		     if ((positive[i] >> j) & 1)
+		     {
+			     if(x[j]) 
+			     {
+				     C = true;
+				     break;
+			     }
+		     }
+		     else
+		     {
+			     if(!x[j])
+			     {
+				     C = true;
+				     break;
+			     }
+		     }
+		}
+    	    }
+        }
+        return C;
+    }
+    else
+    {
+        bool C = false;
+        for(int i = 0; i < NC && !C; ++i)
+        {
+            C = true;
+            for(int j = 0; j < N; ++j)
+            {
 		if ((mask[i] >> j) & 1)
 		{
 		     if ((positive[i] >> j) & 1)
@@ -275,9 +308,10 @@ bool Function<N,NC>::operator()(const std::vector<bool>& x) const
 			     }
 		     }
 		}
-	}
+    	    }
+        }
+        return C;
     }
-    return C;
 }
 
 namespace Search {
