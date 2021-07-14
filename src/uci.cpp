@@ -632,7 +632,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     if(NEW_SCHEDULE)
     {
         constexpr double d0 = 1;
-        constexpr double p0 = 0.999;
+        constexpr double p0 = 0.99;
         T0 = -d0/std::log(p0);
 
         constexpr int K = 2 * F_N * F_NC;
