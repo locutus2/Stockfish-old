@@ -618,6 +618,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     constexpr bool WEIGHT_WITH_FREQ = true;
     double MIN_FREQ = Options["SA_minFreq"] / 1000.0;
     double MAX_FREQ = 1 - MIN_FREQ;
+    constexpr bool NEW_SCHEDULE = true;
     constexpr bool MAXIMIZE = true;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
@@ -625,18 +626,26 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     constexpr double LAMBDA0 = 0.9975; // double halbwertzeit
     constexpr double P0 = 0.5;
     constexpr double LOSS_P0 = 0.1;
-    //double T0 = 10;
-    double LAMBDA = LAMBDA0;
-    double T0 = -LOSS_P0/std::log(P0);
+    double LAMBDA;
+    double T0;
 
-    constexpr double d0 = 1;
-    constexpr double p0 = 0.999;
-    T0 = -d0/std::log(p0);
+    if(NEW_SCHEDULE)
+    {
+        constexpr double d0 = 1;
+        constexpr double p0 = 0.999;
+        T0 = -d0/std::log(p0);
 
-    constexpr int K = 2 * F_N * F_NC;
-    constexpr double L0 = 0.95;
-    double L = std::log(1-p0)/std::log(1 - 1.0/K);
-    LAMBDA = std::pow(L0, 1.0/L);
+        constexpr int K = 2 * F_N * F_NC;
+        constexpr double L0 = 0.95;
+        double L = std::log(1-p0)/std::log(1 - 1.0/K);
+        LAMBDA = std::pow(L0, 1.0/L);
+    }
+    else
+    {
+        //T0 = 10;
+        LAMBDA = LAMBDA0;
+        T0 = -LOSS_P0/std::log(P0);
+    }
 
     double T = T0;
     double support = -1;
