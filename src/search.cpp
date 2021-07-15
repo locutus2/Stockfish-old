@@ -1784,6 +1784,25 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
      [100] Total 30986760 Hits 115037 hit rate (%) 0.371246
      [0] Total 30986760 CramersV(x,y) = 0.075878 error% =5.12764
      */
+
+
+  /*
+       C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
+	        && !((ss-1)->moveCount & 32)
+                && (thisThread->mainHistory[us][from_to(move)] & (1 <<  9))
+                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10))
+		&& !bestMove;
+   * [0] Total 30059042 Hits 1496040 hit rate (%) 4.977
+   * [10] Total 27219057 Hits 1405326 hit rate (%) 5.16302
+   * [11] Total 2839985 Hits 90714 hit rate (%) 3.19417
+   * [100] Total 30059042 Hits 2839985 hit rate (%) 9.44802
+   * [0] Total 30059042 CramersV(x,y) = -0.026481 error% =13.8215
+   * */
+       C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
+	        && !((ss-1)->moveCount & 32)
+                && (thisThread->mainHistory[us][from_to(move)] & (1 <<  9))
+                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10))
+		&& !bestMove;
           if (PvNode)
               r--;
 
