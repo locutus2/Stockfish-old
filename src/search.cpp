@@ -1159,8 +1159,8 @@ moves_loop: // When in check, search starts from here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-          if (move == countermove && cutNode && !givesCheck && !ss->inCheck && !doubleExtension && moveCount < 16 && (moveCount & 2))
-              r -= 2;
+          if (move == ss->killers[1])
+              r--;
 
           if (!captureOrPromotion)
           {
