@@ -1787,22 +1787,119 @@ C = !captureOrPromotion && move == ss->killers[1] && ss->statScore > 0 && ss->tt
 
 
   /*
+     * SA80
+	        c0  cutNode, 
+		c1  PvNode,
+		    captureOrPromotion, 
+		    givesCheck, 
+		    ss->inCheck, 
+		c5  improving, 
+		    likelyFailLow, 
+		    ttCapture,
+		    more_than_one(pos.checkers()),
+		    doubleExtension,
+		c10 moveCountPruning,
+	            singularQuietLMR,
+	            ss->ttPv && !PvNode,
+		    move == ss->killers[0],    
+		c14 move == ss->killers[1],    
+		    move == countermove,
+		    bool(int(depth) & 1),
+		    bool(int(depth) & 2),
+		    bool(int(depth) & 4),
+		    bool(int(depth) & 8),
+		c20 bool(moveCount & 1),
+		    bool(moveCount & 2),
+		    bool(moveCount & 4),
+		    bool(moveCount & 8),
+		    bool(moveCount & 16),
+		    bool(moveCount & 32),
+		    bool(moveCount & 64),
+		c27 bool(type_of(movedPiece) & 1),
+		    bool(type_of(movedPiece) & 2),
+		    bool(type_of(movedPiece) & 4),
+		c30 bool(pos.count<ALL_PIECES>() & 1),
+		    bool(pos.count<ALL_PIECES>() & 2),
+		    bool(pos.count<ALL_PIECES>() & 4),
+		    bool(pos.count<ALL_PIECES>() & 8),
+		    bool(pos.count<ALL_PIECES>() & 16),
+		    bool(extension),
+
+		    ss->ttHit,
+		    bool(ttMove),
+		c37 bool(bestMove),
+		    eval >= beta,
+		    ss->staticEval >= beta,
+		c40 (ss-1)->inCheck,
+		    type_of(move) == PROMOTION,
+		    bool((ss-1)->moveCount & 1),
+		    bool((ss-1)->moveCount & 2),
+		    bool((ss-1)->moveCount & 4),
+		    bool((ss-1)->moveCount & 8),
+		    bool((ss-1)->moveCount & 16),
+*/
+  /*
+  C = move == ss->killers[1];
+  [0] Total 125815165 Hits 6136366 hit rate (%) 4.87729
+  [10] Total 123710316 Hits 5727897 hit rate (%) 4.63009
+  [11] Total 2104849 Hits 408469 hit rate (%) 19.4061
+  [100] Total 125815165 Hits 2104849 hit rate (%) 1.67297
+  [0] Total 125815165 CramersV(x,y) = 0.0879845 error% =5.90094
+  */
+  /*
        C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
 	        && !((ss-1)->moveCount & 32)
                 && (thisThread->mainHistory[us][from_to(move)] & (1 <<  9))
-                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10))
-		&& !bestMove;
-   * [0] Total 30059042 Hits 1496040 hit rate (%) 4.977
-   * [10] Total 27219057 Hits 1405326 hit rate (%) 5.16302
-   * [11] Total 2839985 Hits 90714 hit rate (%) 3.19417
-   * [100] Total 30059042 Hits 2839985 hit rate (%) 9.44802
-   * [0] Total 30059042 CramersV(x,y) = -0.026481 error% =13.8215
+                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10));
+		[0] Total 125815165 Hits 6136366 hit rate (%) 4.87729
+		[10] Total 113430319 Hits 5759428 hit rate (%) 5.0775
+		[11] Total 12384846 Hits 376938 hit rate (%) 3.04354
+		[100] Total 125815165 Hits 12384846 hit rate (%) 9.84368
+		[0] Total 125815165 CramersV(x,y) = -0.0281312 error% =14.1218
    * */
+  /*
        C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
 	        && !((ss-1)->moveCount & 32)
-                && (thisThread->mainHistory[us][from_to(move)] & (1 <<  9))
-                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10))
-		&& !bestMove;
+                && thisThread->mainHistory[us][from_to(move)] >= 512
+                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10));
+		[0] Total 125815165 Hits 6136366 hit rate (%) 4.87729
+		[10] Total 117926092 Hits 5732094 hit rate (%) 4.86075
+		[11] Total 7889073 Hits 404272 hit rate (%) 5.12446
+		[100] Total 125815165 Hits 7889073 hit rate (%) 6.27037
+		[0] Total 125815165 CramersV(x,y) = 0.00296804 error% =10.505
+		*/
+  /*
+       C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
+	        && (ss-1)->moveCount < 32
+                && thisThread->mainHistory[us][from_to(move)] >= 512
+                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10));
+		[0] Total 125815165 Hits 6136366 hit rate (%) 4.87729
+		[10] Total 117926092 Hits 5732094 hit rate (%) 4.86075
+		[11] Total 7889073 Hits 404272 hit rate (%) 5.12446
+		[100] Total 125815165 Hits 7889073 hit rate (%) 6.27037
+		[0] Total 125815165 CramersV(x,y) = 0.00296804 error% =10.505
+		*/
+  /*
+       C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
+	        && (ss-1)->moveCount < 32
+                && thisThread->mainHistory[us][from_to(move)] >= 512
+                && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] < 1024;
+		[0] Total 125815165 Hits 6136366 hit rate (%) 4.87729
+		[10] Total 118229202 Hits 5758835 hit rate (%) 4.87091
+		[11] Total 7585963 Hits 377531 hit rate (%) 4.97671
+		[100] Total 125815165 Hits 7585963 hit rate (%) 6.02945
+		[0] Total 125815165 CramersV(x,y) = 0.00116917 error% =10.3066
+		*/
+  /*
+       C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
+	        && (ss-1)->moveCount < 32
+                && thisThread->mainHistory[us][from_to(move)] >= 512;
+		[0] Total 125815165 Hits 6136366 hit rate (%) 4.87729
+		[10] Total 117138251 Hits 5697020 hit rate (%) 4.8635
+		[11] Total 8676914 Hits 439346 hit rate (%) 5.06339
+		[100] Total 125815165 Hits 8676914 hit rate (%) 6.89656
+		[0] Total 125815165 CramersV(x,y) = 0.00235156 error% =11.0754
+		*/
           if (PvNode)
               r--;
 
