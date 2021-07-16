@@ -54,7 +54,7 @@ struct Function {
 
     void randomInit();
     void init();
-    void mutate(int m = 1, double support = 0.5, double value = 0.0);
+    bool mutate(int m = 1, double support = 0.5, double value = 0.0);
     std::ostream& print(std::ostream& out) const;
 
     bool operator()(const std::vector<bool>& x) const;

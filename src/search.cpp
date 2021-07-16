@@ -130,9 +130,10 @@ void Function<N,NC,CNF>::randomInit()
 }
 
 template <int N, int NC, bool CNF>
-void Function<N,NC,CNF>::mutate(int m, double support, double value)
+bool Function<N,NC,CNF>::mutate(int m, double support, double value)
 {
 	constexpr double EPS = 1.0e-6;
+	bool neutral = true;
 	while(m)
 	{
             int nc = std::rand() % NC;
@@ -158,13 +159,19 @@ void Function<N,NC,CNF>::mutate(int m, double support, double value)
 	    if (avoidZero || (std::rand() & 1))
 	    {
 	        mask[nc] ^= Record(1) << n;
+		neutral = false;
 	    }
-            else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (Record(1)<< n)))
+            else if(!LESS_NEUTRAL_MUTATIONS || (mask[nc] & (Record(1) << n)))
+	    {
 	        positive[nc] ^= Record(1) << n;
+		if (mask[nc] & (Record(1) << n))
+			neutral = false;
+	    }
 	    else
                 continue;
 	    m--;
 	}
+	return neutral;
 }
 /*
 template <int N, int NC>

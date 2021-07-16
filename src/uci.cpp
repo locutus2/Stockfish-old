@@ -787,14 +787,14 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
     func.randomInit();
     for(int it = 0;true;++it)
     {
-	dbg_reset();
+	bool neutral = false;
         if(SIMULATED_ANNEALING)
         {
 	    T *= LAMBDA;
 	    tmp = func;
 	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
 	    steps = 1;
-            func.mutate(steps, support, val);
+            neutral = func.mutate(steps, support, val) && it > 0;
         }
 	else if(HILL_CLIMBING)
         {
@@ -802,7 +802,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	    //steps = fails / 20 + 1;
 	    //steps = 100.0 * (1.0 / (1 + std::exp(-0.01 * fails)) - 0.5) * 2 + 1;
 	    steps = std::min(100.0, fails * fails / 100.0 + 1.0);
-            func.mutate(steps);
+            neutral = func.mutate(steps) && it > 0;
         }
         else
         {
@@ -811,6 +811,9 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 
 
 	//for(const auto& x : samples)
+	if(!neutral)
+	{
+	dbg_reset();
 	int nn = (int)samples.size();
 	for(int i = 0; i < nn; ++i)
 	{
@@ -827,6 +830,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 		bool T2 = func.getSampleClass2(i);
 	      }
 	      */
+	}
 	}
 
 	val = 0;
