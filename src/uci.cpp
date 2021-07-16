@@ -734,7 +734,9 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 
         constexpr int K = 2 * F_N * F_NC;
         constexpr double L0 = 0.95;
-        double L = std::log(1-p0)/std::log(1 - 1.0/K);
+        //double L = std::log(1-p0)/std::log(1 - 1.0/K);
+	//double L = 2;
+	double L = K;
         LAMBDA = std::pow(L0, 1.0/L);
     }
     else
@@ -783,6 +785,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
             else if (token == "position")   position(pos, is, states);
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
+
+    std::cerr << "Sample size: " << samples.size() << std::endl;
 
     func.randomInit();
     for(int it = 0;true;++it)
