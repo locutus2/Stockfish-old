@@ -627,7 +627,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 	            ss->ttPv && !PvNode,
 		    move == ss->killers[0],    
 		c14 move == ss->killers[1],    
-		    move == countermove,
+	        c15 move == countermove,
 		    bool(int(depth) & 1),
 		    bool(int(depth) & 2),
 		    bool(int(depth) & 4),
@@ -638,14 +638,14 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 		    bool(moveCount & 8),
 		    bool(moveCount & 16),
 		    bool(moveCount & 32),
-		    bool(moveCount & 64),
+		c26 bool(moveCount & 64),
 		c27 bool(type_of(movedPiece) & 1),
 		    bool(type_of(movedPiece) & 2),
 		    bool(type_of(movedPiece) & 4),
 		c30 bool(pos.count<ALL_PIECES>() & 1),
 		    bool(pos.count<ALL_PIECES>() & 2),
 		    bool(pos.count<ALL_PIECES>() & 4),
-		    bool(pos.count<ALL_PIECES>() & 8),
+		c33 bool(pos.count<ALL_PIECES>() & 8),
 		    bool(pos.count<ALL_PIECES>() & 16),
 		    bool(extension),
 
@@ -653,7 +653,7 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
 		    bool(ttMove),
 		c37 bool(bestMove),
 		    eval >= beta,
-		    ss->staticEval >= beta,
+		c39 ss->staticEval >= beta,
 		c40 (ss-1)->inCheck,
 		    type_of(move) == PROMOTION,
 		    bool((ss-1)->moveCount & 1),
@@ -680,9 +680,9 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 13)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 14)),
 
-                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  0)),
+               c65  bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  0)),
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  1)),
-                    bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  2)),
+               c67  bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  2)),
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  3)),
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  4)),
               c70   bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  5)),
@@ -706,6 +706,12 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
                 && (thisThread->mainHistory[us][from_to(move)] & (1 <<  9))
                 && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10))
 		&& !bestMove
+      * */
+     /*
+      *  BEST it=7900 hit=0.0937392 support=0.00244858 T=11.4612 msteps=1 => c15*!c26*c33*c39*!c65*!c67
+      C = move == countermove && !(moveCount & 64) && (pos.count<ALL_PIECES>() & 8) &&  ss->staticEval >= beta
+          && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  0))
+          && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  2));
       * */
     FUNC best, tmp;
     double bestVal = 0;
