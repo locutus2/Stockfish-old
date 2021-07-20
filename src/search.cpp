@@ -951,6 +951,9 @@ moves_loop: // When in check, search starts from here
                          && (tte->bound() & BOUND_UPPER)
                          && tte->depth() >= depth;
 
+    bool CC = false, C = false;
+
+    CC = true;
     // Step 12. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1291,6 +1294,64 @@ moves_loop: // When in check, search starts from here
           else if (!captureOrPromotion && quietCount < 64)
               quietsSearched[quietCount++] = move;
       }
+    }
+
+    if(CC && moveCount)
+    {
+	    int index_exp = PvNode ? 0 : cutNode ? 1 : 2;
+	    int index_real = bestMove && bestValue < beta ? 0 : bestMove ? 1 : 2;
+	    dbg_hit_on(index_exp == index_real, index_exp);
+	    dbg_hit_on(index_exp == index_real, index_exp + 10*depth);
+	    /*[0] Total 786596 Hits 207685 hit rate (%) 26.403
+	     * [1] Total 17759416 Hits 13461371 hit rate (%) 75.7985
+	     * [2] Total 12963810 Hits 9146645 hit rate (%) 70.5552
+	     * [10] Total 134638 Hits 46979 hit rate (%) 34.8928
+	     * [11] Total 6396423 Hits 4676248 hit rate (%) 73.1072
+	     * [12] Total 4478222 Hits 3051911 hit rate (%) 68.1501
+	     * [20] Total 124213 Hits 39852 hit rate (%) 32.0836
+	     * [21] Total 3714120 Hits 2837065 hit rate (%) 76.3859
+	     * [22] Total 3251141 Hits 2343064 hit rate (%) 72.069
+	     * [30] Total 108284 Hits 30490 hit rate (%) 28.1574
+	     * [31] Total 3043975 Hits 2322912 hit rate (%) 76.3118
+	     * [32] Total 2108773 Hits 1477251 hit rate (%) 70.0526
+	     * [40] Total 92288 Hits 22619 hit rate (%) 24.5091
+	     * [41] Total 1875565 Hits 1441076 hit rate (%) 76.8342
+	     * [42] Total 1130543 Hits 794576 hit rate (%) 70.2827
+	     * [50] Total 70975 Hits 16569 hit rate (%) 23.3448
+	     * [51] Total 948112 Hits 732231 hit rate (%) 77.2304
+	     * [52] Total 761529 Hits 558331 hit rate (%) 73.3171
+	     * [60] Total 52578 Hits 12061 hit rate (%) 22.9393
+	     * [61] Total 661074 Hits 530931 hit rate (%) 80.3134
+	     * [62] Total 387073 Hits 275710 hit rate (%) 71.2295
+	     * [70] Total 61975 Hits 12989 hit rate (%) 20.9585
+	     * [71] Total 468106 Hits 374170 hit rate (%) 79.9328
+	     * [72] Total 333774 Hits 241454 hit rate (%) 72.3406
+	     * [80] Total 50051 Hits 9631 hit rate (%) 19.2424
+	     * [81] Total 308445 Hits 250381 hit rate (%) 81.1753
+	     * [82] Total 238758 Hits 180780 hit rate (%) 75.7168
+	     * [90] Total 37476 Hits 6962 hit rate (%) 18.5772
+	     * [91] Total 178663 Hits 150329 hit rate (%) 84.1411
+	     * [92] Total 143307 Hits 112693 hit rate (%) 78.6375
+	     * [100] Total 26600 Hits 4739 hit rate (%) 17.8158
+	     * [101] Total 97999 Hits 85505 hit rate (%) 87.2509
+	     * [102] Total 75219 Hits 62053 hit rate (%) 82.4964
+	     * [110] Total 16277 Hits 2848 hit rate (%) 17.4971
+	     * [111] Total 45382 Hits 40522 hit rate (%) 89.2909
+	     * [112] Total 36605 Hits 31608 hit rate (%) 86.3489
+	     * [120] Total 8674 Hits 1521 hit rate (%) 17.5352
+	     * [121] Total 17323 Hits 15934 hit rate (%) 91.9818
+	     * [122] Total 13651 Hits 12285 hit rate (%) 89.9934
+	     * [130] Total 2567 Hits 425 hit rate (%) 16.5563
+	     * [131] Total 3504 Hits 3359 hit rate (%) 95.8619
+	     * [132] Total 4284 Hits 4030 hit rate (%) 94.071
+	     * [141] Total 612 Hits 598 hit rate (%) 97.7124
+	     * [142] Total 801 Hits 772 hit rate (%) 96.3795
+	     * [151] Total 98 Hits 95 hit rate (%) 96.9388
+	     * [152] Total 117 Hits 115 hit rate (%) 98.2906
+	     * [161] Total 15 Hits 15 hit rate (%) 100
+	     * [162] Total 12 Hits 11 hit rate (%) 91.6667
+	     * [172] Total 1 Hits 1 hit rate (%) 100
+	     * */
     }
 
     // The following condition would detect a stop only after move loop has been
