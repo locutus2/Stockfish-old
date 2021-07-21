@@ -601,7 +601,7 @@ namespace {
     (ss+1)->ttPv         = false;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0]   = (ss+2)->killers[1] = MOVE_NONE;
-    (ss+1)->wrongCutNode = false;
+    (ss+2)->wrongCutNode = false;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     Square prevSq        = to_sq((ss-1)->currentMove);
 
@@ -1117,6 +1117,7 @@ moves_loop: // When in check, search starts from here
       // Step 15. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
       // Step 16. Late moves reduction / extension (LMR, ~200 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1160,8 +1161,13 @@ moves_loop: // When in check, search starts from here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-          if (cutNode && ss->wrongCutNode)
-              r--;
+          //if (cutNode && ss->wrongCutNode)
+          //    r--;
+	  if(cutNode)
+	  {
+		  CC = true;
+		  C = ss->wrongCutNode;
+	  }
 
           if (!captureOrPromotion)
           {
@@ -1263,6 +1269,27 @@ moves_loop: // When in check, search starts from here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      dbg_hit_on(T, 10+C);
+	      dbg_cramer_of(C, T);
+	      /*
+	       * ply=1
+	       * [0] Total 10406866 Hits 940468 hit rate (%) 9.037
+	       * [10] Total 8344780 Hits 864849 hit rate (%) 10.364
+	       * [11] Total 2062086 Hits 75619 hit rate (%) 3.66711
+	       * [0] Total 10406866 CramersV(x,y) = -0.0931036 error% =27.3984
+	       *
+	       * ply=2
+	       * [0] Total 10406866 Hits 940468 hit rate (%) 9.037
+	       * [10] Total 7179833 Hits 788838 hit rate (%) 10.9869
+	       * [11] Total 3227033 Hits 151630 hit rate (%) 4.69874
+	       * [0] Total 10406866 CramersV(x,y) = -0.101441 error% =37.1316
+	       * */
       }
 
       if (value > bestValue)
