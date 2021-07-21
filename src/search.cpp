@@ -602,6 +602,8 @@ namespace {
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0]   = (ss+2)->killers[1] = MOVE_NONE;
     (ss+2)->wrongCutNode = false;
+    (ss+2)->wrongAllNode = false;
+    (ss+2)->wrongPvNode = false;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     Square prevSq        = to_sq((ss-1)->currentMove);
 
@@ -1163,10 +1165,22 @@ moves_loop: // When in check, search starts from here
 
           //if (cutNode && ss->wrongCutNode)
           //    r--;
-	  if(cutNode)
+	  if(cutNode && (ss-1)->currentMove != MOVE_NULL)
 	  {
 		  CC = true;
 		  C = ss->wrongCutNode;
+	  }
+
+	  if(false && !PvNode && !cutNode)
+	  {
+		  CC = true;
+		  C = ss->wrongAllNode;
+	  }
+
+	  if(false && PvNode)
+	  {
+		  CC = true;
+		  C = ss->wrongPvNode;
 	  }
 
           if (!captureOrPromotion)
@@ -1279,16 +1293,48 @@ moves_loop: // When in check, search starts from here
 	      dbg_cramer_of(C, T);
 	      /*
 	       * ply=1
+	       * CC = cut node;
+	       * C=wrongcutmode
 	       * [0] Total 10406866 Hits 940468 hit rate (%) 9.037
 	       * [10] Total 8344780 Hits 864849 hit rate (%) 10.364
 	       * [11] Total 2062086 Hits 75619 hit rate (%) 3.66711
 	       * [0] Total 10406866 CramersV(x,y) = -0.0931036 error% =27.3984
 	       *
+	       * CC = all node;
+	       * C=wrongAllmode
+	       * [0] Total 17006228 Hits 479018 hit rate (%) 2.81672
+	       * [10] Total 13320354 Hits 347915 hit rate (%) 2.61191
+	       * [11] Total 3685874 Hits 131103 hit rate (%) 3.5569
+	       * [0] Total 17006228 CramersV(x,y) = 0.0235334 error% =22.9486
+	       *
+	       * CC = pv node;
+	       * C=wrongPvmode
+	       * [0] Total 2645948 Hits 76554 hit rate (%) 2.89325
+	       * [10] Total 1908925 Hits 61116 hit rate (%) 3.20159
+	       * [11] Total 737023 Hits 15438 hit rate (%) 2.09464
+	       * [0] Total 2645948 CramersV(x,y) = -0.0296049 error% =29.5811
+	       *
 	       * ply=2
+	       * CC = cut node;
+	       * C=wrongcutmode
 	       * [0] Total 10406866 Hits 940468 hit rate (%) 9.037
 	       * [10] Total 7179833 Hits 788838 hit rate (%) 10.9869
 	       * [11] Total 3227033 Hits 151630 hit rate (%) 4.69874
 	       * [0] Total 10406866 CramersV(x,y) = -0.101441 error% =37.1316
+	       *
+	       * CC = all node;
+	       * C=wrongAllmode
+	       * [0] Total 17006228 Hits 479018 hit rate (%) 2.81672
+	       * [10] Total 12623342 Hits 320762 hit rate (%) 2.54102
+	       * [11] Total 4382886 Hits 158256 hit rate (%) 3.61077
+	       * [0] Total 17006228 CramersV(x,y) = 0.0282796 error% =26.7278
+	       *
+	       * CC = pv node;
+	       * C=wrongPvmode
+	       *[0] Total 2645948 Hits 76554 hit rate (%) 2.89325
+	       [10] Total 1669955 Hits 53593 hit rate (%) 3.20925
+	       [11] Total 975993 Hits 22961 hit rate (%) 2.35258
+	       [0] Total 2645948 CramersV(x,y) = -0.0246598 error% =38.044
 	       * */
       }
 
@@ -1357,8 +1403,14 @@ moves_loop: // When in check, search starts from here
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
 
-    if (cutNode && moveCount)
+    if (cutNode && moveCount && (ss-1)->currentMove != MOVE_NULL)
         ss->wrongCutNode = !bestMove;
+
+    if (!PvNode && !cutNode && moveCount)
+        ss->wrongAllNode = bestMove;
+
+    if (PvNode && moveCount)
+        ss->wrongPvNode = !bestMove || bestValue >= beta;
 
     // If no good move is found and the previous position was ttPv, then the previous
     // opponent move is probably good and the new position is added to the search tree.

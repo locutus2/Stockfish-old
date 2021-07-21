@@ -54,6 +54,8 @@ struct Stack {
   bool ttPv;
   bool ttHit;
   bool wrongCutNode;
+  bool wrongAllNode;
+  bool wrongPvNode;
 };
 
 
