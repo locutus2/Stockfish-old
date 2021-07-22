@@ -1330,7 +1330,7 @@ moves_loop: // When in check, search starts from here
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
 
-    if (cutNode && moveCount)
+    if (cutNode && priorCapture && moveCount)
         ss->wrongCutNode = !bestMove;
 
     // If no good move is found and the previous position was ttPv, then the previous
