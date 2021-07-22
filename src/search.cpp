@@ -601,7 +601,7 @@ namespace {
     (ss+1)->ttPv         = false;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0]   = (ss+2)->killers[1] = MOVE_NONE;
-    (ss+2)->wrongCutNode = false;
+    (ss+2)->disprovedAllNode = false;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     Square prevSq        = to_sq((ss-1)->currentMove);
 
@@ -1160,7 +1160,7 @@ moves_loop: // When in check, search starts from here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-          if (cutNode && priorCapture && ss->wrongCutNode)
+          if (!PvNode && !cutNode && priorCapture && ss->disprovedAllNode)
               r++;
 
           if (!captureOrPromotion)
@@ -1330,8 +1330,8 @@ moves_loop: // When in check, search starts from here
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
 
-    if (cutNode && priorCapture && moveCount)
-        ss->wrongCutNode = !bestMove;
+    if (!PvNode && !cutNode && moveCount)
+        ss->disprovedAllNode = bestMove;
 
     // If no good move is found and the previous position was ttPv, then the previous
     // opponent move is probably good and the new position is added to the search tree.

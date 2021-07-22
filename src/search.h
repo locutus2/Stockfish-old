@@ -53,7 +53,7 @@ struct Stack {
   bool inCheck;
   bool ttPv;
   bool ttHit;
-  bool wrongCutNode;
+  bool disprovedAllNode;
 };
 
 
