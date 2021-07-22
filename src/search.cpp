@@ -1165,17 +1165,17 @@ moves_loop: // When in check, search starts from here
 
           //if (cutNode && ss->wrongCutNode)
           //    r--;
-	  if(cutNode)
+	  if(false && cutNode)
 	  {
 		  CC = true;
 		  C = ss->wrongCutNode;
 		  C = C && priorCapture;
 	  }
 
-	  if(false && !PvNode && !cutNode)
+	  if(!PvNode && !cutNode)
 	  {
 		  CC = true;
-		  C = ss->wrongAllNode;
+		  C = ss->wrongAllNode && !captureOrPromotion;
 	  }
 
 	  if(false && PvNode)
@@ -1395,12 +1395,40 @@ moves_loop: // When in check, search starts from here
 	       * [0] Total 10406866 CramersV(x,y) = -0.0261707 error% =13.4655
 	       *
 	       * CC = all node;
-	       * C=wrongAllmode
+	       * C = ss->wrongAllNode
 	       * [0] Total 17006228 Hits 479018 hit rate (%) 2.81672
 	       * [10] Total 12623342 Hits 320762 hit rate (%) 2.54102
 	       * [11] Total 4382886 Hits 158256 hit rate (%) 3.61077
 	       * [0] Total 17006228 CramersV(x,y) = 0.0282796 error% =26.7278
 	       *
+	       * CC = all node;
+	       * C = ss->wrongAllNode && priorCapture;
+	       * [0] Total 17006228 Hits 479018 hit rate (%) 2.81672
+	       * [10] Total 15900507 Hits 463502 hit rate (%) 2.91501
+	       * [11] Total 1105721 Hits 15516 hit rate (%) 1.40325
+	       * [0] Total 17006228 CramersV(x,y) = -0.0225288 error% =9.13611
+	       *
+	       * CC = all node;
+	       * C = ss->wrongAllNode && !priorCapture;
+	       * [0] Total 17006228 Hits 479018 hit rate (%) 2.81672
+		       * [10] Total 13729063 Hits 336278 hit rate (%) 2.44939
+		       * [11] Total 3277165 Hits 142740 hit rate (%) 4.35559
+		       * [0] Total 17006228 CramersV(x,y) = 0.0454427 error% =20.4084
+	       *
+	       * CC = all node;
+	       * C = ss->wrongAllNode && captureOrPromotion;
+	       * [0] Total 17006228 Hits 479018 hit rate (%) 2.81672
+		       * [10] Total 16527393 Hits 464127 hit rate (%) 2.80823
+		       * [11] Total 478835 Hits 14891 hit rate (%) 3.10984
+		       * [0] Total 17006228 CramersV(x,y) = 0.00301555 error% =5.45724
+	       *
+	       * CC = all node;
+	       * C = ss->wrongAllNode && !captureOrPromotion;
+	       * [0] Total 17006228 Hits 479018 hit rate (%) 2.81672
+		       * [10] Total 13102177 Hits 335653 hit rate (%) 2.56181
+		       * [11] Total 3904051 Hits 143365 hit rate (%) 3.67221
+		       * [0] Total 17006228 CramersV(x,y) = 0.028225 error% =24.0873
+		       *
 	       * CC = pv node;
 	       * C=wrongPvmode
 	       *[0] Total 2645948 Hits 76554 hit rate (%) 2.89325
@@ -1475,7 +1503,7 @@ moves_loop: // When in check, search starts from here
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
 
-    if (cutNode && moveCount && priorCapture)
+    if (cutNode && moveCount)
         ss->wrongCutNode = !bestMove;
 
     if (!PvNode && !cutNode && moveCount)
