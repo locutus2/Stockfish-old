@@ -1159,7 +1159,11 @@ moves_loop: // When in check, search starts from here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-          if (depth > 12 && !PvNode && !cutNode && (ss-1)->moveCount == 1)
+          if (  !cutNode
+              && depth >= 8
+              && thisThread->mainHistory[us][from_to(move)] < 0
+              && move != ss->killers[0]
+              && move != countermove)
               r++;
 
           if (!captureOrPromotion)
