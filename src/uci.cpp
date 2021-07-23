@@ -279,8 +279,6 @@ namespace {
 	else if(USE_CRAMER)
         {
             val = get_cramer();
-	    if (!MAXIMIZE)
-		    val = -val;
         }	 
 	else // HIT
 	{
@@ -341,7 +339,13 @@ namespace {
 
 	if(USE_CRAMER)
 	{
-	    if(val > bestVal || (val == bestVal && support > bestSupport))
+	    if(MAXIMIZE && (val > bestVal || (val == bestVal && support > bestSupport)))
+	    {
+                bestVal = val;
+                bestSupport = support;
+                cerr << "=>c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
+	    }
+	    else if(!MAXIMIZE && (val < bestVal || (val == bestVal && support > bestSupport)))
 	    {
                 bestVal = val;
                 bestSupport = support;
