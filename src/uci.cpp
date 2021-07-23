@@ -184,7 +184,7 @@ namespace {
 		    bool(int(depth) & 1),
 		    bool(int(depth) & 2),
 		    bool(int(depth) & 4),
-		    bool(int(depth) & 8),
+		c19 bool(int(depth) & 8),
 		c20 bool(moveCount & 1),
 		    bool(moveCount & 2),
 		    bool(moveCount & 4),
@@ -251,9 +251,267 @@ namespace {
      * */
      /*
       CC = true;
+N: 80
+Score: cramer
+Maximize: true
+Sample size: 29861941
+BASE val=0 support=1
+=>c0 cramer=0.1349 support=0.345656
+c1 cramer=-0.0297853 support=0.910955
+c2 cramer=-0.000777146 support=0.896151
+c3 cramer=0.0592456 support=0.0739846
+c4 cramer=0.0125895 support=0.0345092
+c5 cramer=0.0651792 support=0.418966
+c6 cramer=-0.0275422 support=0.959912
+c7 cramer=-0.0200058 support=0.927643
+c8 cramer=0.0035105 support=0.000161075
+c9 cramer=-0.0126512 support=0.993593
+c10 cramer=-0.0364685 support=0.923865
+c11 cramer=-0.0187989 support=0.976593
+c12 cramer=-0.0378052 support=0.877085
+c13 cramer=0.123523 support=0.021057
+c14 cramer=0.0871705 support=0.0177809
+c15 cramer=0.127706 support=0.0311169
+c16 cramer=0.0270161 support=0.560741
+c17 cramer=0.0267242 support=0.494045
+c18 cramer=-0.0134257 support=0.443111
+c19 cramer=-0.0885859 support=0.751706
+c20 cramer=-0.0535825 support=0.550205
+c21 cramer=0.0820123 support=0.5848
+c22 cramer=-0.0848866 support=0.541283
+c23 cramer=-0.102352 support=0.690832
+c24 cramer=-0.0835335 support=0.837624
+c25 cramer=-0.0330835 support=0.97487
+c26 cramer=-5.90038e-05 support=1
+c27 cramer=0.00863242 support=0.423895
+c28 cramer=-0.0145624 support=0.539206
+c29 cramer=-0.00117061 support=0.433596
+c30 cramer=-0.00628826 support=0.563202
+c31 cramer=-0.00272797 support=0.505909
+c32 cramer=0.00860009 support=0.538623
+c33 cramer=-0.00856252 support=0.458167
+c34 cramer=-0.0195648 support=0.459381
+c35 cramer=-0.00756345 support=0.983368
+c36 cramer=-0.0773471 support=0.262626
+c37 cramer=-0.0233117 support=0.730116
+c38 cramer=-0.0170464 support=0.969258
+c39 cramer=0.114718 support=0.258023
+c40 cramer=0.0942794 support=0.313382
+c41 cramer=-0.0241112 support=0.902906
+c42 cramer=-0.00748018 support=0.994302
+c43 cramer=-0.0206961 support=0.325465
+c44 cramer=0.0436073 support=0.306078
+c45 cramer=0.0409404 support=0.181184
+c46 cramer=0.0221508 support=0.123395
+c47 cramer=0.0195482 support=0.0491684
+c48 cramer=0.0164873 support=0.00399251
+c49 cramer=-0.0770602 support=0.722301
+c50 cramer=-0.00601184 support=0.484394
+c51 cramer=-0.00632135 support=0.485034
+c52 cramer=0.00607724 support=0.484261
+c53 cramer=-0.00692029 support=0.483997
+c54 cramer=0.00551223 support=0.485631
+c55 cramer=0.0076183 support=0.481873
+c56 cramer=-0.00868062 support=0.47863
+c57 cramer=-0.00743602 support=0.481924
+c58 cramer=-0.00501985 support=0.487433
+c59 cramer=-0.00170903 support=0.4958
+c60 cramer=-0.00434421 support=0.49093
+c61 cramer=-0.0173127 support=0.455898
+c62 cramer=0.00282813 support=0.480316
+c63 cramer=0.0486801 support=0.392725
+     c64 cramer=-0.123868 support=0.29628
+     c65 cramer=0.00415039 support=0.0564449
+     c66 cramer=0.00273059 support=0.0557379
+     c67 cramer=0.00470614 support=0.0582942
+     c68 cramer=0.00242411 support=0.056062
+     c69 cramer=0.00202538 support=0.0560337
+     c70 cramer=0.0040574 support=0.0565281
+     c71 cramer=0.00398809 support=0.0567344
+     c72 cramer=0.0054971 support=0.0573399
+     c73 cramer=0.00656795 support=0.0573815
+     c74 cramer=0.00128461 support=0.0558256
+     c75 cramer=0.00225757 support=0.0564057
+     c76 cramer=0.00490294 support=0.0560903
+     c77 cramer=0.000602341 support=0.0571093
+     c78 cramer=0.00546808 support=0.0506723
+     c79 cramer=-0.0195482 support=0.954992
 
+CC = !cutNode;
+N: 80
+	   Score: cramer
+	   Maximize: true
+	   Sample size: 19539986
+	   BASE val=0 support=1
+	   c0 cramer=0 support=0
+	   =>c1 cramer=0.00144437 support=0.136082
+	   c2 cramer=-0.000830235 support=0.897402
+	   =>c3 cramer=0.0397234 support=0.0732038
+	   c4 cramer=0.0116764 support=0.0355268
+	   c5 cramer=0.031781 support=0.348434
+	   c6 cramer=-0.0122915 support=0.938735
+	   c7 cramer=-0.0202612 support=0.935634
+	   c8 cramer=0.00256109 support=0.000133368
+	   c9 cramer=-0.00489589 support=0.998355
+	   c10 cramer=-0.0225764 support=0.925425
+	   c11 cramer=-0.00801937 support=0.98521
+	   c12 cramer=-0.0226642 support=0.882655
+	   =>c13 cramer=0.0469346 support=0.0146144
+	   c14 cramer=0.0443839 support=0.0125892
+	   =>c15 cramer=0.079246 support=0.0243577
+	   c16 cramer=0.0204067 support=0.564146
+	   c17 cramer=0.0167002 support=0.48961
+	   c18 cramer=-9.11594e-05 support=0.462165
+	   c19 cramer=-0.0726308 support=0.698184
+	   c20 cramer=-0.0325225 support=0.544738
+	   c21 cramer=0.0505254 support=0.576498
+	   c22 cramer=-0.0503487 support=0.533777
+	   c23 cramer=-0.0715054 support=0.678692
+	   c24 cramer=-0.0630285 support=0.824036
+	   c25 cramer=-0.0252584 support=0.972683
+	   c26 cramer=0 support=0
+	   c27 cramer=0.00539903 support=0.419121
+	   c28 cramer=-0.0111547 support=0.535557
+	   c29 cramer=0.000248958 support=0.571875
+	   c30 cramer=-0.00908748 support=0.556928
+	   c31 cramer=-0.00427801 support=0.503971
+	   c32 cramer=0.00704354 support=0.536898
+	   c33 cramer=-0.00754474 support=0.457941
+	   c34 cramer=-0.0127771 support=0.464665
+	   c35 cramer=-0.00581489 support=0.980601
+	   c36 cramer=-0.0287877 support=0.168448
+	   c37 cramer=-0.0158573 support=0.758025
+	   c38 cramer=0.000677561 support=0.0469814
+	   c39 cramer=0.0404509 support=0.155916
+	   c40 cramer=0.0472287 support=0.254129
+	   c41 cramer=-0.019568 support=0.889126
+	   c42 cramer=-0.00540703 support=0.995126
+	   c43 cramer=0.0207304 support=0.736915
+	   c44 cramer=-0.00183437 support=0.794633
+	   c45 cramer=0.000501309 support=0.152925
+	   c46 cramer=-0.0102153 support=0.87794
+	   c47 cramer=-0.00898973 support=0.950626
+	   c48 cramer=0.00125127 support=0.00209524
+	   c49 cramer=-0.0593207 support=0.664108
+	   c50 cramer=-0.00492556 support=0.483068
+	   c51 cramer=-0.00495108 support=0.483721
+	   c52 cramer=0.00479439 support=0.482854
+	   c53 cramer=-0.00569063 support=0.482538
+	   c54 cramer=0.00444129 support=0.484434
+	   c55 cramer=0.00583407 support=0.480261
+	   c56 cramer=-0.00686509 support=0.476522
+	   c57 cramer=-0.00580805 support=0.480483
+	   c58 cramer=-0.0044255 support=0.486485
+	   c59 cramer=-0.00163333 support=0.495481
+	   c60 cramer=-0.0024629 support=0.490194
+	   c61 cramer=-0.0137031 support=0.451968
+	   c62 cramer=0.00454067 support=0.478998
+	   c63 cramer=0.0371361 support=0.384436
+	   c64 cramer=-0.0776525 support=0.274561
+	   c65 cramer=0.0018951 support=0.0554803
+	   c66 cramer=0.00117405 support=0.054913
+	   c67 cramer=0.00239949 support=0.0572898
+	   c68 cramer=0.00102901 support=0.0552539
+	   c69 cramer=0.000766035 support=0.0552345
+	   c70 cramer=0.00199072 support=0.0555518
+	   c71 cramer=0.00236103 support=0.0559249
+	   c72 cramer=0.00328439 support=0.0563701
+	   c73 cramer=0.00394302 support=0.0563648
+	   c74 cramer=7.33085e-06 support=0.0550696
+	   c75 cramer=0.00123306 support=0.055602
+	   c76 cramer=0.00329865 support=0.0550607
+	   c77 cramer=0.000979485 support=0.0563494
+	   c78 cramer=0.0035812 support=0.0489557
+	   c79 cramer=-0.0127328 support=0.956128
 
+CC = !cutNode && move != countermove;
+N: 80
+	   Score: cramer
+	   Maximize: true
+	   Sample size: 19064037
+	   BASE val=0 support=1
+	   c0 cramer=0 support=0
+	   =>c1 cramer=0.00146738 support=0.136381
+	   =>c2 cramer=0.00351518 support=0.105038
+	   =>c3 cramer=0.0402159 support=0.0729425
+	   c4 cramer=0.0112241 support=0.0338686
+	   c5 cramer=0.0320735 support=0.349993
+	   c6 cramer=-0.0126188 support=0.93872
+	   c7 cramer=-0.0205218 support=0.936054
+	   c8 cramer=0.00245979 support=0.000131347
+	   c9 cramer=-0.00464503 support=0.99834
+	   c10 cramer=-0.0200256 support=0.923634
+	   c11 cramer=-0.00754381 support=0.985108
+	   c12 cramer=-0.0221 support=0.882636
+	   c13 cramer=0.0395051 support=0.0131318
+	   c14 cramer=0.0392533 support=0.0113184
+	   c15 cramer=0 support=0
+	   c16 cramer=0.0203869 support=0.563521
+	   c17 cramer=0.0164307 support=0.489384
+	   c18 cramer=-0.000660166 support=0.462124
+	   =>c19 cramer=-0.0711239 support=0.696352
+	   c20 cramer=-0.0278122 support=0.540429
+	   c21 cramer=0.0432345 support=0.568294
+	   c22 cramer=-0.0420644 support=0.524591
+	   c23 cramer=-0.0664826 support=0.670711
+	   c24 cramer=-0.0603077 support=0.819675
+	   c25 cramer=-0.0243486 support=0.972013
+	   c26 cramer=0 support=0
+	   c27 cramer=0.00424169 support=0.418027
+	   c28 cramer=-0.011057 support=0.535888
+	   c29 cramer=0.0024814 support=0.574047
+	   c30 cramer=-0.00757933 support=0.556253
+	   c31 cramer=-0.00415742 support=0.503862
+	   c32 cramer=0.0072339 support=0.537205
+	   c33 cramer=-0.00864788 support=0.458642
+	   c34 cramer=-0.015695 support=0.467283
+	   c35 cramer=-0.005693 support=0.980599
+	   c36 cramer=-0.0285977 support=0.168289
+	   c37 cramer=-0.0156855 support=0.757958
+	   c38 cramer=0.00112784 support=0.0471248
+	   c39 cramer=0.0407943 support=0.154616
+	   c40 cramer=0.048077 support=0.25296
+	   c41 cramer=-0.0183692 support=0.88806
+	   c42 cramer=-0.00476075 support=0.995004
+	   c43 cramer=0.0207692 support=0.736704
+	   c44 cramer=-0.00317985 support=0.795672
+	   c45 cramer=-0.000520451 support=0.847661
+	   c46 cramer=-0.0106201 support=0.87807
+	   c47 cramer=-0.0089976 support=0.950562
+	   c48 cramer=0.0010604 support=0.00209043
+	   c49 cramer=-0.057465 support=0.663121
+	   c50 cramer=-0.00489184 support=0.482681
+	   c51 cramer=-0.00486713 support=0.483325
+	   c52 cramer=0.00457493 support=0.482405
+	   c53 cramer=-0.00551062 support=0.482096
+	   c54 cramer=0.00422944 support=0.484041
+	   c55 cramer=0.00556622 support=0.479756
+	   c56 cramer=-0.00671587 support=0.475936
+	   c57 cramer=-0.00576568 support=0.479961
+	   c58 cramer=-0.00438198 support=0.486177
+	   c59 cramer=-0.00178282 support=0.495439
+	   c60 cramer=-0.00223653 support=0.489852
+	   c61 cramer=-0.0132831 support=0.450801
+	   c62 cramer=0.00525411 support=0.478993
+	   c63 cramer=0.034844 support=0.380882
+	   c64 cramer=-0.0700037 support=0.266136
+	   c65 cramer=0.00433215 support=0.0564354
+	   c66 cramer=0.00373759 support=0.0559385
+	   c67 cramer=0.00495769 support=0.0582855
+	   c68 cramer=0.00361556 support=0.0562917
+	   c69 cramer=0.00337427 support=0.0562705
+	   c70 cramer=0.00443222 support=0.0565306
+	   c71 cramer=0.00496759 support=0.056932
+	   c72 cramer=0.00584163 support=0.0573489
+	   c73 cramer=0.00654609 support=0.0573027
+	   c74 cramer=0.00247701 support=0.0560895
+	   c75 cramer=0.0037676 support=0.056647
+	   c76 cramer=0.00578334 support=0.056035
+	   c77 cramer=0.00361275 support=0.0574105
+	   c78 cramer=0.00595582 support=0.0497932
+	   c79 cramer=-0.0107251 support=0.955106
 
+CC = !cutNode && move != countermove && (int(depth) & 8);
       */
 
     constexpr bool MAXIMIZE = true;
