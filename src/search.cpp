@@ -1130,8 +1130,24 @@ bool CC = false, C = false;
           Depth r = reduction(improving, depth, moveCount);
 
 	  CC = true;
+	  /*
+          C = !cutNode && move != countermove && depth >= 8 && move != ss->killers[0]
+               &&  thisThread->mainHistory[us][from_to(move)] < 0;
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 25441571 Hits 1450453 hit rate (%) 5.70111
+	       [11] Total 4420370 Hits 25110 hit rate (%) 0.568052
+	       [100] Total 29861941 Hits 4420370 hit rate (%) 14.8027
+	       [0] Total 29861941 CramersV(x,y) = -0.0841093 error% =19.5758
+	  */
+	  /*
           C = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
                &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14));
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 25441602 Hits 1450453 hit rate (%) 5.70111
+	       [11] Total 4420339 Hits 25110 hit rate (%) 0.568056
+	       [100] Total 29861941 Hits 4420339 hit rate (%) 14.8026
+	       [0] Total 29861941 CramersV(x,y) = -0.0841089 error% =19.5757
+	  */
 	  /*
 	  C = !cutNode && move != countermove && (int(depth) & 8);
 	  [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
