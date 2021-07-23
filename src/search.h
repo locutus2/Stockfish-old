@@ -33,7 +33,7 @@ typedef __uint128_t Record;
 extern std::vector<Record> samples;
 
 constexpr bool AVOID_ZERO = true;
-constexpr bool OPTIMIZE_DIFF = true;
+constexpr bool OPTIMIZE_DIFF = false;
 constexpr bool SPARSE_INIT = true;
 constexpr bool LESS_NEUTRAL_MUTATIONS = false;
 constexpr bool HILL_CLIMBING = false;

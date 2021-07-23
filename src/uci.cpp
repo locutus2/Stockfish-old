@@ -249,8 +249,8 @@ namespace {
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  13)),
                 c79 bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  14))
      * */
-    constexpr bool MAXIMIZE = true;
-    constexpr bool USE_CRAMER = false;
+    constexpr bool MAXIMIZE = false;
+    constexpr bool USE_CRAMER = true;
     constexpr bool USE_CRAMER_AND_HIT = false;
     double val = 0, support = 0;
 
