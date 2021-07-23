@@ -1130,6 +1130,15 @@ bool CC = false, C = false;
           Depth r = reduction(improving, depth, moveCount);
 
 	  CC = true;
+	  /*
+	  C = !cutNode && move != countermove && (int(depth) & 8);
+	  [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	  [10] Total 24073190 Hits 1423913 hit rate (%) 5.91493
+	  [11] Total 5788751 Hits 51650 hit rate (%) 0.892248
+	  [100] Total 29861941 Hits 5788751 hit rate (%) 19.385
+	  [0] Total 29861941 CramersV(x,y) = -0.0916139 error% =23.9804
+	  */
+
 	  //C = cutNode && (captureOrPromotion || ss->inCheck || !ttCapture);
 	  //C = cutNode && givesCheck && bool(type_of(movedPiece) & 4);
 	  /*
