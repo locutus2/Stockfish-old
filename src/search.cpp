@@ -1131,6 +1131,77 @@ bool CC = false, C = false;
 
 	  CC = true;
 	  /*
+          C = !cutNode && !ss->ttPv && move != countermove && move != ss->killers[0] && move != ss->killers[1]
+               &&  !captureOrPromotion && !givesCheck && !ss->inCheck
+               &&  thisThread->mainHistory[us][from_to(move)] < 0
+               && (*contHist[0])[movedPiece][to_sq(move)] < 0
+               && (*contHist[1])[movedPiece][to_sq(move)] < 0
+               && (*contHist[3])[movedPiece][to_sq(move)] < 0;
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 29197450 Hits 1473382 hit rate (%) 5.04627
+	       [11] Total 664491 Hits 2181 hit rate (%) 0.328221
+	       [100] Total 29861941 Hits 664491 hit rate (%) 2.22521
+	       [0] Total 29861941 CramersV(x,y) = -0.0321104 error% =7.15189
+	       */
+	  /*
+          C = !cutNode && !ss->ttPv && move != countermove && move != ss->killers[0] && move != ss->killers[1]
+               &&  !captureOrPromotion && !givesCheck && !ss->inCheck;
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 19368550 Hits 1230716 hit rate (%) 6.3542
+	       [11] Total 10493391 Hits 244847 hit rate (%) 2.33334
+	       [100] Total 29861941 Hits 10493391 hit rate (%) 35.1397
+	       [0] Total 29861941 CramersV(x,y) = -0.0885709 error% =38.4411
+	       */
+	  /*
+          C = !cutNode && !ss->ttPv && move != countermove && depth >= 8 && move != ss->killers[0]
+               &&  thisThread->mainHistory[us][from_to(move)] < 0;
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 26442394 Hits 1455962 hit rate (%) 5.50617
+	       [11] Total 3419547 Hits 19601 hit rate (%) 0.573205
+	       [100] Total 29861941 Hits 3419547 hit rate (%) 11.4512
+	       [0] Total 29861941 CramersV(x,y) = -0.0724784 error% =16.2612
+	       */
+	  /*
+          C = !cutNode && !PvNode && move != countermove && depth >= 8 && move != ss->killers[0]
+               &&  thisThread->mainHistory[us][from_to(move)] < 0;
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 26442394 Hits 1455962 hit rate (%) 5.50617
+	       [11] Total 3419547 Hits 19601 hit rate (%) 0.573205
+	       [100] Total 29861941 Hits 3419547 hit rate (%) 11.4512
+	       [0] Total 29861941 CramersV(x,y) = -0.0724784 error% =16.2612
+	       */
+	  /*
+          C = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
+               &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14))
+               && !(thisThread->mainHistory[us][from_to(move)] & (1 << 13))
+	       &&    ss->staticEval < beta;
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 27887014 Hits 1471415 hit rate (%) 5.27634
+	       [11] Total 1974927 Hits 4148 hit rate (%) 0.210033
+	       [100] Total 29861941 Hits 1974927 hit rate (%) 6.61353
+	       [0] Total 29861941 CramersV(x,y) = -0.0580944 error% =11.527
+	       */
+	  /*
+          C = !cutNode && move != countermove && depth >= 8 && move != ss->killers[0]
+               &&  thisThread->mainHistory[us][from_to(move)] < 0
+	       &&    ss->staticEval < beta;
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 26805933 Hits 1464244 hit rate (%) 5.46239
+	       [11] Total 3056008 Hits 11319 hit rate (%) 0.370385
+	       [100] Total 29861941 Hits 3056008 hit rate (%) 10.2338
+	       [0] Total 29861941 CramersV(x,y) = -0.0712111 error% =15.0993
+	       */
+	  /*
+          C = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
+               &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14))
+               && !(thisThread->mainHistory[us][from_to(move)] & (1 << 13));
+	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
+	       [10] Total 27012724 Hits 1465688 hit rate (%) 5.42592
+	       [11] Total 2849217 Hits 9875 hit rate (%) 0.346586
+	       [100] Total 29861941 Hits 2849217 hit rate (%) 9.5413
+	       [0] Total 29861941 CramersV(x,y) = -0.0688525 error% =14.4164
+	       */
+	  /*
           C = !cutNode && move != countermove && depth >= 8 && move != ss->killers[0]
                &&  thisThread->mainHistory[us][from_to(move)] < 0;
 	       [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
