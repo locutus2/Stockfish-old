@@ -54,11 +54,13 @@ struct Function {
 
     void randomInit();
     void init();
+    void initCondition(int c, bool posit);
     bool mutate(int m = 1, double support = 0.5, double value = 0.0);
     std::ostream& print(std::ostream& out) const;
 
     bool operator()(const std::vector<bool>& x) const;
 
+    void evaluate() const;
     void addSample(bool T, const std::vector<bool>& C) const;
     void addSample(bool T, bool T2, const std::vector<bool>& C) const;
     bool getSampleClass(const Record& x) const;

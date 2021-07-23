@@ -161,455 +161,8 @@ namespace {
     uint64_t num, nodes = 0, cnt = 1;
 
     vector<string> list = setup_bench(pos, args);
-    num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
+    //num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
 
-    TimePoint elapsed = now();
-
-    /*
-     * {PvNode, cutNode, captureOrPromotion, givesCheck, ss->inCheck, improving, likelyFailLow, ttCapture}
-     * it=0 cramer=0.0223331 => !c1*c2*c4*!c6*!c7 c2*!c4*c5*c6*!c7 c0*c4*c6*!c7 c0*c1*!c5*c6 !c4*!c5*c7 c0*c2*!c3*!c4*!c6*!c7 !c5*!c6*!c7 !c0*c2*c3*!c5*c7 !c1*c2*c3*c4 c4*!c5*c7 c4*c5*!c6*!c7 c0*!c3*c5*!c6*!c7 c1*!c4*c6*c7 !c0*!c1*!c2*!c3*c4*c7 !c0*!c1*c4 c1*c3 c2*c4*c5*c6*c7 !c0*c1*c2*!c3*c6 !c3*c4*c5*!c6 !c0*c3 c0*c1*!c4*c5*c6 !c1*c2*!c3*!c5 c0*c1 c1*c5*!c6*!c7 !c3*c4*c7 !c1*!c2*!c4*!c5*c7 c1*c3*!c6*c7 c0*!c1*c3*!c5*c7 !c0*!c2*c3*!c7 !c0*!c2*!c3*c5 !c0*!c1 c1*!c3*c7
-     * it=16 cramer=0.0832873 => c1*c5 c0*c1*c4*!c5*c6 c0*c3*!c4*c5*c6 c5*!c7 c0*c2*c3*!c4*c5*c7 c0*!c1*c4*!c7 c2*c3*c4*!c6 c2*!c5 c2*c6*!c7 c0*c2*c5*!c6 c0*c2*!c3*!c5*c6*c7 !c1*c2*!c3*c4*!c5*!c6*c7 c0*c2*!c6*c7 !c0*c2*!c3*c5*c7 c1*!c2*!c4*c5 c0*!c2*c6 c0*!c2*c3 c2*!c3*!c5 !c1*c2*!c5 c1 !c1*!c3*c4*!c5*!c6 c0*!c3*c4*!c5*c6*c7 !c1*c4*!c5 !c0*c2*c5*c6*c7 c1*!c7 c2*!c4*c5 !c0*c5 c2 c0*!c1*!c2*c5*!c6*c7 c0*c2*c3*!c6*!c7 !c2*!c3*c4*!c7 c1*!c2*!c4*c5*!c6
-     * it=77 cramer=0.085573 => !c1*!c2*!c7 !c0*!c1*!c2*!c4*!c5*c7 c0*c1*c4*c5*c6*!c7 c0*!c1*!c4*c6*c7 !c2*!c3*c5*c6*!c7 c4*!c6 !c0*!c2*!c3*c4 !c0*!c1*c4*!c5*!c6*c7 c0*!c1*c2*!c5*c7 c2*!c3 c1*!c3*!c4*c5*c7 !c0*!c3*!c5*!c6*!c7 c2*!c6 !c0*!c2*!c4*!c5*!c7 c4*c5*!c6*c7 c1*c4*c6*!c7 !c2*c3*!c4*!c5*!c6*c7 c1*c2*c3*!c4*c5 c0*!c2 !c2*c4*c5*c7 c0*!c1*!c4*!c5*!c6 c0*!c3*!c5*c7 !c0*c2*c4 !c0*c2*c3*c5 c0*c5*!c6 !c0*!c1*c4*!c6*!c7 c2*c3*c4 !c2*!c3*!c4 c0*!c1*!c3*c6 c0*c1*c3*c5*!c6 !c1*c2*c3*!c7 !c0*!c4*!c5*c7
-     * it=156 cramer=0.0950918 => !c1*!c3*!c7 !c1*!c2*!c4*!c5*!c7 c1*c3*c4*!c5 !c0*!c1*!c5 c1*!c2*c3*!c4*c5*c6 !c1*c5 !c0*!c1*c3*c6*!c7 c1*!c4*!c5 c3*!c4 c0*c5*!c7 c0*!c3*!c7 !c1*c5*c6 c0*c1*!c2*c6 !c0*!c1*!c4*!c5*!c6*c7 c4*!c6*c7 !c0*!c2*c6*!c7 c1*c3*c5*!c7 !c0*!c1*!c3*!c4*c7 c1*c3*c4*!c6*c7 !c2*c3*c4*!c5*c6*!c7 c3*!c5*!c7 !c2*c6 !c0*c1*c2*c4*!c7 c1*c3*!c4*c5*!c6 c0*!c2*!c5*!c7 c1*c3*!c4 !c1*c2*c3*c5 c0*!c1*!c3*c4*!c7 c3*!c6*c7 !c0*!c2*c3*c4*!c5*!c6*c7 !c3*!c5 !c0*c1*c4*!c5*c6*c7
-     * it=207 cramer=0.105246 => !c1*c3*!c4*!c5 c1*!c2*c3*!c5*!c6*!c7 c0*c1*!c4*c5*c7 !c0*!c2*c3*c5 !c1*!c3*c7 !c1*!c2*c5*c6*c7 c0*c2*c3*!c6 c1*c5*c7 c2*c3*c4*!c6*!c7 c2*c3*!c5 c0*!c1*!c4*!c5*!c7 c0*c5*!c6*!c7 c0*c1*!c3*c5*c6*!c7 !c1*!c4*c7 c1*c5*!c6 !c1*c3*c4*!c5*!c6 !c2*c6*!c7 !c3*c4*c5*!c7 !c4*c6 c4*!c5*c6 c1*!c3*!c7 c1*!c3*c4*!c5*c7 c0*c2*!c7 c0*!c2*!c3*!c7 !c1*c3*c4*c5*!c6 !c0*c2*c3*c5*!c7 c1*c3*!c4*!c5*!c6*c7 c0*!c1*!c3*!c4*c6 !c1*!c4*c5*c6*c7 !c0*c2*c6*!c7 c0*c1*c2*c5 c0*!c4*c5*c6*c7
-     * it=278 cramer=0.117186 => c0*!c1*c2*!c4*!c5*c7 !c0*c2 c0*!c2*c3*c4*c6*!c7 !c2*!c4*c5*c7 !c0*c1*!c2*c6*c7 !c1 c4*c6*!c7 !c0*!c1*!c3 c0*!c2*c4 !c1*!c3*c6*c7 !c2*c5*!c6*c7 c0*!c2*c3*!c4*c5*!c6*!c7 c0*!c1*c2*c3*c4 !c2*c3*c4*c5*c7 !c4*!c5*!c6 c1*c2*c5 c0*!c2*c3*!c7 c0*c1*!c4*c5 c1*c2*c7 c0*!c1*!c4 c0*!c6*!c7 !c1*!c3*c4*!c5*!c6 !c0*!c4*!c5*!c6 c1*c2 !c0*!c1*!c2*c4*c7 c3*c4*c5*c6 c0*!c3*!c7 c0*!c1*!c2*c5*c7 c1*!c4*c6*!c7 c1*!c5*c6 c0*!c1*c3*!c5*!c6 !c0*c3*c5*c6
-     *
-     * it=17972 cramer=0.19789 => c0*!c2*c3 c2*!c4*!c5*c6 !c0*!c1*!c6 c4*!c5*c6*c7 !c0*c3*c4*!c5 !c0*c1*!c2*c3*!c5*c6*c7 !c0*!c3*!c6 !c0*!c2*c3*!c4*!c5*c6 c2*c3*!c6 !c0*c3*c4*!c7 !c0*!c1*!c2*!c3*c7 c1*c2*!c3*!c6*!c7 !c0*!c1*!c2*!c3*c4*!c5*c7 !c0*c3*c4*!c5*c6 !c0*c1*c3*c4*c5 !c0*!c1*c2*!c4*c5*!c6*!c7 c1*c3*c4*c5*c6*c7 !c1*!c3*!c5 c1*!c2*c4*c5*!c6 c1*c3*c5*c6*c7 !c2*c6 !c0*!c1*!c2*c4*!c5*!c7 c1*!c2*!c3*c4*c6 c0*!c2*!c6*!c7 !c1*!c2*c4*!c5*c6 !c1*c2*c4*!c5*c7 !c0*!c1*!c2*c4*c5*c6 !c1*c7 c0*!c3*!c4*!c6 !c1*c2*c6 c0*!c1*c3*c6*c7 c0*c2*!c4*!c6*c7
-     *
-     * it=3156 cramer=0.130392 => c0*c4*!c5*c7 !c0*c3*!c5*!c7 c0*c2*!c3*!c5 c0*!c1*!c4*!c5*c6 c0*!c1*!c3*!c4*!c6*c7 c3*c4*!c5 !c0*!c1*c2*!c3*!c4*!c5*!c6*!c7 c3*!c7 !c2*c3*c4 c1*!c3*c6*!c7 !c1*c2*c5 !c1*!c2*c4*c5 c1*c2*c3*!c4*!c5*c6 c1*c3*!c4*!c7 c1*c3*c6 !c0*c3*c4 c1*!c2*!c3*c7 c0*c1*!c2*!c6*!c7 !c0*c1*c2*c3*c5*!c6*!c7 !c2*!c4*!c5*!c7 !c1*!c4*c5*c6*c7 !c0*!c1*!c2*c7 c4*c5*c6*!c7 !c0*c1*c3*!c6*!c7 !c1*c3*!c5*!c6*c7 c0*c2*c3*!c5*!c6 !c1*c2*c6*!c7 c0*!c1*c2*!c3*!c4*!c7 !c2*c3*!c6*!c7 !c0*c1*c2*!c3*c6 !c1*!c2*!c5*!c6 !c1*!c4
-     *
-     * it=131 cramer=0.111711 msteps=2 => c1*c6*c7 !c0*c2*c4*!c7 c2*c3*!c4*c5*!c6 !c2*c4*c5*c6 c0*!c1*c2 !c2*c3*!c4*!c6*!c7 !c0*c1*!c2*!c4*!c5 !c0*!c1*!c4*c5*!c7 c3*c5 c1*c2*c3*c7 c3*c5*c6 !c0*c1*c3*!c4*!c7 c2*c5*c6 c0*!c3*!c4*!c5*!c7 c0*!c1*c2 c0*!c2*c3*!c6*c7 !c0*c1*!c3*c4*!c6 c0*!c1*c2*!c3*c4*c6*c7 !c0*!c1*!c3*c4*!c6*!c7 c1*!c6 c0*c3*c6*!c7 !c0*!c1*c2*!c3*!c5*!c7 !c0*c3*c4*c5 c3*!c4*c5*c6 c1*c4*!c5*!c6*!c7 !c0*c1*c2*c3*!c4*!c5*!c6*!c7 c0*!c2*c4*!c7 !c2*c3*c5*c6 !c1*c2*!c3*c4*c7 !c1*c2*c6*c7 c1*!c2*c3*c4*c7 c0*!c1*!c2*c3*c5*c6
-     *
-     * it=0 cramer=0 msteps=1 => c1*!c4*c6*!c7
-     * it=6 cramer=0.0198077 msteps=1 => !c4*c6*!c7
-     * it=8 cramer=0.0205214 msteps=1 => !c4*!c6*!c7
-     * it=9 cramer=0.106422 msteps=1 => !c4*c5*!c6*!c7
-     * it=43 cramer=0.12846 msteps=11 => !c0*c1*!c4*c5*!c6*!c7
-     * it=67 cramer=0.128563 msteps=6 => c1*!c7
-     *
-     * it=0 cramer=0.00819133 msteps=1 => !c0*c5*c7 c0*!c1*c2*!c3*!c5 !c0*c4*!c6*!c7
-     * it=3 cramer=0.110463 msteps=1 => !c0*c5 c0*!c1*c2*!c3*!c5 !c0*c4*!c6*!c7
-     * it=27 cramer=0.11831 msteps=6 => !c1*!c5 c0*!c1*c2*!c3*!c5 c0*c4*!c6
-     * it=29 cramer=0.120865 msteps=1 => !c1*!c5 c0*!c1*c2*!c3*!c5 c0*!c6
-     * it=30 cramer=0.123473 msteps=1 => !c1*!c5 c0*!c1*c2*!c3*!c5 c0*c6
-     * it=56 cramer=0.12355 msteps=7 => !c0*!c1*!c5 c0*!c1*!c3*!c4*!c5 c0*!c2*c6
-     * it=64 cramer=0.123592 msteps=1 => !c0*!c1*!c5 c0*!c1*!c4*!c5 c0*!c2*c6
-     * it=96 cramer=0.127924 msteps=10 => !c0*!c1*!c6 c0*!c4*!c5 c0*!c2
-     * it=102 cramer=0.127926 msteps=1 => !c0*!c1*!c6 c0*!c4*!c5 c0
-     * it=118 cramer=0.128083 msteps=3 => !c1*!c6 c0*!c4*!c5 c0*c5
-     * it=135 cramer=0.128154 msteps=3 => !c0*!c1*!c6 c0*!c4*!c5 c0*c5
-     * it=150 cramer=0.133232 msteps=2 => !c0*!c1*!c6 !c4*!c5 c0*!c4*c5
-     * it=153 cramer=0.135885 msteps=1 => !c0*!c1*!c6 !c3*!c4*!c5 c0*!c4*c5
-     *
-     *it=0 cramer=0.0839565 msteps=1 => !c0*!c1*!c2 c4
-     it=2 cramer=0.0850625 msteps=1 => !c0*!c1*!c2 !c2*c4
-     it=9 cramer=0.100589 msteps=1 => !c0*!c1 !c2*c4
-     it=10 cramer=0.106029 msteps=1 => !c0*!c1 !c2*c4*c7
-     it=12 cramer=0.11576 msteps=1 => !c0*!c1 !c2*!c4*c7
-     it=19 cramer=0.131894 msteps=1 => !c1 !c2*!c4*c7
-     * */
-    /*
-     * {PvNode, cutNode, captureOrPromotion, givesCheck,
-     *                     ss->inCheck, improving, likelyFailLow, ttCapture,
-     *                                         type_of(movedPiece) == PAWN,
-     *                                                             type_of(movedPiece) == KNIGHT,
-     *                                                                                 type_of(movedPiece) == BISHOP,
-     *                                                                                                     type_of(movedPiece) == ROOK,
-     *                                                                                                                         type_of(movedPiece) == QUEEN,
-     *                                                                                                                                             type_of(movedPiece) == KING}
-     * */
-    /* SA
-     * !it=37 cramer=0.0126155 T=8.26565 msteps=1 => c1*!c2*!c3*c4*c7*!c11*!c12*c13
-     * !it=70 cramer=-0.0289673 T=7.00549 msteps=1 => c0*!c1*!c3*!c4*!c10*!c11*!c13
-     *
-     * HC
-     * it=697 cramer=0.218433 msteps=1 => c1*c3*!c10
-     * */
-    /*
-     * {
-     *                     cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *                                         captureOrPromotion, givesCheck,
-     *                                                             ss->inCheck, improving, likelyFailLow, ttCapture,
-     *                                                                                 bool(type_of(movedPiece) & 1),
-     *                                                                                                     bool(type_of(movedPiece) & 2),
-     *                                                                                                                         bool(type_of(movedPiece) & 4)
-     *                                                                                                                                             }
-     * SA
-     * !it=7 cramer=-0.0566331 T=9.60693 msteps=1 => !c1*!c3*c5*!c9
-     * !it=150 cramer=0.144986 T=0.0676799 msteps=1 => c3*c5*!c7*!c9*c10
-     * !it=174 cramer=0.165945 T=0.0600086 msteps=1 => c1*!c2*c3*c5*!c6*!c7*!c9*c10
-     * !it=188 cramer=0.206156 T=0.056223 msteps=1 => c0*c1*!c2*c3*!c6*!c9*c10
-     * !it=520 cramer=0.21261 T=0.0105925 msteps=1 => c0*c3*!c9*c10
-     * !it=536 cramer=0.212756 T=0.00977617 msteps=1 => c0*c3*c10
-     *
-     * !it=246 cramer=0.139198 T=0.0418288 msteps=1 => c0*!c2*c3*!c7*c8*c10
-     * !it=282 cramer=-0.159476 T=0.0349226 msteps=1 => !c0*!c3
-     * !it=789 cramer=0.212756 T=0.00275048 msteps=1 => c0*c3*c10
-     *
-     *
-     * !it=69 cramer=0.133803 T=0.101576 msteps=1 => c1*c3*!c7*c8*!c9
-     * !it=135 cramer=0.147517 T=0.0729648 msteps=1 => c0*c1*c3*!c7*!c8
-     * !it=176 cramer=0.190269 T=0.05941 msteps=1 => c0*c3*c5*!c6
-     * !it=285 cramer=0.208086 T=0.0344014 msteps=1 => c0*c3*!c4*c10
-     * !it=311 cramer=0.21033 T=0.0301978 msteps=1 => c0*c1*c3*!c9
-     *
-     * */
-    /* SA11_1 less neutral
-     * !it=87 cramer=0.0902212 T=0.0928123 msteps=1 => c1*!c2*!c3*c5*!c6*!c7*!c8
-     * !it=105 cramer=0.118283 T=0.0848049 msteps=1 => c0*!c2*!c7
-     * !it=245 cramer=0.128563 T=0.042039 msteps=1 => c0*!c6*!c7
-     */
-    /*
-     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *                      captureOrPromotion, givesCheck,
-     *                                          ss->inCheck, improving, likelyFailLow, ttCapture,
-     *                                                              bool(type_of(movedPiece) & 1),
-     *                                                                                  bool(type_of(movedPiece) & 2),
-     *                                                                                                      bool(type_of(movedPiece) & 4),
-     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
-     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
-     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 4),
-     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
-     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
-     *bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),
-     * SA17_1 (+ all squares)
-     *
-     * !it=13 cramer=-0.0154655 T=0.134492 msteps=1 => !c5*!c10*!c11*!c12*c15
-     * !it=131 cramer=0.0256613 T=0.0744425 msteps=1 => c0*!c2*!c4*c8*!c9*!c12*!c13*c14*!c15*c16
-     * !it=159 cramer=0.0695837 T=0.0646945 msteps=1 => c0*!c2*!c3*c5*!c6*!c8*!c15
-     * !it=368 cramer=-0.105991 T=0.022693 msteps=1 => !c0*!c1
-     * !it=377 cramer=-0.127926 T=0.021692 msteps=1 => !c0
-     *
-     * !it=27 cramer=-0.0401729 T=0.125378 msteps=1 => !c0*!c2*!c4*!c6*!c8*!c9*!c16
-     * !it=141 cramer=0.0639901 T=0.0708031 msteps=1 => !c2*c5*!c7*c10*!c11*!c12*c13*!c14
-     * !it=144 cramer=0.0642419 T=0.0697463 msteps=1 => !c2*c5*!c7*c10*!c11*c13*!c14
-     * !it=285 cramer=0.0681137 T=0.0344014 msteps=1 => c0*c1*!c7*c10*c11*!c15
-BEST it=1300 cramer=0.128563 T=0.000212326 msteps=1 => c0*!c7
-     *
-     * !it=13 cramer=0.0397511 T=0.134492 msteps=1 => c0*c1*c8*!c10*!c15*c16
-     * !it=101 cramer=0.0621644 T=0.0865224 msteps=1 => c1*!c3*c5*!c7*c9*!c12
-     * !it=236 cramer=-0.127926 T=0.0439789 msteps=1 => !c0
-     * !it=361 cramer=0.073454 T=0.0235034 msteps=1 => c0*!c2*c5*!c8*!c12
-     *BEST it=1400 cramer=0.128563 T=0.000128621 msteps=1 => c0*c1*!c7
-
-     HIT
-     BEST it=9400 score=0.0392538 T=4.94261e-22 msteps=1 => !c0*!c1*c3*!c6*c8*c13
-
-     BEST it=9600 score=0.099455 T=1.81373e-22 msteps=1 => !c0*c1*!c2*c4*c6*c8*c9*c15
-     * */
-    /*
-     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *  captureOrPromotion, givesCheck,
-     *  ss->inCheck, improving, likelyFailLow, ttCapture,
-     *  bool(type_of(movedPiece) & 1),
-     *  bool(type_of(movedPiece) & 2),
-     *  bool(type_of(movedPiece) & 4),
-     *bool(pos.count<ALL_PIECES>() & 1),
-     *bool(pos.count<ALL_PIECES>() & 2),
-     *bool(pos.count<ALL_PIECES>() & 4),
-     *bool(pos.count<ALL_PIECES>() & 8),
-     *bool(pos.count<ALL_PIECES>() & 16),
-     * SA16_1 (+ material)
-     * BEST it=8700 score=0.19103 T=1.6512e-20 msteps=1 => !c3*!c4*c5*!c6*!c8*c9*c10*!c12*c13*!c14*!c15
-BEST it=8700 score=0.128563 T=1.6512e-20 msteps=1 => c0*!c7
-     BEST it=8800 score=0.19103 T=1.00025e-20 msteps=1 => !c3*!c4*c5*!c6*c9*c10*!c12*c13*!c14*!c15
-     */
-    /*
-     * *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *      *  captureOrPromotion, givesCheck,
-     *           *  ss->inCheck, improving, likelyFailLow, ttCapture,
-     *                *  bool(type_of(movedPiece) & 1),
-     *                     *  bool(type_of(movedPiece) & 2),
-     *                          *  bool(type_of(movedPiece) & 4),
-     *                               *bool(pos.count<ALL_PIECES>() & 1),
-     *                                    *bool(pos.count<ALL_PIECES>() & 2),
-     *                                         *bool(pos.count<ALL_PIECES>() & 4),
-     *                                              *bool(pos.count<ALL_PIECES>() & 8),
-     *                                                   *bool(pos.count<ALL_PIECES>() & 16),
-     *
-     * bench 16 1 13 pos1000.fen
-     * SA16_1 (+material)
-     * BEST it=300 score=-0.132012 T=0.0319096 msteps=1 => !c0*!c4
-     * */
-    /*
-     c0-c1 *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     c2-c3 *  captureOrPromotion, givesCheck,
-     c4-c7 *ss->inCheck, improving, likelyFailLow, ttCapture,
-     c8 *more_than_one(pos.checkers()),
-     c9 *doubleExtension,
-     c10 *bool(extension),
-     c11 *singularQuietLMR,
-     c12 *ss->ttPv && !PvNode,
-     c13 *move == ss->killers[0],
-     c14* move == ss->killers[1],
-     c15 *move == countermove
-     * SA16_1_mix
-     * !it=559 score=-0.0938326 T=0.00871164 msteps=1 => !c0*!c5*!c7*!c11*!c13*!c14
-     *
-     * BEST it=500 score=0.147967 T=0.0117095 msteps=1 => c0*c1*!c11*c13
-     * C = cutNode && move == countermove && !singularQuietLMR
-     *
-     * !it=574 score=-0.171404 T=0.00808064 msteps=1 => !c9*!c13*!c14*!c15
-     * C = doubleExtension || move == ss->killers[0] || move == ss->killers[1] || move == countermove;
-     * */
-
-    /* SA16_1
-     *  cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *                      captureOrPromotion, givesCheck,
-     *                                          ss->inCheck, improving, likelyFailLow, ttCapture,
-     *                                                              more_than_one(pos.checkers()),
-     *                                                                                  doubleExtension,
-     *                                                                                                      bool(extension),
-     *                                                                                                                          singularQuietLMR,
-     *                                                                                                                                              ss->ttPv && !PvNode,
-     *                                                                                                                                                                  move == ss->killers[0],
-     *                                                                                                                                                                                      move == ss->killers[1],
-     *                                                                                                                                                                                                          move == countermove
-     *
-     * HIT unweighted:
-     * BEST it=2200 fh=0.500691 T=2.33225e-06 msteps=1 => c0*!c2*!c6*c7*!c8*!c11*c13*!c14*!c15*c17*!c19*c24*!c25
-     * */
-    /* SA27_1_w
-c0   cutNode, 
-c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-c2   captureOrPromotion, 
-c3   givesCheck,
-c4   ss->inCheck, 
-c5   improving, 
-c6   likelyFailLow, 
-c7   ttCapture,
-c8   more_than_one(pos.checkers()),
-c9   doubleExtension,
-c19  moveCountPruning, // CHANGED
-c11  singularQuietLMR,
-c12  ss->ttPv && !PvNode,
-c13  move == ss->killers[0],
-c14  move == ss->killers[1],
-c15  move == countermove,
-c16  bool(int(depth) & 1),
-c17  bool(int(depth) & 2),
-c18  bool(int(depth) & 4),
-c19  bool(int(depth) & 8),
-c20  bool(moveCount & 1),
-c21  bool(moveCount & 2),
-c22  bool(moveCount & 4),
-c23  bool(moveCount & 8),
-c24  bool(moveCount & 16),
-c25  bool(moveCount & 32),
-c26  bool(moveCount & 64),
-c27  bool(type_of(movedPiece) & 1),
-c28  bool(type_of(movedPiece) & 2),
-c29  bool(type_of(movedPiece) & 4),
-c30  bool(pos.count<ALL_PIECES>() & 1),
-c31  bool(pos.count<ALL_PIECES>() & 2),
-c32  bool(pos.count<ALL_PIECES>() & 4),
-c33  bool(pos.count<ALL_PIECES>() & 8),
-c34  bool(pos.count<ALL_PIECES>() & 16)
-     *
-     * CRAMER:
-     *BEST it=500 cramer=0.0845341 support=0.355078 T=0.0117095 msteps=1 => c0
-
-     BEST it=500 cramer=-0.0216342 support=0.93837 T=0.0117095 msteps=1 => !c0*c16*c17*!c28*c29
-
-     * HIT:
-     *BEST it=500 hit=0.0504412 support=0.010036 T=0.0117095 msteps=1 => c0*c1*c5*!c7*c16*c28*c29
-
-     *BEST it=500 hit=-0.0290207 support=0.997926 T=0.0117095 msteps=1 => c9*c24
-
-     * CRAMER+HIT:
-     * */
-    /* prune
-     *   SA35_1_w
-     *  c0   cutNode,
-     *  c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *  c2   captureOrPromotion,
-     *  c3   givesCheck,
-     *  c4   ss->inCheck,
-     *  c5   improving,
-     *  c6   likelyFailLow,
-     *  c7   ttCapture,
-     *  c8   more_than_one(pos.checkers()),
-     *  c9   doubleExtension,
-     *  c19  moveCountPruning, // CHANGED
-     *  c11  singularQuietLMR,
-     *  c12  ss->ttPv && !PvNode,
-     *  c13  move == ss->killers[0],
-     *  c14  move == ss->killers[1],
-     *  c15  move == countermove,
-     *  c16  bool(int(depth) & 1),
-     *  c17  bool(int(depth) & 2),
-     *  c18  bool(int(depth) & 4),
-     *  c19  bool(int(depth) & 8),
-     *  c20  bool(moveCount & 1),
-     *  c21  bool(moveCount & 2),
-     *  c22  bool(moveCount & 4),
-     *  c23  bool(moveCount & 8),
-     *  c24  bool(moveCount & 16),
-     *  c25  bool(moveCount & 32),
-     *  c26  bool(moveCount & 64),
-     *  c27  bool(type_of(movedPiece) & 1),
-     *  c28  bool(type_of(movedPiece) & 2),
-     *  c29  bool(type_of(movedPiece) & 4),
-     *  c30  bool(pos.count<ALL_PIECES>() & 1),
-     *  c31  bool(pos.count<ALL_PIECES>() & 2),
-     *  c32  bool(pos.count<ALL_PIECES>() & 4),
-     *  c33  bool(pos.count<ALL_PIECES>() & 8),
-     *  c34  bool(pos.count<ALL_PIECES>() & 16),
-     *  c35  bool(extension)
-     *  *
-     *  * CRAMER:
-     *  *
-     *  * HIT:
-     *  *BEST it=300 hit=0.0504412 support=0.010036 T=0.0319096 msteps=1 => c0*c1*c5*!c7*c16*c28*c29
-     *  C = cutNode && improving && !ttCapture && bool(int(depth) & 1) && type_of(movedPiece) == KING
-     *
-     *  BEST it=300 hit=-0.0290207 support=0.997926 T=0.0319096 msteps=1 => c9*c24
-     *  C = !doubleExtension || 
-     *
-     *  BEST it=19000 hit=0.31693 support=0.0102376 T=6.24499e-43 msteps=1 => c5*!c6*!c9*!c11*c15*!c19*!c23*!c24*!c25
-     *  BEST it=19500 hit=0.350634 support=0.00998556 T=5.09416e-44 msteps=1 => c0*!c4*!c7*!c11*!c12*c15*!c19*c21*!c25
-     *  BEST it=19100 hit=0.275892 support=0.0108136 T=3.78303e-43 msteps=1 => c0*!c2*!c4*!c7*!c11*!c12*!c19*!c20*c21*!c22*!c23*!c24*!c25*!c29*!c30
-     *  BEST it=19600 hit=0.369648 support=0.00996203 T=3.08589e-44 msteps=1 => c0*c1*!c6*!c12*c13:wq
-     * */
-     /*   SA55_1_w
-     *  c0   cutNode,
-     *  c1   PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-     *  c2   captureOrPromotion,
-     *  c3   givesCheck,
-     *  c4   ss->inCheck,
-     *  c5   improving,
-     *  c6   likelyFailLow,
-     *  c7   ttCapture,
-     *  c8   more_than_one(pos.checkers()),
-     *  c9   doubleExtension,
-     *  c19  moveCountPruning, // CHANGED
-     *  c11  singularQuietLMR,
-     *  c12  ss->ttPv && !PvNode,
-     *  c13  move == ss->killers[0],
-     *  c14  move == ss->killers[1],
-     *  c15  move == countermove,
-     *  c16  bool(int(depth) & 1),
-     *  c17  bool(int(depth) & 2),
-     *  c18  bool(int(depth) & 4),
-     *  c19  bool(int(depth) & 8),
-     *  c20  bool(moveCount & 1),
-     *  c21  bool(moveCount & 2),
-     *  c22  bool(moveCount & 4),
-     *  c23  bool(moveCount & 8),
-     *  c24  bool(moveCount & 16),
-     *  c25  bool(moveCount & 32),
-     *  c26  bool(moveCount & 64),
-     *  c27  bool(type_of(movedPiece) & 1),
-     *  c28  bool(type_of(movedPiece) & 2),
-     *  c29  bool(type_of(movedPiece) & 4),
-     *  c30  bool(pos.count<ALL_PIECES>() & 1),
-     *  c31  bool(pos.count<ALL_PIECES>() & 2),
-     *  c32  bool(pos.count<ALL_PIECES>() & 4),
-     *  c33  bool(pos.count<ALL_PIECES>() & 8),
-     *  c34  bool(pos.count<ALL_PIECES>() & 16),
-     *  c35  bool(extension)
-        c36  ss->ttHit,
-        c37  bool(ttMove),
-        c38  bool(bestMove),
-        c39  eval >= beta,
-        c40  ss->staticEval >= beta,
-        c41  (ss-1)->inCheck,
-        c42  type_of(move) == PROMOTION,
-        c43  bool((ss-1)->moveCount & 1),
-        c44  bool((ss-1)->moveCount & 2),
-        c45  bool((ss-1)->moveCount & 4),
-        c46  bool((ss-1)->moveCount & 8),
-        c47  bool((ss-1)->moveCount & 16),
-        c48  bool((ss-1)->moveCount & 32),
-        c49  thisThread->mainHistory[us][from_to(move)] > 0,
-        c50  (*contHist[0])[movedPiece][to_sq(move)] > 0,
-        c51  (*contHist[1])[movedPiece][to_sq(move)] > 0,
-        c52  (*contHist[3])[movedPiece][to_sq(move)] > 0,
-        c53  (*contHist[5])[movedPiece][to_sq(move)] > 0,
-        c54  thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0
-		    */
-    /* Sa55_1 stockfish_sa55d
-     * minfre=0.02 lambda=0.9975
-     * BEST it=8100 hit=0.0690513 support=0.0200232 T=2.25223e-10 msteps=1 => !c4*!c6*!c8*!c10*!c13*!c22*!c23*!c24*!c25*!c26*c34*!c35*c39*!c41*!c42
-     * BEST it=8400 hit=0.0642906 support=0.0199354 T=1.06288e-10 msteps=1 => c1*c16*!c18*!c19*c21*!c23*!c30*!c41*!c42*c50
-     * BEST it=8500 hit=0.0568897 support=0.0200512 T=8.27512e-11 msteps=1 => c0*c1*!c2*!c4*!c6*!c8*!c9*!c11*!c12*!c13*!c19*!c23*!c24*!c25*c27*c32*c34*!c35*!c41*!c42*!c48
-     * BEST it=8300 hit=0.0647959 support=0.0199354 T=1.36519e-10 msteps=1 => c1*!c2*!c19*c21*!c23*!c30*c34*!c42*c49
-     *
-     * BEST it=1500 hit=0.0976453 support=0.00106662 T=0.00336856 msteps=1 => c0*!c4*!c7*c15*c20*!c25*c34*!c35*!c36
-     C = move == countermove && cutNode && !ss->inCheck && !ttCapture && (moveCount & 1) && !(moveCount & 32) && (pos.count<ALL_PIECES>() & 16) && !extension && !ss->ttHit;
-     BEST it=4600 hit=0.0976453 support=0.00106662 T=1.43697e-06 msteps=1 => c0*!c4*!c7*c15*c20*!c25*c34*!c35*!c36
-
-     * BEST it=200 hit=-0.0194255 support=0.605756 T=0.0872305 msteps=1 => c23
-     * BEST it=3300 hit=0.0818704 support=0.000997348 T=3.7211e-05 msteps=1 => c4*!c8*c17*!c19*!c22*!c24*!c25*!c34*c39*c50*c51*c52
-     *
-     * BEST it=1500 hit=0.0923174 support=0.000987029 T=0.00336856 msteps=1 => c1*!c3*!c6*!c12*c14*!c19*!c22*!c23*!c26*c30*c32*!c33*!c47
-     * BEST it=4500 hit=0.102871 support=0.000996367 T=1.84568e-06 msteps=1 => c1*!c8*!c10*!c11*!c12*c17*!c23*!c25*!c26*c37*!c38*c39*!c41*c45*c49*c53
-     *
-     * BEST it=1500 hit=0.0867556 support=0.00143028 T=0.00336856 msteps=1 => !c8*!c12*!c16*!c17*c18*!c19*!c24*!c26*c33*!c38*c39*!c41*c45*!c47*!c48*c49*c50*!c54
-     * BEST it=4500 hit=0.0973592 support=0.00113917 T=1.84568e-06 msteps=1 => c0*!c6*!c8*!c10*!c11*!c12*!c18*!c19*!c23*!c24*!c25*!c35*c39*!c41*!c42*c45*!c47*c49*c50*c51*!c54
-     * */
-    /*
-     * SA63 (mainhistory most sig 13 bits of 15)
-	            cutNode, PvNode,
-		    captureOrPromotion, givesCheck, 
-		    ss->inCheck, improving, likelyFailLow, ttCapture,
-		    more_than_one(pos.checkers()),
-		    doubleExtension,
-		    moveCountPruning,
-	            singularQuietLMR,
-	            ss->ttPv && !PvNode,
-		    move == ss->killers[0],    
-		    move == ss->killers[1],    
-		    move == countermove,
-		    bool(int(depth) & 1),
-		    bool(int(depth) & 2),
-		    bool(int(depth) & 4),
-		    bool(int(depth) & 8),
-		    bool(moveCount & 1),
-		    bool(moveCount & 2),
-		    bool(moveCount & 4),
-		    bool(moveCount & 8),
-		    bool(moveCount & 16),
-		    bool(moveCount & 32),
-		    bool(moveCount & 64),
-		    bool(type_of(movedPiece) & 1),
-		    bool(type_of(movedPiece) & 2),
-		    bool(type_of(movedPiece) & 4),
-		    bool(pos.count<ALL_PIECES>() & 1),
-		    bool(pos.count<ALL_PIECES>() & 2),
-		    bool(pos.count<ALL_PIECES>() & 4),
-		    bool(pos.count<ALL_PIECES>() & 8),
-		    bool(pos.count<ALL_PIECES>() & 16),
-		    bool(extension),
-
-		    ss->ttHit,
-		    bool(ttMove),
-		    bool(bestMove),
-		    eval >= beta,
-		    ss->staticEval >= beta,
-		    (ss-1)->inCheck,
-		    type_of(move) == PROMOTION,
-		    bool((ss-1)->moveCount & 1),
-		    bool((ss-1)->moveCount & 2),
-		    bool((ss-1)->moveCount & 4),
-		    bool((ss-1)->moveCount & 8),
-		    bool((ss-1)->moveCount & 16),
-		    bool((ss-1)->moveCount & 32),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  3)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  4)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  5)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  6)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  7)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  8)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  9)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 10)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 11)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 12)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 13)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 14)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 15)),
-		    priorCapture,
-     * */
     /*
      * SA80
 	        c0  cutNode, 
@@ -696,78 +249,51 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  13)),
                 c79 bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  14))
      * */
-     /*
-      * BEST it=900 hit=0.0511527 support=0.0106637 T=18.6863 msteps=1 => c14
-       C = move == ss->killers[1]
-      *
-      * BEST it=1000 hit=-0.0140238 support=0.915353 T=18.5563 msteps=1 => !c1*!c5*!c13*!c15*c27*!c37*!c48*c59*!c75
-       C = !PvNode && !improving && move != ss->killers[0] && move != countermove && (type_of(movedPiece) & 1)
-	        && !((ss-1)->moveCount & 32)
-                && (thisThread->mainHistory[us][from_to(move)] & (1 <<  9))
-                && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  10))
-		&& !bestMove
-      * */
-     /*
-      *  BEST it=7900 hit=0.0937392 support=0.00244858 T=11.4612 msteps=1 => c15*!c26*c33*c39*!c65*!c67
-      C = move == countermove && !(moveCount & 64) && (pos.count<ALL_PIECES>() & 8) &&  ss->staticEval >= beta
-          && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  0))
-          && !(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  2));
-      * */
-    FUNC best, tmp;
-    double bestVal = 0;
-    double curVal = 0;
-    int fails = 0;
-    int steps = 0;
-    constexpr bool WEIGHT_WITH_FREQ = true;
-    double MIN_FREQ = Options["SA_minFreq"] / 1000.0;
-    double MAX_FREQ = 1 - MIN_FREQ;
-    constexpr bool NEW_SCHEDULE = true;
     constexpr bool MAXIMIZE = true;
     constexpr bool USE_CRAMER = false;
     constexpr bool USE_CRAMER_AND_HIT = false;
-    //constexpr double LAMBDA = 0.995;
-    constexpr double LAMBDA0 = 0.9975; // double halbwertzeit
-    constexpr double P0 = 0.5;
-    constexpr double LOSS_P0 = 0.1;
-    double LAMBDA;
-    double T0;
+    double val = 0, support = 0;
 
-    if(NEW_SCHEDULE)
-    {
-        constexpr double d0 = 0.2;
-        constexpr double p0 = 0.99;
-        T0 = -d0/std::log(p0);
-
-        constexpr int K = 2 * F_N * F_NC;
-        constexpr double L0 = 0.95;
-        //double L = std::log(1-p0)/std::log(1 - 1.0/K);
-	//double L = 2;
-	double L = K;
-        LAMBDA = std::pow(L0, 1.0/L);
-    }
-    else
-    {
-        //T0 = 10;
-        LAMBDA = LAMBDA0;
-        T0 = -LOSS_P0/std::log(P0);
-    }
-
-    double T = T0;
-    double support = -1;
+    double bestVal = -1;
     double bestSupport = 0;
-    double val = 0;
+    double baseVal = 0;
+    double cVal[F_N];
 
-    //auto Greater = std::conditional<MAXIMIZE, std::greater<double>, std::less<double>>::type();
-    auto Greater = std::greater<double>();
+    auto doEval = [&]() {
+	val = 0;
+	double w = get_hit(10);
+	auto wFunc = [&](double freq) { return 1; };
 
-    std::cerr << "Minimum frequency: " << MIN_FREQ << std::endl;
+	double get_hit1 = MAXIMIZE ? get_hit(1) : 1 - get_hit(1);
+	double get_hit0 = MAXIMIZE ? get_hit(0) : 1 - get_hit(0);
+
+        if(USE_CRAMER_AND_HIT)
+        {
+            double valc = get_cramer();
+            double v1 = get_hit1;
+            double v0 = get_hit0;
+            double valh = v1 >= v0 ? v1 : -v0;
+
+	    val = (valc + valh) / 2;
+        }	 
+	else if(USE_CRAMER)
+        {
+            val = get_cramer();
+        }	 
+	else // HIT
+	{
+            double v1 = get_hit1;
+            double v0 = get_hit0;
+            val = v1 >= v0 ? v1 : -v0;
+	}
+
+	support = (val >= 0 ? get_hit(10) : 1 - get_hit(10) );
+    };
+
     std::cerr << "N: " << F_N << std::endl;
-    std::cerr << "NC: " << F_NC << std::endl;
-    std::cerr << "Lambda: " << LAMBDA << std::endl;
-    std::cerr << "T0: " << T0 << std::endl;
 
-    const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
     func.init();
+    const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
 
         for (const auto& cmd : list)
         {
@@ -789,112 +315,43 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
             }
             else if (token == "setoption")  setoption(is);
             else if (token == "position")   position(pos, is, states);
-            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+            else if (token == "ucinewgame") { Search::clear(); } // Search::clear() may take some while
         }
 
     std::cerr << "Sample size: " << samples.size() << std::endl;
 
-    func.randomInit();
+    // evaluate base condition CC
+    func.evaluate();
+    doEval();
+    cerr << "BASE val=" << val << " support=" << support << std::endl;
+    baseVal = val;
+    //func.print(cerr);
+
+    // evaluate addidinc different conditions
+    for(int c = 0; c < F_N; ++c)
+    {
+        func.initCondition(c, true);
+        func.evaluate();
+        doEval();
+        cVal[c] = val;
+
+	if(std::abs(val) > std::abs(bestVal) || (std::abs(val) == std::abs(bestVal) && support > bestSupport))
+	{
+		bestVal = val;
+		bestSupport = support;
+            cerr << "=>c" << c << " val=" << val << " support=" << support << std::endl;
+	}
+	else
+	{
+            cerr << "c" << c << " val=" << val << " support=" << support << std::endl;
+	}
+    }
+
+    /*
     for(int it = 0;true;++it)
     {
-	bool neutral = false;
-        if(SIMULATED_ANNEALING)
-        {
-	    T *= LAMBDA;
-	    tmp = func;
-	    //steps = std::min(100.0, fails * fails / 100.0 + 1.0);
-	    steps = 1;
-            neutral = func.mutate(steps, support, val) && it > 0;
-        }
-	else if(HILL_CLIMBING)
-        {
-	    tmp = func;
-	    //steps = fails / 20 + 1;
-	    //steps = 100.0 * (1.0 / (1 + std::exp(-0.01 * fails)) - 0.5) * 2 + 1;
-	    steps = std::min(100.0, fails * fails / 100.0 + 1.0);
-            neutral = func.mutate(steps) && it > 0;
-        }
-        else
-        {
-            func.randomInit();
-        }
 
 
-	//for(const auto& x : samples)
-	if(!neutral)
-	{
-	dbg_reset();
-	int nn = (int)samples.size();
-	for(int i = 0; i < nn; ++i)
-	{
-		const auto& x = samples[i];
-		bool TT = func.getSampleClass(x);
-		bool C = func.getSampleValue(x);
-              dbg_cramer_of(C, TT);
-              dbg_hit_on(TT, int(C));
-              dbg_hit_on(C, 10);
-
-	      /*
-	      if(OPTIMIZE_DIFF)
-	      {
-		bool T2 = func.getSampleClass2(i);
-	      }
-	      */
-	}
-	}
-
-	val = 0;
-	double w = get_hit(10);
-	auto wFunc = [&](double freq) { return std::min(std::min(1.0, freq / MIN_FREQ), std::min(1.0, (1-freq)/(1-MAX_FREQ))); };
-
-	double get_hit1 = MAXIMIZE ? get_hit(1) : 1 - get_hit(1);
-	double get_hit0 = MAXIMIZE ? get_hit(0) : 1 - get_hit(0);
-
-        if(USE_CRAMER_AND_HIT)
-        {
-            double valc = get_cramer();
-            double v1 = get_hit1;
-            double v0 = get_hit0;
-	    if (WEIGHT_WITH_FREQ)
-	    {
-		valc *= wFunc(val >= 0 ? w : 1-w);
-                v1 *= wFunc(w);
-                v0 *= wFunc(1-w);
-	    }
-            double valh = v1 >= v0 ? v1 : -v0;
-
-	    val = (valc + valh) / 2;
-        }	 
-	else if(USE_CRAMER)
-        {
-            val = get_cramer();
-	    if (WEIGHT_WITH_FREQ)
-		    val *= wFunc(val >= 0 ? w : 1-w);
-        }	 
-	else // HIT
-	{
-            double v1 = get_hit1;
-            double v0 = get_hit0;
-	    if (WEIGHT_WITH_FREQ)
-	    {
-                v1 *= wFunc(w);
-                v0 *= wFunc(1-w);
-	    }
-            val = v1 >= v0 ? v1 : -v0;
-	}
-
-	support = (val >= 0 ? get_hit(10) : 1 - get_hit(10) );
-
-		/*
-	double val = (USE_CRAMER_AND_HIT       ? (get_cramer() + (get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0))) / 2 :
-	              USE_CRAMER               ? get_cramer() : 
-	              get_hit(1) >= get_hit(0) ? get_hit(1)   : -get_hit(0));
-
-	if (WEIGHT_WITH_FREQ)
-	{
-		val *= (val < 0 ? 1 - get_hit(10) : get_hit(10));
-	}
-	*/
 
 	if(it == 0 || std::abs(val) > std::abs(curVal))
 	{
@@ -949,17 +406,8 @@ c34  bool(pos.count<ALL_PIECES>() & 16)
                     best.print(cerr);
 	}
     }
+    */
 
-
-    //elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
-
-    //dbg_print(); // Just before exiting
-    //dbg_printc(); // Just before exiting
-
-    //cerr << "\n==========================="
-    //     << "\nTotal time (ms) : " << elapsed
-    //     << "\nNodes searched  : " << nodes
-    //     << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
 
   }
 

@@ -98,13 +98,47 @@ bool Function<N,NC,CNF>::getSampleValue(const Record& x) const
 	return operator()(C);
 }
 
+template <int N, int NC, bool CNF>
+void Function<N,NC,CNF>::evaluate() const
+{
+	dbg_reset();
+	int nn = (int)samples.size();
+	for(int i = 0; i < nn; ++i)
+	{
+            const auto& x = samples[i];
+            bool tt = func.getSampleClass(x);
+	    bool C = func.getSampleValue(x);
+              dbg_cramer_of(C, tt);
+              dbg_hit_on(tt, int(C));
+              dbg_hit_on(C, 10);
+	}
+}
 
 template <int N, int NC, bool CNF>
 void Function<N,NC,CNF>::init()
 {
     std::srand(std::time(nullptr));
     //std::srand(1234);
+        for(int i = 0; i < NC; ++i)
+        {
+	    mask[i] = Record(0);
+	    positive[i] = Record(0);
+        }
 }
+
+template <int N, int NC, bool CNF>
+void Function<N,NC,CNF>::initCondition(int c, bool posit)
+{
+        for(int i = 0; i < NC; ++i)
+        {
+	    mask[i] = Record(1) << c;
+	    if (posit)
+	       positive[i] = Record(1) << c;
+	    else
+	       positive[i] = Record(0);
+        }
+}
+
 
 template <int N, int NC, bool CNF>
 void Function<N,NC,CNF>::randomInit()
