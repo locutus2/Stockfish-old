@@ -254,7 +254,7 @@ namespace {
     constexpr bool USE_CRAMER_AND_HIT = false;
     double val = 0, support = 0;
 
-    double bestVal = -1;
+    double bestVal = 0;
     double bestSupport = 0;
     double baseVal = 0;
     double cVal[F_N];
@@ -337,8 +337,8 @@ namespace {
 
 	if(std::abs(val) > std::abs(bestVal) || (std::abs(val) == std::abs(bestVal) && support > bestSupport))
 	{
-		bestVal = val;
-		bestSupport = support;
+            bestVal = val;
+            bestSupport = support;
             cerr << "=>c" << c << " val=" << val << " support=" << support << std::endl;
 	}
 	else
