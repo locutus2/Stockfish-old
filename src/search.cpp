@@ -1130,6 +1130,8 @@ bool CC = false, C = false;
           Depth r = reduction(improving, depth, moveCount);
 
 	  CC = true;
+          C = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
+               &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14));
 	  /*
 	  C = !cutNode && move != countermove && (int(depth) & 8);
 	  [0] Total 29861941 Hits 1475563 hit rate (%) 4.94128
