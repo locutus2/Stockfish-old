@@ -1452,7 +1452,9 @@ moves_loop: // When in check, search starts from here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          CC = !cutNode && move != countermove && (int(depth) & 8);
+          //CC = !cutNode && move != countermove && (int(depth) & 8);
+          CC = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
+               &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14));
           C = {
 	            //cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
 	            cutNode, PvNode,
