@@ -1454,12 +1454,19 @@ moves_loop: // When in check, search starts from here
 
           //CC = !cutNode && move != countermove && (int(depth) & 8);
           CC = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
-               &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14));
+               &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14))
+               && !(thisThread->mainHistory[us][from_to(move)] & (1 << 13))
+	       &&    ss->staticEval < beta;
           C = {
 	            //cutNode, PvNode || cutNode,  // PvNode = 00, cutNode = 01, allNode = 10
-	            cutNode, PvNode,
-		    captureOrPromotion, givesCheck, 
-		    ss->inCheck, improving, likelyFailLow, ttCapture,
+	            cutNode, 
+		    PvNode,
+		    captureOrPromotion, 
+		    givesCheck, 
+		    ss->inCheck, 
+		    improving, 
+		    likelyFailLow, 
+		    ttCapture,
 		    more_than_one(pos.checkers()),
 		    doubleExtension,
 		    moveCountPruning,
@@ -1487,15 +1494,7 @@ moves_loop: // When in check, search starts from here
 		    bool(pos.count<ALL_PIECES>() & 4),
 		    bool(pos.count<ALL_PIECES>() & 8),
 		    bool(pos.count<ALL_PIECES>() & 16),
-		    /*
-		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
-		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
-		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 4),
-		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
-		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
-		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
 		    bool(extension),
-
 		    ss->ttHit,
 		    bool(ttMove),
 		    bool(bestMove),
@@ -1509,16 +1508,7 @@ moves_loop: // When in check, search starts from here
 		    bool((ss-1)->moveCount & 8),
 		    bool((ss-1)->moveCount & 16),
 		    bool((ss-1)->moveCount & 32),
-		    /*
-                    thisThread->mainHistory[us][from_to(move)] > 0,
-                    (*contHist[0])[movedPiece][to_sq(move)] > 0,
-                    (*contHist[1])[movedPiece][to_sq(move)] > 0,
-                    (*contHist[3])[movedPiece][to_sq(move)] > 0,
-                    (*contHist[5])[movedPiece][to_sq(move)] > 0,
-                    thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0,
-		    */
 		    priorCapture,
-
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  0)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  1)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  2)),
@@ -1550,6 +1540,21 @@ moves_loop: // When in check, search starts from here
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  12)),
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  13)),
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  14))
+		    /*
+                    thisThread->mainHistory[us][from_to(move)] > 0,
+                    (*contHist[0])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[1])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[3])[movedPiece][to_sq(move)] > 0,
+                    (*contHist[5])[movedPiece][to_sq(move)] > 0,
+                    thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0,
+		    */
+		    /*
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 1),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 2),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 4),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 8),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 16),
+		    bool(int(us == WHITE ? to_sq(move) : flip_rank(to_sq(move))) & 32),*/
 		    };
 
           if (PvNode)

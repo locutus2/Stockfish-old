@@ -201,13 +201,12 @@ namespace {
 		c33 bool(pos.count<ALL_PIECES>() & 8),
 		    bool(pos.count<ALL_PIECES>() & 16),
 		    bool(extension),
-
 		    ss->ttHit,
-		    bool(ttMove),
-		c37 bool(bestMove),
+		c37 bool(ttMove),
+		c38 bool(bestMove),
 		    eval >= beta,
-		c39 ss->staticEval >= beta,
-		c40 (ss-1)->inCheck,
+		c40 ss->staticEval >= beta,
+		c41 (ss-1)->inCheck,
 		    type_of(move) == PROMOTION,
 		    bool((ss-1)->moveCount & 1),
 		    bool((ss-1)->moveCount & 2),
@@ -216,7 +215,6 @@ namespace {
 		    bool((ss-1)->moveCount & 16),
 	        c48 bool((ss-1)->moveCount & 32),
 		    priorCapture,
-
                 c50 bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  0)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  1)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 <<  2)),
@@ -230,9 +228,8 @@ namespace {
                c60  bool(thisThread->mainHistory[us][from_to(move)] & (1 << 10)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 11)),
                     bool(thisThread->mainHistory[us][from_to(move)] & (1 << 12)),
-                    bool(thisThread->mainHistory[us][from_to(move)] & (1 << 13)),
+               c63  bool(thisThread->mainHistory[us][from_to(move)] & (1 << 13)),
                c64  bool(thisThread->mainHistory[us][from_to(move)] & (1 << 14)),
-
                c65  bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  0)),
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  1)),
                c67  bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  2)),
@@ -687,6 +684,185 @@ N: 80
 
 CC = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
     &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14));
+N: 80
+	   Score: cramer
+	   Maximize: true
+	   Sample size: 4420339
+	   BASE val=0 support=1
+	   c0 cramer=0 support=0
+	   =>c1 cramer=-0.00126757 support=0.773587
+	   =>c2 cramer=0.0114331 support=0.047421
+	   =>c3 cramer=0.0208232 support=0.0499701
+	   =>c4 cramer=0.0306557 support=0.0254333
+	   c5 cramer=0.0150902 support=0.370678
+	   c6 cramer=-0.0087431 support=0.885094
+	   c7 cramer=-0.0137212 support=0.889992
+	   c8 cramer=0.00336406 support=3.93635e-05
+	   c9 cramer=0.00035631 support=0.00304569
+	   c10 cramer=-0.00368845 support=0.987082
+	   c11 cramer=0.00792166 support=0.0380208
+	   c12 cramer=-0.0073539 support=0.736594
+	   c13 cramer=0 support=0
+	   =>c14 cramer=0.0350533 support=0.00749965
+	   c15 cramer=0 support=0
+	   c16 cramer=-0.0100202 support=0.579765
+	   c17 cramer=-0.0235912 support=0.652713
+	   c18 cramer=-0.0152714 support=0.924999
+	   c19 cramer=0 support=1
+	   c20 cramer=-0.00736265 support=0.509528
+	   c21 cramer=0.0127865 support=0.517459
+	   c22 cramer=-0.00958487 support=0.50402
+	   c23 cramer=-0.0266363 support=0.530579
+	   =>c24 cramer=-0.0357617 support=0.639215
+	   c25 cramer=-0.015267 support=0.920455
+	   c26 cramer=0 support=0
+	   c27 cramer=-0.000399722 support=0.576001
+	   c28 cramer=-0.00184561 support=0.56144
+	   c29 cramer=0.00517799 support=0.586898
+	   c30 cramer=-0.000677809 support=0.568199
+	   c31 cramer=-0.00353739 support=0.499579
+	   c32 cramer=0.00132345 support=0.53017
+	   c33 cramer=-0.00193196 support=0.441589
+	   c34 cramer=-0.0165206 support=0.412703
+	   c35 cramer=0.0181136 support=0.0396031
+	   c36 cramer=-0.0103738 support=0.0828715
+	   c37 cramer=0.000530351 support=0.431212
+	   c38 cramer=-0.00270906 support=0.934544
+	   c39 cramer=0.0239539 support=0.1565
+	   =>c40 cramer=0.0393633 support=0.308653
+	   c41 cramer=-0.00620616 support=0.862657
+	   c42 cramer=0.00153767 support=0.000194329
+	   c43 cramer=0.00815007 support=0.591846
+	   c44 cramer=-0.000169968 support=0.648707
+	   c45 cramer=0.00510267 support=0.310035
+	   c46 cramer=2.63005e-05 support=0.285625
+	   c47 cramer=-0.00367758 support=0.864511
+	   c48 cramer=0.000649488 support=0.00437138
+	   c49 cramer=-0.0291963 support=0.677089
+	   c50 cramer=-0.00471392 support=0.465268
+	   c51 cramer=-0.00449173 support=0.46538
+	   c52 cramer=0.00419796 support=0.465724
+	   c53 cramer=-0.00414159 support=0.465103
+	   c54 cramer=0.00500412 support=0.467763
+	   c55 cramer=0.00506894 support=0.46048
+	   c56 cramer=-0.00585726 support=0.451559
+	   c57 cramer=-0.00461323 support=0.457685
+	   c58 cramer=-0.00365211 support=0.468084
+	   c59 cramer=-0.00158778 support=0.482772
+	   c60 cramer=0.00190084 support=0.521049
+	   c61 cramer=-0.00893625 support=0.388143
+	   c62 cramer=0.0164226 support=0.48591
+	   =>c63 cramer=0.0396838 support=0.35543
+	   c64 cramer=0 support=1
+	   c65 cramer=0.00807404 support=0.0253754
+	   c66 cramer=0.00784253 support=0.0251055
+	   c67 cramer=0.00801097 support=0.0262613
+	   c68 cramer=0.00735215 support=0.0252435
+	   c69 cramer=0.00784333 support=0.0255894
+	   c70 cramer=0.00787091 support=0.0255152
+	   c71 cramer=0.00843568 support=0.0253786
+	   c72 cramer=0.00886742 support=0.0255682
+	   c73 cramer=0.00893563 support=0.0255806
+	   c74 cramer=0.00633462 support=0.0252761
+	   c75 cramer=0.00730007 support=0.0254505
+	   c76 cramer=0.00821034 support=0.025132
+	   c77 cramer=0.00721859 support=0.0260471
+	   c78 cramer=0.00667707 support=0.0242147
+	   c79 cramer=-0.00135172 support=0.976714
+
+CC = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
+    &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14))
+    && !(thisThread->mainHistory[us][from_to(move)] & (1 << 13));
+N: 80
+	   Score: cramer
+	   Maximize: true
+	   Sample size: 2849217
+	   BASE val=0 support=1
+	   c0 cramer=0 support=0
+	   =>c1 cramer=-0.00448689 support=0.756723
+	   =>c2 cramer=0.0206397 support=0.0401531
+	   c3 cramer=0.0199055 support=0.0374138
+	   =>c4 cramer=0.0305099 support=0.0224683
+	   c5 cramer=0.0113049 support=0.380742
+	   c6 cramer=-0.0087814 support=0.873671
+	   c7 cramer=-0.0104775 support=0.884604
+	   c8 cramer=0.00304579 support=2.84289e-05
+	   c9 cramer=0.000925626 support=0.002991
+	   c10 cramer=-0.000864549 support=0.988188
+	   c11 cramer=0.00551636 support=0.0377641
+	   c12 cramer=-0.00677868 support=0.730897
+	   c13 cramer=0 support=0
+	   c14 cramer=0.0185574 support=0.00282955
+	   c15 cramer=0 support=0
+	   c16 cramer=-0.00924049 support=0.576139
+	   c17 cramer=-0.0196454 support=0.642134
+	   c18 cramer=-0.0122898 support=0.921455
+	   c19 cramer=0 support=1
+	   c20 cramer=-0.0051137 support=0.506217
+	   c21 cramer=0.00853577 support=0.510127
+	   c22 cramer=-0.00631183 support=0.503044
+	   c23 cramer=-0.0161945 support=0.506964
+	   c24 cramer=-0.0274113 support=0.573679
+	   c25 cramer=-0.0114184 support=0.906039
+	   c26 cramer=0 support=0
+	   c27 cramer=0.000112606 support=0.429131
+	   c28 cramer=-0.00244241 support=0.546369
+	   c29 cramer=0.00496556 support=0.569858
+	   c30 cramer=-4.19531e-05 support=0.572711
+	   c31 cramer=-0.00211475 support=0.504096
+	   c32 cramer=0.00118134 support=0.521741
+	   c33 cramer=-0.00265819 support=0.429033
+	   c34 cramer=-0.0144923 support=0.379391
+	   c35 cramer=0.0178729 support=0.0295716
+	   c36 cramer=-0.00744882 support=0.0809001
+	   c37 cramer=-0.00277689 support=0.551875
+	   c38 cramer=-0.003794 support=0.932292
+	   c39 cramer=0.0229679 support=0.152165
+	   =>c40 cramer=0.0349219 support=0.306853
+	   c41 cramer=-0.00364466 support=0.869838
+	   c42 cramer=-0.000310539 support=0.999972
+	   c43 cramer=0.00612811 support=0.579695
+	   c44 cramer=0.000735788 support=0.352319
+	   c45 cramer=0.00537516 support=0.31073
+	   c46 cramer=0.000621055 support=0.290309
+	   c47 cramer=-0.00384983 support=0.860958
+	   c48 cramer=-0.000137224 support=0.995284
+	   c49 cramer=-0.0218029 support=0.675284
+	   c50 cramer=-0.00549425 support=0.445543
+	   c51 cramer=-0.00492249 support=0.446304
+	   c52 cramer=0.00491126 support=0.447201
+	   c53 cramer=-0.00554883 support=0.446291
+	   c54 cramer=0.00490102 support=0.450801
+	   c55 cramer=0.00520919 support=0.4391
+	   c56 cramer=-0.00569175 support=0.425398
+	   c57 cramer=-0.00449996 support=0.433578
+	   c58 cramer=-0.00393475 support=0.447231
+	   c59 cramer=-0.00205894 support=0.467542
+	   c60 cramer=0.00430939 support=0.544061
+	   c61 cramer=-0.00753246 support=0.304656
+	   c62 cramer=0.0264272 support=0.519298
+	   c63 cramer=0 support=0
+	   c64 cramer=0 support=1
+	   c65 cramer=0.0134119 support=0.0212083
+	   c66 cramer=0.014187 support=0.0207201
+	   c67 cramer=0.0138519 support=0.021515
+	   c68 cramer=0.0134962 support=0.0210914
+	   c69 cramer=0.0133641 support=0.021275
+	   c70 cramer=0.0136771 support=0.0211855
+	   c71 cramer=0.0143916 support=0.0212286
+	   c72 cramer=0.0141425 support=0.0211167
+	   c73 cramer=0.015248 support=0.0210833
+	   c74 cramer=0.0128877 support=0.0211876
+	   c75 cramer=0.0132995 support=0.0214234
+	   c76 cramer=0.0138237 support=0.0207011
+	   c77 cramer=0.0130371 support=0.0220317
+	   c78 cramer=0.0126778 support=0.0199009
+	   c79 cramer=0.00301715 support=0.0201526
+
+CC = !cutNode && move != countermove && (int(depth) & 8) && move != ss->killers[0]
+    &&  (thisThread->mainHistory[us][from_to(move)] & (1 << 14))
+    && !(thisThread->mainHistory[us][from_to(move)] & (1 << 13))
+    && ss->staticEval < beta;
       */
 
     constexpr bool MAXIMIZE = true;
