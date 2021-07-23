@@ -1159,15 +1159,21 @@ moves_loop: // When in check, search starts from here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-          if (  !cutNode
-              && depth >= 8
-              && thisThread->mainHistory[us][from_to(move)] < 0
-              && move != ss->killers[0]
-              && move != countermove)
-              r++;
-
           if (!captureOrPromotion)
           {
+              if (   !cutNode
+                  && !ss->ttPv
+                  && thisThread->mainHistory[us][from_to(move)] < 0
+                  && (*contHist[0])[movedPiece][to_sq(move)] < 0
+                  && (*contHist[1])[movedPiece][to_sq(move)] < 0
+                  && (*contHist[3])[movedPiece][to_sq(move)] < 0
+                  && !givesCheck
+                  && !ss->inCheck
+                  && move != ss->killers[0]
+                  && move != ss->killers[1]
+                  && move != countermove)
+                  r++;
+
               // Increase reduction if ttMove is a capture (~3 Elo)
               if (ttCapture)
                   r++;
