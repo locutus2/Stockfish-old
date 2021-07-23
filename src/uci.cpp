@@ -188,7 +188,7 @@ namespace {
 		c20 bool(moveCount & 1),
 		    bool(moveCount & 2),
 		    bool(moveCount & 4),
-		    bool(moveCount & 8),
+		c23 bool(moveCount & 8),
 		    bool(moveCount & 16),
 		    bool(moveCount & 32),
 		c26 bool(moveCount & 64),
@@ -249,7 +249,14 @@ namespace {
                     bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  13)),
                 c79 bool(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] & (1 <<  14))
      * */
-    constexpr bool MAXIMIZE = false;
+     /*
+      CC = true;
+
+
+
+      */
+
+    constexpr bool MAXIMIZE = true;
     constexpr bool USE_CRAMER = true;
     constexpr bool USE_CRAMER_AND_HIT = false;
     double val = 0, support = 0;
@@ -337,6 +344,18 @@ namespace {
         doEval();
         cVal[c] = val;
 
+	    if(std::abs(val) > std::abs(bestVal) || (std::abs(val) == std::abs(bestVal) && support > bestSupport))
+	    {
+                bestVal = val;
+                bestSupport = support;
+                cerr << "=>c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
+	    }
+	    else
+            {
+                cerr << "c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
+	    }
+
+	/*
 	if(USE_CRAMER)
 	{
 	    if(MAXIMIZE && (val > bestVal || (val == bestVal && support > bestSupport)))
@@ -369,6 +388,7 @@ namespace {
                 cerr << "c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
 	    }
 	}
+	*/
     }
 
     /*
