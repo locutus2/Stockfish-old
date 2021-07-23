@@ -279,6 +279,8 @@ namespace {
 	else if(USE_CRAMER)
         {
             val = get_cramer();
+	    if (!MAXIMIZE)
+		    val = -val;
         }	 
 	else // HIT
 	{
@@ -290,10 +292,12 @@ namespace {
 	support = (val >= 0 ? get_hit(10) : 1 - get_hit(10) );
     };
 
+    const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
     std::cerr << "N: " << F_N << std::endl;
+    std::cerr << "Score: " << measure << std::endl;
+    std::cerr << "Maximize: " << (MAXIMIZE ? "true" : "false" ) << std::endl;
 
     func.init();
-    const std::string measure = (USE_CRAMER_AND_HIT ? "cramer+hit" : USE_CRAMER ? "cramer" : "hit");
 
         for (const auto& cmd : list)
         {
@@ -335,15 +339,31 @@ namespace {
         doEval();
         cVal[c] = val;
 
-	if(std::abs(val) > std::abs(bestVal) || (std::abs(val) == std::abs(bestVal) && support > bestSupport))
+	if(USE_CRAMER)
 	{
-            bestVal = val;
-            bestSupport = support;
-            cerr << "=>c" << c << " val=" << val << " support=" << support << std::endl;
+	    if(val > bestVal || (val == bestVal && support > bestSupport))
+	    {
+                bestVal = val;
+                bestSupport = support;
+                cerr << "=>c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
+	    }
+	    else
+            {
+                cerr << "c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
+	    }
 	}
 	else
 	{
-            cerr << "c" << c << " val=" << val << " support=" << support << std::endl;
+	    if(std::abs(val) > std::abs(bestVal) || (std::abs(val) == std::abs(bestVal) && support > bestSupport))
+	    {
+                bestVal = val;
+                bestSupport = support;
+                cerr << "=>c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
+	    }
+	    else
+            {
+                cerr << "c" << c << " " << measure << "=" << val << " support=" << support << std::endl;
+	    }
 	}
     }
 
