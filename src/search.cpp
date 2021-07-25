@@ -1124,7 +1124,7 @@ moves_loop: // When in check, search starts from here
       // been searched. In general we would like to reduce them, but there are many
       // cases where we extend a son if it has good chances to be "interesting".
       if (    depth >= 3
-          &&  moveCount > 1 + 2 * rootNode
+          &&  moveCount > 1 + (2 + thisThread->failedLowCnt) * rootNode
           && (  !captureOrPromotion
               || (cutNode && (ss-1)->moveCount > 1)
               || !ss->ttPv)
@@ -1134,9 +1134,6 @@ moves_loop: // When in check, search starts from here
 
           if (PvNode)
               r--;
-
-          if (rootNode)
-              r -= thisThread->failedLowCnt;
 
           // Decrease reduction if the ttHit running average is large (~0 Elo)
           if (thisThread->ttHitAverage > 537 * TtHitAverageResolution * TtHitAverageWindow / 1024)
