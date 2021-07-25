@@ -369,7 +369,7 @@ void Thread::search() {
           // high/low, re-search with a bigger window until we don't fail
           // high/low anymore.
           int failedHighCnt = 0;
-          failLow = false;
+          failedLowCnt = 0;
           while (true)
           {
               Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
@@ -405,7 +405,7 @@ void Thread::search() {
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
                   failedHighCnt = 0;
-                  failLow = true;
+                  ++failedLowCnt;
                   if (mainThread)
                       mainThread->stopOnPonderhit = false;
               }
@@ -413,7 +413,7 @@ void Thread::search() {
               {
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
                   ++failedHighCnt;
-                  failLow = false;
+                  failedLowCnt = 0;
               }
               else
                   break;
@@ -1135,7 +1135,7 @@ moves_loop: // When in check, search starts from here
           if (PvNode)
               r--;
 
-          else if (ss->ply == 1 && thisThread->failLow)
+          if (rootNode && thisThread->failedLowCnt >= 2)
               r--;
 
           // Decrease reduction if the ttHit running average is large (~0 Elo)
