@@ -1163,7 +1163,8 @@ moves_loop: // When in check, search starts from here
           if (ttCapture)
               r++;
 
-          ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+          ss->statScore =  (captureOrPromotion ? thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]
+                                               : thisThread->mainHistory[us][from_to(move)])
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
