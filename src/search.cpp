@@ -1163,12 +1163,14 @@ moves_loop: // When in check, search starts from here
           if (ttCapture)
               r++;
 
-          ss->statScore =  (captureOrPromotion ? thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] - 4000
-                                               : thisThread->mainHistory[us][from_to(move)])
+          ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          - 4923;
+
+          if (captureOrPromotion)
+              ss->statScore += thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())];
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
