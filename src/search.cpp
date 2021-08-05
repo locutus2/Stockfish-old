@@ -989,6 +989,9 @@ moves_loop: // When in check, search starts here
       // Calculate new depth for this move
       newDepth = depth - 1;
 
+      bool CC = false;
+      int V =0;
+      int V2 =0;
       // Step 13. Pruning at shallow depth (~200 Elo)
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1017,9 +1020,18 @@ moves_loop: // When in check, search starts here
           {
               // Continuation history based pruning (~20 Elo)
               if (   lmrDepth < 5
-                  && (*contHist[0])[movedPiece][to_sq(move)] < (depth == 1 ? 0 : -stat_bonus(depth-1))
-                  && (*contHist[1])[movedPiece][to_sq(move)] < (depth == 1 ? 0 : -stat_bonus(depth-1)))
+                  && (*contHist[0])[movedPiece][to_sq(move)] < 28 - 28 * depth * depth
+                  && (*contHist[1])[movedPiece][to_sq(move)] < 28 - 28 * depth * depth)
                   continue;
+
+              if (   lmrDepth < 5
+                  && (*contHist[0])[movedPiece][to_sq(move)] < 23 - 23 * depth * depth
+                  && (*contHist[1])[movedPiece][to_sq(move)] < 23 - 23 * depth * depth)
+	      {
+		      CC = true;
+		      V = lmrDepth;
+		      V2 = depth;
+	      }
 
               // Futility pruning: parent node (~5 Elo)
               if (   !ss->inCheck
@@ -1255,6 +1267,31 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      dbg_hit_on(T, 100+V);
+	      dbg_hit_on(T, 200+V2);
+	      /*
+	       * [0] Total 373552 Hits 6314 hit rate (%) 1.69026
+	       * [100] Total 1817 Hits 107 hit rate (%) 5.88883
+	       * [101] Total 37595 Hits 1398 hit rate (%) 3.71858
+	       * [102] Total 82341 Hits 1681 hit rate (%) 2.04151
+	       * [103] Total 126796 Hits 1867 hit rate (%) 1.47244
+	       * [104] Total 125003 Hits 1261 hit rate (%) 1.00878
+	       * [202] Total 2706 Hits 330 hit rate (%) 12.1951
+	       * [203] Total 13936 Hits 994 hit rate (%) 7.13261
+	       * [204] Total 25150 Hits 1115 hit rate (%) 4.4334
+	       * [205] Total 44091 Hits 1252 hit rate (%) 2.83958
+	       * [206] Total 51634 Hits 1084 hit rate (%) 2.09939
+	       * [207] Total 83159 Hits 928 hit rate (%) 1.11593
+	       * [208] Total 94935 Hits 483 hit rate (%) 0.508769
+	       * [209] Total 49276 Hits 122 hit rate (%) 0.247585
+	       * [210] Total 8665 Hits 6 hit rate (%) 0.0692441
+	       * */
       }
 
       if (value > bestValue)
