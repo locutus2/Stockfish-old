@@ -1163,7 +1163,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (rule50 <= depth && (captureOrPromotion || type_of(movedPiece) == PAWN))
+          if (rule50 <= depth && !captureOrPromotion && type_of(movedPiece) != PAWN)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
