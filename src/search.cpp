@@ -945,6 +945,7 @@ moves_loop: // When in check, search starts here
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
     bool doubleExtension = false;
+    int rule50 = 100 - pos.rule50_count();
 
     // Indicate PvNodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -1124,7 +1125,7 @@ moves_loop: // When in check, search starts here
           && (  !captureOrPromotion
               || (cutNode && (ss-1)->moveCount > 1)
               || !ss->ttPv)
-          && (99 - pos.rule50_count() > depth || (!captureOrPromotion && type_of(movedPiece) != PAWN))
+          && (rule50 > depth || (!captureOrPromotion && type_of(movedPiece) != PAWN))
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
