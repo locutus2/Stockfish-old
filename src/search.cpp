@@ -82,8 +82,8 @@ namespace {
   }
 
   // History and stats update bonus, based on depth
-  int stat_bonus(Depth d) {
-    return d > 14 ? 73 : 6 * d * d + 229 * d - 215;
+  int stat_bonus(const Position& pos, Depth d) {
+    return (d > 14 ? 73 : 6 * d * d + 229 * d - 215) + (pos.this_thread()->nodes & 1);
   }
 
   // Add a small random component to draw evaluations to avoid 3-fold blindness
@@ -630,7 +630,7 @@ namespace {
         && ss->ply - 1 < MAX_LPH
         && !priorCapture
         && is_ok((ss-1)->currentMove))
-        thisThread->lowPlyHistory[ss->ply - 1][from_to((ss-1)->currentMove)] << stat_bonus(depth - 5);
+        thisThread->lowPlyHistory[ss->ply - 1][from_to((ss-1)->currentMove)] << stat_bonus(pos, depth - 5);
 
     // thisThread->ttHitAverage can be used to approximate the running average of ttHit
     thisThread->ttHitAverage =   (TtHitAverageWindow - 1) * thisThread->ttHitAverage / TtHitAverageWindow
@@ -651,16 +651,16 @@ namespace {
             {
                 // Bonus for a quiet ttMove that fails high
                 if (!pos.capture_or_promotion(ttMove))
-                    update_quiet_stats(pos, ss, ttMove, stat_bonus(depth), depth);
+                    update_quiet_stats(pos, ss, ttMove, stat_bonus(pos, depth), depth);
 
                 // Extra penalty for early quiet moves of the previous ply
                 if ((ss-1)->moveCount <= 2 && !priorCapture)
-                    update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + 1));
+                    update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(pos, depth + 1));
             }
             // Penalty for a quiet ttMove that fails low
             else if (!pos.capture_or_promotion(ttMove))
             {
-                int penalty = -stat_bonus(depth);
+                int penalty = -stat_bonus(pos, depth);
                 thisThread->mainHistory[us][from_to(ttMove)] << penalty;
                 update_continuation_histories(ss, pos.moved_piece(ttMove), to_sq(ttMove), penalty);
             }
@@ -1196,8 +1196,8 @@ moves_loop: // When in check, search starts here
           // If the move passed LMR update its stats
           if (didLMR && !captureOrPromotion)
           {
-              int bonus = value > alpha ?  stat_bonus(newDepth)
-                                        : -stat_bonus(newDepth);
+              int bonus = value > alpha ?  stat_bonus(pos, newDepth)
+                                        : -stat_bonus(pos, newDepth);
 
               update_continuation_histories(ss, movedPiece, to_sq(move), bonus);
           }
@@ -1316,7 +1316,7 @@ moves_loop: // When in check, search starts here
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
              && !priorCapture)
-        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth));
+        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(pos, depth));
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
@@ -1636,9 +1636,9 @@ moves_loop: // When in check, search starts here
     Piece moved_piece = pos.moved_piece(bestMove);
     PieceType captured = type_of(pos.piece_on(to_sq(bestMove)));
 
-    bonus1 = stat_bonus(depth + 1);
+    bonus1 = stat_bonus(pos, depth + 1);
     bonus2 = bestValue > beta + PawnValueMg ? bonus1                                 // larger bonus
-                                            : std::min(bonus1, stat_bonus(depth));   // smaller bonus
+                                            : std::min(bonus1, stat_bonus(pos, depth));   // smaller bonus
 
     if (!pos.capture_or_promotion(bestMove))
     {
@@ -1717,7 +1717,7 @@ moves_loop: // When in check, search starts here
 
     // Update low ply history
     if (depth > 11 && ss->ply < MAX_LPH)
-        thisThread->lowPlyHistory[ss->ply][from_to(move)] << stat_bonus(depth - 7);
+        thisThread->lowPlyHistory[ss->ply][from_to(move)] << stat_bonus(pos, depth - 7);
   }
 
   // When playing with strength handicap, choose best move among a set of RootMoves
