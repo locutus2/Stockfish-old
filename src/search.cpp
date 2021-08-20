@@ -1158,8 +1158,8 @@ moves_loop: // When in check, search starts here
           if (cutNode && move != ss->killers[0])
               r += 2;
 
-	  else if(!cutNode && !(thisThread->nodes & 0x3F))
-              r++;
+          if(more_than_one(pos.checkers()) && !(thisThread->nodes & 0xF))
+              r--;
 
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
