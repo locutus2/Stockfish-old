@@ -83,7 +83,7 @@ namespace {
 
   // History and stats update bonus, based on depth
   int stat_bonus(const Position& pos, Depth d) {
-    return (d > 14 ? 73 : 6 * d * d + 229 * d - 215) + (pos.this_thread()->nodes & 1);
+    return (d > 14 ? 72 : 6 * d * d + 229 * d - 216) + (pos.this_thread()->nodes & 3);
   }
 
   // Add a small random component to draw evaluations to avoid 3-fold blindness
