@@ -1710,24 +1710,20 @@ moves_loop: // When in check, search starts here
         ss->killers[0] = move;
     }
 
-    bool countermoveFound = false;
+    int countermoveFound = CounterMovesAtStack - 1;
 
-    for (int i = 0; i < CounterMovesAtStack; i++)
+    for (int i = 0; i < CounterMovesAtStack - 1; i++)
         if (ss->countermove[i][0] == (ss-1)->currentMove)
         {
-            ss->countermove[i][1] = move;
-            countermoveFound = true;
+            countermoveFound = i;
             break;
         }
 
-    if (!countermoveFound)
-    {
-        for (int i = CounterMovesAtStack - 1; i > 0; i--)
-            ss->countermove[i][0] = ss->countermove[i-1][0], ss->countermove[i][1] = ss->countermove[i-1][1];
+    for (int i = countermoveFound; i > 0; i--)
+        ss->countermove[i][0] = ss->countermove[i-1][0], ss->countermove[i][1] = ss->countermove[i-1][1];
 
-        ss->countermove[0][0] = (ss-1)->currentMove;
-        ss->countermove[0][1] = move;
-    }
+    ss->countermove[0][0] = (ss-1)->currentMove;
+    ss->countermove[0][1] = move;
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();
