@@ -35,7 +35,7 @@ namespace Search {
 constexpr int CounterMovePruneThreshold = 0;
 
 /// Number of counter moves saved at stack per step
-constexpr int CounterMovesAtStack = 2;
+constexpr int CounterMovesAtStack = 1;
 
 
 /// Stack struct keeps track of the information we need to remember from nodes
