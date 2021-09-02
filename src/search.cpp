@@ -601,11 +601,9 @@ namespace {
     (ss+1)->ttPv         = false;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0]   = (ss+2)->killers[1] = MOVE_NONE;
+    (ss+2)->countermove[0] = (ss+2)->countermove[1] = MOVE_NONE;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     Square prevSq        = to_sq((ss-1)->currentMove);
-
-    for (int i = 0; i < CounterMovesAtStack; ++i)
-        (ss+2)->countermove[i][0] = (ss+2)->countermove[i][1] = MOVE_NONE;
 
     // Initialize statScore to zero for the grandchildren of the current position.
     // So statScore is shared between all grandchildren and only the first grandchild
@@ -935,14 +933,12 @@ moves_loop: // When in check, search starts here
                                           nullptr                   , (ss-4)->continuationHistory,
                                           nullptr                   , (ss-6)->continuationHistory };
 
-    Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move countermove;
 
-    for (int i = 0; i < CounterMovesAtStack; ++i)
-        if (ss->countermove[i][0] == (ss-1)->currentMove)
-        {
-            countermove = ss->countermove[i][1];
-            break;
-        }
+    if (ss->countermove[0] == (ss-1)->currentMove)
+        countermove = ss->countermove[1];
+    else
+        countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->lowPlyHistory,
@@ -1710,24 +1706,8 @@ moves_loop: // When in check, search starts here
         ss->killers[0] = move;
     }
 
-    bool countermoveFound = false;
-
-    for (int i = 0; i < CounterMovesAtStack; i++)
-        if (ss->countermove[i][0] == (ss-1)->currentMove)
-        {
-            ss->countermove[i][1] = move;
-            countermoveFound = true;
-            break;
-        }
-
-    if (!countermoveFound)
-    {
-        for (int i = CounterMovesAtStack - 1; i > 0; i--)
-            ss->countermove[i][0] = ss->countermove[i-1][0], ss->countermove[i][1] = ss->countermove[i-1][1];
-
-        ss->countermove[0][0] = (ss-1)->currentMove;
-        ss->countermove[0][1] = move;
-    }
+    ss->countermove[0] = (ss-1)->currentMove;
+    ss->countermove[1] = move;
 
     Color us = pos.side_to_move();
     Thread* thisThread = pos.this_thread();

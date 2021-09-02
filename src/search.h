@@ -34,9 +34,6 @@ namespace Search {
 /// Threshold used for countermoves based pruning
 constexpr int CounterMovePruneThreshold = 0;
 
-/// Number of counter moves saved at stack per step
-constexpr int CounterMovesAtStack = 1;
-
 
 /// Stack struct keeps track of the information we need to remember from nodes
 /// shallower and deeper in the tree during the search. Each search thread has
@@ -49,7 +46,7 @@ struct Stack {
   Move currentMove;
   Move excludedMove;
   Move killers[2];
-  Move countermove[CounterMovesAtStack][2];
+  Move countermove[2];
   Value staticEval;
   int statScore;
   int moveCount;
