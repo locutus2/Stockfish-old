@@ -1716,8 +1716,8 @@ moves_loop: // When in check, search starts here
         if (ss->countermove[i][0] == (ss-1)->currentMove)
         {
             ss->countermove[i][1] = move;
-	    countermoveFound = true;
-	    break;
+            countermoveFound = true;
+            break;
         }
 
     if (!countermoveFound)
