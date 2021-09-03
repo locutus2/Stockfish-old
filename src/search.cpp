@@ -250,11 +250,11 @@ void MainThread::search() {
 
 void Thread::search() {
 
-  // To allow access to (ss-7) up to (ss+2), the stack must be oversized.
+  // To allow access to (ss-7) up to (ss+3), the stack must be oversized.
   // The former is needed to allow update_continuation_histories(ss-1, ...),
   // which accesses its argument at ss-6, also near the root.
   // The latter is needed for statScore and killer initialization.
-  Stack stack[MAX_PLY+10], *ss = stack+7;
+  Stack stack[MAX_PLY+11], *ss = stack+7;
   Move  pv[MAX_PLY+1];
   Value bestValue, alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
@@ -264,11 +264,11 @@ void Thread::search() {
   Color us = rootPos.side_to_move();
   int iterIdx = 0;
 
-  std::memset(ss-7, 0, 10 * sizeof(Stack));
+  std::memset(ss-7, 0, 11 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
 
-  for (int i = 0; i <= MAX_PLY + 2; ++i)
+  for (int i = 0; i <= MAX_PLY + 3; ++i)
       (ss+i)->ply = i;
 
   ss->pv = pv;
@@ -601,7 +601,7 @@ namespace {
     (ss+1)->ttPv         = false;
     (ss+1)->excludedMove = bestMove = MOVE_NONE;
     (ss+2)->killers[0]   = (ss+2)->killers[1] = MOVE_NONE;
-    (ss+2)->countermove[0] = (ss+2)->countermove[1] = MOVE_NONE;
+    (ss+3)->countermove[0] = (ss+3)->countermove[1] = MOVE_NONE;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     Square prevSq        = to_sq((ss-1)->currentMove);
 
