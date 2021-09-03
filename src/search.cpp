@@ -651,7 +651,7 @@ namespace {
             {
                 // Bonus for a quiet ttMove that fails high
                 if (!pos.capture_or_promotion(ttMove))
-                    update_quiet_stats(pos, ss, ttMove, stat_bonus(depth), depth, cutNode);
+                    update_quiet_stats(pos, ss, ttMove, stat_bonus(depth), depth, true);
 
                 // Extra penalty for early quiet moves of the previous ply
                 if ((ss-1)->moveCount <= 2 && !priorCapture)
@@ -1312,7 +1312,7 @@ moves_loop: // When in check, search starts here
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
-                         quietsSearched, quietCount, capturesSearched, captureCount, depth, cutNode);
+                         quietsSearched, quietCount, capturesSearched, captureCount, depth, bestValue >= beta);
 
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
