@@ -1162,8 +1162,8 @@ moves_loop: // When in check, search starts here
               r += 2;
 
           // Decrease reduction for captures at PV and cut nodes
-          if (captureOrPromotion && (PvNode || cutNode))
-             r--;
+          if (captureOrPromotion && (PvNode || cutNode) && !singularQuietLMR)
+              r--;
 
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
