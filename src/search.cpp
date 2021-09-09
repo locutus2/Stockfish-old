@@ -1098,7 +1098,8 @@ moves_loop: // When in check, search starts here
       // Capture extensions for PvNodes and cutNodes
       else if (   (PvNode || cutNode) 
                && captureOrPromotion 
-               && moveCount != 1)
+               && moveCount != 1
+               && !pos.see_ge(move))
           extension = 1;
 
       // Check extensions
