@@ -266,4 +266,12 @@ top:
   return MOVE_NONE; // Silence warning
 }
 
+void MovePicker::resort() {
+  if (stage == QUIET)
+  {
+      score<QUIETS>();
+      partial_insertion_sort(cur, endMoves, -3000 * depth);
+  }
+}
+
 } // namespace Stockfish
