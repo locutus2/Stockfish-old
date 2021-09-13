@@ -1301,7 +1301,7 @@ moves_loop: // When in check, search starts here
               quietsSearched[quietCount++] = move;
       }
 
-      if (cutNode)
+      if (rootNode)
           mp.resort();
     }
 
