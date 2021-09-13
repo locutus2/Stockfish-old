@@ -267,9 +267,10 @@ top:
 }
 
 void MovePicker::resort() {
-  if (stage == EVASION)
+  if (stage == QUIET)
   {
-      score<EVASIONS>();
+      score<QUIETS>();
+      partial_insertion_sort(cur, endMoves, -3000 * depth);
   }
 }
 
