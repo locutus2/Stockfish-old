@@ -1142,7 +1142,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          if (PvNode)
+          if (PvNode && bestValue < thisThread->rootMoves[thisThread->pvIdx].previousScore)
               r--;
 
           // Decrease reduction if the ttHit running average is large (~0 Elo)
@@ -1175,9 +1175,6 @@ moves_loop: // When in check, search starts here
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
               r++;
-
-          if (rootNode && bestValue < thisThread->rootMoves[thisThread->pvIdx].previousScore)
-              r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
