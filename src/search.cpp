@@ -1176,7 +1176,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (PvNode && bestValue < thisThread->rootMoves[thisThread->pvIdx].previousScore)
+          if (rootNode && bestValue < thisThread->rootMoves[thisThread->pvIdx].previousScore)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
