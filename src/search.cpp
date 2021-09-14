@@ -1142,7 +1142,10 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          if (PvNode && bestValue < thisThread->rootMoves[thisThread->pvIdx].previousScore)
+          if (PvNode)
+              r--;
+
+          if (depth < ss->ply && bestValue < thisThread->rootMoves[thisThread->pvIdx].previousScore)
               r--;
 
           // Decrease reduction if the ttHit running average is large (~0 Elo)
