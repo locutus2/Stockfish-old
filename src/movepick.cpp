@@ -267,8 +267,11 @@ top:
 }
 
 void MovePicker::resort() {
-  if (stage == GOOD_CAPTURE)
+  if (stage == BAD_CAPTURE)
+  {
       score<CAPTURES>();
+      partial_insertion_sort(cur, endMoves, std::numeric_limits<int>::min());
+  }
 }
 
 } // namespace Stockfish
