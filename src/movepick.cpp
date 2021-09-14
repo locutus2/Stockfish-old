@@ -267,11 +267,8 @@ top:
 }
 
 void MovePicker::resort() {
-  if (stage == QUIET)
-  {
-      score<QUIETS>();
-      partial_insertion_sort(cur, endMoves, -3000 * depth);
-  }
+  if (stage == GOOD_CAPTURE)
+      score<CAPTURES>();
 }
 
 } // namespace Stockfish
