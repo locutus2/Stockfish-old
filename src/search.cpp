@@ -1145,7 +1145,7 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r--;
 
-          if (PvNode && !(ss->ply & 1) && bestValue < thisThread->rootMoves[thisThread->pvIdx].previousScore)
+          if (PvNode && (ss->ply & 1) && bestValue < -thisThread->rootMoves[thisThread->pvIdx].previousScore)
               r--;
 
           // Decrease reduction if the ttHit running average is large (~0 Elo)
