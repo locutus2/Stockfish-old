@@ -445,8 +445,8 @@ void Thread::search() {
       {
           double branchingFactor = (double)nodes / lastNodesSearched;
           randomLMRThreshold = RandomLMRResolution / (branchingFactor + 1);
-          lastNodesSearched = nodes;
       }
+      lastNodesSearched = nodes;
 
       // Have we found a "mate in x"?
       if (   Limits.mate
