@@ -444,7 +444,7 @@ void Thread::search() {
 
       if (lastNodesSearched)
       {
-          branchingFactor = (3 * branchingFactor + (double)nodes / lastNodesSearched) / 4;
+          branchingFactor = (7 * branchingFactor + (double)nodes / lastNodesSearched) / 8;
           randomLMRThreshold = RandomLMRResolution / (branchingFactor + 1);
       }
       lastNodesSearched = nodes;
