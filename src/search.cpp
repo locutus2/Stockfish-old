@@ -64,6 +64,8 @@ namespace {
   constexpr uint64_t TtHitAverageWindow     = 4096;
   constexpr uint64_t TtHitAverageResolution = 1024;
 
+  constexpr int RandomLMRResolution = 256;
+
   // Futility margin
   Value futility_margin(Depth d, bool improving) {
     return Value(214 * (d - improving));
@@ -275,6 +277,9 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
+  randomLMRThreshold = RandomLMRResolution / 2;
+
+  uint64_t lastNodesSearched = 0;
 
   if (mainThread)
   {
@@ -434,6 +439,13 @@ void Thread::search() {
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
+      }
+
+      if (lastNodesSearched)
+      {
+          double branchingFactor = (double)nodes / lastNodesSearched;
+          randomLMRThreshold = RandomLMRResolution / (branchingFactor + 1);
+          lastNodesSearched = nodes;
       }
 
       // Have we found a "mate in x"?
@@ -1141,6 +1153,8 @@ moves_loop: // When in check, search starts here
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
           Depth r = reduction(improving, depth, moveCount);
+
+          r -= 2 * (int(thisThread->nodes & (RandomLMRResolution - 1)) <= thisThread->randomLMRThreshold) - 1;
 
           if (PvNode)
               r--;
