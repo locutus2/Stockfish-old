@@ -320,6 +320,7 @@ void Thread::search() {
   trend = SCORE_ZERO;
 
   int searchAgainCounter = 0;
+  double branchingFactor = 1.65;
 
   // Iterative deepening loop until requested to stop or the target depth is reached
   while (   ++rootDepth < MAX_PLY
@@ -443,7 +444,7 @@ void Thread::search() {
 
       if (lastNodesSearched)
       {
-          double branchingFactor = (double)nodes / lastNodesSearched;
+          branchingFactor = (branchingFactor + (double)nodes / lastNodesSearched) / 2;
           randomLMRThreshold = RandomLMRResolution / (branchingFactor + 1);
       }
       lastNodesSearched = nodes;
