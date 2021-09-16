@@ -1170,7 +1170,7 @@ moves_loop: // When in check, search starts here
 
           // Increase reduction for cut nodes (~3 Elo)
           if (cutNode && move != ss->killers[0])
-              r += 3 - ss->ttPv;
+              r += 2 - ss->ttPv + int(thisThread->nodes & 1);
 
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
