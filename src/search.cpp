@@ -1142,7 +1142,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          if (!(thisThread->nodes & 0x1E))
+          if (!(thisThread->nodes & 0xE))
               r += 2 * (thisThread->nodes & 1) - 1;
 
           if (PvNode)
