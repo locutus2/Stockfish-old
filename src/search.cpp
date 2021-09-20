@@ -1142,7 +1142,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount);
 
-          if (!captureOrPromotion && type_of(movedPiece) == PAWN && !(thisThread->nodes & 7))
+          if (!captureOrPromotion && type_of(movedPiece) == PAWN && !(thisThread->nodes & 0xF))
               r--;
 
           if (PvNode)
