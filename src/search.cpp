@@ -1050,7 +1050,7 @@ moves_loop: // When in check, search starts here
               if (   !givesCheck
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0
-                  && (*contHist[0])[movedPiece][to_sq(move)] < 18000)
+                  && (*contHist[0])[movedPiece][to_sq(move)] < 15000)
                   continue;
 
               // SEE based pruning
