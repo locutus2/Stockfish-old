@@ -1049,8 +1049,8 @@ moves_loop: // When in check, search starts here
               // Capture history based pruning when the move doesn't give check
               if (   !givesCheck
                   && lmrDepth < 1
-                  && ss->ply + depth < thisThread->rootDepth + 6
-                  && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
+                  && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0
+                  && (*contHist[0])[movedPiece][to_sq(move)] < 24000)
                   continue;
 
               // SEE based pruning
