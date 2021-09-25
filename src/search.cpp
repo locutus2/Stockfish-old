@@ -587,7 +587,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool givesCheck, improving, didLMR, nmpFailed, probcutFailed, singularFailed, priorCapture;
+    bool givesCheck, improving, didLMR, probcutFailed, singularFailed, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR, noLMRExtension;
     Piece movedPiece;
@@ -600,7 +600,6 @@ namespace {
     moveCount          = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
-    nmpFailed          = false;
     probcutFailed      = false;
     singularFailed     = false;
 
@@ -875,7 +874,6 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
-        nmpFailed = true;
     }
 
     probCutBeta = beta + 209 - 44 * improving;
@@ -1060,9 +1058,7 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // SEE based pruning
-              if (  !pos.see_ge(move, Value(-218) * depth)
-                  &&  cutNode - ss->ttHit + (eval >= beta) - bool(excludedMove) - probcutFailed + ((ss-1)->currentMove == MOVE_NULL)
-                    + 4 * ss->inCheck - 2 * singularQuietLMR + nmpFailed - 2 * singularFailed - noLMRExtension < 2) // (~25 Elo)
+              if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
                   continue;
           }
           else
@@ -1071,7 +1067,9 @@ moves_loop: // When in check, search starts here
               if (lmrDepth < 5
                   && (*contHist[0])[movedPiece][to_sq(move)]
                   + (*contHist[1])[movedPiece][to_sq(move)]
-                  + (*contHist[3])[movedPiece][to_sq(move)] < -3000 * depth + 3000)
+                  + (*contHist[3])[movedPiece][to_sq(move)] < -3000 * depth + 3000
+                  &&  cutNode - probcutFailed - ss->ttHit - 2 * bool(excludedMove) - 2 * singularQuietLMR - 2 * singularFailed
+                    - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension < 1)
                   continue;
 
               // Futility pruning: parent node (~5 Elo)
