@@ -1193,7 +1193,7 @@ moves_loop: // When in check, search starts here
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
 	      {
-                  CC = true;
+                  CC = false;
                   if(!CC) continue;
 	      }
 
@@ -1422,7 +1422,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          //CC = true;
+          CC = true;
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
