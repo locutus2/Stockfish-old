@@ -1185,7 +1185,7 @@ moves_loop: // When in check, search starts here
       }
 
       std::vector<Param> C;
-     //if(CC) 
+      //if(CC) 
 	     C = {PARAM(cutNode) /*0*/, 
 	                      PARAM(PvNode) /*1*/, 
 			      PARAM(ss->inCheck) /*2*/, 
@@ -1207,13 +1207,13 @@ moves_loop: // When in check, search starts here
                               PARAM(singularFailed) /*18*/, 
 			      PARAM((!PvNode&&!cutNode)) /*19*/,
       
-			      PARAM(moveCount) /*20*/,
-			      PARAM(depth) /*21*/,
-			      PARAM(rangeReduction) /*22*/,
-			      PARAM(ss->doubleExtensions) /*23*/,
-			      PARAM(ss->ply) /*24*/,
-			      PARAM(thisThread->rootDepth) /*25*/,
-			      PARAM((ss-1)->moveCount) /*26*/,
+			      //PARAM(moveCount) /*20*/,
+			      //PARAM(depth) /*21*/,
+			      //PARAM(rangeReduction) /*22*/,
+			      //PARAM(ss->doubleExtensions) /*23*/,
+			      //PARAM(ss->ply) /*24*/,
+			      //PARAM(thisThread->rootDepth) /*25*/,
+			      //PARAM((ss-1)->moveCount) /*26*/,
 
 			      PARAM((type_of(movedPiece) == PAWN)) /*27*/,
 			      PARAM((type_of(movedPiece) == KNIGHT)) /*28*/,
@@ -1222,7 +1222,7 @@ moves_loop: // When in check, search starts here
 			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
 			      PARAM((type_of(movedPiece) == KING)) /*32*/,
 			      PARAM((type_of(move) == PROMOTION)) /*33*/,
-			      PARAM(thisThread->bestMoveChanges) /*34*/,
+			      //PARAM(thisThread->bestMoveChanges) /*34*/,
       	};
 
       // Step 14. Extensions (~75 Elo)
@@ -1386,7 +1386,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          CC = true;
+          CC = PvNode;
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
