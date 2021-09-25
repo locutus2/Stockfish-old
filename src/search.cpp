@@ -587,7 +587,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool givesCheck, improving, didLMR, priorCapture;
+    bool givesCheck, improving, didLMR, nmpFailed, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR, noLMRExtension;
     Piece movedPiece;
@@ -600,6 +600,7 @@ namespace {
     moveCount          = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
+    nmpFailed          = false;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -872,6 +873,7 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        nmpFailed = true;
     }
 
     probCutBeta = beta + 209 - 44 * improving;
@@ -1050,12 +1052,13 @@ moves_loop: // When in check, search starts here
               // Capture history based pruning when the move doesn't give check
               if (   !givesCheck
                   && lmrDepth < 1
-                  && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
+                  && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0
+                  &&   improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove
+		     + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck < 6)
                   continue;
 
               // SEE based pruning
-              if (  !pos.see_ge(move, Value(-218) * depth)
-                  && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 10000) // (~25 Elo)
+              if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
                   continue;
           }
           else
