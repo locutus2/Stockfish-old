@@ -1054,7 +1054,7 @@ moves_loop: // When in check, search starts here
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0
                   &&   improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove
-		     + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck < 6)
+		     + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck < 5)
                   continue;
 
               // SEE based pruning
