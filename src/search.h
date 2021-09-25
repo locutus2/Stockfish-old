@@ -31,6 +31,13 @@ class Position;
 
 namespace Search {
 
+constexpr int N_PARAMS = 20;
+
+int getParam(int n);
+void setParam(int n, int v);
+bool searchBest();
+void printParams(std::ostream& out = std::cerr);
+
 /// Threshold used for countermoves based pruning
 constexpr int CounterMovePruneThreshold = 0;
 

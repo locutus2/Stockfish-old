@@ -370,6 +370,17 @@ void printCondition(int k, std::ostream& out = std::cerr)
 	      }
 }
 
+double get_corr_of(int n)
+{
+        double x = corrs[n][1] / (double)corrs[n][0];
+        double y = corrs[n][2] / (double)corrs[n][0];
+        double x2 = corrs[n][3] - corrs[n][0] * x * x;
+        double y2 = corrs[n][4] - corrs[n][0] * y * y;
+        double xy = corrs[n][5] - corrs[n][0] * x * y;
+        double w = (y2 - xy) / (x2 + y2 - 2 * xy);
+        return xy / std::sqrt(x2 * y2);
+}
+
 void dbg_clear() {
   for(int n = 0; n < DBG_N; ++n)
   {

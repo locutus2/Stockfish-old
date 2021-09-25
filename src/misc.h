@@ -55,6 +55,7 @@ void dbg_hit_on_cmp(std::vector<bool>& c, bool b, int n, int m, int w = 1);
 void dbg_clear();
 void dbg_print();
 void dbg_printc();
+double get_corr_of(int n = 0);
 
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds

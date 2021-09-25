@@ -40,6 +40,93 @@ namespace Stockfish {
 namespace Search {
 
   LimitsType Limits;
+
+  int params[N_PARAMS];
+  double best = 0;
+
+  struct Param {
+	  int v;
+	  std::string s;
+
+	  Param(int x = 0, const std::string& r = "") : v(x), s(r) {}
+	  operator int () const { return v; }
+  };
+
+  std::vector<Param> lastC;
+
+#define PARAM(x) Param((x),#x)
+
+  void printParams(std::ostream& out)
+  {
+	  out << "V=" << best << " =>";
+	  for(int i = 0; i < N_PARAMS; ++i)
+	  {
+		  if(params[i])
+		  {
+			  out << " " << (params[i] > 0 ? "+": "") << params[i] << " * " << lastC[i].s;
+		  }
+	  }
+	  out << std::endl;
+  }
+
+  int getParam(int n)
+  {
+	  return params[n];
+  }
+
+  void setParam(int n, int v)
+  {
+	  params[n] = v;
+  }
+
+  int getValue(const std::vector<Param>& C)
+  {
+	  int v = 0;
+	  for(int i = 0; i < N_PARAMS; ++i)
+	  {
+		  v += params[i] * int(C[i]);
+	  }
+	  return v;
+  }
+
+  void addData(bool T, const std::vector<Param>& C)
+  {
+	  lastC = C;
+	  int V = getValue(C);
+	  dbg_corr_of(V, T, 1000);
+	  for(int i = 0; i < N_PARAMS; ++i)
+	  {
+		  int V0 = V - int(C[i]);
+		  int V1 = V + int(C[i]);
+		  dbg_corr_of(V0, T, 10*i);
+		  dbg_corr_of(V1, T, 10*i+1);
+	  }
+  }
+
+  bool searchBest()
+  {
+	  bool found = false;
+	  int besti = -1; int bestj = -1;
+	  for(int i = 0; i < N_PARAMS; ++i)
+	  {
+		  for(int j = 0; j < 2; ++j)
+		  {
+		      double corr = get_corr_of(10*i+j);
+		      if(corr > best)
+		      {
+			      best = corr;
+			      besti = i;
+			      bestj = j;
+			      found = true;
+		      }
+		  }
+	  }
+	  if(found)
+	  {
+		  params[besti] += 2 * bestj - 1;
+	  }
+	  return found;
+  }
 }
 
 namespace Tablebases {
@@ -1039,10 +1126,27 @@ moves_loop: // When in check, search starts here
       newDepth = depth - 1;
 
       bool CC = false;
-      int V = cutNode - probcutFailed - ss->ttHit - 2 * bool(excludedMove) - 2 * singularQuietLMR - 2 * singularFailed - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension;
-      std::vector<bool> C = {cutNode /*0*/, PvNode, ss->inCheck /*2*/, improving /*3*/, ttCapture /*4*/, ss->ttPv /*5*/, singularQuietLMR /*6*/, bool(excludedMove) /*7*/, bool(ttMove), ss->ttHit /*9*/, moveCountPruning /*10*/, 
-	                     noLMRExtension /*11*/, eval >= beta /*12*/, (ss-1)->currentMove == MOVE_NULL /*13*/, probcutFailed /*14*/, nmpFailed /*15*/, captureOrPromotion /*16*/, givesCheck /*17*/,
-                             singularFailed /*18*/, !PvNode&&!cutNode /*19*/};
+      //int V = cutNode - probcutFailed - ss->ttHit - 2 * bool(excludedMove) - 2 * singularQuietLMR - 2 * singularFailed - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension;
+      std::vector<Param> C = {PARAM(cutNode) /*0*/, 
+	                      PARAM(PvNode) /*1*/, 
+			      PARAM(ss->inCheck) /*2*/, 
+			      PARAM(improving) /*3*/, 
+			      PARAM(ttCapture) /*4*/, 
+			      PARAM(ss->ttPv) /*5*/, 
+			      PARAM(singularQuietLMR) /*6*/, 
+			      PARAM(bool(excludedMove)) /*7*/, 
+			      PARAM(bool(ttMove)), 
+			      PARAM(ss->ttHit) /*9*/, 
+			      PARAM(moveCountPruning) /*10*/, 
+	                      PARAM(noLMRExtension) /*11*/, 
+			      PARAM(eval >= beta) /*12*/, 
+			      PARAM((ss-1)->currentMove == MOVE_NULL) /*13*/, 
+			      PARAM(probcutFailed) /*14*/, 
+			      PARAM(nmpFailed) /*15*/, 
+			      PARAM(captureOrPromotion) /*16*/, 
+			      PARAM(givesCheck) /*17*/,
+                              PARAM(singularFailed) /*18*/, 
+			      PARAM(!PvNode&&!cutNode) /*19*/};
       //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
       //// capture see pruning
       //
@@ -1347,6 +1451,7 @@ moves_loop: // When in check, search starts here
       if(CC)
       {
 	      	bool T = value > alpha;
+		/*
 		dbg_corr_of(V, T, 1000);
 		for(int i = 0; i < (int)C.size(); ++i)
 		{
@@ -1356,6 +1461,8 @@ moves_loop: // When in check, search starts here
 			dbg_corr_of(V0, T, 10*i);
 			dbg_corr_of(V1, T, 10*i+1);
 		}
+		*/
+		addData(T, C);
       }
 
       if (value > bestValue)
@@ -1877,7 +1984,6 @@ void MainThread::check_time() {
   if (tick - lastInfoTime >= 1000)
   {
       lastInfoTime = tick;
-      dbg_print();
   }
 
   // We should not stop pondering until told so by the GUI
