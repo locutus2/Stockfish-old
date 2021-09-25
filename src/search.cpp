@@ -63,7 +63,7 @@ namespace Search {
 	  {
 		  if(params[i])
 		  {
-			  out << " " << (params[i] > 0 ? "+": "") << params[i] << " * " << lastC[i].s;
+			  out << " " << (params[i] > 0 ? "+ ": "- ") << std::abs(params[i]) << " * " << lastC[i].s;
 		  }
 	  }
 	  out << std::endl;
@@ -1139,14 +1139,14 @@ moves_loop: // When in check, search starts here
 			      PARAM(ss->ttHit) /*9*/, 
 			      PARAM(moveCountPruning) /*10*/, 
 	                      PARAM(noLMRExtension) /*11*/, 
-			      PARAM(eval >= beta) /*12*/, 
-			      PARAM((ss-1)->currentMove == MOVE_NULL) /*13*/, 
+			      PARAM((eval >= beta)) /*12*/, 
+			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
 			      PARAM(probcutFailed) /*14*/, 
 			      PARAM(nmpFailed) /*15*/, 
 			      PARAM(captureOrPromotion) /*16*/, 
 			      PARAM(givesCheck) /*17*/,
                               PARAM(singularFailed) /*18*/, 
-			      PARAM(!PvNode&&!cutNode) /*19*/};
+			      PARAM((!PvNode&&!cutNode)) /*19*/};
       //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
       //// capture see pruning
       //
@@ -1187,16 +1187,16 @@ moves_loop: // When in check, search starts here
                   && (*contHist[0])[movedPiece][to_sq(move)]
                   + (*contHist[1])[movedPiece][to_sq(move)]
                   + (*contHist[3])[movedPiece][to_sq(move)] < -3000 * depth + 3000)
-	      {
-                  CC = true;
-                  if(!CC) continue;
-	      }
+                  continue;
 
               // Futility pruning: parent node (~5 Elo)
               if (   !ss->inCheck
                   && lmrDepth < 8
                   && ss->staticEval + 172 + 145 * lmrDepth <= alpha)
-                  continue;
+	      {
+                  CC = true;
+                  if(!CC) continue;
+	      }
 
               // Prune moves with negative SEE (~20 Elo)
               if (!pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))

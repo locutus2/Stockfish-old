@@ -158,11 +158,11 @@ namespace {
     vector<string> list = setup_bench(pos, args);
     num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
 
-    TimePoint elapsed = now();
 
     bool cont = true;
     for(int it = 0; cont; ++it)
     {
+        TimePoint elapsed = now();
     	dbg_clear();
     for (const auto& cmd : list)
     {
@@ -185,12 +185,12 @@ namespace {
         else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
     }
 
-    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
+       elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
 
        cont = Search::searchBest();
        //gif (cont)
        {
-	       std::cerr << "Iter " << it << ": ";
+	       std::cerr << "Iter " << it << ": T=" << elapsed/1000.0 << " sec ";
 	       Search::printParams();
        }
     }
