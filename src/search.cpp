@@ -1126,7 +1126,6 @@ moves_loop: // When in check, search starts here
       newDepth = depth - 1;
 
       bool CC = false;
-      std::vector<Param> C;
       //int V = cutNode - probcutFailed - ss->ttHit - 2 * bool(excludedMove) - 2 * singularQuietLMR - 2 * singularFailed - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension;
       //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
       //// capture see pruning
@@ -1148,43 +1147,6 @@ moves_loop: // When in check, search starts here
           // Reduced depth of the next LMR search
           int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2), 0);
 
-       C = {PARAM(cutNode) /*0*/, 
-	                      PARAM(PvNode) /*1*/, 
-			      PARAM(ss->inCheck) /*2*/, 
-			      PARAM(improving) /*3*/, 
-			      PARAM(ttCapture) /*4*/, 
-			      PARAM(ss->ttPv) /*5*/, 
-			      PARAM(singularQuietLMR) /*6*/, 
-			      PARAM(bool(excludedMove)) /*7*/, 
-			      PARAM(bool(ttMove)), 
-			      PARAM(ss->ttHit) /*9*/, 
-			      PARAM(moveCountPruning) /*10*/, 
-	                      PARAM(noLMRExtension) /*11*/, 
-			      PARAM((eval >= beta)) /*12*/, 
-			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
-			      PARAM(probcutFailed) /*14*/, 
-			      PARAM(nmpFailed) /*15*/, 
-			      PARAM(captureOrPromotion) /*16*/, 
-			      PARAM(givesCheck) /*17*/,
-                              PARAM(singularFailed) /*18*/, 
-			      PARAM((!PvNode&&!cutNode)) /*19*/,
-      
-			      PARAM(moveCount) /*20*/,
-			      PARAM(depth) /*21*/,
-			      PARAM(rangeReduction) /*22*/,
-			      PARAM(ss->doubleExtensions) /*23*/,
-			      PARAM(ss->ply) /*24*/,
-			      PARAM(thisThread->rootDepth) /*25*/,
-			      PARAM((ss-1)->moveCount) /*26*/,
-
-			      PARAM((type_of(movedPiece) == PAWN)) /*27*/,
-			      PARAM((type_of(movedPiece) == KNIGHT)) /*28*/,
-			      PARAM((type_of(movedPiece) == BISHOP)) /*29*/,
-			      PARAM((type_of(movedPiece) == ROOK)) /*30*/,
-			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
-			      PARAM((type_of(movedPiece) == KING)) /*32*/,
-			      PARAM((type_of(move) == PROMOTION)) /*33*/,
-      };
           if (   captureOrPromotion
               || givesCheck)
           {
@@ -1222,8 +1184,7 @@ moves_loop: // When in check, search starts here
           }
       }
 
-      if(!CC)
-       C = {PARAM(cutNode) /*0*/, 
+      std::vector<Param> C = {PARAM(cutNode) /*0*/, 
 	                      PARAM(PvNode) /*1*/, 
 			      PARAM(ss->inCheck) /*2*/, 
 			      PARAM(improving) /*3*/, 
