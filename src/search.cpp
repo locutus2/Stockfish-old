@@ -1182,7 +1182,7 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r--;
 
-          if (!PvNode && ss->inCheck && !ttMove)
+          if (ss->inCheck && !ttMove)
               r--;
 
           // Decrease reduction if the ttHit running average is large (~0 Elo)
