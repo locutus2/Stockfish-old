@@ -1039,8 +1039,7 @@ moves_loop: // When in check, search starts here
       newDepth = depth - 1;
 
       bool CC = false;
-      int V = cutNode - ss->ttHit + (eval >= beta) - bool(excludedMove) - probcutFailed + ((ss-1)->currentMove == MOVE_NULL) + 4 * ss->inCheck - 2 * singularQuietLMR
-	     + nmpFailed - 2 * singularFailed - noLMRExtension;
+      int V = 0;
       std::vector<bool> C = {cutNode /*0*/, PvNode, ss->inCheck /*2*/, improving /*3*/, ttCapture, ss->ttPv /*5*/, singularQuietLMR /*6*/, bool(excludedMove) /*7*/, bool(ttMove), ss->ttHit /*9*/, moveCountPruning /*10*/, 
 	                     noLMRExtension /*11*/, eval >= beta /*12*/, (ss-1)->currentMove == MOVE_NULL /*13*/, probcutFailed /*14*/, nmpFailed /*15*/, captureOrPromotion /*16*/, givesCheck /*17*/,
                              singularFailed /*18*/, !PvNode&&!cutNode /*19*/};
@@ -1050,6 +1049,8 @@ moves_loop: // When in check, search starts here
       //// capture history pruning
       //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove;
       //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck;
+      //int V = cutNode - ss->ttHit + (eval >= beta) - bool(excludedMove) - probcutFailed + ((ss-1)->currentMove == MOVE_NULL) + 4 * ss->inCheck - 2 * singularQuietLMR
+//	     + nmpFailed - 2 * singularFailed - noLMRExtension;
 
       // Step 13. Pruning at shallow depth (~200 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
@@ -1073,10 +1074,7 @@ moves_loop: // When in check, search starts here
 
               // SEE based pruning
               if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
-	      {
-                  CC = true;
-                  if(!CC) continue;
-	      }
+                  continue;
           }
           else
           {
@@ -1085,7 +1083,10 @@ moves_loop: // When in check, search starts here
                   && (*contHist[0])[movedPiece][to_sq(move)]
                   + (*contHist[1])[movedPiece][to_sq(move)]
                   + (*contHist[3])[movedPiece][to_sq(move)] < -3000 * depth + 3000)
-                  continue;
+	      {
+                  CC = true;
+                  if(!CC) continue;
+	      }
 
               // Futility pruning: parent node (~5 Elo)
               if (   !ss->inCheck
