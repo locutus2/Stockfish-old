@@ -650,6 +650,8 @@ namespace {
     if (!rootNode)
         (ss+2)->statScore = 0;
 
+bool nmpFailed = false;
+bool probcutFailed = false;
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
     // position key in case of an excluded move.
@@ -836,6 +838,7 @@ namespace {
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
+	nmpFailed = true;
 
         // Null move dynamic reduction based on depth and value
         Depth R = std::min(int(eval - beta) / 205, 3) + depth / 3 + 4;
@@ -897,6 +900,7 @@ namespace {
         int probCutCount = 0;
         bool ttPv = ss->ttPv;
         ss->ttPv = false;
+	probcutFailed = true;
 
         while (   (move = mp.next_move()) != MOVE_NONE
                && probCutCount < 2 + 2 * cutNode)
@@ -1033,6 +1037,14 @@ moves_loop: // When in check, search starts here
       // Calculate new depth for this move
       newDepth = depth - 1;
 
+      bool CC = false;
+      int V = improving + cutNode;
+      std::vector<bool> C = {cutNode /*0*/, PvNode, ss->inCheck /*2*/, improving /*3*/, ttCapture, ss->ttPv /*5*/, singularQuietLMR, bool(excludedMove) /*7*/, bool(ttMove), ss->ttHit /*9*/, moveCountPruning /*10*/, 
+	                     noLMRExtension /*11*/, eval >= beta /*12*/, (ss-1)->currentMove == MOVE_NULL /*13*/, probcutFailed /*14*/, nmpFailed /*15*/};
+      //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
+      //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove;
+      //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck;
+
       // Step 13. Pruning at shallow depth (~200 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1051,7 +1063,10 @@ moves_loop: // When in check, search starts here
               if (   !givesCheck
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
-                  continue;
+	      {
+                  CC = true;
+                  if(!CC) continue;
+	      }
 
               // SEE based pruning
               if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
@@ -1317,6 +1332,20 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      	bool T = value > alpha;
+		dbg_corr_of(V, T, 1000);
+		for(int i = 0; i < (int)C.size(); ++i)
+		{
+			int V0 = V + !C[i];
+			int V1 = V + C[i];
+			//dbg_hit_on(T, 10*i+C[i]);
+			dbg_corr_of(V0, T, 10*i);
+			dbg_corr_of(V1, T, 10*i+1);
+		}
       }
 
       if (value > bestValue)
