@@ -1176,6 +1176,14 @@ moves_loop: // When in check, search starts here
 			      PARAM(ss->ply) /*24*/,
 			      PARAM(thisThread->rootDepth) /*25*/,
 			      PARAM((ss-1)->moveCount) /*26*/,
+
+			      PARAM((type_of(movedPiece) == PAWN)) /*27*/,
+			      PARAM((type_of(movedPiece) == KNIGHT)) /*28*/,
+			      PARAM((type_of(movedPiece) == BISHOP)) /*29*/,
+			      PARAM((type_of(movedPiece) == ROOK)) /*30*/,
+			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
+			      PARAM((type_of(movedPiece) == KING)) /*32*/,
+			      PARAM((type_of(move) == PROMOTION)) /*33*/,
       };
           if (   captureOrPromotion
               || givesCheck)
@@ -1243,6 +1251,14 @@ moves_loop: // When in check, search starts here
 			      PARAM(ss->ply) /*24*/,
 			      PARAM(thisThread->rootDepth) /*25*/,
 			      PARAM((ss-1)->moveCount) /*26*/,
+
+			      PARAM((type_of(movedPiece) == PAWN)) /*27*/,
+			      PARAM((type_of(movedPiece) == KNIGHT)) /*28*/,
+			      PARAM((type_of(movedPiece) == BISHOP)) /*29*/,
+			      PARAM((type_of(movedPiece) == ROOK)) /*30*/,
+			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
+			      PARAM((type_of(movedPiece) == KING)) /*32*/,
+			      PARAM((type_of(move) == PROMOTION)) /*33*/,
       };
 
       // Step 14. Extensions (~75 Elo)
