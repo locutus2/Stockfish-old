@@ -370,6 +370,58 @@ void printCondition(int k, std::ostream& out = std::cerr)
 	      }
 }
 
+void dbg_clear() {
+  for(int n = 0; n < DBG_N; ++n)
+  {
+	  for(int i = 0; i < 6; ++i)
+	  {
+		  if(i < 2)
+		  {
+			  hits[n][i] = 0;
+			  means[n][i] = 0;
+			  stds[n][i] = 0;
+			  covs[n][i] = 0;
+			  corrs[n][i] = 0;
+			  cramer[n][i] = 0;
+			  chi2[n][i] = 0;
+			  gain[n][i] = 0;
+		  }
+		  else if (i < 3)
+		  {
+			  stds[n][i] = 0;
+			  covs[n][i] = 0;
+			  corrs[n][i] = 0;
+			  cramer[n][i] = 0;
+			  chi2[n][i] = 0;
+			  gain[n][i] = 0;
+		  }
+		  else if (i < 5)
+		  {
+			  covs[n][i] = 0;
+			  corrs[n][i] = 0;
+			  cramer[n][i] = 0;
+			  chi2[n][i] = 0;
+			  gain[n][i] = 0;
+		  }
+		  else if (i < 6)
+		  {
+			  covs[n][i] = 0;
+			  corrs[n][i] = 0;
+		  }
+	  }
+
+	  for(int k = 0; k < DBG_C3; ++k)
+	  {
+		  Chits[n][k][0] = 0;
+		  Chits[n][k][1] = 0;
+		  ChitsCmp[n][k][0] = 0;
+		  ChitsCmp[n][k][1] = 0;
+		  ChitsCmp[n][k][2] = 0;
+	  }
+
+  }
+}
+
 void dbg_printc() {
 
   const bool SORT = true;
