@@ -1062,7 +1062,7 @@ moves_loop: // When in check, search starts here
               // SEE based pruning
               if (  !pos.see_ge(move, Value(-218) * depth)
                   &&  cutNode - ss->ttHit + (eval >= beta) - bool(excludedMove) - probcutFailed + ((ss-1)->currentMove == MOVE_NULL)
-                    + 4 * ss->inCheck - 2 * singularQuietLMR + nmpFailed - 2 * singularFailed - noLMRExtension < 3) // (~25 Elo)
+                    + 4 * ss->inCheck - 2 * singularQuietLMR + nmpFailed - 2 * singularFailed - noLMRExtension < 2) // (~25 Elo)
                   continue;
           }
           else
