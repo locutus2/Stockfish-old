@@ -587,7 +587,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool givesCheck, improving, didLMR, probcutFailed, singularFailed, priorCapture;
+    bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR, noLMRExtension;
     Piece movedPiece;
@@ -600,8 +600,6 @@ namespace {
     moveCount          = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
-    probcutFailed      = false;
-    singularFailed     = false;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -939,9 +937,7 @@ namespace {
                     return value;
                 }
             }
-
-        ss->ttPv = ttPv;
-        probcutFailed = true;
+         ss->ttPv = ttPv;
     }
 
     // Step 10. If the position is not in TT, decrease depth by 2 or 1 depending on node type
@@ -1067,15 +1063,14 @@ moves_loop: // When in check, search starts here
               if (lmrDepth < 5
                   && (*contHist[0])[movedPiece][to_sq(move)]
                   + (*contHist[1])[movedPiece][to_sq(move)]
-                  + (*contHist[3])[movedPiece][to_sq(move)] < -3000 * depth + 3000
-                  &&  cutNode - probcutFailed - ss->ttHit - 2 * bool(excludedMove) - 2 * singularQuietLMR - 2 * singularFailed
-                    - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension < 2)
+                  + (*contHist[3])[movedPiece][to_sq(move)] < -3000 * depth + 3000)
                   continue;
 
               // Futility pruning: parent node (~5 Elo)
               if (   !ss->inCheck
                   && lmrDepth < 8
-                  && ss->staticEval + 172 + 145 * lmrDepth <= alpha)
+                  && ss->staticEval + 172 + 145 * lmrDepth <= alpha
+                  && cutNode + improving + 2 * moveCountPruning - (eval >= beta) + 2 * ((ss-1)->currentMove == MOVE_NULL) < 4)
                   continue;
 
               // Prune moves with negative SEE (~20 Elo)
@@ -1140,10 +1135,7 @@ moves_loop: // When in check, search starts here
 
               if (value >= beta)
                   return beta;
-              singularFailed = true;
           }
-	  else
-              singularFailed = true;
       }
 
       // Capture extensions for PvNodes and cutNodes
