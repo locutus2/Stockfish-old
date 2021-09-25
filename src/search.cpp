@@ -652,6 +652,7 @@ namespace {
 
 bool nmpFailed = false;
 bool probcutFailed = false;
+	    bool  singularFailed = false;
     // Step 4. Transposition table lookup. We don't want the score of a partial
     // search to overwrite a previous full search TT value, so we use a different
     // position key in case of an excluded move.
@@ -900,7 +901,6 @@ bool probcutFailed = false;
         int probCutCount = 0;
         bool ttPv = ss->ttPv;
         ss->ttPv = false;
-	probcutFailed = true;
 
         while (   (move = mp.next_move()) != MOVE_NONE
                && probCutCount < 2 + 2 * cutNode)
@@ -942,6 +942,7 @@ bool probcutFailed = false;
                 }
             }
          ss->ttPv = ttPv;
+	 probcutFailed = true;
     }
 
     // Step 10. If the position is not in TT, decrease depth by 2 or 1 depending on node type
@@ -1040,8 +1041,12 @@ moves_loop: // When in check, search starts here
       bool CC = false;
       int V = 0;
       std::vector<bool> C = {cutNode /*0*/, PvNode, ss->inCheck /*2*/, improving /*3*/, ttCapture, ss->ttPv /*5*/, singularQuietLMR, bool(excludedMove) /*7*/, bool(ttMove), ss->ttHit /*9*/, moveCountPruning /*10*/, 
-	                     noLMRExtension /*11*/, eval >= beta /*12*/, (ss-1)->currentMove == MOVE_NULL /*13*/, probcutFailed /*14*/, nmpFailed /*15*/};
+	                     noLMRExtension /*11*/, eval >= beta /*12*/, (ss-1)->currentMove == MOVE_NULL /*13*/, probcutFailed /*14*/, nmpFailed /*15*/, captureOrPromotion /*16*/, givesCheck /*17*/,
+                             singularFailed /*18*/, !PvNode&&!cutNode /*19*/};
       //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
+      //// capture see pruning
+      //
+      //// capture history pruning
       //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove;
       //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck;
 
@@ -1063,14 +1068,14 @@ moves_loop: // When in check, search starts here
               if (   !givesCheck
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
+                  continue;
+
+              // SEE based pruning
+              if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
 	      {
                   CC = true;
                   if(!CC) continue;
 	      }
-
-              // SEE based pruning
-              if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
-                  continue;
           }
           else
           {
@@ -1149,7 +1154,10 @@ moves_loop: // When in check, search starts here
 
               if (value >= beta)
                   return beta;
+	      singularFailed = true;
           }
+	  else
+	      singularFailed = true;
       }
 
       // Capture extensions for PvNodes and cutNodes
