@@ -112,7 +112,7 @@ namespace Search {
 		  for(int j = 0; j < 2; ++j)
 		  {
 		      double corr = get_corr_of(10*i+j);
-		      if(corr > best)
+		      if(std::isnormal(corr) && corr > best)
 		      {
 			      best = corr;
 			      besti = i;
@@ -1222,6 +1222,7 @@ moves_loop: // When in check, search starts here
 			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
 			      PARAM((type_of(movedPiece) == KING)) /*32*/,
 			      PARAM((type_of(move) == PROMOTION)) /*33*/,
+			      PARAM(likelyFailLow) /*33*/,
 			      //PARAM(thisThread->bestMoveChanges) /*34*/,
       	};
 
