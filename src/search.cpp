@@ -1280,8 +1280,9 @@ moves_loop: // When in check, search starts here
               ss->excludedMove = MOVE_NONE;
 
               if (value >= beta)
-                  return beta;
-	      singularFailed = true;
+                  extension = -2;
+	      else
+	          singularFailed = true;
           }
 	  else
 	      singularFailed = true;
