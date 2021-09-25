@@ -1174,7 +1174,10 @@ moves_loop: // When in check, search starts here
               if (   !givesCheck
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
-                  continue;
+	      {
+                  CC = false;
+                  if(!CC) continue;
+	      }
 
               // SEE based pruning
               if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
@@ -1197,10 +1200,7 @@ moves_loop: // When in check, search starts here
 
               // Prune moves with negative SEE (~20 Elo)
               if (!pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))
-	      {
-                  CC = true;
-                  if(!CC) continue;
-	      }
+                  continue;
           }
       }
 
@@ -1365,6 +1365,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+          CC = true;
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
