@@ -1069,7 +1069,7 @@ moves_loop: // When in check, search starts here
                   + (*contHist[1])[movedPiece][to_sq(move)]
                   + (*contHist[3])[movedPiece][to_sq(move)] < -3000 * depth + 3000
                   &&  cutNode - probcutFailed - ss->ttHit - 2 * bool(excludedMove) - 2 * singularQuietLMR - 2 * singularFailed
-                    - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension < 1)
+                    - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension < 2)
                   continue;
 
               // Futility pruning: parent node (~5 Elo)
