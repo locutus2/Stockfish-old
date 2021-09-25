@@ -1146,7 +1146,16 @@ moves_loop: // When in check, search starts here
 			      PARAM(captureOrPromotion) /*16*/, 
 			      PARAM(givesCheck) /*17*/,
                               PARAM(singularFailed) /*18*/, 
-			      PARAM((!PvNode&&!cutNode)) /*19*/};
+			      PARAM((!PvNode&&!cutNode)) /*19*/,
+      
+			      PARAM(moveCount) /*20*/,
+			      PARAM(depth) /*21*/,
+			      PARAM(rangeReduction) /*22*/,
+			      PARAM(ss->doubleExtensions) /*23*/,
+			      PARAM(ss->ply) /*24*/,
+			      PARAM(thisThread->rootDepth) /*25*/,
+			      PARAM((ss-1)->moveCount) /*26*/,
+      };
       //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
       //// capture see pruning
       //
@@ -1175,7 +1184,7 @@ moves_loop: // When in check, search starts here
                   && lmrDepth < 1
                   && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
 	      {
-                  CC = false;
+                  CC = true;
                   if(!CC) continue;
 	      }
 
@@ -1365,7 +1374,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          CC = true;
+          //CC = true;
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
