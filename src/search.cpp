@@ -1184,7 +1184,9 @@ moves_loop: // When in check, search starts here
           }
       }
 
-      std::vector<Param> C = {PARAM(cutNode) /*0*/, 
+      std::vector<Param> C;
+     //if(CC) 
+	     C = {PARAM(cutNode) /*0*/, 
 	                      PARAM(PvNode) /*1*/, 
 			      PARAM(ss->inCheck) /*2*/, 
 			      PARAM(improving) /*3*/, 
@@ -1220,7 +1222,8 @@ moves_loop: // When in check, search starts here
 			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
 			      PARAM((type_of(movedPiece) == KING)) /*32*/,
 			      PARAM((type_of(move) == PROMOTION)) /*33*/,
-      };
+			      PARAM(thisThread->bestMoveChanges) /*34*/,
+      	};
 
       // Step 14. Extensions (~75 Elo)
 
