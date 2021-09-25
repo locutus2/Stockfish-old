@@ -1070,7 +1070,7 @@ moves_loop: // When in check, search starts here
               if (   !ss->inCheck
                   && lmrDepth < 8
                   && ss->staticEval + 172 + 145 * lmrDepth <= alpha
-                  && cutNode + improving + 2 * moveCountPruning - (eval >= beta) + 2 * ((ss-1)->currentMove == MOVE_NULL) < 4)
+                  && cutNode + improving + 2 * moveCountPruning - (eval >= beta) + 2 * ((ss-1)->currentMove == MOVE_NULL) < 3)
                   continue;
 
               // Prune moves with negative SEE (~20 Elo)
