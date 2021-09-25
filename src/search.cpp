@@ -1387,7 +1387,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          CC = PvNode;
+          CC = ss->inCheck;
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
