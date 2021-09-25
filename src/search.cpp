@@ -1126,8 +1126,29 @@ moves_loop: // When in check, search starts here
       newDepth = depth - 1;
 
       bool CC = false;
+      std::vector<Param> C;
       //int V = cutNode - probcutFailed - ss->ttHit - 2 * bool(excludedMove) - 2 * singularQuietLMR - 2 * singularFailed - ttCapture + ((ss-1)->currentMove == MOVE_NULL) - noLMRExtension;
-      std::vector<Param> C = {PARAM(cutNode) /*0*/, 
+      //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
+      //// capture see pruning
+      //
+      //// capture history pruning
+      //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove;
+      //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck;
+      //int V = cutNode - ss->ttHit + (eval >= beta) - bool(excludedMove) - probcutFailed + ((ss-1)->currentMove == MOVE_NULL) + 4 * ss->inCheck - 2 * singularQuietLMR
+//	     + nmpFailed - 2 * singularFailed - noLMRExtension;
+
+      // Step 13. Pruning at shallow depth (~200 Elo). Depth conditions are important for mate finding.
+      if (  !rootNode
+          && pos.non_pawn_material(us)
+          && bestValue > VALUE_TB_LOSS_IN_MAX_PLY)
+      {
+          // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
+          moveCountPruning = moveCount >= futility_move_count(improving, depth);
+
+          // Reduced depth of the next LMR search
+          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2), 0);
+
+       C = {PARAM(cutNode) /*0*/, 
 	                      PARAM(PvNode) /*1*/, 
 			      PARAM(ss->inCheck) /*2*/, 
 			      PARAM(improving) /*3*/, 
@@ -1156,26 +1177,6 @@ moves_loop: // When in check, search starts here
 			      PARAM(thisThread->rootDepth) /*25*/,
 			      PARAM((ss-1)->moveCount) /*26*/,
       };
-      //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
-      //// capture see pruning
-      //
-      //// capture history pruning
-      //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove;
-      //int V = improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck;
-      //int V = cutNode - ss->ttHit + (eval >= beta) - bool(excludedMove) - probcutFailed + ((ss-1)->currentMove == MOVE_NULL) + 4 * ss->inCheck - 2 * singularQuietLMR
-//	     + nmpFailed - 2 * singularFailed - noLMRExtension;
-
-      // Step 13. Pruning at shallow depth (~200 Elo). Depth conditions are important for mate finding.
-      if (  !rootNode
-          && pos.non_pawn_material(us)
-          && bestValue > VALUE_TB_LOSS_IN_MAX_PLY)
-      {
-          // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold
-          moveCountPruning = moveCount >= futility_move_count(improving, depth);
-
-          // Reduced depth of the next LMR search
-          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2), 0);
-
           if (   captureOrPromotion
               || givesCheck)
           {
@@ -1212,6 +1213,37 @@ moves_loop: // When in check, search starts here
                   continue;
           }
       }
+
+      if(!CC)
+       C = {PARAM(cutNode) /*0*/, 
+	                      PARAM(PvNode) /*1*/, 
+			      PARAM(ss->inCheck) /*2*/, 
+			      PARAM(improving) /*3*/, 
+			      PARAM(ttCapture) /*4*/, 
+			      PARAM(ss->ttPv) /*5*/, 
+			      PARAM(singularQuietLMR) /*6*/, 
+			      PARAM(bool(excludedMove)) /*7*/, 
+			      PARAM(bool(ttMove)), 
+			      PARAM(ss->ttHit) /*9*/, 
+			      PARAM(moveCountPruning) /*10*/, 
+	                      PARAM(noLMRExtension) /*11*/, 
+			      PARAM((eval >= beta)) /*12*/, 
+			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
+			      PARAM(probcutFailed) /*14*/, 
+			      PARAM(nmpFailed) /*15*/, 
+			      PARAM(captureOrPromotion) /*16*/, 
+			      PARAM(givesCheck) /*17*/,
+                              PARAM(singularFailed) /*18*/, 
+			      PARAM((!PvNode&&!cutNode)) /*19*/,
+      
+			      PARAM(moveCount) /*20*/,
+			      PARAM(depth) /*21*/,
+			      PARAM(rangeReduction) /*22*/,
+			      PARAM(ss->doubleExtensions) /*23*/,
+			      PARAM(ss->ply) /*24*/,
+			      PARAM(thisThread->rootDepth) /*25*/,
+			      PARAM((ss-1)->moveCount) /*26*/,
+      };
 
       // Step 14. Extensions (~75 Elo)
 
