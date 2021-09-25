@@ -587,7 +587,7 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool givesCheck, improving, didLMR, nmpFailed, priorCapture;
+    bool givesCheck, improving, didLMR, nmpFailed, probcutFailed, singularFailed, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR, noLMRExtension;
     Piece movedPiece;
@@ -601,6 +601,8 @@ namespace {
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
     nmpFailed          = false;
+    probcutFailed      = false;
+    singularFailed     = false;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -939,7 +941,9 @@ namespace {
                     return value;
                 }
             }
-         ss->ttPv = ttPv;
+
+        ss->ttPv = ttPv;
+        probcutFailed = true;
     }
 
     // Step 10. If the position is not in TT, decrease depth by 2 or 1 depending on node type
@@ -1052,13 +1056,13 @@ moves_loop: // When in check, search starts here
               // Capture history based pruning when the move doesn't give check
               if (   !givesCheck
                   && lmrDepth < 1
-                  && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0
-                  &&   improving + cutNode + !moveCountPruning + !ss->ttHit + !excludedMove
-		     + (eval >= beta) + ((ss-1)->currentMove == MOVE_NULL) + nmpFailed + !ss->inCheck < 5)
+                  && captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 0)
                   continue;
 
               // SEE based pruning
-              if (!pos.see_ge(move, Value(-218) * depth)) // (~25 Elo)
+              if (  !pos.see_ge(move, Value(-218) * depth)
+                  &&  cutNode - ss->ttHit + (eval >= beta) - bool(excludedMove) - probcutFailed + ((ss-1)->currentMove == MOVE_NULL)
+                    + 4 * ss->inCheck - 2 * singularQuietLMR + nmpFailed - 2 * singularFailed - noLMRExtension < 3) // (~25 Elo)
                   continue;
           }
           else
@@ -1138,7 +1142,10 @@ moves_loop: // When in check, search starts here
 
               if (value >= beta)
                   return beta;
+              singularFailed = true;
           }
+	  else
+              singularFailed = true;
       }
 
       // Capture extensions for PvNodes and cutNodes
