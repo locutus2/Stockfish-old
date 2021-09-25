@@ -1038,7 +1038,7 @@ moves_loop: // When in check, search starts here
       newDepth = depth - 1;
 
       bool CC = false;
-      int V = improving + cutNode;
+      int V = 0;
       std::vector<bool> C = {cutNode /*0*/, PvNode, ss->inCheck /*2*/, improving /*3*/, ttCapture, ss->ttPv /*5*/, singularQuietLMR, bool(excludedMove) /*7*/, bool(ttMove), ss->ttHit /*9*/, moveCountPruning /*10*/, 
 	                     noLMRExtension /*11*/, eval >= beta /*12*/, (ss-1)->currentMove == MOVE_NULL /*13*/, probcutFailed /*14*/, nmpFailed /*15*/};
       //std::vector<bool> C = {cutNode, PvNode, ss->inCheck, improving, ttCapture, ss->ttPv, singularQuietLMR, bool(excludedMove), bool(ttMove), ss->ttHit, moveCountPruning, noLMRExtension};
