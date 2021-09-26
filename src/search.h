@@ -32,7 +32,7 @@ class Position;
 namespace Search {
 
 //constexpr int N_PARAMS = 34;
-constexpr int N_PARAMS = 27;
+constexpr int N_PARAMS = 24;
 
 int getParam(int n);
 void setParam(int n, int v);

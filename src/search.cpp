@@ -1200,11 +1200,11 @@ moves_loop: // When in check, search starts here
 	                      PARAM(noLMRExtension) /*11*/, 
 			      PARAM((eval >= beta)) /*12*/, 
 			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
-			      PARAM(probcutFailed) /*14*/, 
-			      PARAM(nmpFailed) /*15*/, 
+			      //PARAM(probcutFailed) /*14*/, 
+			      //PARAM(nmpFailed) /*15*/, 
 			      PARAM(captureOrPromotion) /*16*/, 
 			      PARAM(givesCheck) /*17*/,
-                              PARAM(singularFailed) /*18*/, 
+                              //PARAM(singularFailed) /*18*/, 
 			      PARAM((!PvNode&&!cutNode)) /*19*/,
       
 			      //PARAM(moveCount) /*20*/,
@@ -1395,7 +1395,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          CC = givesCheck;
+          CC = !PvNode && !cutNode;
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
