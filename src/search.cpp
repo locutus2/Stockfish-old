@@ -1223,7 +1223,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (givesCheck && cutNode && nmpFailed)
+          if (givesCheck && cutNode && nmpFailed && type_of(movedPiece) == QUEEN)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
