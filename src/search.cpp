@@ -1221,6 +1221,20 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (   givesCheck
+              &&   (PvNode ? 0 : cutNode ? 1 : -1)
+                 + (eval >= beta)
+                 + (type_of(movedPiece) == QUEEN ? 1 : type_of(movedPiece) == ROOK ? 0 : -1)
+                 - ss->inCheck
+                 - ss->ttPv
+                 - 2 * singularQuietLMR
+                 - bool(ttMove)
+                 - ss->ttHit
+                 - moveCountPruning
+                 - noLMRExtension
+                 - (type_of(move) == PROMOTION) >= 3)
+              r--;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
