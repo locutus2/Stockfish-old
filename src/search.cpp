@@ -587,19 +587,20 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool givesCheck, improving, didLMR, priorCapture;
+    bool givesCheck, improving, didLMR, nmpFailed, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR, noLMRExtension;
     Piece movedPiece;
     int moveCount, captureCount, quietCount;
 
     // Step 1. Initialize node
-    ss->inCheck        = pos.checkers();
-    priorCapture       = pos.captured_piece();
-    Color us           = pos.side_to_move();
-    moveCount          = captureCount = quietCount = ss->moveCount = 0;
-    bestValue          = -VALUE_INFINITE;
-    maxValue           = VALUE_INFINITE;
+    ss->inCheck  = pos.checkers();
+    priorCapture = pos.captured_piece();
+    Color us     = pos.side_to_move();
+    moveCount    = captureCount = quietCount = ss->moveCount = 0;
+    bestValue    = -VALUE_INFINITE;
+    maxValue     = VALUE_INFINITE;
+    nmpFailed    = false;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -872,6 +873,7 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        nmpFailed = true;
     }
 
     probCutBeta = beta + 209 - 44 * improving;
@@ -1221,7 +1223,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (givesCheck && cutNode)
+          if (givesCheck && cutNode && nmpFailed)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
