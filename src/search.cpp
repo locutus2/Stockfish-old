@@ -1232,7 +1232,7 @@ moves_loop: // When in check, search starts here
                  - ss->ttHit
                  - moveCountPruning
                  - noLMRExtension
-                 - (type_of(move) == PROMOTION) >= 3)
+                 - (type_of(move) == PROMOTION) >= 2)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
