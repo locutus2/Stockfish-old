@@ -187,7 +187,7 @@ namespace {
     for(int it = 0; cont; ++it)
     {
        TimePoint elapsed = now();
-       dbg_clear();
+       //dbg_clear();
 
        cont = Search::searchBest();
        elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'

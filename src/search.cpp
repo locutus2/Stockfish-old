@@ -53,6 +53,7 @@ namespace Search {
   };
 
   std::vector<Param> lastC;
+  std::vector<std::pair<bool, std::vector<Param>>> records;
 
 #define PARAM(x) Param((x),#x)
 
@@ -91,20 +92,38 @@ namespace Search {
 
   void addData(bool T, const std::vector<Param>& C)
   {
+	  /*
 	  lastC = C;
 	  int V = getValue(C);
-	  dbg_corr_of(V, T, 1000);
+	  //dbg_corr_of(V, T, 1000);
 	  for(int i = 0; i < N_PARAMS; ++i)
 	  {
 		  int V0 = V - int(C[i]);
 		  int V1 = V + int(C[i]);
-		  dbg_corr_of(V0, T, 10*i);
-		  dbg_corr_of(V1, T, 10*i+1);
+		  //dbg_corr_of(V0, T, 10*i);
+		  //dbg_corr_of(V1, T, 10*i+1);
 	  }
+	  */
+	  records.push_back(std::pair<bool,std::vector<Param>>(T, C));
   }
 
   bool searchBest()
   {
+	  dbg_clear();
+          for(int k = 0; k < (int)records.size(); ++k)
+	  {
+	     int V = getValue(records[k].second);
+	     int T = records[k].first;
+	     dbg_corr_of(V, T, 1000);
+	     for(int i = 0; i < N_PARAMS; ++i)
+	     {
+		  int V0 = V - int(records[k].second[i]);
+		  int V1 = V + int(records[k].second[i]);
+		  dbg_corr_of(V0, T, 10*i);
+		  dbg_corr_of(V1, T, 10*i+1);
+	     }
+	  }
+
 	  bool found = false;
 	  int besti = -1; int bestj = -1;
 	  for(int i = 0; i < N_PARAMS; ++i)
