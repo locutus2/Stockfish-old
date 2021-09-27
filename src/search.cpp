@@ -41,7 +41,7 @@ namespace Search {
 
   LimitsType Limits;
 
-  int params[N_PARAMS];
+  int params[N_PARAMS] = { -1, 0};
   double best = 0;
   std::vector<std::string> paramString;
   std::map<std::string,int> string2index;
@@ -1224,46 +1224,6 @@ moves_loop: // When in check, search starts here
       }
 
       std::vector<Param> C;
-      //if(CC) 
-	     C = {PARAM(cutNode) /*0*/, 
-	                      PARAM(PvNode) /*1*/, 
-			      PARAM(ss->inCheck) /*2*/, 
-			      PARAM(improving) /*3*/, 
-			      PARAM(ttCapture) /*4*/, 
-			      PARAM(ss->ttPv) /*5*/, 
-			      PARAM(singularQuietLMR) /*6*/, 
-			      PARAM(bool(excludedMove)) /*7*/, 
-			      PARAM(bool(ttMove)), 
-			      PARAM(ss->ttHit) /*9*/, 
-			      PARAM(moveCountPruning) /*10*/, 
-	                      PARAM(noLMRExtension) /*11*/, 
-			      PARAM((eval >= beta)) /*12*/, 
-			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
-			      //PARAM(probcutFailed) /*14*/, 
-			      //PARAM(nmpFailed) /*15*/, 
-			      PARAM(captureOrPromotion) /*16*/, 
-			      PARAM(givesCheck) /*17*/,
-                              //PARAM(singularFailed) /*18*/, 
-			      PARAM((!PvNode&&!cutNode)) /*19*/,
-      
-			      //PARAM(moveCount) /*20*/,
-			      //PARAM(depth) /*21*/,
-			      //PARAM(rangeReduction) /*22*/,
-			      //PARAM(ss->doubleExtensions) /*23*/,
-			      //PARAM(ss->ply) /*24*/,
-			      //PARAM(thisThread->rootDepth) /*25*/,
-			      //PARAM((ss-1)->moveCount) /*26*/,
-
-			      PARAM((type_of(movedPiece) == PAWN)) /*27*/,
-			      PARAM((type_of(movedPiece) == KNIGHT)) /*28*/,
-			      PARAM((type_of(movedPiece) == BISHOP)) /*29*/,
-			      PARAM((type_of(movedPiece) == ROOK)) /*30*/,
-			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
-			      PARAM((type_of(movedPiece) == KING)) /*32*/,
-			      PARAM((type_of(move) == PROMOTION)) /*33*/,
-			      PARAM(likelyFailLow) /*33*/,
-			      //PARAM(thisThread->bestMoveChanges) /*34*/,
-      	};
 
       // Step 14. Extensions (~75 Elo)
 
@@ -1347,6 +1307,52 @@ moves_loop: // When in check, search starts here
                && move == ss->killers[0]
                && (*contHist[0])[movedPiece][to_sq(move)] >= 10000)
           extension = 1;
+
+      //if(CC) 
+	     C = {
+			      PARAM(depth) /*21*/,
+		     PARAM(cutNode) /*0*/, 
+	                      PARAM(PvNode) /*1*/, 
+			      PARAM(ss->inCheck) /*2*/, 
+			      PARAM(improving) /*3*/, 
+			      PARAM(ttCapture) /*4*/, 
+			      PARAM(ss->ttPv) /*5*/, 
+			      PARAM(singularQuietLMR) /*6*/, 
+			      PARAM(bool(excludedMove)) /*7*/, 
+			      PARAM(bool(ttMove)), 
+			      PARAM(ss->ttHit) /*9*/, 
+			      PARAM(moveCountPruning) /*10*/, 
+	                      PARAM(noLMRExtension) /*11*/, 
+			      PARAM((eval >= beta)) /*12*/, 
+			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
+			      //PARAM(probcutFailed) /*14*/, 
+			      //PARAM(nmpFailed) /*15*/, 
+			      PARAM(captureOrPromotion) /*16*/, 
+			      PARAM(givesCheck) /*17*/,
+                              //PARAM(singularFailed) /*18*/, 
+			      PARAM((!PvNode&&!cutNode)) /*19*/,
+      
+			      //PARAM(moveCount) /*20*/,
+			      //PARAM(rangeReduction) /*22*/,
+			      //PARAM(ss->doubleExtensions) /*23*/,
+			      //PARAM(ss->ply) /*24*/,
+			      //PARAM(thisThread->rootDepth) /*25*/,
+			      //PARAM((ss-1)->moveCount) /*26*/,
+
+			      PARAM((type_of(movedPiece) == PAWN)) /*27*/,
+			      PARAM((type_of(movedPiece) == KNIGHT)) /*28*/,
+			      PARAM((type_of(movedPiece) == BISHOP)) /*29*/,
+			      PARAM((type_of(movedPiece) == ROOK)) /*30*/,
+			      PARAM((type_of(movedPiece) == QUEEN)) /*31*/,
+			      PARAM((type_of(movedPiece) == KING)) /*32*/,
+			      PARAM((type_of(move) == PROMOTION)) /*33*/,
+			      PARAM(likelyFailLow) /*33*/,
+			      PARAM(bool(extension)) /*33*/,
+			      PARAM((move == countermove)) /*33*/,
+			      PARAM((move == ss->killers[0])) /*33*/,
+			      PARAM((move == ss->killers[1])) /*33*/,
+			      //PARAM(thisThread->bestMoveChanges) /*34*/,
+      	};
 
       // Add extension to new depth
       newDepth += extension;
