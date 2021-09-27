@@ -43,13 +43,32 @@ namespace Search {
 
   int params[N_PARAMS];
   double best = 0;
+  std::vector<std::string> paramString;
+  std::map<std::string,int> string2index;
 
   struct Param {
 	  int v;
-	  std::string s;
+	  int si;
 
-	  Param(int x = 0, const std::string& r = "") : v(x), s(r) {}
+	  Param(int x = 0, const std::string& s = "") : v(x) { setTitle(s); }
 	  operator int () const { return v; }
+	  std::string& title() const { return paramString[si]; }
+
+	  private:
+	  void setTitle(const std::string& s)
+	  {
+		  auto x = string2index.find(s);
+		  if(x == string2index.end())
+		  {
+			  si = (int)paramString.size();
+			  string2index[s] = si;
+			  paramString.push_back(s);
+		  }
+		  else
+		  {
+			  si = x->second;
+		  }
+	  }
   };
 
   std::vector<Param> lastC;
@@ -64,7 +83,8 @@ namespace Search {
 	  {
 		  if(params[i])
 		  {
-			  out << " " << (params[i] > 0 ? "+ ": "- ") << std::abs(params[i]) << " * " << lastC[i].s;
+			  //out << " " << (params[i] > 0 ? "+ ": "- ") << std::abs(params[i]) << " * " << lastC[i].title();
+			  out << " " << (params[i] > 0 ? "+ ": "- ") << std::abs(params[i]) << " * " << records[0].second[i].title();
 		  }
 	  }
 	  out << std::endl;
