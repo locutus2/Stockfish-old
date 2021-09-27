@@ -1240,7 +1240,7 @@ moves_loop: // When in check, search starts here
                  -      bool(excludedMove)
                  -      ss->ttHit
                  -      (type_of(movedPiece) == KING)
-                 >= depth + 5)
+                 >= depth + 2)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
