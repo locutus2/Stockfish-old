@@ -1221,7 +1221,26 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (!PvNode && !cutNode && givesCheck && !ss->ttHit)
+          if (   !PvNode
+              && !cutNode
+              &&   12 * (move == countermove)
+                 +  9 * (move == ss->killers[0])
+                 +  5 * givesCheck
+                 +  2 * (eval >= beta)
+                 +      ss->inCheck
+                 +      improving
+                 +      ((ss-1)->currentMove == MOVE_NULL)
+                 +      (type_of(movedPiece) == QUEEN)
+                 -  4 * bool(extension)
+                 -  3 * moveCountPruning
+                 -  3 * (type_of(move) == PROMOTION)
+                 -  2 * noLMRExtension
+                 -      ttCapture
+                 -      singularQuietLMR
+                 -      bool(excludedMove)
+                 -      ss->ttHit
+                 -      (type_of(movedPiece) == KING)
+                 >= depth + 8)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
