@@ -41,7 +41,7 @@ namespace Search {
 
   LimitsType Limits;
 
-  constexpr bool RAND_PARAMS = true;
+  constexpr bool RAND_PARAMS = false;
   int params[N_PARAMS];// = { -1, 0};
   double best = 0;
   std::vector<std::string> paramString;
