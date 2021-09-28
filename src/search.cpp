@@ -1237,8 +1237,8 @@ moves_loop: // When in check, search starts here
              -     moveCountPruning
              -     noLMRExtension
              -     bool(extension)
-             <= -2)
-              r++;
+             >= 8)
+              r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
