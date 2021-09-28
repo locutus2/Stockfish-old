@@ -42,7 +42,7 @@ namespace Search {
   LimitsType Limits;
 
   constexpr bool RAND_PARAMS = false;
-  int params[N_PARAMS];// = { -1, 0};
+  int params[N_PARAMS] = { 1, 0};
   double best = 0;
   std::vector<std::string> paramString;
   std::map<std::string,int> string2index;
@@ -1314,7 +1314,8 @@ moves_loop: // When in check, search starts here
 
       //if(CC) 
 	     C = {
-	//		      PARAM(depth) /*21*/,
+			      PARAM(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]) /*21*/,
+		      PARAM(depth) /*21*/,
 		     PARAM(cutNode) /*0*/, 
 	                      PARAM(PvNode) /*1*/, 
 			      PARAM(ss->inCheck) /*2*/, 
@@ -1444,7 +1445,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          CC = thisThread->nodes & 1;
+          CC = captureOrPromotion;
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
