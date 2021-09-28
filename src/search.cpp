@@ -1243,7 +1243,7 @@ moves_loop: // When in check, search starts here
              -     (type_of(movedPiece) == KING)
              -     likelyFailLow
              -     bool(extension)
-             >= depth + 19)
+             >= depth + 15)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
