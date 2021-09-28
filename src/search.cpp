@@ -42,7 +42,7 @@ namespace Search {
   LimitsType Limits;
 
   constexpr bool RAND_PARAMS = false;
-  int params[N_PARAMS] = { 1, 0};
+  int params[N_PARAMS];// = { 1, 0};
   double best = 0;
   std::vector<std::string> paramString;
   std::map<std::string,int> string2index;
@@ -1357,6 +1357,16 @@ moves_loop: // When in check, search starts here
 			      PARAM((move == ss->killers[0])) /*33*/,
 			      PARAM((move == ss->killers[1])) /*33*/,
 			      //PARAM(thisThread->bestMoveChanges) /*34*/,
+      	};
+
+	C = {
+			      PARAM(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]),
+		      	      PARAM(thisThread->mainHistory[us][from_to(move)]),
+		      	      PARAM((*contHist[0])[movedPiece][to_sq(move)]),
+		      	      PARAM((*contHist[1])[movedPiece][to_sq(move)]),
+		      	      PARAM((*contHist[3])[movedPiece][to_sq(move)]),
+		      	      PARAM((*contHist[5])[movedPiece][to_sq(move)]),
+		      	      PARAM((ss->ply < MAX_LPH ? thisThread->lowPlyHistory[ss->ply][from_to(move)] : 0)),
       	};
 
       // Add extension to new depth
