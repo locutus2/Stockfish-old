@@ -1226,7 +1226,7 @@ moves_loop: // When in check, search starts here
                 + 13 * (*contHist[0])[movedPiece][to_sq(move)]
                 +  2 * (*contHist[3])[movedPiece][to_sq(move)]
                 - 10 * (ss->ply < MAX_LPH ? thisThread->lowPlyHistory[ss->ply][from_to(move)] : 0)
-                >= 216497)
+                >= 166521)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
