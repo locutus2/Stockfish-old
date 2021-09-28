@@ -1221,6 +1221,14 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (   captureOrPromotion
+              &&   2 * thisThread->mainHistory[us][from_to(move)]
+                + 13 * (*contHist[0])[movedPiece][to_sq(move)]
+                +  2 * (*contHist[3])[movedPiece][to_sq(move)]
+                - 10 * (ss->ply < MAX_LPH ? thisThread->lowPlyHistory[ss->ply][from_to(move)] : 0)
+                >= 216497)
+              r--;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
