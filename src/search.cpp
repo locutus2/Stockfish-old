@@ -1237,7 +1237,7 @@ moves_loop: // When in check, search starts here
              -     moveCountPruning
              -     noLMRExtension
              -     bool(extension)
-             <= -3)
+             <= -2)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
