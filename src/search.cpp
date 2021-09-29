@@ -1221,24 +1221,8 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if(  6 * (move == ss->killers[0])
-             + 5 * (move == countermove)
-             + 2 * givesCheck
-             +     cutNode
-             +     PvNode
-             +     improving
-             +     (eval >= beta)
-             +     captureOrPromotion
-             - 2 * singularQuietLMR
-             - 2 * (type_of(move) == PROMOTION)
-             -     ttCapture
-             -     ss->ttPv
-             -     ss->ttHit
-             -     moveCountPruning
-             -     noLMRExtension
-             -     bool(extension)
-             <= -1)
-              r++;
+          if(-PvNode - moveCountPruning - noLMRExtension - givesCheck + likelyFailLow - (move == ss->killers[0]) + (move == ss->killers[1]) >= 1)
+              r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
