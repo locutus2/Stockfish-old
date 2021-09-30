@@ -1229,7 +1229,7 @@ moves_loop: // When in check, search starts here
                +     givesCheck
                -     moveCountPruning
                -     (type_of(move) == PROMOTION)
-               >= 4)
+               >= 3)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
