@@ -33,7 +33,7 @@ namespace Search {
 
 //constexpr int N_PARAMS = 34;
 //constexpr int N_PARAMS = 29+1;
-constexpr int N_PARAMS = 42;
+constexpr int N_PARAMS = 14;//42;
 
 int getParam(int n);
 void setParam(int n, int v);
