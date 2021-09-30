@@ -1249,7 +1249,7 @@ moves_loop: // When in check, search starts here
                -     likelyFailLow
                -     ((ss-1)->moveCount == 1)
                -     ((ss-3)->moveCount == 1)
-               <= -5)
+               <= -4)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
