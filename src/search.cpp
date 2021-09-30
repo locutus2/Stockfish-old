@@ -1314,36 +1314,31 @@ moves_loop: // When in check, search starts here
 
       //if(CC) 
 	     C = {
-			      PARAM(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]) /*21*/,
+	//		      PARAM(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]) /*21*/,
 	//	      PARAM(depth) /*21*/,
 		     PARAM(cutNode) /*0*/, 
 	                      PARAM(PvNode) /*1*/, 
+			      PARAM((!PvNode && !cutNode)) /*19*/,
+			      PARAM(ss->ttPv) /*5*/, 
+			      PARAM((ss-1)->ttPv) /*5*/, 
+			      PARAM((ss-2)->ttPv) /*5*/, 
 			      PARAM(ss->inCheck) /*2*/, 
 			      PARAM(improving) /*3*/, 
 			      PARAM(ttCapture) /*4*/, 
-			      PARAM(ss->ttPv) /*5*/, 
 			      PARAM(singularQuietLMR) /*6*/, 
 			      PARAM(bool(excludedMove)) /*7*/, 
 			      PARAM(bool(ttMove)), 
 			      PARAM(ss->ttHit) /*9*/, 
+			      PARAM((ss-1)->ttHit) /*9*/, 
+			      PARAM((ss-2)->ttHit) /*9*/, 
 			      PARAM(moveCountPruning) /*10*/, 
 	                      PARAM(noLMRExtension) /*11*/, 
 			      PARAM((eval >= beta)) /*12*/, 
 			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
-			      //PARAM(probcutFailed) /*14*/, 
-			      //PARAM(nmpFailed) /*15*/, 
+			      PARAM(((ss-2)->currentMove == MOVE_NULL)) /*13*/, 
+			      PARAM(((ss-3)->currentMove == MOVE_NULL)) /*13*/, 
 			      PARAM(captureOrPromotion) /*16*/, 
 			      PARAM(givesCheck) /*17*/,
-                              //PARAM(singularFailed) /*18*/, 
-			      PARAM((!PvNode&&!cutNode)) /*19*/,
-      
-			      //PARAM(moveCount) /*20*/,
-			      //PARAM(rangeReduction) /*22*/,
-			      //PARAM(ss->doubleExtensions) /*23*/,
-			      //PARAM(ss->ply) /*24*/,
-			      //PARAM(thisThread->rootDepth) /*25*/,
-			      //PARAM((ss-1)->moveCount) /*26*/,
-
 			      PARAM((type_of(movedPiece) == PAWN)) /*27*/,
 			      PARAM((type_of(movedPiece) == KNIGHT)) /*28*/,
 			      PARAM((type_of(movedPiece) == BISHOP)) /*29*/,
@@ -1356,9 +1351,28 @@ moves_loop: // When in check, search starts here
 			      PARAM((move == countermove)) /*33*/,
 			      PARAM((move == ss->killers[0])) /*33*/,
 			      PARAM((move == ss->killers[1])) /*33*/,
+			      PARAM(bool(countermove)) /*33*/,
+			      PARAM(((ss-1)->moveCount == 1)),
+			      PARAM(((ss-2)->moveCount == 1)),
+			      PARAM(((ss-3)->moveCount == 1)),
+			      PARAM((ss-1)->inCheck),
+			      PARAM((ss-2)->inCheck),
+			      PARAM((ss-3)->inCheck),
+			      //PARAM(probcutFailed) /*14*/, 
+			      //PARAM(nmpFailed) /*15*/, 
+                              //PARAM(singularFailed) /*18*/, 
+      
+			      //PARAM(moveCount) /*20*/,
+			      //PARAM(rangeReduction) /*22*/,
+			      //PARAM(ss->doubleExtensions) /*23*/,
+			      //PARAM(ss->ply) /*24*/,
+			      //PARAM(thisThread->rootDepth) /*25*/,
+			      //PARAM((ss-1)->moveCount) /*26*/,
+
 			      //PARAM(thisThread->bestMoveChanges) /*34*/,
       	};
 
+	     /*
 	C = {
 			      PARAM(thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())]),
 		      	      PARAM(thisThread->mainHistory[us][from_to(move)]),
@@ -1368,6 +1382,7 @@ moves_loop: // When in check, search starts here
 		      	      PARAM((*contHist[5])[movedPiece][to_sq(move)]),
 		      	      PARAM((ss->ply < MAX_LPH ? thisThread->lowPlyHistory[ss->ply][from_to(move)] : 0)),
       	};
+	*/
 
       // Add extension to new depth
       newDepth += extension;
@@ -1455,7 +1470,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          CC = captureOrPromotion && (thisThread->nodes & 1);
+          CC = depth <= 3 && (thisThread->nodes & 1);
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
