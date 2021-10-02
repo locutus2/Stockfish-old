@@ -1494,6 +1494,7 @@ moves_loop: // When in check, search starts here
           CC = (thisThread->nodes & 1)
 		  && !PvNode && !cutNode
 		  && !captureOrPromotion
+		  && !givesCheck
 		  && move != countermove
 		  && move != ss->killers[0]
 		  && move != ss->killers[1];
