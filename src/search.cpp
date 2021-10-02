@@ -1328,31 +1328,33 @@ moves_loop: // When in check, search starts here
 			      PARAM((type_of(movedPiece) == KING)),
 			      PARAM((type_of(move) == PROMOTION)),
 			      PARAM(bool(extension)),
+			      PARAM(bool(countermove)),
+			      PARAM(bool(ss->killers[0])),
+			      PARAM(bool(ss->killers[1])),
 			      PARAM((move == countermove)),
 			      PARAM((move == ss->killers[0])),
 			      PARAM((move == ss->killers[1])),
-		     PARAM(cutNode), 
+		              PARAM(cutNode), 
 	                      PARAM(PvNode), 
-			      PARAM((!PvNode && !cutNode)) /*19*/,
-			      PARAM(ss->ttPv) /*5*/, 
-			      PARAM((ss-1)->ttPv) /*5*/, 
-			      PARAM((ss-2)->ttPv) /*5*/, 
-			      PARAM(ss->inCheck) /*2*/, 
-			      PARAM(improving) /*3*/, 
-			      PARAM(ttCapture) /*4*/, 
-			      PARAM(singularQuietLMR) /*6*/, 
-			      PARAM(bool(excludedMove)) /*7*/, 
+			      PARAM((!PvNode && !cutNode)),
+			      PARAM(ss->ttPv), 
+			      PARAM((ss-1)->ttPv), 
+			      PARAM((ss-2)->ttPv), 
+			      PARAM(ss->inCheck), 
+			      PARAM(improving), 
+			      PARAM(ttCapture), 
+			      PARAM(singularQuietLMR), 
+			      PARAM(bool(excludedMove)), 
 			      PARAM(bool(ttMove)), 
-			      PARAM(ss->ttHit) /*9*/, 
-			      PARAM((ss-1)->ttHit) /*9*/, 
-			      PARAM((ss-2)->ttHit) /*9*/, 
-	                      PARAM(noLMRExtension) /*11*/, 
-			      PARAM((eval >= beta)) /*12*/, 
-			      PARAM(((ss-1)->currentMove == MOVE_NULL)) /*13*/, 
-			      PARAM(((ss-2)->currentMove == MOVE_NULL)) /*13*/, 
-			      PARAM(((ss-3)->currentMove == MOVE_NULL)) /*13*/, 
-			      PARAM(likelyFailLow) /*33*/,
-			      PARAM(bool(countermove)) /*33*/,
+			      PARAM(ss->ttHit), 
+			      PARAM((ss-1)->ttHit), 
+			      PARAM((ss-2)->ttHit), 
+	                      PARAM(noLMRExtension), 
+			      PARAM((eval >= beta)), 
+			      PARAM(((ss-1)->currentMove == MOVE_NULL)), 
+			      PARAM(((ss-2)->currentMove == MOVE_NULL)), 
+			      PARAM(((ss-3)->currentMove == MOVE_NULL)), 
+			      PARAM(likelyFailLow),
 			      PARAM(((ss-1)->moveCount == 1)),
 			      PARAM(((ss-2)->moveCount == 1)),
 			      PARAM(((ss-3)->moveCount == 1)),
@@ -1384,6 +1386,7 @@ moves_loop: // When in check, search starts here
 		      	      PARAM((ss->ply < MAX_LPH ? thisThread->lowPlyHistory[ss->ply][from_to(move)] : 0)),
       	};
 	*/
+	     /*
 	     C = {
 			      PARAM(moveCountPruning), 
 			      PARAM(captureOrPromotion), 
@@ -1400,6 +1403,7 @@ moves_loop: // When in check, search starts here
 			      PARAM((move == ss->killers[0])),
 			      PARAM((move == ss->killers[1])),
       	};
+	*/
 
       // Add extension to new depth
       newDepth += extension;
@@ -1487,7 +1491,7 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          CC = depth <= 3 && (thisThread->nodes & 1);
+          CC = !cutNode && (thisThread->nodes & 1);
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
