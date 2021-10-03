@@ -67,10 +67,10 @@ namespace {
   }
 
   // Reductions lookup table, initialized at startup
-  int Reductions[MAX_MOVES]; // [depth or moveNumber]
+  int Reductions[8][MAX_MOVES]; // [thread id mod 8][depth or moveNumber]
 
-  Depth reduction(bool i, Depth d, int mn, bool rangeReduction) {
-    int r = Reductions[d] * Reductions[mn];
+  Depth reduction(Thread* th, bool i, Depth d, int mn, bool rangeReduction) {
+    int r = Reductions[th->id() % 8][d] * Reductions[th->id() % 8][mn];
     return (r + 534) / 1024 + (!i && r > 904) + rangeReduction;
   }
 
@@ -173,7 +173,8 @@ namespace {
 void Search::init() {
 
   for (int i = 1; i < MAX_MOVES; ++i)
-      Reductions[i] = int((21.9 + std::log(Threads.size()) / 2) * std::log(i));
+      for (int th = 0; th < 8; ++th)
+          Reductions[th][i] = int((21.9 + std::log(Threads.size()) * th / 8) * std::log(i));
 }
 
 
@@ -1042,7 +1043,7 @@ moves_loop: // When in check, search starts here
           moveCountPruning = moveCount >= futility_move_count(improving, depth);
 
           // Reduced depth of the next LMR search
-          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2), 0);
+          int lmrDepth = std::max(newDepth - reduction(thisThread, improving, depth, moveCount, rangeReduction > 2), 0);
 
           if (   captureOrPromotion
               || givesCheck)
@@ -1185,7 +1186,7 @@ moves_loop: // When in check, search starts here
               || !ss->ttPv)
           && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
       {
-          Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
+          Depth r = reduction(thisThread, improving, depth, moveCount, rangeReduction > 2);
 
           if (PvNode)
               r--;
