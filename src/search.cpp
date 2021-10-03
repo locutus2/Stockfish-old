@@ -1245,7 +1245,7 @@ moves_loop: // When in check, search starts here
                -     ((ss-1)->moveCount == 1)
                -     (ss-1)->inCheck
                -     (ss-3)->inCheck
-               >= 3)
+               >= 2)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
