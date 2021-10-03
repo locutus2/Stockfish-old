@@ -1361,6 +1361,7 @@ moves_loop: // When in check, search starts here
 			      PARAM((ss-1)->inCheck),
 			      PARAM((ss-2)->inCheck),
 			      PARAM((ss-3)->inCheck),
+			      PARAM((pos.count<ALL_PIECES>() >= 16)),
 			      //PARAM(probcutFailed) /*14*/, 
 			      //PARAM(nmpFailed) /*15*/, 
                               //PARAM(singularFailed) /*18*/, 
@@ -1492,6 +1493,7 @@ moves_loop: // When in check, search starts here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
           CC = (thisThread->nodes & 1)
+		  && pos.count<ALL_PIECES>() >= 16
 		  && !PvNode && !cutNode
 		  && !captureOrPromotion
 		  && !givesCheck
