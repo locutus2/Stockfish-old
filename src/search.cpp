@@ -1362,6 +1362,8 @@ moves_loop: // When in check, search starts here
 			      PARAM((ss-2)->inCheck),
 			      PARAM((ss-3)->inCheck),
 			      PARAM((pos.count<ALL_PIECES>() >= 16)),
+			      PARAM((pos.count<ALL_PIECES>() >= 24)),
+			      PARAM((pos.count<ALL_PIECES>() >= 8)),
 			      //PARAM(probcutFailed) /*14*/, 
 			      //PARAM(nmpFailed) /*15*/, 
                               //PARAM(singularFailed) /*18*/, 
@@ -1494,12 +1496,13 @@ moves_loop: // When in check, search starts here
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
           CC = (thisThread->nodes & 1)
 		  && pos.count<ALL_PIECES>() >= 16
-		  && !PvNode && !cutNode
+	;/*	  && !PvNode && !cutNode
 		  && !captureOrPromotion
 		  && !givesCheck
 		  && move != countermove
 		  && move != ss->killers[0]
 		  && move != ss->killers[1];
+		  */
 
           // Range reductions (~3 Elo)
           if (ss->staticEval - value < 30 && depth > 7)
