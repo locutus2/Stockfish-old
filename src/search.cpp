@@ -1481,6 +1481,8 @@ moves_loop: // When in check, search starts here
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
+	  C.push_back(PARAM(r));
+
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
           // deeper than the first move (this may lead to hidden double extensions if
@@ -1495,8 +1497,9 @@ moves_loop: // When in check, search starts here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
           CC = (thisThread->nodes & 1)
+		  ;/*
 		  && pos.count<ALL_PIECES>() >= 16
-	;/*	  && !PvNode && !cutNode
+		  && !PvNode && !cutNode
 		  && !captureOrPromotion
 		  && !givesCheck
 		  && move != countermove
