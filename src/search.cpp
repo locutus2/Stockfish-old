@@ -80,7 +80,7 @@ namespace {
 
   // History and stats update bonus, based on depth
   int stat_bonus(Depth d) {
-    return d > 14 ? 73 : 6 * d * d + 229 * d - 215;
+    return std::min((6 * d + 229) * d - 215 , 2000);
   }
 
   // Add a small random component to draw evaluations to avoid 3-fold blindness
@@ -173,7 +173,7 @@ namespace {
 void Search::init() {
 
   for (int i = 1; i < MAX_MOVES; ++i)
-      Reductions[i] = int(21.9 * std::log(i));
+      Reductions[i] = int((21.9 + std::log(Threads.size()) / 2) * std::log(i));
 }
 
 
@@ -790,7 +790,6 @@ namespace {
     else
     {
         // In case of null move search use previous static eval with a different sign
-        // and addition of two tempos
         if ((ss-1)->currentMove != MOVE_NULL)
             ss->staticEval = eval = evaluate(pos);
         else
@@ -1187,6 +1186,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
+          // Decrease reduction if on the PV (~1 Elo)
           if (PvNode)
               r--;
 
@@ -1314,9 +1314,11 @@ moves_loop: // When in check, search starts here
               for (Move* m = (ss+1)->pv; *m != MOVE_NONE; ++m)
                   rm.pv.push_back(*m);
 
-              // We record how often the best move has been changed in each
-              // iteration. This information is used for time management and LMR
-              if (moveCount > 1)
+              // We record how often the best move has been changed in each iteration.
+              // This information is used for time management and LMR. In MultiPV mode,
+              // we must take care to only do this for the first PV line.
+              if (   moveCount > 1
+                  && !thisThread->pvIdx)
                   ++thisThread->bestMoveChanges;
           }
           else
@@ -1497,7 +1499,6 @@ moves_loop: // When in check, search starts here
         }
         else
             // In case of null move search use previous static eval with a different sign
-            // and addition of two tempos
             ss->staticEval = bestValue =
             (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
                                              : -(ss-1)->staticEval;
@@ -1707,8 +1708,8 @@ moves_loop: // When in check, search starts here
     PieceType captured = type_of(pos.piece_on(to_sq(bestMove)));
 
     bonus1 = stat_bonus(depth + 1);
-    bonus2 = bestValue > beta + PawnValueMg ? bonus1                                 // larger bonus
-                                            : std::min(bonus1, stat_bonus(depth));   // smaller bonus
+    bonus2 = bestValue > beta + PawnValueMg ? bonus1               // larger bonus
+                                            : stat_bonus(depth);   // smaller bonus
 
     if (!pos.capture_or_promotion(bestMove))
     {
