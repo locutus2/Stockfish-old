@@ -1252,6 +1252,14 @@ moves_loop: // When in check, search starts here
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
           didLMR = true;
+
+          if (d >= newDepth && !captureOrPromotion)
+          {
+              int bonus = value > alpha ?  stat_bonus(newDepth)
+                                        : -stat_bonus(newDepth);
+
+              update_continuation_histories(ss, movedPiece, to_sq(move), bonus);
+          }
       }
       else
       {
