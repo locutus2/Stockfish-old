@@ -1243,7 +1243,7 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
-          if (!PvNode || d <= newDepth)
+          if (!rootNode || d <= newDepth)
           {
               value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
