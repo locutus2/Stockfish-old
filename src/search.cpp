@@ -1255,7 +1255,7 @@ moves_loop: // When in check, search starts here
       }
       else
       {
-          doFullDepthSearch = !PvNode || (moveCount > 1 && !(rootNode && !bestMove && ss->inCheck));
+          doFullDepthSearch = !PvNode || (moveCount > 1 && !(rootNode && !bestMove));
           didLMR = false;
       }
 
