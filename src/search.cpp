@@ -1243,15 +1243,20 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+          if (!PvNode || d <= newDepth)
+          {
+              value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          // Range reductions (~3 Elo)
-          if (ss->staticEval - value < 30 && depth > 7)
-              rangeReduction++;
+              // Range reductions (~3 Elo)
+              if (ss->staticEval - value < 30 && depth > 7)
+                  rangeReduction++;
 
-          // If the son is reduced and fails high it will be re-searched at full depth
-          doFullDepthSearch = value > alpha && d < newDepth;
-          didLMR = true;
+              // If the son is reduced and fails high it will be re-searched at full depth
+              doFullDepthSearch = value > alpha && d < newDepth;
+              didLMR = true;
+          }
+          else
+              doFullDepthSearch = didLMR = false;
       }
       else
       {
@@ -1277,7 +1282,7 @@ moves_loop: // When in check, search starts here
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
       // parent node fail low with value <= alpha and try another move.
-      if (PvNode && (moveCount == 1 || (value > alpha && (rootNode || value < beta))))
+      if (PvNode && ((!doFullDepthSearch && !didLMR) || (value > alpha && (rootNode || value < beta))))
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
