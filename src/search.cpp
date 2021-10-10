@@ -1182,7 +1182,8 @@ moves_loop: // When in check, search starts here
           && (  !captureOrPromotion
               || (cutNode && (ss-1)->moveCount > 1)
               || !ss->ttPv)
-          && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3))
+          && (!PvNode || ss->ply > 1 || thisThread->id() % 4 != 3)
+	  && !(rootNode && !bestMove && ss->inCheck))
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
@@ -1255,7 +1256,7 @@ moves_loop: // When in check, search starts here
       }
       else
       {
-          doFullDepthSearch = !PvNode || (moveCount > 1 && bestMove);
+          doFullDepthSearch = !PvNode || (moveCount > 1 && !(rootNode && !bestMove && ss->inCheck));
           didLMR = false;
       }
 
