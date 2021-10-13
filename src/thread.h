@@ -62,7 +62,7 @@ public:
   size_t pvIdx, pvLast;
   RunningAverage ttHitAverage;
   RunningAverage doubleExtensionAverage[COLOR_NB];
-  RunningAverage failHighAtALLnodeAverage;
+  RunningAverage failHighAtPVnodeAverage;
   uint64_t nodesLastExplosive;
   uint64_t nodesLastNormal;
   std::atomic<uint64_t> nodes, tbHits, bestMoveChanges;
