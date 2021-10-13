@@ -335,7 +335,7 @@ void Thread::search() {
   ttHitAverage.set(50, 100);                  // initialize the running average at 50%
   doubleExtensionAverage[WHITE].set(0, 100);  // initialize the running average at 0%
   doubleExtensionAverage[BLACK].set(0, 100);  // initialize the running average at 0%
-  failHighAtALLnodeAverage.set(30, 100);      // initialize the running average at 30%
+  failLowAtCUTnodeAverage.set(25, 100);       // initialize the running average at 25%
 
   nodesLastExplosive = nodes;
   nodesLastNormal    = nodes;
@@ -1223,7 +1223,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (!PvNode && !cutNode && thisThread->failHighAtALLnodeAverage.is_greater(42, 100))
+          if (cutNode && thisThread->failLowAtCUTnodeAverage.is_greater(40, 100))
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
@@ -1401,8 +1401,8 @@ moves_loop: // When in check, search starts here
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
 
-    if (!PvNode && !cutNode && moveCount)
-        thisThread->failHighAtALLnodeAverage.update(bestValue >= beta);
+    if (cutNode && moveCount)
+        thisThread->failLowAtCUTnodeAverage.update(bestValue < beta);
 
     // If no good move is found and the previous position was ttPv, then the previous
     // opponent move is probably good and the new position is added to the search tree.
