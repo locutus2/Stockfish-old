@@ -1223,7 +1223,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (cutNode && thisThread->failLowAtCUTnodeAverage.is_greater(40, 100))
+          if (cutNode && thisThread->failLowAtCUTnodeAverage.is_greater(42, 100))
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
