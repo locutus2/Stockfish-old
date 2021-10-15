@@ -668,7 +668,7 @@ namespace {
         && ss->ply - 1 < MAX_LPH
         && !priorCapture
         && is_ok((ss-1)->currentMove))
-        thisThread->lowPlyHistory[ss->ply - 1][from_to((ss-1)->currentMove)] << stat_bonus(depth);
+        thisThread->lowPlyHistory[ss->ply - 1][from_to((ss-1)->currentMove)] << stat_bonus(depth - 3);
 
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
@@ -1778,7 +1778,7 @@ moves_loop: // When in check, search starts here
 
     // Update low ply history
     if (depth > 11 && ss->ply < MAX_LPH)
-        thisThread->lowPlyHistory[ss->ply][from_to(move)] << stat_bonus(depth);
+        thisThread->lowPlyHistory[ss->ply][from_to(move)] << stat_bonus(depth - 5);
   }
 
   // When playing with strength handicap, choose best move among a set of RootMoves
