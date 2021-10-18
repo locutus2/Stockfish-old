@@ -106,7 +106,7 @@ class RunningAverage {
         { return b * average > a * PERIOD * RESOLUTION ; }
 
   private :
-      static constexpr int64_t PERIOD     = 4096;
+      static constexpr int64_t PERIOD     = 1024;
       static constexpr int64_t RESOLUTION = 1024;
       int64_t average;
 };
