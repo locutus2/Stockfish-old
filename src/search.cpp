@@ -93,7 +93,7 @@ namespace {
 
     Thread* thisThread = pos.this_thread();
     uint64_t nodesNow = thisThread->nodes;
-    bool explosive = thisThread->doubleExtensionAverage[~pos.side_to_move()].is_greater(2, 100);
+    bool explosive = thisThread->doubleExtensionAverage[pos.side_to_move()].is_greater(2, 100);
 
     if (explosive)
        thisThread->nodesLastExplosive = nodesNow;
