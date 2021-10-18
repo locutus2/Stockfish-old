@@ -89,11 +89,11 @@ namespace {
   }
 
   // Check if the current thread is in a search explosion
-  ExplosionState search_explosion(Thread* thisThread) {
+  ExplosionState search_explosion(const Position& pos) {
 
+    Thread* thisThread = pos.this_thread();
     uint64_t nodesNow = thisThread->nodes;
-    bool explosive =    thisThread->doubleExtensionAverage[WHITE].is_greater(1, 100)
-                     || thisThread->doubleExtensionAverage[BLACK].is_greater(1, 100);
+    bool explosive = thisThread->doubleExtensionAverage[~pos.side_to_move()].is_greater(2, 100);
 
     if (explosive)
        thisThread->nodesLastExplosive = nodesNow;
@@ -548,7 +548,7 @@ namespace {
 
     // Step 0. Limit search explosion
     if (   ss->ply > 10
-        && search_explosion(thisThread) == MUST_CALM_DOWN
+        && search_explosion(pos) == MUST_CALM_DOWN
         && depth > (ss-1)->depth)
        depth = (ss-1)->depth;
 
