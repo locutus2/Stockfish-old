@@ -92,8 +92,8 @@ namespace {
   ExplosionState search_explosion(Thread* thisThread) {
 
     uint64_t nodesNow = thisThread->nodes;
-    bool explosive =    thisThread->doubleExtensionAverage[WHITE].is_greater(2, 100)
-                     || thisThread->doubleExtensionAverage[BLACK].is_greater(2, 100);
+    bool explosive =    thisThread->doubleExtensionAverage[WHITE].is_greater(1, 100)
+                     || thisThread->doubleExtensionAverage[BLACK].is_greater(1, 100);
 
     if (explosive)
        thisThread->nodesLastExplosive = nodesNow;
