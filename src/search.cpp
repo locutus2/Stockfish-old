@@ -636,6 +636,7 @@ namespace {
     (ss+2)->killers[0]   = (ss+2)->killers[1] = MOVE_NONE;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     ss->depth            = depth;
+    ss->deeper           = 0;
     Square prevSq        = to_sq((ss-1)->currentMove);
 
     // Update the running average statistics for double extensions
@@ -1214,13 +1215,14 @@ moves_loop: // When in check, search starts here
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
           // deeper than the first move (this may lead to hidden double extensions).
-          int deeper =   r >= -1                   ? 0
+          ss->deeper =   r >= -1                   ? 0
+                       : (ss-1)->deeper > 0        ? 0
                        : moveCount <= 3 && r <= -3 ? 2
                        : moveCount <= 5            ? 1
                        : PvNode && depth > 6       ? 1
                        :                             0;
 
-          Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
+          Depth d = std::clamp(newDepth - r, 1, newDepth + ss->deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
@@ -1234,6 +1236,7 @@ moves_loop: // When in check, search starts here
       }
       else
       {
+          ss->deeper = 0;
           doFullDepthSearch = !PvNode || moveCount > 1;
           didLMR = false;
       }
