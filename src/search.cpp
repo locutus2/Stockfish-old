@@ -294,6 +294,7 @@ void Thread::search() {
 
   ss->pv = pv;
 
+  rootPieceCount = rootPos.count<ALL_PIECES>();
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
 
@@ -1173,7 +1174,7 @@ moves_loop: // When in check, search starts here
 
           if (   !PvNode
               && captureOrPromotion)
-              r--;
+              r -= (thisThread->rootPieceCount - pos.count<ALL_PIECES>()) / 4;
 
           // Decrease reduction if position is or has been on the PV
           // and node is not likely to fail low. (~3 Elo)
