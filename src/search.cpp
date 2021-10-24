@@ -1173,7 +1173,7 @@ moves_loop: // When in check, search starts here
               r--;
 
           if (   !PvNode
-              && captureOrPromotion)
+              && priorCapture)
               r -= (thisThread->rootPieceCount - pos.count<ALL_PIECES>()) / 4;
 
           // Decrease reduction if position is or has been on the PV
