@@ -1172,7 +1172,7 @@ moves_loop: // When in check, search starts here
               r--;
 
           if (   !PvNode
-              && priorCapture)
+              && captureOrPromotion)
               r--;
 
           // Decrease reduction if position is or has been on the PV
