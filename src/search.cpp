@@ -1261,7 +1261,7 @@ moves_loop: // When in check, search starts here
                               std::min(maxNextDepth, newDepth), false);
 
           // If the move passed LMR update its stats
-          if (didLMR && !captureOrPromotion)
+          if (!doFullDepthSearch && didLMR && !captureOrPromotion)
           {
               int bonus = value > alpha ?  stat_bonus(newDepth)
                                         : -stat_bonus(newDepth);
