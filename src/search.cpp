@@ -1198,6 +1198,9 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (ss->LMRresearch)
+              r--;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1237,7 +1240,9 @@ moves_loop: // When in check, search starts here
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch)
       {
+          (ss+1)->LMRresearch = didLMR;
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth, !cutNode);
+          (ss+1)->LMRresearch = false;
 
           // If the move passed LMR update its stats
           if (didLMR && !captureOrPromotion)
