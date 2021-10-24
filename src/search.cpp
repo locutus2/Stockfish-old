@@ -828,6 +828,7 @@ namespace {
         &&  ss->staticEval >= beta - 20 * depth - improvement / 15 + 204
         && !excludedMove
         &&  pos.non_pawn_material(us)
+        && !ss->LMRresearch
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
@@ -1196,9 +1197,6 @@ moves_loop: // When in check, search starts here
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
               r++;
-
-          if (ss->LMRresearch)
-              r += 2;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
