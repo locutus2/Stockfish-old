@@ -590,7 +590,7 @@ namespace {
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount, bestMoveCount, improvement;
+    int moveCount, captureCount, quietCount, bestMoveCount, improvement, deeper;
 
     // Step 1. Initialize node
     ss->inCheck        = pos.checkers();
@@ -1209,10 +1209,10 @@ moves_loop: // When in check, search starts here
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
           // deeper than the first move (this may lead to hidden double extensions).
-          int deeper =   r >= -1             ? 0
-                       : moveCount <= 5      ? 2
-                       : PvNode && depth > 6 ? 1
-                       :                       0;
+          deeper =   r >= -1             ? 0
+                   : moveCount <= 5      ? 2
+                   : PvNode && depth > 6 ? 1
+                   :                       0;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
@@ -1230,6 +1230,7 @@ moves_loop: // When in check, search starts here
       {
           doFullDepthSearch = !PvNode || moveCount > 1;
           didLMR = false;
+          deeper = 0;
       }
 
       // Step 17. Full depth search when LMR is skipped or fails high
@@ -1256,7 +1257,7 @@ moves_loop: // When in check, search starts here
           (ss+1)->pv[0] = MOVE_NONE;
 
           value = -search<PV>(pos, ss+1, -beta, -alpha,
-                              std::min(maxNextDepth, newDepth), false);
+                              std::min(maxNextDepth, newDepth + deeper), false);
       }
 
       // Step 18. Undo move
