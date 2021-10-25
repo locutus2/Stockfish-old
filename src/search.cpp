@@ -1161,7 +1161,6 @@ moves_loop: // When in check, search starts here
           &&  moveCount > 1 + 2 * rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
-              ||  ss->LMRresearch
               || (cutNode && (ss-1)->moveCount > 1)))
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
@@ -1196,6 +1195,9 @@ moves_loop: // When in check, search starts here
 
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
+              r++;
+
+          if (ss->LMRresearch && (thisThread->nodes & 1))
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
