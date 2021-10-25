@@ -1197,7 +1197,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (ss->LMRresearch && (thisThread->nodes & 1))
+          if (ss->LMRresearch && captureOrPromotion)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
