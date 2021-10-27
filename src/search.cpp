@@ -1328,7 +1328,7 @@ moves_loop: // When in check, search starts here
       }
 
       if (rootNode && bestValue > alpha)
-          alpha = (bestValue + alpha) / 2;
+          alpha = (3 * bestValue + alpha) / 4;
 
       // If the move is worse than some previously searched move, remember it to update its stats later
       if (move != bestMove)
