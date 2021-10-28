@@ -1315,7 +1315,7 @@ moves_loop: // When in check, search starts here
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
-                  alpha = value - 1;
+                  alpha = value - rootNode;
                   bestMoveCount++;
               }
               else
@@ -1325,7 +1325,7 @@ moves_loop: // When in check, search starts here
               }
           }
       }
-      else if (PvNode && bestValue > alpha)
+      else if (rootNode && bestValue > alpha)
           alpha += 1;
 
       // If the move is worse than some previously searched move, remember it to update its stats later
