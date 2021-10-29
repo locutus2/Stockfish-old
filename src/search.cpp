@@ -585,7 +585,7 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, ttValue, eval, maxValue, probCutBeta, alphaOld;
+    Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning,
          ttCapture, singularQuietLMR;
@@ -599,7 +599,6 @@ namespace {
     moveCount          = bestMoveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
-    alphaOld           = alpha;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -1282,7 +1281,7 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          if (value > alphaOld && value < beta)
+          if (value > alpha)
           {
               rm.averageScore = value = rm.scoreWeights ? (value + rm.averageScore) / 2 : value;
               rm.scoreWeights++;
