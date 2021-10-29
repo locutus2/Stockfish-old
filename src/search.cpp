@@ -1285,7 +1285,7 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          if (value > alpha && value < beta)
+          if (value > alpha)
           {
               rm.averageScore = rm.scoreWeights ? (value + rm.averageScore) / 2 : value;
               rm.scoreWeights++;
