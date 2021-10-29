@@ -1283,7 +1283,7 @@ moves_loop: // When in check, search starts here
 
           //rm.score = rm.updates ? (value * depth + rm.score * rm.updates) / (rm.updates + depth) : value;
           //rm.updates += depth;
-          rm.score = rm.score != -VALUE_INFINITE ? (31 * value + rm.score) / 32 : value;
+          rm.score = rm.score != -VALUE_INFINITE ? (63 * value + rm.score) / 64 : value;
           value = rm.score;
 
           // PV move or new best move?
