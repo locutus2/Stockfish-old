@@ -1258,6 +1258,11 @@ moves_loop: // When in check, search starts here
           value = -search<PV>(pos, ss+1, -beta, -alpha,
                               std::min(maxNextDepth, newDepth), false);
       }
+      else if (rootNode)
+      {
+          (ss+1)->pv = pv;
+          (ss+1)->pv[0] = MOVE_NONE;
+      }
 
       // Step 18. Undo move
       pos.undo_move(move);
@@ -1276,10 +1281,13 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
+          rm.score = rm.updates ? (value * depth + rm.score * rm.updates) / (rm.updates + depth) : value;
+          rm.updates += depth;
+          value = rm.score;
+
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
           {
-              rm.score = value;
               rm.selDepth = thisThread->selDepth;
               rm.pv.resize(1);
 
@@ -1295,11 +1303,6 @@ moves_loop: // When in check, search starts here
                   && !thisThread->pvIdx)
                   ++thisThread->bestMoveChanges;
           }
-          else
-              // All other moves but the PV are set to the lowest value: this
-              // is not a problem when sorting because the sort is stable and the
-              // move position in the list is preserved - just the PV is pushed up.
-              rm.score = -VALUE_INFINITE;
       }
 
       if (value > bestValue)
