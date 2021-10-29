@@ -397,6 +397,7 @@ void Thread::search() {
           int failedHighCnt = 0;
           while (true)
           {
+              currentRootMove = nullptr;
               Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
               bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
 
@@ -1003,6 +1004,9 @@ moves_loop: // When in check, search starts here
                                   thisThread->rootMoves.begin() + thisThread->pvLast, move))
           continue;
 
+      if (rootNode)
+          thisThread->currentRootMove = &*std::find(thisThread->rootMoves.begin(), thisThread->rootMoves.end(), move);
+
       // Check for legality
       if (!rootNode && !pos.legal(move))
           continue;
@@ -1197,6 +1201,11 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (   !PvNode
+              && thisThread->currentRootMove->scoreWeights
+              && thisThread->currentRootMove->averageScore <= alpha)
+              r++;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1258,11 +1267,6 @@ moves_loop: // When in check, search starts here
           value = -search<PV>(pos, ss+1, -beta, -alpha,
                               std::min(maxNextDepth, newDepth), false);
       }
-      else if (rootNode)
-      {
-          (ss+1)->pv = pv;
-          (ss+1)->pv[0] = MOVE_NONE;
-      }
 
       // Step 18. Undo move
       pos.undo_move(move);
@@ -1281,9 +1285,9 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          if (value > alpha)
+          if (value > alpha && value < beta)
           {
-              rm.averageScore = value = rm.scoreWeights ? (value + rm.averageScore) / 2 : value;
+              rm.averageScore = rm.scoreWeights ? (value + rm.averageScore) / 2 : value;
               rm.scoreWeights++;
           }
 
