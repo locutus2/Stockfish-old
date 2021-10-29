@@ -1281,8 +1281,9 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          rm.score = rm.updates ? (value * depth + rm.score * rm.updates) / (rm.updates + depth) : value;
-          rm.updates += depth;
+          //rm.score = rm.updates ? (value * depth + rm.score * rm.updates) / (rm.updates + depth) : value;
+          //rm.updates += depth;
+          rm.score = rm.score != -VALUE_INFINITE ? (15 * value + rm.score) / 16 : value;
           value = rm.score;
 
           // PV move or new best move?
