@@ -1258,11 +1258,6 @@ moves_loop: // When in check, search starts here
           value = -search<PV>(pos, ss+1, -beta, -alpha,
                               std::min(maxNextDepth, newDepth), false);
       }
-      else if (rootNode)
-      {
-          (ss+1)->pv = pv;
-          (ss+1)->pv[0] = MOVE_NONE;
-      }
 
       // Step 18. Undo move
       pos.undo_move(move);
@@ -1284,7 +1279,7 @@ moves_loop: // When in check, search starts here
           if (value > alpha)
           {
               rm.averageScore = value = (depth * value + rm.scoreWeight * rm.averageScore) / (depth + rm.scoreWeight);
-              rm.scoreWeight = rm.scoreWeight / 2 + depth;
+              rm.scoreWeight = (rm.scoreWeight + depth) / 2;
           }
 
           // PV move or new best move?
