@@ -1010,6 +1010,7 @@ moves_loop: // When in check, search starts here
           sync_cout << "info depth " << depth
                     << " currmove " << UCI::move(move, pos.is_chess960())
                     << " currmovenumber " << moveCount + thisThread->pvIdx << sync_endl;
+
       if (PvNode)
           (ss+1)->pv = nullptr;
 
@@ -1162,6 +1163,15 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
+          if (rootNode)
+          {
+              RootMove& rm = *std::find(thisThread->rootMoves.begin(),
+                                        thisThread->rootMoves.end(), move);
+
+              if (rm.averageScore > alpha)
+                  r--;
+          }
+
           // Decrease reduction if on the PV (~2 Elo)
           if (   PvNode
               && bestMoveCount <= 3)
@@ -1276,10 +1286,10 @@ moves_loop: // When in check, search starts here
 
           if (value > alpha)
           {
-              rm.averageScore = value = (depth * value + rm.scoreWeight * rm.averageScore) / (depth + rm.scoreWeight);
+              rm.averageScore = (depth * value + rm.scoreWeight * rm.averageScore) / (depth + rm.scoreWeight);
               rm.scoreWeight += depth;
           }
-          rm.scoreWeight /= 3;
+          rm.scoreWeight /= 2;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
