@@ -1163,7 +1163,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
-          if (ss->ply <= 1)
+          if (PvNode)
           {
               RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                         thisThread->rootMoves.end(),
