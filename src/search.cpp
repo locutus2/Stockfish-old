@@ -1279,7 +1279,7 @@ moves_loop: // When in check, search starts here
               rm.averageScore = value = (depth * value + rm.scoreWeight * rm.averageScore) / (depth + rm.scoreWeight);
               rm.scoreWeight += depth;
           }
-          rm.scoreWeight /= 3;
+          rm.scoreWeight = rm.scoreWeight * 2 / 3;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
