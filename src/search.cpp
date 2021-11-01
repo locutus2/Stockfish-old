@@ -1163,14 +1163,14 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
-          if (PvNode)
+          if (rootNode)
           {
               RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                         thisThread->rootMoves.end(),
-                                        (ss - ss->ply)->currentMove);
+                                        move);
               if (   rm.averageScore != -VALUE_INFINITE
-                  && rm.averageScore * (ss->ply & 1 ? -1 : 1) > alpha)
-                  r--;
+                  && rm.averageScore < alpha)
+                  r++;
           }
 
           // Decrease reduction if on the PV (~2 Elo)
