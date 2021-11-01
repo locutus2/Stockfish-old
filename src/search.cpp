@@ -1168,8 +1168,8 @@ moves_loop: // When in check, search starts here
               RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                         thisThread->rootMoves.end(), move);
 
-              if (rm.averageScore > alpha)
-                  r--;
+              if (rm.averageScore < alpha)
+                  r++;
           }
 
           // Decrease reduction if on the PV (~2 Elo)
