@@ -1169,7 +1169,7 @@ moves_loop: // When in check, search starts here
                                         thisThread->rootMoves.end(),
                                         move);
               if (   rm.averageScore != -VALUE_INFINITE
-                  && rm.averageScore < alpha - 200)
+                  && rm.averageScore < alpha - 100)
                   r++;
           }
 
