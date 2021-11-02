@@ -1169,8 +1169,8 @@ moves_loop: // When in check, search starts here
                                         thisThread->rootMoves.end(),
                                         move);
               if (   rm.averageScore != -VALUE_INFINITE
-                  && rm.averageScore < alpha - 400)
-                  r++;
+                  && rm.averageScore < alpha)
+                  r += (alpha - rm.averageScore) / 200;
           }
 
           // Decrease reduction if on the PV (~2 Elo)
