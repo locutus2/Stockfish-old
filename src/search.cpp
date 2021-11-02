@@ -1274,9 +1274,9 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          if (value > alpha)
+          if (value > alpha && depth >= thisThread->rootDepth)
           {
-              rm.averageScore = value = (depth * std::min(value, beta) + rm.scoreWeight * rm.averageScore) / (depth + rm.scoreWeight);
+              rm.averageScore = value = (depth * value + rm.scoreWeight * rm.averageScore) / (depth + rm.scoreWeight);
               rm.scoreWeight += depth;
           }
           rm.scoreWeight /= 2;
