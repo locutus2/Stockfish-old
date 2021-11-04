@@ -351,7 +351,13 @@ void Thread::search() {
       // Save the last iteration's scores before first PV line is searched and
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
       for (RootMove& rm : rootMoves)
-          rm.previousScore = rm.score;
+      {
+          if (rm.score != -VALUE_INFINITE)
+          {
+              rm.previousScore2 = rm.previousScore;
+              rm.previousScore = rm.score;
+          }
+      }
 
       size_t pvFirst = 0;
       pvLast = 0;
@@ -376,7 +382,8 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 4)
           {
-              Value prev = rootMoves[pvIdx].previousScore;
+              Value prev = rootMoves[pvIdx].previousScore2 != -VALUE_INFINITE ? (rootMoves[pvIdx].previousScore + rootMoves[pvIdx].previousScore2) / 2
+                                                                              : rootMoves[pvIdx].previousScore;
               delta = Value(17) + int(prev) * prev / 16384;
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
