@@ -352,11 +352,8 @@ void Thread::search() {
       // all the move scores except the (new) PV are set to -VALUE_INFINITE.
       for (RootMove& rm : rootMoves)
       {
-          if (rm.score != -VALUE_INFINITE)
-          {
-              rm.previousScore2 = rm.previousScore;
-              rm.previousScore = rm.score;
-          }
+          rm.previousScore2 = rm.previousScore;
+          rm.previousScore = rm.score;
       }
 
       size_t pvFirst = 0;
