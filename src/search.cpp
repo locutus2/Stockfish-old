@@ -1283,9 +1283,8 @@ moves_loop: // When in check, search starts here
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
 
           if (   std::abs(value) < VALUE_KNOWN_WIN
-              && value > alpha
-              && value < beta
-              && rm.averageScore > alpha)
+              && value >= beta
+              && rm.averageScore >= beta)
               value = rm.averageScore;
 
           // PV move or new best move?
