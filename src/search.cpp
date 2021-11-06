@@ -1282,12 +1282,14 @@ moves_loop: // When in check, search starts here
 
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
 
+          if (   std::abs(value) < VALUE_KNOWN_WIN
+              && value > alpha
+              && rm.averageScore > alpha)
+              value = rm.averageScore;
+
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
           {
-              if (std::abs(value) < VALUE_KNOWN_WIN)
-                  value = rm.averageScore;
-
               rm.score = value;
               rm.selDepth = thisThread->selDepth;
               rm.pv.resize(1);
