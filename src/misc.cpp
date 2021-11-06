@@ -480,9 +480,9 @@ void dbg_print() {
         double d = x1q * x2q - x1x2 * x1x2;
 	double a = yx1 * x2q - yx2 * x1x2;
 	double b = yx2 * x1q - yx1 * x1x2;
-	double R2 = yq + a/d * a/d * x1q + b/d * b/d * x2q - 2 * a/d * yx1 - 2 * b/d * yx2 + 2 * a/d * b/d * x1x2;
+	double MSE = yq + a/d * a/d * x1q + b/d * b/d * x2q - 2 * a/d * yx1 - 2 * b/d * yx2 + 2 * a/d * b/d * x1x2;
         cerr << "[" << n << "] Total " << biforms[n][0]
-	     << " R^2 = " << R2
+	     << " sigma = " << std::sqrt(MSE)
              << " y = " << a / d
              << " * x1 + " << b / d
              << " * x2";
