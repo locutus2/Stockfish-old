@@ -296,7 +296,7 @@ const int DBG_C2 = POW<2, DBG_C>::value;
 const int DBG_C3 = POW<3, DBG_C>::value;
 
 /// Debug functions used mainly to collect run-time statistics
-static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], cramer[DBG_N][5],
+static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], biforms[DBG_N][7], cramer[DBG_N][5],
                             chi2[DBG_N][5], gain[DBG_N][5];
 
 static std::atomic<int64_t> Chits[DBG_N][DBG_C3][2];
@@ -308,6 +308,8 @@ void dbg_mean_of(int v, int n, int w) { means[n][0] += w; means[n][1] += w*v; }
 void dbg_std_of(int v, int n, int w) { stds[n][0] += w; stds[n][1] += w*v; stds[n][2] += w*v*v; }
 void dbg_cov_of(int x, int y, int n, int w) { covs[n][0] += w; covs[n][1] += w*x; covs[n][2] += w*y; covs[n][3] += w*x*x; covs[n][4] += w*y*y; covs[n][5] += w*x*y;}
 void dbg_corr_of(int x, int y, int n, int w) { corrs[n][0] += w; corrs[n][1] += w*x; corrs[n][2] += w*y; corrs[n][3] += w*x*x; corrs[n][4] += w*y*y; corrs[n][5] += w*x*y;}
+void dbg_bi_form(int x1, int x2, int y, int n, int w) { biforms[n][0] += w; biforms[n][1] += w*x1*x1; biforms[n][2] += w*x2*x2; biforms[n][3] += w*x1*x2; 
+	                                                biforms[n][4] += w*y*x1; biforms[n][5] += w*y*x2; biforms[n][6] += w*y*y; }
 void dbg_cramer_of(bool x, bool y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
 void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
 void dbg_gain_ratio(bool x, bool y, int n, int w) { gain[n][0] += w; gain[n][2*x+y+1] += w;}
@@ -463,6 +465,27 @@ void dbg_print() {
              << " x = " << xy / y2
              << " * y + " << x - y * xy / y2
              << " var_min with w(x) = " << w << endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (biforms[n][0])
+    {
+        double N = biforms[n][0];
+        double x1q = biforms[n][1] / N;
+        double x2q = biforms[n][2] / N;
+        double x1x2 = biforms[n][3] / N;
+        double yx1 = biforms[n][4] / N;
+        double yx2 = biforms[n][5] / N;
+        double yq = biforms[n][6] / N;
+        double d = x1q * x2q - x1x2 * x1x2;
+	double a = yx1 * x2q - yx2 * x1x2;
+	double b = yx2 * x1q - yx1 * x1x2;
+	double R2 = yq + a/d * a/d * x1q + b/d * b/d * x2q - 2 * a/d * yx1 - 2 * b/d * yx2 + 2 * a/d * b/d * x1x2;
+        cerr << "[" << n << "] Total " << biforms[n][0]
+	     << " R^2 = " << N * R2
+             << " y = " << a / d
+             << " * x1 " << b / d
+             << " * x2 = ";
     }
 
   for(int n = 0; n < DBG_N; ++n)
