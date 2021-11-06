@@ -376,7 +376,8 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 4)
           {
-              Value prev = (2 * rootMoves[pvIdx].averageScore + rootMoves[pvIdx].previousScore) / 3;
+              Value prev = rootDepth & 1 ? rootMoves[pvIdx].averageScore
+                                         : (rootMoves[pvIdx].averageScore + rootMoves[pvIdx].previousScore) / 2;
               delta = Value(17) + int(prev) * prev / 16384;
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
