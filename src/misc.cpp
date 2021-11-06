@@ -297,7 +297,7 @@ const int DBG_C3 = POW<3, DBG_C>::value;
 
 /// Debug functions used mainly to collect run-time statistics
 static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], biforms[DBG_N][7], cramer[DBG_N][5],
-                            chi2[DBG_N][5], gain[DBG_N][5];
+                            chi2[DBG_N][5], gain[DBG_N][5], linc[DBG_N][5];
 
 static std::atomic<int64_t> Chits[DBG_N][DBG_C3][2];
 static std::atomic<int64_t> ChitsCmp[DBG_N][DBG_C3][3];
@@ -310,6 +310,8 @@ void dbg_cov_of(int x, int y, int n, int w) { covs[n][0] += w; covs[n][1] += w*x
 void dbg_corr_of(int x, int y, int n, int w) { corrs[n][0] += w; corrs[n][1] += w*x; corrs[n][2] += w*y; corrs[n][3] += w*x*x; corrs[n][4] += w*y*y; corrs[n][5] += w*x*y;}
 void dbg_bi_form(int x1, int x2, int y, int n, int w) { biforms[n][0] += w; biforms[n][1] += w*x1*x1; biforms[n][2] += w*x2*x2; biforms[n][3] += w*x1*x2; 
 	                                                biforms[n][4] += w*y*x1; biforms[n][5] += w*y*x2; biforms[n][6] += w*y*y; }
+void dbg_linc(int x1, int x2, int y, int n, int w) { linc[n][0] += w; linc[n][1] += w*(y-x2)*(x1-x2); linc[n][2] += w*(x1-x2)*(x1-x2); 
+                                                     linc[n][3] += w*(y+x2)*(y+x2); linc[n][4] += w*(y+x2)*(x1-x2); }
 void dbg_cramer_of(bool x, bool y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
 void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
 void dbg_gain_ratio(bool x, bool y, int n, int w) { gain[n][0] += w; gain[n][2*x+y+1] += w;}
@@ -485,6 +487,22 @@ void dbg_print() {
 	     << " sigma = " << std::sqrt(MSE)
              << " y = " << a / d
              << " * x1 + " << b / d
+             << " * x2" << endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (linc[n][0])
+    {
+        double N = linc[n][0];
+        double yd = linc[n][1] / N;
+        double d2 = linc[n][2] / N;
+        double yx2q = linc[n][3] / N;
+        double yx2d = linc[n][4] / N;
+	double MSE = yx2q + yd/d2 * yd/d2 * d2 - 2 * yd/d2 * yx2d;
+        cerr << "[" << n << "] Total " << linc[n][0]
+	     << " sigma = " << std::sqrt(MSE)
+             << " y = " << yd / d2
+             << " * x1 + " << 1 - yd / d2
              << " * x2" << endl;
     }
 

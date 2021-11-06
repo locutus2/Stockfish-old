@@ -46,6 +46,7 @@ void dbg_std_of(int v, int n = 0, int w = 1);
 void dbg_cov_of(int x, int y, int n = 0, int w = 1);
 void dbg_corr_of(int x, int y, int n = 0, int w = 1);
 void dbg_bi_form(int x1, int x2, int y, int n = 0, int w = 1);
+void dbg_linc(int x1, int x2, int y, int n = 0, int w = 1);
 void dbg_cramer_of(bool x, bool y, int n = 0, int w = 1);
 void dbg_chi2_of(bool x, bool y, int n = 0, int w = 1);
 void dbg_gain_ratio(bool x, bool y, int n = 0, int w = 1);
