@@ -485,7 +485,7 @@ void dbg_print() {
 	     << " sigma = " << std::sqrt(MSE)
              << " y = " << a / d
              << " * x1 + " << b / d
-             << " * x2";
+             << " * x2" << endl;
     }
 
   for(int n = 0; n < DBG_N; ++n)
