@@ -376,14 +376,13 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 4)
           {
-              Value prev = rootMoves[pvIdx].averageScore;
-              Value prev2 = rootMoves[pvIdx].previousScore;
+              Value prev = (2 * rootMoves[pvIdx].averageScore - rootMoves[pvIdx].previousScore) * 3 / 4;
               delta = Value(17) + int(prev) * prev / 16384;
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
 
               // Adjust trend based on root move's previousScore (dynamic contempt)
-              int tr = 113 * prev2 / (abs(prev2) + 147);
+              int tr = 113 * prev / (abs(prev) + 147);
 
               trend = (us == WHITE ?  make_score(tr, tr / 2)
                                    : -make_score(tr, tr / 2));
