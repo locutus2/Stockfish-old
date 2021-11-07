@@ -1285,7 +1285,7 @@ moves_loop: // When in check, search starts here
           if (   std::abs(value) < VALUE_KNOWN_WIN
               && value > alpha
               && rm.averageScore > alpha)
-              value = (depth * value + 6 * rm.averageScore) / (depth + 6);
+              value = (depth * value + 7 * rm.averageScore) / (depth + 7);
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
