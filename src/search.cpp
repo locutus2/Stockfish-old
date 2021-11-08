@@ -938,8 +938,8 @@ namespace {
         depth -= 2;
 
     if (   cutNode
-        && !ss->ttPv
         && depth >= 9
+        && ss->ttHit
         && !ttMove)
         depth--;
 
