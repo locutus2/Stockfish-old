@@ -1283,7 +1283,7 @@ moves_loop: // When in check, search starts here
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
 
           if (   std::abs(value) < VALUE_KNOWN_WIN
-              && depth < 15
+              && depth < 14
               && value > alpha
               && rm.averageScore > alpha)
               value = rm.averageScore;
