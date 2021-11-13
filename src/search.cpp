@@ -377,11 +377,9 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value prev = rootMoves[pvIdx].averageScore;
-              Value prevMin = std::min(prev, rootMoves[pvIdx].previousScore);
-              Value prevMax = std::max(prev, rootMoves[pvIdx].previousScore);
-              delta = Value(5) + int(prev) * prev / 16384;
-              alpha = std::max(prevMin - delta,-VALUE_INFINITE);
-              beta  = std::min(prevMax + delta, VALUE_INFINITE);
+              delta = Value(17) + int(prev) * prev / 16384 + std::abs(rootMoves[pvIdx].previousScore - prev) / 16;
+              alpha = std::max(prev - delta,-VALUE_INFINITE);
+              beta  = std::min(prev + delta, VALUE_INFINITE);
 
               // Adjust trend based on root move's previousScore (dynamic contempt)
               int tr = 113 * prev / (abs(prev) + 147);
