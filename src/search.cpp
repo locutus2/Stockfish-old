@@ -1281,7 +1281,7 @@ moves_loop: // When in check, search starts here
                                     thisThread->rootMoves.end(), move);
 
           rm.averageScore = rm.averageScore == -VALUE_INFINITE ? value :
-                            value <= alpha                     ? (2 * value + rm.averageScore) / 3
+                            value > alpha                      ? (2 * value + rm.averageScore) / 3
                                                                : (value + rm.averageScore) / 2;
 
           // PV move or new best move?
