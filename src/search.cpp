@@ -1282,7 +1282,7 @@ moves_loop: // When in check, search starts here
 
           rm.averageScore = rm.averageScore  == -VALUE_INFINITE ? value :
                             rm.previousScore == -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3
-                                                                : (2 * value + rm.averageScore + rm.previousScore) / 4;
+                                                                : (4 * value + 2 * rm.averageScore + rm.previousScore) / 7;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
