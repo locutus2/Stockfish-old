@@ -377,6 +377,8 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value prev = rootMoves[pvIdx].averageScore[rootDepth % 2];
+              int diff = rootMoves[pvIdx].previousScore - prev;
+              prev += std::clamp(diff / 2, -4, 4);
               delta = Value(17) + int(prev) * prev / 16384;
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
@@ -1277,8 +1279,7 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          rm.averageScore[depth % 2] = rm.averageScore[0] != -VALUE_INFINITE && rm.averageScore[1] != -VALUE_INFINITE
-                                      ? (4 * value + rm.averageScore[0] + rm.averageScore[1]) / 6 : value;
+          rm.averageScore[depth % 2] = rm.averageScore[depth % 2] != -VALUE_INFINITE ? (2 * value + rm.averageScore[depth % 2]) / 3 : value;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
