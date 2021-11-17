@@ -376,7 +376,7 @@ void Thread::search() {
           // Reset aspiration window starting size
           if (rootDepth >= 4)
           {
-              Value prev = (rootMoves[pvIdx].averageScore[0] + rootMoves[pvIdx].averageScore[1]) / 2;
+              Value prev = (2 * rootMoves[pvIdx].averageScore[rootDepth % 2] + rootMoves[pvIdx].averageScore[!(rootDepth % 2)]) / 3;
               delta = Value(17) + int(prev) * prev / 16384;
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
@@ -1277,7 +1277,7 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          rm.averageScore[thisThread->rootDepth % 2] = rm.averageScore[thisThread->rootDepth % 2] != -VALUE_INFINITE ? (2 * value + rm.averageScore[thisThread->rootDepth % 2]) / 3 : value;
+          rm.averageScore[depth % 2] = rm.averageScore[depth % 2] != -VALUE_INFINITE ? (2 * value + rm.averageScore[depth % 2]) / 3 : value;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
