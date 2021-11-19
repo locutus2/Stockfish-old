@@ -68,7 +68,7 @@ struct RootMove {
   bool operator==(const Move& m) const { return pv[0] == m; }
   bool operator<(const RootMove& m) const { // Sort in descending order
     return m.score != score ? m.score < score
-                            : m.averageScore < averageScore;
+                            : m.previousScore < previousScore;
   }
 
   Value score = -VALUE_INFINITE;

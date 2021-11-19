@@ -177,7 +177,9 @@ top:
       th = pos.this_thread();
 
       for (unsigned int i = th->pvIdx; i < th->rootMoves.size(); i++)
-          *endMoves++ = th->rootMoves[i].pv[0];
+          *endMoves++ = { th->rootMoves[i].pv[0], th->rootMoves[i].averageScore };
+
+      partial_insertion_sort(cur, endMoves, std::numeric_limits<int>::min());
 
       ++stage;
       [[fallthrough]];
