@@ -19,12 +19,14 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "thread.h"
 
 namespace Stockfish {
 
 namespace {
 
   enum Stages {
+    ROOT_TT, ROOT_INIT, ROOT_MOVES,
     MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
     EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
@@ -63,7 +65,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
 
   assert(d > 0);
 
-  stage = (pos.checkers() ? EVASION_TT : MAIN_TT) +
+  stage = (ply == 0 ? ROOT_TT : pos.checkers() ? EVASION_TT : MAIN_TT) +
           !(ttm && pos.pseudo_legal(ttm));
 }
 
@@ -148,9 +150,11 @@ Move MovePicker::select(Pred filter) {
 /// moves left, picking the move with the highest score from a list of generated moves.
 Move MovePicker::next_move(bool skipQuiets) {
 
+  Thread* th;
 top:
   switch (stage) {
 
+  case ROOT_TT:
   case MAIN_TT:
   case EVASION_TT:
   case QSEARCH_TT:
@@ -167,6 +171,19 @@ top:
       score<CAPTURES>();
       ++stage;
       goto top;
+
+  case ROOT_INIT:
+      cur = endMoves = moves;
+      th = pos.this_thread();
+
+      for (unsigned int i = th->pvIdx; i < th->rootMoves.size(); i++)
+          *endMoves++ = th->rootMoves[i].pv[0];
+
+      ++stage;
+      [[fallthrough]];
+
+  case ROOT_MOVES:
+      return select<Next>([](){ return true; });
 
   case GOOD_CAPTURE:
       if (select<Best>([&](){
