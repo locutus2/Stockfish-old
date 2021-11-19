@@ -350,7 +350,7 @@ inline bool Position::opposite_bishops() const {
 }
 
 inline int Position::bucket() const {
-  Square ksq = square<KING>(side_to_move());
+  Square ksq = square<KING>(~side_to_move());
   return (rank_of(ksq) / 4) * 2 + file_of(ksq) / 4;
 }
 
