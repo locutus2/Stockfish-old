@@ -671,7 +671,7 @@ namespace {
 
     // At non-PV nodes we check for an early TT cutoff
     if (   !PvNode
-        && !(ss->ttPv && ss->ply <= 2)
+        && !(ss->ttPv && ss->ply <= 3)
         && ss->ttHit
         && tte->depth() > depth - (thisThread->id() % 2 == 1)
         && ttValue != VALUE_NONE // Possible in case of TT access race
