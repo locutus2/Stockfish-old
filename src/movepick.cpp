@@ -179,7 +179,7 @@ top:
       for (unsigned int i = th->pvIdx; i < th->rootMoves.size(); i++)
       {
           Search::RootMove& rm = th->rootMoves[i];
-          *endMoves++ = { rm.pv[0], (rm.score != -VALUE_INFINITE ? (rm.score + rm.averageScore) / 2 : rm.averageScore) };
+          *endMoves++ = { rm.pv[0], rm.score + rm.averageScore };
       }
 
       partial_insertion_sort(cur, endMoves, std::numeric_limits<int>::min());
