@@ -1169,8 +1169,8 @@ moves_loop: // When in check, search starts here
               RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                         thisThread->rootMoves.end(), move);
 
-              if (rm.averageScore >= beta)
-                  r++;
+              if (rm.previousScore != -VALUE_INFINITE)
+                  r--;
           }
 
           // Decrease reduction at some PvNodes (~2 Elo)
