@@ -1170,7 +1170,7 @@ moves_loop: // When in check, search starts here
                                         thisThread->rootMoves.end(), move);
 
               if (rm.averageScore >= beta)
-                  r--;
+                  r++;
           }
 
           // Decrease reduction at some PvNodes (~2 Elo)
