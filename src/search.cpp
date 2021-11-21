@@ -967,6 +967,17 @@ moves_loop: // When in check, search starts here
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
+    if (rootNode)
+    {
+        int i = 0;
+        for(unsigned int j = thisThread->pvIdx + 1; i < 2 && j < thisThread->rootMoves.size(); j++)
+        {
+            move = thisThread->rootMoves[j].pv[0];
+            if(!pos.capture_or_promotion(move))
+                ss->killers[i++] = move;
+        }
+    }
+
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &thisThread->lowPlyHistory,
                                       &captureHistory,
