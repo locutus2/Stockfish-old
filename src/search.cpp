@@ -970,11 +970,17 @@ moves_loop: // When in check, search starts here
     if (rootNode)
     {
         int i = 0;
-        for(unsigned int j = thisThread->pvIdx + 1; i < 2 && j < thisThread->rootMoves.size(); j++)
+        for(unsigned int j = thisThread->pvIdx + 1; i < 3 && j < thisThread->rootMoves.size(); j++)
         {
             move = thisThread->rootMoves[j].pv[0];
             if(!pos.capture_or_promotion(move))
-                ss->killers[i++] = move;
+            {
+                if(i < 2)
+                    ss->killers[i] = move;
+                else
+                    countermove = move;
+                i++;
+            }
         }
     }
 
