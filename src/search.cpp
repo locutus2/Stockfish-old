@@ -675,8 +675,7 @@ namespace {
         thisThread->lowPlyHistory[ss->ply - 1][from_to((ss-1)->currentMove)] << stat_bonus(depth - 5);
 
     // At non-PV nodes we check for an early TT cutoff
-    if (   !PvNode
-        && !(ss->ttPv && ss->ply <= 3)
+    if (  !PvNode
         && ss->ttHit
         && tte->depth() > depth - (thisThread->id() % 2 == 1)
         && ttValue != VALUE_NONE // Possible in case of TT access race
@@ -818,7 +817,8 @@ namespace {
 
     // Step 7. Futility pruning: child node (~50 Elo).
     // The depth condition is important for mate finding.
-    if (   !PvNode
+    if (   !ss->ttPv
+        && !(ss-1)->ttPv
         &&  depth < 9
         &&  eval - futility_margin(depth, improving) >= beta
         &&  eval < 15000) // 50% larger than VALUE_KNOWN_WIN, but smaller than TB wins.
