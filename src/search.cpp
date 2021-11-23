@@ -1169,7 +1169,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
-          if(   ss->ply == thisThread->rootDepth / 2
+          if(   ss->ply >= thisThread->rootDepth / 2
              && !(ss - thisThread->rootDepth / 4)->ttPv)
               r--;
 
