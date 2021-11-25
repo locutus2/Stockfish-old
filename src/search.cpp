@@ -1124,7 +1124,7 @@ moves_loop: // When in check, search starts here
       }
 
       // Capture extensions for PvNodes and cutNodes
-      else if (   (PvNode || cutNode)
+      else if (   (ss->ttPv || cutNode)
                && captureOrPromotion
                && moveCount != 1)
           extension = 1;
@@ -1136,7 +1136,7 @@ moves_loop: // When in check, search starts here
           extension = 1;
 
       // Quiet ttMove extensions
-      else if (   ss->ttPv
+      else if (   PvNode
                && move == ttMove
                && move == ss->killers[0]
                && (*contHist[0])[movedPiece][to_sq(move)] >= 10000)
