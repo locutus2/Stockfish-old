@@ -1124,7 +1124,7 @@ moves_loop: // When in check, search starts here
       }
 
       // Capture extensions for PvNodes and cutNodes
-      else if (   (ss->ttPv || cutNode)
+      else if (   (PvNode || cutNode)
                && captureOrPromotion
                && moveCount != 1)
           extension = 1;
@@ -1218,7 +1218,7 @@ moves_loop: // When in check, search starts here
           // deeper than the first move (this may lead to hidden double extensions).
           int deeper =   r >= -1                   ? 0
                        : moveCount <= 5            ? 2
-                       : PvNode && depth > 6       ? 1
+                       : ss->ttPv && depth > 6     ? 1
                        : cutNode && moveCount <= 7 ? 1
                        :                             0;
 
