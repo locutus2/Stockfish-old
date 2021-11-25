@@ -854,7 +854,7 @@ namespace {
             if (nullValue >= VALUE_TB_WIN_IN_MAX_PLY)
                 nullValue = beta;
 
-            if (!ss->ttPv && (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14)))
+            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14))
                 return nullValue;
 
             assert(!thisThread->nmpMinPly); // Recursive verification is not allowed
@@ -1134,7 +1134,7 @@ moves_loop: // When in check, search starts here
           extension = 1;
 
       // Quiet ttMove extensions
-      else if (   PvNode
+      else if (   ss->ttPv
                && move == ttMove
                && move == ss->killers[0]
                && (*contHist[0])[movedPiece][to_sq(move)] >= 10000)
