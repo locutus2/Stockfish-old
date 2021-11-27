@@ -280,11 +280,11 @@ void MainThread::search() {
 
 void Thread::search() {
 
-  // To allow access to (ss-7) up to (ss+2), the stack must be oversized.
+  // To allow access to (ss-8) up to (ss+2), the stack must be oversized.
   // The former is needed to allow update_continuation_histories(ss-1, ...),
   // which accesses its argument at ss-6, also near the root.
   // The latter is needed for statScore and killer initialization.
-  Stack stack[MAX_PLY+10], *ss = stack+7;
+  Stack stack[MAX_PLY+11], *ss = stack+8;
   Move  pv[MAX_PLY+1];
   Value alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
@@ -294,8 +294,8 @@ void Thread::search() {
   Color us = rootPos.side_to_move();
   int iterIdx = 0;
 
-  std::memset(ss-7, 0, 10 * sizeof(Stack));
-  for (int i = 7; i > 0; i--)
+  std::memset(ss-8, 0, 11 * sizeof(Stack));
+  for (int i = 8; i > 0; i--)
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
 
   for (int i = 0; i <= MAX_PLY + 2; ++i)
@@ -1173,7 +1173,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
-          if(ss->ply > 6 && !(ss-6)->ttPv)
+          if(ss->ply > 8 && !(ss-8)->ttPv)
               r--;
 
           // Decrease reduction at some PvNodes (~2 Elo)
