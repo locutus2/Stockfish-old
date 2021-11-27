@@ -1173,7 +1173,7 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2);
 
-          if(ss->ply > depth && !(ss-7)->ttPv)
+          if(ss->ply > 7 && !(ss-7)->ttPv)
               r--;
 
           // Decrease reduction at some PvNodes (~2 Elo)
