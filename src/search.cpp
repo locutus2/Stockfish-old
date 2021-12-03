@@ -1579,8 +1579,8 @@ moves_loop: // When in check, search starts here
       // Continuation history based pruning
       if (  !captureOrPromotion
           && bestValue > VALUE_TB_LOSS_IN_MAX_PLY
-          && (*contHist[0])[pos.moved_piece(move)][to_sq(move)] < CounterMovePruneThreshold
-          && (*contHist[1])[pos.moved_piece(move)][to_sq(move)] < CounterMovePruneThreshold)
+          && (*contHist[0])[pos.moved_piece(move)][to_sq(move)] < 0
+          && (*contHist[1])[pos.moved_piece(move)][to_sq(move)] < 0)
           continue;
 
       // Make and search the move
