@@ -88,11 +88,6 @@ namespace {
     return VALUE_DRAW + Value(2 * (thisThread->nodes & 1) - 1);
   }
 
-  template <typename T>
-  T leakyRelu(T x) {
-      return x >= 0 ? x : x / 4;
-  }
-
   // Check if the current thread is in a search explosion
   ExplosionState search_explosion(Thread* thisThread) {
 
@@ -495,9 +490,9 @@ void Thread::search() {
           && !Threads.stop
           && !mainThread->stopOnPonderhit)
       {
-          double fallingEval = (142 + 6 * leakyRelu(mainThread->bestPreviousScore - bestValue)
-                                    + 6 * leakyRelu(mainThread->bestPreviousAverageScore - bestValue)
-                                    + 6 * leakyRelu(mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
+          double fallingEval = (84 + 6 * std::max(VALUE_ZERO, mainThread->bestPreviousScore - bestValue)
+                                   + 6 * std::max(VALUE_ZERO, mainThread->bestPreviousAverageScore - bestValue)
+                                   + 6 * std::max(VALUE_ZERO, mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
           fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
           // If the bestMove is stable over several iterations, reduce time accordingly
