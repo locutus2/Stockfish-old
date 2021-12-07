@@ -90,7 +90,7 @@ namespace {
 
   template <typename T>
   T leakyRelu(T x) {
-      return x >= 0 ? x : x / 4;
+      return x >= 0 ? x : x / 2;
   }
 
   // Check if the current thread is in a search explosion
@@ -495,7 +495,7 @@ void Thread::search() {
           && !Threads.stop
           && !mainThread->stopOnPonderhit)
       {
-          double fallingEval = (142 + 6 * leakyRelu(mainThread->bestPreviousScore - bestValue)
+          double fallingEval = (128 + 6 * leakyRelu(mainThread->bestPreviousScore - bestValue)
                                     + 6 * leakyRelu(mainThread->bestPreviousAverageScore - bestValue)
                                     + 6 * leakyRelu(mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
           fallingEval = std::clamp(fallingEval, 0.5, 1.5);
