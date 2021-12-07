@@ -89,8 +89,7 @@ namespace {
   }
 
   template <typename T>
-  T leakyRelu(T x)
-  {
+  T leakyRelu(T x) {
       return x >= 0 ? x : x / 2;
   }
 
