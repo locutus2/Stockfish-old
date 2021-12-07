@@ -90,7 +90,7 @@ namespace {
 
   template <typename T>
   T leakyRelu(T x) {
-      return x >= 0 ? x : x / 2;
+      return x >= 0 ? x : x / 4;
   }
 
   // Check if the current thread is in a search explosion
