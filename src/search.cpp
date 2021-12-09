@@ -309,12 +309,12 @@ void Thread::search() {
 
   if (mainThread)
   {
-      if (mainThread->bestPreviousScore == VALUE_INFINITE)
+      if (mainThread->bestPreviousAverageScore == VALUE_INFINITE)
           for (int i = 0; i < 4; ++i)
               mainThread->iterValue[i] = VALUE_ZERO;
       else
           for (int i = 0; i < 4; ++i)
-              mainThread->iterValue[i] = mainThread->bestPreviousScore;
+              mainThread->iterValue[i] = mainThread->bestPreviousAverageScore;
   }
 
   std::copy(&lowPlyHistory[2][0], &lowPlyHistory.back().back() + 1, &lowPlyHistory[0][0]);
@@ -525,7 +525,7 @@ void Thread::search() {
                    Threads.increaseDepth = true;
       }
 
-      mainThread->iterValue[iterIdx] = bestValue;
+      mainThread->iterValue[iterIdx] = rootMoves[0].averageScore;
       iterIdx = (iterIdx + 1) & 3;
   }
 
