@@ -310,10 +310,10 @@ void Thread::search() {
   if (mainThread)
   {
       if (mainThread->bestPreviousScore == VALUE_INFINITE)
-          for (int i = 0; i < 6; ++i)
+          for (int i = 0; i < 5; ++i)
               mainThread->iterValue[i] = VALUE_ZERO;
       else
-          for (int i = 0; i < 6; ++i)
+          for (int i = 0; i < 5; ++i)
               mainThread->iterValue[i] = mainThread->bestPreviousScore;
   }
 
@@ -492,7 +492,7 @@ void Thread::search() {
       {
           double fallingEval = (142 + 6 * (mainThread->bestPreviousScore - bestValue)
                                     + 6 * (mainThread->bestPreviousAverageScore - bestValue)
-                                    + 4 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
+                                    + 5 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
           fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
           // If the bestMove is stable over several iterations, reduce time accordingly
@@ -526,7 +526,7 @@ void Thread::search() {
       }
 
       mainThread->iterValue[iterIdx] = bestValue;
-      iterIdx = (iterIdx + 1) % 6;
+      iterIdx = (iterIdx + 1) % 5;
   }
 
   if (!mainThread)
