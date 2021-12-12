@@ -287,7 +287,7 @@ void Thread::search() {
   // The latter is needed for statScore and killer initialization.
   Stack stack[MAX_PLY+10], *ss = stack+7;
   Move  pv[MAX_PLY+1];
-  Value alpha, beta, delta, lastBestValue = VALUE_ZERO;
+  Value alpha, beta, delta;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = 0;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
@@ -305,14 +305,6 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
-
-  if (mainThread)
-  {
-      if (mainThread->bestPreviousScore == VALUE_INFINITE)
-          lastBestValue = VALUE_ZERO;
-      else
-          lastBestValue = mainThread->bestPreviousScore;
-  }
 
   std::copy(&lowPlyHistory[2][0], &lowPlyHistory.back().back() + 1, &lowPlyHistory[0][0]);
   std::fill(&lowPlyHistory[MAX_LPH - 2][0], &lowPlyHistory.back().back() + 1, 0);
@@ -487,8 +479,7 @@ void Thread::search() {
           && !Threads.stop
           && !mainThread->stopOnPonderhit)
       {
-          double fallingEval = (142 + 12 * (mainThread->bestPreviousAverageScore - bestValue)
-                                    +  6 * (lastBestValue - bestValue)) / 825.0;
+          double fallingEval = (142 + 36 * (mainThread->bestPreviousAverageScore - bestValue)) / 825.0;
           fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
           // If the bestMove is stable over several iterations, reduce time accordingly
@@ -520,8 +511,6 @@ void Thread::search() {
           else
                    Threads.increaseDepth = true;
       }
-
-      lastBestValue = bestValue;
   }
 
   if (!mainThread)
