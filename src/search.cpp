@@ -1771,11 +1771,11 @@ moves_loop: // When in check, search starts here
         if (ss->inCheck && i > 2)
             break;
         if (is_ok((ss-i)->currentMove))
-        {
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
-            (*(ss-i)->fromContinuationHistory)[pc][to] << bonus;
-        }
     }
+
+    if (is_ok((ss-2)->currentMove))
+        (*(ss-2)->fromContinuationHistory)[pc][to] << bonus;
   }
 
 
