@@ -69,6 +69,11 @@ void Thread::clear() {
                 for (auto& h : to)
                       h->fill(-71);
           continuationHistory[inCheck][c][NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
+
+          for (auto& to : fromContinuationHistory[inCheck][c])
+                for (auto& h : to)
+                      h->fill(-71);
+          fromContinuationHistory[inCheck][c][NO_PIECE][0]->fill(Search::CounterMovePruneThreshold - 1);
       }
 }
 
