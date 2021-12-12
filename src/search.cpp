@@ -287,13 +287,12 @@ void Thread::search() {
   // The latter is needed for statScore and killer initialization.
   Stack stack[MAX_PLY+10], *ss = stack+7;
   Move  pv[MAX_PLY+1];
-  Value alpha, beta, delta;
+  Value alpha, beta, delta, lastBestValue = VALUE_ZERO;
   Move  lastBestMove = MOVE_NONE;
   Depth lastBestMoveDepth = 0;
   MainThread* mainThread = (this == Threads.main() ? Threads.main() : nullptr);
   double timeReduction = 1, totBestMoveChanges = 0;
   Color us = rootPos.side_to_move();
-  int iterIdx = 0;
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
@@ -310,11 +309,9 @@ void Thread::search() {
   if (mainThread)
   {
       if (mainThread->bestPreviousScore == VALUE_INFINITE)
-          for (int i = 0; i < 4; ++i)
-              mainThread->iterValue[i] = VALUE_ZERO;
+          lastBestValue = VALUE_ZERO;
       else
-          for (int i = 0; i < 4; ++i)
-              mainThread->iterValue[i] = mainThread->bestPreviousScore;
+          lastBestValue = mainThread->bestPreviousScore;
   }
 
   std::copy(&lowPlyHistory[2][0], &lowPlyHistory.back().back() + 1, &lowPlyHistory[0][0]);
@@ -491,7 +488,7 @@ void Thread::search() {
           && !mainThread->stopOnPonderhit)
       {
           double fallingEval = (142 + 12 * (mainThread->bestPreviousAverageScore - bestValue)
-                                    +  6 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
+                                    +  6 * (lastBestValue - bestValue)) / 825.0;
           fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
           // If the bestMove is stable over several iterations, reduce time accordingly
@@ -524,8 +521,7 @@ void Thread::search() {
                    Threads.increaseDepth = true;
       }
 
-      mainThread->iterValue[iterIdx] = bestValue;
-      iterIdx = (iterIdx + 1) & 3;
+      lastBestValue = bestValue;
   }
 
   if (!mainThread)
