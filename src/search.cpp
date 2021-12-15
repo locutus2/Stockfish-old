@@ -665,7 +665,10 @@ namespace {
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
     if (!excludedMove)
+    {
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
+        ss->distanceToPV = (PvNode ? 0 : (ss-1)->distanceToPV + 1);
+    }
 
     // Update low ply history for previous move if we are near root and position is or has been in PV
     if (   ss->ttPv
