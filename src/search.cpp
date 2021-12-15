@@ -982,7 +982,8 @@ moves_loop: // When in check, search starts here
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      ss->ply);
+                                      ss->ply,
+                                      ss->distanceToPV);
 
     value = bestValue;
     singularQuietLMR = moveCountPruning = false;
