@@ -442,12 +442,11 @@ void Thread::search() {
               {
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
                   ++failedHighCnt;
-                  failedLowCnt = 0;
               }
               else
                   break;
 
-              delta += delta / 4 + 5 + 2 * failedLowCnt;
+              delta += delta / 4 + 5 + failedLowCnt;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
