@@ -444,7 +444,7 @@ void Thread::search() {
               else
                   break;
 
-              delta += delta / 4 + 2 + researches;
+              delta += delta * (3 + researches) / 16 + 5;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
