@@ -431,7 +431,7 @@ void Thread::search() {
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
                   failedHighCnt = 0;
-                  ++researches;
+                  researches += 2;
                   if (mainThread)
                       mainThread->stopOnPonderhit = false;
               }
@@ -439,7 +439,7 @@ void Thread::search() {
               {
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
                   ++failedHighCnt;
-                  researches += 2;
+                  ++researches;
               }
               else
                   break;
