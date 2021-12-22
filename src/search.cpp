@@ -439,7 +439,7 @@ void Thread::search() {
               {
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
                   ++failedHighCnt;
-                  ++researches;
+                  researches += 2;
               }
               else
                   break;
