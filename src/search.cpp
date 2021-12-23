@@ -378,7 +378,10 @@ void Thread::search() {
           {
               Value prev = rootMoves[pvIdx].averageScore;
               delta = Value(17) + int(prev) * prev / 16384
-                                + 3 * (rootDepth % 2);
+                                + 5 * (rootDepth % 2)
+                                -     rootPos.capture(rootMoves[pvIdx].pv[0])
+                                - 2 * rootPos.gives_check(rootMoves[pvIdx].pv[0])
+                                -     bool(rootPos.checkers());
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
 
@@ -442,7 +445,10 @@ void Thread::search() {
               else
                   break;
 
-              delta += delta / 4 + 6 - (rootDepth % 2) - 3 * rootPos.capture(rootMoves[pvIdx].pv[0]);
+              delta += delta / 4 + 4 - 2 * (rootDepth % 2)
+                                     -     rootPos.capture(rootMoves[pvIdx].pv[0])
+                                     -     rootPos.gives_check(rootMoves[pvIdx].pv[0])
+                                     +     bool(rootPos.checkers());
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
