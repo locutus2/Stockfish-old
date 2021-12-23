@@ -241,6 +241,15 @@ namespace {
     TimePoint elapsed = now();
 
     double valBest = iteration(pos, list, nodes, states);
+    int it = 0;
+    std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
+    std::cerr << "=>";
+    for(int i = 0; i < (int)params.size(); ++i)
+    {
+         std::cerr << " " << params[i];
+    }
+    std::cerr << std::endl;
+
     while(true)
     {
         std::vector<int> orig = params;
@@ -252,14 +261,23 @@ namespace {
 
         double val = iteration(pos, list, nodes, states);
 
-	if(val >= valBest)
+	if(val <= valBest)
 	{
 	    valBest = val;
+    std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
+    std::cerr << "=>";
+    for(int i = 0; i < (int)params.size(); ++i)
+    {
+         std::cerr << " " << params[i];
+    }
+    std::cerr << std::endl;
 	}
 	else
 	{
             params = orig;
+    std::cerr << "Iter " << it << " val=" << val << std::endl;
 	}
+        ++it;
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
