@@ -383,9 +383,10 @@ void Thread::search() {
 
 	      std::vector<bool> C = { 
 		      true,
+		      bool(rootDepth%2),
 		      rootPos.capture(rootMoves[pvIdx].pv[0]),
 		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
-		      (bool)rootPos.checkers(),
+		      bool(rootPos.checkers()),
 	      };
               for(int i = 0; i < (int)params.size(); ++i)
 	      {
