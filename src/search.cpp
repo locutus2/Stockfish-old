@@ -37,7 +37,7 @@
 
 namespace Stockfish {
 
-  std::vector<int> params = {0, 0, 0, 0};
+  std::vector<int> params = {0, 0, 0, 0, 0};
 
 namespace Search {
 
