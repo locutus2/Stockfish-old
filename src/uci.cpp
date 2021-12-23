@@ -233,7 +233,9 @@ namespace {
   void learn(Position& pos, istream& args, StateListPtr& states) {
 
     uint64_t nodes = 0;
-    std::srand(12345);
+    size_t seed = std::time(nullptr);
+    //std::srand(12345);
+    std::srand(seed);
 
     vector<string> list = setup_bench(pos, args);
     //num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
@@ -242,6 +244,7 @@ namespace {
 
     int64_t valBest = iteration(pos, list, nodes, states);
     int it = 0;
+    std::cerr << "Seed " << seed << std::endl;
     std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
     std::cerr << "=>";
     for(int i = 0; i < (int)params.size(); ++i)
