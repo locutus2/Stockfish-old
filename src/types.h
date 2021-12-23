@@ -181,7 +181,7 @@ enum ExplosionState {
 enum Value : int {
   VALUE_ZERO      = 0,
   VALUE_DRAW      = 0,
-  VALUE_KNOWN_WIN = 10000,
+  VALUE_KNOWN_WIN = 10800,
   VALUE_MATE      = 32000,
   VALUE_INFINITE  = 32001,
   VALUE_NONE      = 32002,
@@ -192,10 +192,10 @@ enum Value : int {
   VALUE_MATED_IN_MAX_PLY = -VALUE_MATE_IN_MAX_PLY,
 
   PawnValueMg   = 126,   PawnValueEg   = 208,
-  KnightValueMg = 781,   KnightValueEg = 854,
-  BishopValueMg = 825,   BishopValueEg = 915,
-  RookValueMg   = 1276,  RookValueEg   = 1380,
-  QueenValueMg  = 2538,  QueenValueEg  = 2682,
+  KnightValueMg = 782,   KnightValueEg = 854,
+  BishopValueMg = 824,   BishopValueEg = 914,
+  RookValueMg   = 1277,  RookValueEg   = 1382,
+  QueenValueMg  = 2540,  QueenValueEg  = 2685,
 
   MidgameLimit  = 15258, EndgameLimit  = 3915
 };
