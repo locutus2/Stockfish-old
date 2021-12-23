@@ -198,6 +198,80 @@ namespace {
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
 
+  double iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states) {
+
+    string token;
+    nodes = 0;
+
+    dbg_clear();
+
+    for (const auto& cmd : list)
+    {
+        istringstream is(cmd);
+        is >> skipws >> token;
+
+        if (token == "go" || token == "eval")
+        {
+       //     cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+            if (token == "go")
+            {
+               go(pos, is, states);
+               Threads.main()->wait_for_search_finished();
+               nodes += Threads.nodes_searched();
+            }
+            else
+               trace_eval(pos);
+        }
+        else if (token == "setoption")  setoption(is);
+        else if (token == "position")   position(pos, is, states);
+        else if (token == "ucinewgame") { Search::clear(); } // Search::clear() may take some while
+    }
+
+    return nodes;
+  }
+
+  void learn(Position& pos, istream& args, StateListPtr& states) {
+
+    uint64_t nodes = 0;
+    std::srand(12345);
+
+    vector<string> list = setup_bench(pos, args);
+    //num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
+
+    TimePoint elapsed = now();
+
+    double valBest = iteration(pos, list, nodes, states);
+    while(true)
+    {
+        std::vector<int> orig = params;
+
+	for(int i = 0; i < (int)params.size(); ++i)
+	{
+		params[i] += std::rand() % 3 - 1;
+	}
+
+        double val = iteration(pos, list, nodes, states);
+
+	if(val >= valBest)
+	{
+	    valBest = val;
+	}
+	else
+	{
+            params = orig;
+	}
+    }
+
+    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
+
+    //dbg_print(); // Just before exiting
+    //dbg_printc(); // Just before exiting
+
+    //cerr << "\n==========================="
+    //     << "\nTotal time (ms) : " << elapsed
+    //     << "\nNodes searched  : " << nodes;
+  }
+
   // The win rate model returns the probability (per mille) of winning given an eval
   // and a game-ply. The model fits rather accurately the LTC fishtest statistics.
   int win_rate_model(Value v, int ply) {
@@ -275,6 +349,7 @@ void UCI::loop(int argc, char* argv[]) {
       // Do not use these commands during a search!
       else if (token == "flip")     pos.flip();
       else if (token == "bench")    bench(pos, is, states);
+      else if (token == "learn")    learn(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
       else if (token == "eval")     trace_eval(pos);
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;

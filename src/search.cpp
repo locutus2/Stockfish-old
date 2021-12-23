@@ -37,6 +37,8 @@
 
 namespace Stockfish {
 
+  std::vector<int> params = {0, 0, 0, 0};
+
 namespace Search {
 
   LimitsType Limits;
@@ -378,6 +380,19 @@ void Thread::search() {
           {
               Value prev = rootMoves[pvIdx].averageScore;
               delta = Value(17) + int(prev) * prev / 16384;
+
+	      std::vector<bool> C = { 
+		      true,
+		      rootPos.capture(rootMoves[pvIdx].pv[0]),
+		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
+		      (bool)rootPos.checkers(),
+	      };
+              for(int i = 0; i < (int)params.size(); ++i)
+	      {
+		      delta += C[i] * params[i];
+	      }
+	      delta = std::max(delta, Value(1));
+
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
 

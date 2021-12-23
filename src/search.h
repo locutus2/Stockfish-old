@@ -27,6 +27,8 @@
 
 namespace Stockfish {
 
+extern std::vector<int> params;
+
 class Position;
 
 namespace Search {
