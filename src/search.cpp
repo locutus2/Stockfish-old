@@ -37,7 +37,8 @@
 
 namespace Stockfish {
 
-  std::vector<int> params = {0, 0, 0, 0, 0};
+  std::vector<int> params = {0, 0, 0, 0, 0,
+                             0, 0, 0, 0, 0};
 
 namespace Search {
 
@@ -388,7 +389,7 @@ void Thread::search() {
 		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
 		      bool(rootPos.checkers()),
 	      };
-              for(int i = 0; i < (int)params.size(); ++i)
+              for(int i = 0; i < (int)C.size(); ++i)
 	      {
 		      delta += C[i] * params[i];
 	      }
@@ -458,6 +459,18 @@ void Thread::search() {
                   break;
 
               delta += delta / 4 + 5;
+	      std::vector<bool> C = { 
+		      true,
+		      bool(rootDepth%2),
+		      rootPos.capture(rootMoves[pvIdx].pv[0]),
+		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
+		      bool(rootPos.checkers()),
+	      };
+              for(int i = 0; i < (int)C.size(); ++i)
+	      {
+		      delta += C[i] * params[i+(int)C.size()];
+	      }
+	      delta = std::max(delta, Value(1));
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
