@@ -198,7 +198,7 @@ namespace {
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
 
-  double iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states) {
+  int64_t iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states) {
 
     string token;
     nodes = 0;
@@ -240,7 +240,7 @@ namespace {
 
     TimePoint elapsed = now();
 
-    double valBest = iteration(pos, list, nodes, states);
+    int64_t valBest = iteration(pos, list, nodes, states);
     int it = 0;
     std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
     std::cerr << "=>";
@@ -259,7 +259,7 @@ namespace {
 		params[i] += std::rand() % 3 - 1;
 	}
 
-        double val = iteration(pos, list, nodes, states);
+        int64_t val = iteration(pos, list, nodes, states);
 
 	if(val <= valBest)
 	{
