@@ -256,6 +256,7 @@ namespace {
     while(true)
     {
         std::vector<int> orig = params;
+        ++it;
 
 	for(int i = 0; i < (int)params.size(); ++i)
 	{
@@ -280,7 +281,6 @@ namespace {
             params = orig;
     std::cerr << "Iter " << it << " val=" << val << std::endl;
 	}
-        ++it;
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
