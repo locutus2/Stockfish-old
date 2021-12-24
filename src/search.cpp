@@ -38,7 +38,7 @@
 namespace Stockfish {
 
   std::vector<int> params = {0, 0, 0, 0, 0,
-                             0, 0, 0, 0, 0};
+                             0, 0, 0, 0, 0, 0};
 
 namespace Search {
 
@@ -465,6 +465,7 @@ void Thread::search() {
 		      rootPos.capture(rootMoves[pvIdx].pv[0]),
 		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
 		      bool(rootPos.checkers()),
+		      bool(failedHighCnt),
 	      };
               for(int i = 0; i < (int)C.size(); ++i)
 	      {
