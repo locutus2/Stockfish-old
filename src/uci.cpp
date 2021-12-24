@@ -232,6 +232,9 @@ namespace {
 
   void learn(Position& pos, istream& args, StateListPtr& states) {
 
+    enum Method {HILL_CLIMB, SPSA};
+
+    Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
     //std::srand(12345);
@@ -245,6 +248,11 @@ namespace {
     int64_t valBest = iteration(pos, list, nodes, states);
     int it = 0;
     std::cerr << "Seed " << seed << std::endl;
+    if (method == SPSA)
+       std::cerr << "Method: SPSA" << std::endl;
+    if (method == HILL_CLIMB)
+       std::cerr << "Method: Hill climbing" << std::endl;
+
     std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
     std::cerr << "=>";
     for(int i = 0; i < (int)params.size(); ++i)
@@ -258,28 +266,63 @@ namespace {
         std::vector<int> orig = params;
         ++it;
 
-	for(int i = 0; i < (int)params.size(); ++i)
-	{
-		params[i] += std::rand() % 3 - 1;
-	}
+	int64_t val;
 
-        int64_t val = iteration(pos, list, nodes, states);
+	if (method == SPSA)
+	{
+            std::vector<int> paramsp = params;
+            std::vector<int> paramsm = params;
+	    for(int i = 0; i < (int)params.size(); ++i)
+	    {
+                int d = std::rand() % 3 - 1;
+		paramsp[i] += d;
+		paramsm[i] -= d;
+	    }
+
+            params = paramsp;
+            int64_t valp = iteration(pos, list, nodes, states);
+
+            params = paramsm;
+            int64_t valm = iteration(pos, list, nodes, states);
+
+	    if (valp <= valm)
+	    {
+		    params = paramsp;
+		    val = valp;
+	    }
+	    else
+	    {
+		    params = paramsm;
+		    val = valm;
+	    }
+	}
+	else if (method == HILL_CLIMB)
+	{
+	    for(int i = 0; i < (int)params.size(); ++i)
+	    {
+		params[i] += std::rand() % 3 - 1;
+	    }
+
+            val = iteration(pos, list, nodes, states);
+
+	    if(val > valBest)
+                params = orig;
+	}
 
 	if(val <= valBest)
 	{
 	    valBest = val;
-    std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
-    std::cerr << "=>";
-    for(int i = 0; i < (int)params.size(); ++i)
-    {
-         std::cerr << " " << params[i];
-    }
-    std::cerr << std::endl;
+            std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
+            std::cerr << "=>";
+            for(int i = 0; i < (int)params.size(); ++i)
+            {
+                std::cerr << " " << params[i];
+            }
+            std::cerr << std::endl;
 	}
 	else
 	{
-            params = orig;
-    std::cerr << "Iter " << it << " val=" << val << std::endl;
+            std::cerr << "Iter " << it << " val=" << val << std::endl;
 	}
     }
 
