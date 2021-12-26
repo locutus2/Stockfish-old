@@ -1192,8 +1192,7 @@ moves_loop: // When in check, search starts here
               && !captureOrPromotion
               && !givesCheck
               && type_of(movedPiece) != PAWN
-              && eval > VALUE_ZERO
-              && (attacks_bb(type_of(movedPiece), from_sq((ss-2)->currentMove), pos.pieces()) & to_sq(move)))
+              && type_of(movedPiece) != KING)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
