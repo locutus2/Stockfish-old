@@ -1192,7 +1192,7 @@ moves_loop: // When in check, search starts here
               && !captureOrPromotion
               && !givesCheck
               && type_of(movedPiece) != PAWN
-              && type_of(movedPiece) != KING)
+              && type_of(movedPiece) != KNIGHT)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
