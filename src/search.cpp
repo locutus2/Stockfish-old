@@ -586,14 +586,14 @@ namespace {
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool givesCheck, improving, didLMR, priorCapture;
+    bool givesCheck, improving, didLMR;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, bestMoveCount, improvement;
 
     // Step 1. Initialize node
     ss->inCheck        = pos.checkers();
-    priorCapture       = pos.captured_piece();
+    ss->priorCapture   = pos.captured_piece();
     Color us           = pos.side_to_move();
     moveCount          = bestMoveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
@@ -681,7 +681,7 @@ namespace {
                     update_quiet_stats(pos, ss, ttMove, stat_bonus(depth));
 
                 // Extra penalty for early quiet moves of the previous ply (~0 Elo)
-                if ((ss-1)->moveCount <= 2 && !priorCapture)
+                if ((ss-1)->moveCount <= 2 && !ss->priorCapture)
                     update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, -stat_bonus(depth + 1));
             }
             // Penalty for a quiet ttMove that fails low (~1 Elo)
@@ -788,7 +788,7 @@ namespace {
     }
 
     // Use static evaluation difference to improve quiet move ordering (~3 Elo)
-    if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !priorCapture)
+    if (is_ok((ss-1)->currentMove) && !(ss-1)->inCheck && !ss->priorCapture)
     {
         int bonus = std::clamp(-16 * int((ss-1)->staticEval + ss->staticEval), -2000, 2000);
         thisThread->mainHistory[~us][from_to((ss-1)->currentMove)] << bonus;
@@ -1184,6 +1184,16 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (   to_sq((ss-2)->currentMove) == from_sq(move)
+              && !ss->priorCapture
+              && !ss->inCheck
+              && !(ss-1)->priorCapture
+              && !(ss-1)->inCheck
+              && !captureOrPromotion
+              && !givesCheck
+              && type_of(movedPiece) != PAWN)
+              r++;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1355,7 +1365,7 @@ moves_loop: // When in check, search starts here
 
     // Bonus for prior countermove that caused the fail low
     else if (   (depth >= 3 || PvNode)
-             && !priorCapture)
+             && !ss->priorCapture)
     {
         //Assign extra bonus if current node is PvNode or cutNode
         //or fail low was really bad
