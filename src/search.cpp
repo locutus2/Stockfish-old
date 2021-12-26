@@ -1192,7 +1192,7 @@ moves_loop: // When in check, search starts here
               && !captureOrPromotion
               && !givesCheck
               && type_of(movedPiece) != PAWN
-              && eval > VALUE_ZERO)
+              && bestValue > VALUE_ZERO)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
