@@ -241,7 +241,7 @@ namespace {
 
     enum Method {HILL_CLIMB, SPSA};
 
-    constexpr double L = 1000000;
+    constexpr int64_t L = 1000000;
     Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
@@ -300,7 +300,7 @@ namespace {
             params = paramsm;
             int64_t valm = iteration(pos, list, nodes, states, bm, errorsm);
 
-	    if (valp <= valm)
+	    if (valp  + L * errorsp <= valm + L * errorsm)
 	    {
 		    params = paramsp;
 		    errors = errorsp;
@@ -322,7 +322,7 @@ namespace {
 
             val = iteration(pos, list, nodes, states, bm, errors);
 
-	    if(val > valBest)
+	    if(val + L * errors > valBest)
                 params = orig;
 	}
 	valg = val + L * errors;
