@@ -491,10 +491,12 @@ void Thread::search() {
                                     +  6 * (mainThread->iterValue[iterIdx] - bestValue)) / 825.0;
           fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
+          double drawishEval = 0.01 * (50 - std::abs(bestValue)) * double(rootPos.non_pawn_material()) / 16384;
+          drawishEval = 0.97 + std::clamp(drawishEval, 0.0, 0.5);
+
           // If the bestMove is stable over several iterations, reduce time accordingly
           timeReduction = lastBestMoveDepth + 9 < completedDepth ? 1.92 : 0.95;
           double reduction = (1.47 + mainThread->previousTimeReduction) / (2.32 * timeReduction);
-          double drawishEval = 0.94 + 0.02 * std::max(25 - std::abs(bestValue), 0);
           double bestMoveInstability = 1.073 + std::max(1.0, 2.25 - 9.9 / rootDepth)
                                               * totBestMoveChanges / Threads.size();
           double totalTime = Time.optimum() * drawishEval * fallingEval * reduction * bestMoveInstability;
