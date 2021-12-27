@@ -259,6 +259,7 @@ namespace {
     bm = bestMoves;
     int it = 0;
     std::cerr << "Seed " << seed << std::endl;
+    std::cerr << "L " << L << std::endl;
     if (method == SPSA)
        std::cerr << "Method: SPSA" << std::endl;
     if (method == HILL_CLIMB)
