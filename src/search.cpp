@@ -1184,7 +1184,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (   PvNode
+          if (   ss->ttPv
               && to_sq((ss-2)->currentMove) == from_sq(move)
               && !ss->priorCapture
               && !ss->inCheck
@@ -1192,8 +1192,7 @@ moves_loop: // When in check, search starts here
               && !(ss-1)->inCheck
               && !captureOrPromotion
               && !givesCheck
-              && type_of(movedPiece) != PAWN
-              && type_of(movedPiece) != KING)
+              && type_of(movedPiece) != PAWN)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
