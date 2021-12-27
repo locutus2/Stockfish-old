@@ -39,6 +39,7 @@ namespace Stockfish {
 
   std::vector<int> params = {0, 0, 0, 0, 0,
                              0, 0, 0, 0, 0, 0};
+  std::vector<Move> bestMoves;
 
 namespace Search {
 
@@ -275,6 +276,8 @@ void MainThread::search() {
       std::cout << " ponder " << UCI::move(bestThread->rootMoves[0].pv[1], rootPos.is_chess960());
 
   std::cout << sync_endl;
+
+  bestMoves.push_back(bestThread->rootMoves[0].pv[0]);
 }
 
 

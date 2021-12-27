@@ -28,6 +28,7 @@
 namespace Stockfish {
 
 extern std::vector<int> params;
+extern std::vector<Move> bestMoves;
 
 class Position;
 

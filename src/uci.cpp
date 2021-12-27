@@ -198,12 +198,13 @@ namespace {
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
 
-  int64_t iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states) {
+  int64_t iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states, const std::vector<Move> &bm, int& errors) {
 
     string token;
     nodes = 0;
 
     dbg_clear();
+    bestMoves.clear();
 
     for (const auto& cmd : list)
     {
@@ -227,6 +228,12 @@ namespace {
         else if (token == "ucinewgame") { Search::clear(); } // Search::clear() may take some while
     }
 
+    errors = 0;
+    for (int i = 0; i < (int)bm.size(); i++)
+    {
+	    if(bm[i] != bestMoves[i])
+		    ++errors;
+    }
     return nodes;
   }
 
@@ -234,10 +241,13 @@ namespace {
 
     enum Method {HILL_CLIMB, SPSA};
 
+    constexpr double L = 1000000;
     Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
     //std::srand(12345);
+    std::vector<Move> bm;
+    int errors = 0;
     std::srand(seed);
 
     vector<string> list = setup_bench(pos, args);
@@ -245,7 +255,8 @@ namespace {
 
     TimePoint elapsed = now();
 
-    int64_t valBest = iteration(pos, list, nodes, states);
+    int64_t valBest = iteration(pos, list, nodes, states, bm, errors);
+    bm = bestMoves;
     int it = 0;
     std::cerr << "Seed " << seed << std::endl;
     if (method == SPSA)
@@ -267,6 +278,9 @@ namespace {
         ++it;
 
 	int64_t val;
+	int64_t valg;
+	int errorsp;
+	int errorsm;
 
 	if (method == SPSA)
 	{
@@ -280,19 +294,21 @@ namespace {
 	    }
 
             params = paramsp;
-            int64_t valp = iteration(pos, list, nodes, states);
+            int64_t valp = iteration(pos, list, nodes, states, bm, errorsp);
 
             params = paramsm;
-            int64_t valm = iteration(pos, list, nodes, states);
+            int64_t valm = iteration(pos, list, nodes, states, bm, errorsm);
 
 	    if (valp <= valm)
 	    {
 		    params = paramsp;
+		    errors = errorsp;
 		    val = valp;
 	    }
 	    else
 	    {
 		    params = paramsm;
+		    errors = errorsm;
 		    val = valm;
 	    }
 	}
@@ -303,16 +319,17 @@ namespace {
 		params[i] += std::rand() % 3 - 1;
 	    }
 
-            val = iteration(pos, list, nodes, states);
+            val = iteration(pos, list, nodes, states, bm, errors);
 
 	    if(val > valBest)
                 params = orig;
 	}
+	valg = val + L * errors;
 
-	if(val <= valBest)
+	if(valg <= valBest)
 	{
-	    valBest = val;
-            std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
+	    valBest = valg;
+            std::cerr << "Iter " << it << " => best=" << val << " err=" << errors << std::endl;
             std::cerr << "=>";
             for(int i = 0; i < (int)params.size(); ++i)
             {
@@ -322,7 +339,7 @@ namespace {
 	}
 	else
 	{
-            std::cerr << "Iter " << it << " val=" << val << std::endl;
+            std::cerr << "Iter " << it << " val=" << val << " err=" << errors << std::endl;
 	}
     }
 
