@@ -589,7 +589,7 @@ namespace {
     bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount, bestMoveCount, improvement;
+    int moveCount, captureCount, quietCount, bestMoveCount, improvement, probcutCount;
 
     // Step 1. Initialize node
     ss->inCheck        = pos.checkers();
@@ -598,6 +598,7 @@ namespace {
     moveCount          = bestMoveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
+    probcutCount       = 0;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -892,6 +893,7 @@ namespace {
                 assert(depth >= 5);
 
                 captureOrPromotion = true;
+                probcutCount++;
 
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
@@ -1157,7 +1159,8 @@ moves_loop: // When in check, search starts here
           &&  moveCount > 1 + 2 * rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
-              || (cutNode && (ss-1)->moveCount > 1)))
+              || (cutNode && (ss-1)->moveCount > 1)
+              || probcutCount > 0))
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta);
 
