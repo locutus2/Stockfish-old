@@ -37,9 +37,78 @@
 
 namespace Stockfish {
 
-  std::vector<int> params = {0, 0, 0, 0, 0,
-                             0, 0, 0, 0, 0, 0};
+  constexpr int NN_IN1 = 4;
+  constexpr int NN_HIDDEN1 = 1;
+  constexpr int NN_INNER1 = 4;
+  constexpr int NN_IN2 = 5;
+  constexpr int NN_HIDDEN2 = 1;
+  constexpr int NN_INNER2 = 5;
+
+  constexpr int NN_PARAMS1 =  NN_INNER1*(NN_IN1+1) + (NN_HIDDEN1-1)*NN_INNER1*(NN_INNER1+1) + NN_INNER1 + 1;
+  constexpr int NN_PARAMS2 =  NN_INNER2*(NN_IN2+1) + (NN_HIDDEN2-1)*NN_INNER2*(NN_INNER2+1) + NN_INNER2 + 1;
+  constexpr int NN_PARAMS = NN_PARAMS1 + NN_PARAMS2;
+
+  std::vector<int> params(NN_PARAMS, 0);
   std::vector<Move> bestMoves;
+
+  int RELU(int x) { return std::max(x,0); }
+
+  int predictInternal(int nn_in, int nn_hidden, int nn_inner, int offset, const std::vector<bool>& C)
+  {
+	  int val = 0;
+	  if(nn_hidden == 0)
+	  {
+		  val = params[offset++];
+		  for(int i = 0; i < nn_in; ++i)
+		  {
+		  	val += params[offset++] * C[i];
+		  }
+	  }
+	  else
+	  {
+		  std::vector<int> v[2] = { std::vector<int>(nn_inner), std::vector<int>(nn_inner) };
+		  for(int i = 0; i < nn_inner; ++i)
+		  {
+			int sum = params[offset++];
+		  	for(int j = 0; j < nn_in; ++j)
+				sum += params[offset++] * C[j];
+			v[0][i] = RELU(sum);
+		  }
+
+		  int ind = 1;
+		  for(int k = 1; k < nn_hidden; ++k, ind = 1 - ind)
+		  {
+		  	for(int i = 0; i < nn_inner; ++i)
+		  	{
+				int sum = params[offset++];
+		  		for(int j = 0; j < nn_inner; ++j)
+					sum += params[offset++] * v[1-ind][j];
+				v[ind][i] = RELU(sum);
+		  	}
+		  }
+
+		  ind = 1 - ind;
+		  val = params[offset++];
+		  for(int i = 0; i < nn_inner; ++i)
+		  {
+		  	val += params[offset++] * v[ind][i];
+		  }
+	  }
+	  return val;
+  }
+
+  int predict(int nr, const std::vector<bool>& C)
+  {
+	  int nn_in = NN_IN1, nn_hidden = NN_HIDDEN1, nn_inner = NN_INNER1, offset = 0;
+	  if(nr == 2)
+	  {
+		  nn_in = NN_IN2;
+		  nn_hidden = NN_HIDDEN2;
+		  nn_inner = NN_INNER2;
+		  offset = NN_PARAMS1;
+	  }
+	  return predictInternal(nn_in, nn_hidden, nn_inner, offset, C);
+  }
 
 namespace Search {
 
@@ -386,16 +455,18 @@ void Thread::search() {
               delta = Value(17) + int(prev) * prev / 16384;
 
 	      std::vector<bool> C = { 
-		      true,
+		 //     true,
 		      bool(rootDepth%2),
 		      rootPos.capture(rootMoves[pvIdx].pv[0]),
 		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
 		      bool(rootPos.checkers()),
 	      };
+	      /*
               for(int i = 0; i < (int)C.size(); ++i)
 	      {
 		      delta += C[i] * params[i];
-	      }
+	      }*/
+	      delta += predict(1, C);
 	      delta = std::max(delta, Value(1));
 
               alpha = std::max(prev - delta,-VALUE_INFINITE);
@@ -461,20 +532,24 @@ void Thread::search() {
               else
                   break;
 
+	      Value deltaOrig = delta;
               delta += delta / 4 + 5;
 	      std::vector<bool> C = { 
-		      true,
+		      //true,
 		      bool(rootDepth%2),
 		      rootPos.capture(rootMoves[pvIdx].pv[0]),
 		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
 		      bool(rootPos.checkers()),
 		      bool(failedHighCnt),
 	      };
+	      /*
               for(int i = 0; i < (int)C.size(); ++i)
 	      {
 		      delta += C[i] * params[i+(int)C.size()];
 	      }
 	      delta = std::max(delta, Value(1));
+	      */
+	      delta = std::max(deltaOrig, delta + predict(2, C));
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
