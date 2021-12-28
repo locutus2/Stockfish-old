@@ -237,11 +237,19 @@ namespace {
     return nodes;
   }
 
+  template <typename T = int64_t, typename V = int64_t>
+  struct Performance : std::vector<T>
+  {
+	  static constexpr V L = 1;
+	  V operator()() const { return (*this)[0] + L * (*this)[1]; }
+  };
+
   void learn(Position& pos, istream& args, StateListPtr& states) {
 
     enum Method {HILL_CLIMB, SPSA};
 
-    constexpr int64_t L = 50000;
+    //constexpr int64_t L = 50000;
+    constexpr int64_t L = 10000;
     Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
