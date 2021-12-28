@@ -1186,13 +1186,11 @@ moves_loop: // When in check, search starts here
 
           if (   PvNode
               && to_sq((ss-2)->currentMove) == from_sq(move)
-              && from_sq((ss-2)->currentMove) == to_sq(move)
-              && !ss->priorCapture
-              && !ss->inCheck
               && !(ss-1)->priorCapture
               && !(ss-1)->inCheck
               && !captureOrPromotion
-              && !givesCheck)
+              && !givesCheck
+              && type_of(movedPiece) != PAWN)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
