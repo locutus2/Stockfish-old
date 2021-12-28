@@ -273,7 +273,7 @@ namespace {
     if (method == HILL_CLIMB)
        std::cerr << "Method: Hill climbing" << std::endl;
 
-    std::cerr << "Iter " << it << " => best=" << valBest << std::endl;
+    std::cerr << "Iter " << it << " val=" << valBest << " err=" << errors << " loss=" << valBest+L*errors << std::endl;
     std::cerr << "=>";
     for(int i = 0; i < (int)params.size(); ++i)
     {
@@ -335,20 +335,16 @@ namespace {
 	}
 	valg = val + L * errors;
 
+        std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << val+L*errors << std::endl;
 	if(valg <= valBest)
 	{
 	    valBest = valg;
-            std::cerr << "Iter " << it << " => best=" << val << " err=" << errors << std::endl;
             std::cerr << "=>";
             for(int i = 0; i < (int)params.size(); ++i)
             {
                 std::cerr << " " << params[i];
             }
             std::cerr << std::endl;
-	}
-	else
-	{
-            std::cerr << "Iter " << it << " val=" << val << " err=" << errors << std::endl;
 	}
     }
 
