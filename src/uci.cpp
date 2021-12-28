@@ -249,7 +249,8 @@ namespace {
     enum Method {HILL_CLIMB, SPSA};
 
     //constexpr int64_t L = 50000;
-    constexpr int64_t L = 10000;
+    //constexpr int64_t L = 10000;
+    constexpr int64_t L = 100000;
     Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
