@@ -438,6 +438,10 @@ double gain_ratio(double p)
 		return 0;
 }
 
+double dbg_get_hit_on(int n) {
+	return hits[n][0] ? hits[n][1]/double(hits[n][0]) : 0.0;
+}
+
 void dbg_clear() {
   for(int n = 0; n < DBG_N; ++n)
 	  for(int i = 0; i < 2; ++i)

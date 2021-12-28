@@ -37,7 +37,7 @@
 
 namespace Stockfish {
 
-  constexpr int NN_IN1 = 4;
+  constexpr int NN_IN1 = 11;
   constexpr int NN_HIDDEN1 = 1;
   constexpr int NN_INNER1 = NN_IN1 * NN_IN1;
 
@@ -454,22 +454,6 @@ void Thread::search() {
           {
               Value prev = rootMoves[pvIdx].averageScore;
               delta = Value(17) + int(prev) * prev / 16384;
-
-	      std::vector<bool> C = { 
-		 //     true,
-		      bool(rootDepth%2),
-		      rootPos.capture(rootMoves[pvIdx].pv[0]),
-		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
-		      bool(rootPos.checkers()),
-	      };
-	      /*
-              for(int i = 0; i < (int)C.size(); ++i)
-	      {
-		      delta += C[i] * params[i];
-	      }*/
-	      delta += predict(1, C);
-	      delta = std::max(delta, Value(1));
-
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
 
@@ -533,24 +517,7 @@ void Thread::search() {
               else
                   break;
 
-	      Value deltaOrig = delta;
               delta += delta / 4 + 5;
-	      std::vector<bool> C = { 
-		      //true,
-		      bool(rootDepth%2),
-		      rootPos.capture(rootMoves[pvIdx].pv[0]),
-		      rootPos.gives_check(rootMoves[pvIdx].pv[0]),
-		      bool(rootPos.checkers()),
-		      bool(failedHighCnt),
-	      };
-	      /*
-              for(int i = 0; i < (int)C.size(); ++i)
-	      {
-		      delta += C[i] * params[i+(int)C.size()];
-	      }
-	      delta = std::max(delta, Value(1));
-	      */
-	      delta = std::max(deltaOrig, delta + predict(2, C));
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
@@ -1257,6 +1224,20 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
+      bool CC = false;
+      std::vector<bool> C = { 
+	PvNode,
+	cutNode,
+	ss->ttPv,
+	captureOrPromotion,
+	givesCheck,
+	ss->inCheck,
+	ttCapture,
+	priorCapture,
+	likelyFailLow,
+	bool(rangeReduction),
+	(ss-1)->moveCount == 1
+      };
 
       // Step 16. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1301,6 +1282,8 @@ moves_loop: // When in check, search starts here
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
+
+	  CC = true;
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
@@ -1400,6 +1383,13 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T1 = value > alpha;
+	      bool T2 = predict(1, C) > 0;
+	      dbg_hit_on(T1 != T2);
       }
 
       if (value > bestValue)

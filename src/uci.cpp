@@ -198,7 +198,7 @@ namespace {
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
 
-  int64_t iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states, const std::vector<Move> &bm, int& errors) {
+  double iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states, const std::vector<Move> &bm, int& errors) {
 
     string token;
     nodes = 0;
@@ -234,7 +234,7 @@ namespace {
 	    if(bm[i] != bestMoves[i])
 		    ++errors;
     }
-    return nodes;
+    return dbg_get_hit_on(0);
   }
 
   template <typename T = int64_t, typename V = int64_t>
@@ -250,8 +250,9 @@ namespace {
 
     //constexpr int64_t L = 50000;
     //constexpr int64_t L = 10000;
-    constexpr int64_t L = 100000;
+    //constexpr int64_t L = 100000;
     //constexpr int64_t L = 1000000;
+    constexpr double L = 0;
     Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
@@ -265,9 +266,10 @@ namespace {
 
     TimePoint elapsed = now();
 
-    int64_t valBest = iteration(pos, list, nodes, states, bm, errors);
+    double valBest = iteration(pos, list, nodes, states, bm, errors);
     bm = bestMoves;
     int it = 0;
+    std::cerr << "Reduction " << seed << std::endl;
     std::cerr << "Seed " << seed << std::endl;
     std::cerr << "L " << L << std::endl;
     if (method == SPSA)
@@ -288,8 +290,8 @@ namespace {
         std::vector<int> orig = params;
         ++it;
 
-	int64_t val;
-	int64_t valg;
+	double val;
+	double valg;
 	int errorsp;
 	int errorsm;
 
@@ -305,10 +307,10 @@ namespace {
 	    }
 
             params = paramsp;
-            int64_t valp = iteration(pos, list, nodes, states, bm, errorsp);
+            double valp = iteration(pos, list, nodes, states, bm, errorsp);
 
             params = paramsm;
-            int64_t valm = iteration(pos, list, nodes, states, bm, errorsm);
+            double valm = iteration(pos, list, nodes, states, bm, errorsm);
 
 	    if (valp  + L * errorsp <= valm + L * errorsm)
 	    {
