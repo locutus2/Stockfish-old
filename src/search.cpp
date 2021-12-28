@@ -39,10 +39,11 @@ namespace Stockfish {
 
   constexpr int NN_IN1 = 4;
   constexpr int NN_HIDDEN1 = 1;
-  constexpr int NN_INNER1 = 4;
+  constexpr int NN_INNER1 = NN_IN1 * NN_IN1;
+
   constexpr int NN_IN2 = 5;
   constexpr int NN_HIDDEN2 = 1;
-  constexpr int NN_INNER2 = 5;
+  constexpr int NN_INNER2 = NN_IN2 * NN_IN2;
 
   constexpr int NN_PARAMS1 =  NN_INNER1*(NN_IN1+1) + (NN_HIDDEN1-1)*NN_INNER1*(NN_INNER1+1) + NN_INNER1 + 1;
   constexpr int NN_PARAMS2 =  NN_INNER2*(NN_IN2+1) + (NN_HIDDEN2-1)*NN_INNER2*(NN_INNER2+1) + NN_INNER2 + 1;
