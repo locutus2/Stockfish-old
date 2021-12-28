@@ -1160,7 +1160,7 @@ moves_loop: // When in check, search starts here
           && (   !ss->ttPv
               || !captureOrPromotion
               || (cutNode && (ss-1)->moveCount > 1)
-              || probcutCount > 0))
+              || probcutCount == 0))
       {
           Depth r = reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta);
 
