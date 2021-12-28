@@ -449,7 +449,7 @@ void dbg_clear() {
 }
 
 void dbg_print() {
-
+return;
   for(int n = 0; n < DBG_N; ++n)
     if (hits[n][0])
         cerr << "[" << n << "] Total " << hits[n][0] << " Hits " << hits[n][1]

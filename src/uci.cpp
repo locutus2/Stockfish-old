@@ -340,7 +340,7 @@ namespace {
 	valg = val + L * errors;
 
         std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << val+L*errors << std::endl;
-	if(valg <= valBest)
+	if(valg < valBest)
 	{
 	    valBest = valg;
             std::cerr << "=>";
