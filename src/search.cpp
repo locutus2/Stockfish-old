@@ -1388,10 +1388,13 @@ moves_loop: // When in check, search starts here
       if(CC)
       {
 	      bool T1 = value > alpha;
-	      bool T2 = predict(1, C) > 0;
+	      double P = predict(1, C);
+	      bool T2 = P > 0;
 	      dbg_hit_on(T1 != T2, 0);
 	      dbg_hit_on(!T2, T1 != T2, 1);
 	      dbg_hit_on(T2, T1 != T2, 2);
+
+	      dbg_crossentropy_of(T1, P, 0);
       }
 
       if (value > bestValue)

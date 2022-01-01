@@ -50,6 +50,7 @@ void dbg_linc(int x1, int x2, int y, int n = 0, int w = 1);
 void dbg_cramer_of(bool x, bool y, int n = 0, int w = 1);
 void dbg_chi2_of(bool x, bool y, int n = 0, int w = 1);
 void dbg_gain_ratio(bool x, bool y, int n = 0, int w = 1);
+void dbg_crossentropy_of(bool x, double p, int n = 0, int w = 1);
 
 void dbg_hit_on(std::vector<bool>& c, bool b, int n = 0, int w = 1);
 void dbg_hit_on_cmp(std::vector<bool>& c, bool b, int n, int m, int w = 1);
@@ -59,6 +60,7 @@ void dbg_print();
 void dbg_printc();
 
 double dbg_get_hit_on(int n = 0);
+double dbg_get_crossentropy_of(int n = 0);
 
 
 typedef std::chrono::milliseconds::rep TimePoint; // A value in milliseconds
