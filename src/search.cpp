@@ -1389,7 +1389,9 @@ moves_loop: // When in check, search starts here
       {
 	      bool T1 = value > alpha;
 	      bool T2 = predict(1, C) > 0;
-	      dbg_hit_on(T1 != T2);
+	      dbg_hit_on(T1 != T2, 0);
+	      dbg_hit_on(!T2, T1 != T2, 1);
+	      dbg_hit_on(T2, T1 != T2, 2);
       }
 
       if (value > bestValue)

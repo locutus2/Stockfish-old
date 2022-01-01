@@ -234,7 +234,9 @@ namespace {
 	    if(bm[i] != bestMoves[i])
 		    ++errors;
     }
-    return dbg_get_hit_on(0);
+    //return dbg_get_hit_on(0); // 1-accuracy
+    return dbg_get_hit_on(1); // false negative
+    //return dbg_get_hit_on(2); // false positive
   }
 
   template <typename T = int64_t, typename V = int64_t>
