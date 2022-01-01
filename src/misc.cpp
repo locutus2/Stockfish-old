@@ -319,138 +319,139 @@ void dbg_linc(int x1, int x2, int y, int n, int w) { linc[n][0] += w; linc[n][1]
 void dbg_cramer_of(bool x, bool y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
 void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
 void dbg_gain_ratio(bool x, bool y, int n, int w) { gain[n][0] += w; gain[n][2*x+y+1] += w;}
+	constexpr int KCE = 10000;
 void dbg_crossentropy_of(bool x, double p, int n, int w) {
-	cross[n][0]++;
+	cross[n][0]+= w;
 	constexpr double A = 1;
 	p =  1 / (1 + std::exp(-A*p));
-	cross[n][1] -=  std::log(p) * x + std::log(1-p) * (1-x);
-}
+		cross[n][1] -= w * KCE * (x ? std::log(p) : std::log(1-p));
+	}
 
-void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) { 
-	const int cn = (int)c.size();
-	const int CN = 1 << cn;
-	assert(CN <= DBG_C2);
+	void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) { 
+		const int cn = (int)c.size();
+		const int CN = 1 << cn;
+		assert(CN <= DBG_C2);
 
-	for(int i = 0; i  < CN; ++i)
-	{
-		int k = 0;
-		for(int j = cn-1; j >= 0; --j)
+		for(int i = 0; i  < CN; ++i)
 		{
-			k *= 3;
-			if(i & (1<<j))
-				k += 2 - c[j];
-		}
-		assert(k < DBG_C3);
-		Chits[n][k][0] += w; if (b) Chits[n][k][1] += w; 
-	}	
-}
+			int k = 0;
+			for(int j = cn-1; j >= 0; --j)
+			{
+				k *= 3;
+				if(i & (1<<j))
+					k += 2 - c[j];
+			}
+			assert(k < DBG_C3);
+			Chits[n][k][0] += w; if (b) Chits[n][k][1] += w; 
+		}	
+	}
 
-void dbg_hit_on_cmp(std::vector<bool>& c, bool b, int n, int m, int w) { 
-	const int cn = (int)c.size();
-	const int CN = 1 << cn;
-	assert(CN <= DBG_C2);
+	void dbg_hit_on_cmp(std::vector<bool>& c, bool b, int n, int m, int w) { 
+		const int cn = (int)c.size();
+		const int CN = 1 << cn;
+		assert(CN <= DBG_C2);
 
-	for(int i = 0; i  < CN; ++i)
-	{
-		int k = 0;
-		for(int j = cn-1; j >= 0; --j)
+		for(int i = 0; i  < CN; ++i)
 		{
-			k *= 3;
-			if(i & (1<<j))
-				k += 2 - c[j];
-		}
-		assert(k < DBG_C3);
-		ChitsCmp[n][k][0] += w; 
-        if (b) ChitsCmp[n][k][1] += w;
-        ChitsCmp[n][k][2] = m;         
-	}	
-}
+			int k = 0;
+			for(int j = cn-1; j >= 0; --j)
+			{
+				k *= 3;
+				if(i & (1<<j))
+					k += 2 - c[j];
+			}
+			assert(k < DBG_C3);
+			ChitsCmp[n][k][0] += w; 
+		if (b) ChitsCmp[n][k][1] += w;
+		ChitsCmp[n][k][2] = m;         
+		}	
+	}
 
-void printCondition(int k, std::ostream& out = std::cerr)
-{
-              bool first = true;
-	      for(int i = 0; i < DBG_C; ++i)
-	      {
-		      if(k % 3)
+	void printCondition(int k, std::ostream& out = std::cerr)
+	{
+		      bool first = true;
+		      for(int i = 0; i < DBG_C; ++i)
 		      {
-		         if(!first) out << " & ";
-			 first = false;
-			 if(k % 3 == 1)
-				 out << "c" << i;
-			 else
-				 out << "!c" << i;
+			      if(k % 3)
+			      {
+				 if(!first) out << " & ";
+				 first = false;
+				 if(k % 3 == 1)
+					 out << "c" << i;
+				 else
+					 out << "!c" << i;
+			      }
+			      k /= 3;
 		      }
-                      k /= 3;
-	      }
-}
+	}
 
-void dbg_printc() {
+	void dbg_printc() {
 
-  const bool SORT = true;
-  int x[DBG_C3], m;
+	  const bool SORT = true;
+	  int x[DBG_C3], m;
 
-  for(int n = 0; n < DBG_N; ++n)
-  {
-      for(int k = 0; k < DBG_C3; ++k)
-              x[k] = k;
+	  for(int n = 0; n < DBG_N; ++n)
+	  {
+	      for(int k = 0; k < DBG_C3; ++k)
+		      x[k] = k;
 
-      if(SORT)
-              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (Chits[n][a][0]?Chits[n][a][1]/(double)Chits[n][a][0]:0.0)
-                                                                    > (Chits[n][b][0]?Chits[n][b][1]/(double)Chits[n][b][0]:0.0);} );
+	      if(SORT)
+		      std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (Chits[n][a][0]?Chits[n][a][1]/(double)Chits[n][a][0]:0.0)
+									    > (Chits[n][b][0]?Chits[n][b][1]/(double)Chits[n][b][0]:0.0);} );
 
-      for(int k = 0; k < DBG_C3; ++k)
-          if (Chits[n][x[k]][0])
-          {
-              cerr << "[" << n << "," << x[k] << "] Total " << Chits[n][x[k]][0] << " Chits " << Chits[n][x[k]][1]
-                   << " hit rate (%) " << 100. * Chits[n][x[k]][1] / Chits[n][x[k]][0];
-              cerr << " => ";
-              printCondition(x[k], cerr);
-              cerr << std::endl;
-          }
-  }
+	      for(int k = 0; k < DBG_C3; ++k)
+		  if (Chits[n][x[k]][0])
+		  {
+		      cerr << "[" << n << "," << x[k] << "] Total " << Chits[n][x[k]][0] << " Chits " << Chits[n][x[k]][1]
+			   << " hit rate (%) " << 100. * Chits[n][x[k]][1] / Chits[n][x[k]][0];
+		      cerr << " => ";
+		      printCondition(x[k], cerr);
+		      cerr << std::endl;
+		  }
+	  }
 
-  for(int n = 0; n < DBG_N; ++n)
-  {
-      for(int k = 0; k < DBG_C3; ++k)
-              x[k] = k;
+	  for(int n = 0; n < DBG_N; ++n)
+	  {
+	      for(int k = 0; k < DBG_C3; ++k)
+		      x[k] = k;
 
-      if(SORT)
-              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (ChitsCmp[ChitsCmp[n][a][2]][a][0] ? ChitsCmp[ChitsCmp[n][a][2]][a][1]/(double)ChitsCmp[ChitsCmp[n][a][2]][a][0] :0.0)
-                                                                     -(ChitsCmp[n][a][0]                 ? ChitsCmp[n][a][1]/(double)ChitsCmp[n][a][0]                                 :0.0)
-                                                                    > (ChitsCmp[ChitsCmp[n][b][2]][b][0] ? ChitsCmp[ChitsCmp[n][b][2]][b][1]/(double)ChitsCmp[ChitsCmp[n][b][2]][b][0] :0.0)
-                                                                     -(ChitsCmp[n][b][0]                 ? ChitsCmp[n][b][1]/(double)ChitsCmp[n][b][0]                                  :0.0);} );
+	      if(SORT)
+		      std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (ChitsCmp[ChitsCmp[n][a][2]][a][0] ? ChitsCmp[ChitsCmp[n][a][2]][a][1]/(double)ChitsCmp[ChitsCmp[n][a][2]][a][0] :0.0)
+									     -(ChitsCmp[n][a][0]                 ? ChitsCmp[n][a][1]/(double)ChitsCmp[n][a][0]                                 :0.0)
+									    > (ChitsCmp[ChitsCmp[n][b][2]][b][0] ? ChitsCmp[ChitsCmp[n][b][2]][b][1]/(double)ChitsCmp[ChitsCmp[n][b][2]][b][0] :0.0)
+									     -(ChitsCmp[n][b][0]                 ? ChitsCmp[n][b][1]/(double)ChitsCmp[n][b][0]                                  :0.0);} );
 
-      for(int k = 0; k < DBG_C3; ++k)
-          if (ChitsCmp[n][x[k]][0] && ChitsCmp[ChitsCmp[n][x[k]][2]][x[k]][0] && n < (m = ChitsCmp[n][x[k]][2]))
-          {
-              cerr << "[" << n << "," << x[k] << "] Total " << ChitsCmp[n][x[k]][0] << " ChitsCmp1 " << ChitsCmp[n][x[k]][1]
-                   << " hit rate (%) " << 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0]
-                   << " Total " << ChitsCmp[m][x[k]][0] << " ChitsCmp2 " << ChitsCmp[m][x[k]][1]
-                   << " hit rate (%) " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0]
-                   << " diff " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0] - 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0];
-              cerr << " => ";
-              printCondition(x[k], cerr);
-              cerr << std::endl;
-          }
-  }
+	      for(int k = 0; k < DBG_C3; ++k)
+		  if (ChitsCmp[n][x[k]][0] && ChitsCmp[ChitsCmp[n][x[k]][2]][x[k]][0] && n < (m = ChitsCmp[n][x[k]][2]))
+		  {
+		      cerr << "[" << n << "," << x[k] << "] Total " << ChitsCmp[n][x[k]][0] << " ChitsCmp1 " << ChitsCmp[n][x[k]][1]
+			   << " hit rate (%) " << 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0]
+			   << " Total " << ChitsCmp[m][x[k]][0] << " ChitsCmp2 " << ChitsCmp[m][x[k]][1]
+			   << " hit rate (%) " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0]
+			   << " diff " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0] - 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0];
+		      cerr << " => ";
+		      printCondition(x[k], cerr);
+		      cerr << std::endl;
+		  }
+	  }
 
-}
+	}
 
-double gain_ratio(double p)
+	double gain_ratio(double p)
+	{
+		if(p > 0 && p < 1)
+			return -(p*std::log(p)+(1-p)*std::log(1-p))/std::log(2);
+		else
+			return 0;
+	}
+
+	double dbg_get_hit_on(int n) {
+		return hits[n][0] ? hits[n][1]/double(hits[n][0]) : 0.0;
+	}
+
+	double dbg_get_crossentropy_of(int n)
 {
-	if(p > 0 && p < 1)
-		return -(p*std::log(p)+(1-p)*std::log(1-p))/std::log(2);
-	else
-		return 0;
-}
-
-double dbg_get_hit_on(int n) {
-	return hits[n][0] ? hits[n][1]/double(hits[n][0]) : 0.0;
-}
-
-double dbg_get_crossentropy_of(int n)
-{
-	return cross[n][0] ? cross[n][1]/double(cross[n][0])/std::log(2) : 1.0;
+	return cross[n][0] ? cross[n][1]/double(cross[n][0])/std::log(2)/KCE : 1.0;
 }
 
 void dbg_clear() {

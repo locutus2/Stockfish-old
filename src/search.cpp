@@ -1387,7 +1387,7 @@ moves_loop: // When in check, search starts here
 
       if(CC)
       {
-	      bool T1 = value > alpha;
+	      bool T1 = value <= alpha;
 	      double P = predict(1, C);
 	      bool T2 = P > 0;
 	      dbg_hit_on(T1 != T2, 0);
