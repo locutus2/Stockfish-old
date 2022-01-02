@@ -457,7 +457,10 @@ void dbg_crossentropy_of(bool x, double p, int n, double w) {
 void dbg_clear() {
   for(int n = 0; n < DBG_N; ++n)
 	  for(int i = 0; i < 2; ++i)
+	  {
 		  hits[n][i] = 0;
+		  cross[n][i] = 0;
+	  }
 }
 
 void dbg_print() {
