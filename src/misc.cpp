@@ -299,7 +299,8 @@ const int DBG_C3 = POW<3, DBG_C>::value;
 
 /// Debug functions used mainly to collect run-time statistics
 static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], biforms[DBG_N][7], cramer[DBG_N][5],
-                            chi2[DBG_N][5], gain[DBG_N][5], linc[DBG_N][5+2],cross[DBG_N][2];
+                            chi2[DBG_N][5], gain[DBG_N][5], linc[DBG_N][5+2];
+static std::atomic<double> cross[DBG_N][2];
 
 static std::atomic<int64_t> Chits[DBG_N][DBG_C3][2];
 static std::atomic<int64_t> ChitsCmp[DBG_N][DBG_C3][3];
@@ -319,13 +320,12 @@ void dbg_linc(int x1, int x2, int y, int n, int w) { linc[n][0] += w; linc[n][1]
 void dbg_cramer_of(bool x, bool y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
 void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
 void dbg_gain_ratio(bool x, bool y, int n, int w) { gain[n][0] += w; gain[n][2*x+y+1] += w;}
-	constexpr int KCE = 10000;
-void dbg_crossentropy_of(bool x, double p, int n, int w) {
-	cross[n][0]+= w;
+void dbg_crossentropy_of(bool x, double p, int n, double w) {
+	cross[n][0] = cross[n][0] + w;
 	constexpr double A = 1;
 	p =  1 / (1 + std::exp(-A*p));
-		cross[n][1] -= w * KCE * (x ? std::log(p) : std::log(1-p));
-	}
+		cross[n][1] = cross[n][1] - w * (x ? std::log(p) : std::log(1-p));
+}
 
 	void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) { 
 		const int cn = (int)c.size();
@@ -451,7 +451,7 @@ void dbg_crossentropy_of(bool x, double p, int n, int w) {
 
 	double dbg_get_crossentropy_of(int n)
 {
-	return cross[n][0] ? cross[n][1]/double(cross[n][0])/std::log(2)/KCE : 1.0;
+	return cross[n][0] ? cross[n][1]/double(cross[n][0])/std::log(2) : 1.0;
 }
 
 void dbg_clear() {

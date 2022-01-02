@@ -54,7 +54,7 @@ namespace Stockfish {
 
   int RELU(int x) { return std::max(x,0); }
 
-  int predictInternal(int nn_in, int nn_hidden, int nn_inner, int offset, const std::vector<bool>& C)
+  double predictInternal(int nn_in, int nn_hidden, int nn_inner, int offset, const std::vector<bool>& C)
   {
 	  int val = 0;
 	  if(nn_hidden == 0)
@@ -94,11 +94,13 @@ namespace Stockfish {
 		  {
 		  	val += params[offset++] * v[ind][i];
 		  }
-	  }
-	  return val;
+		}
+	  constexpr double A = 1;
+	  val = 1 / (1 + std::exp(-A * val));
+	return val;
   }
 
-  int predict(int nr, const std::vector<bool>& C)
+  double predict(int nr, const std::vector<bool>& C)
   {
 	  int nn_in = NN_IN1, nn_hidden = NN_HIDDEN1, nn_inner = NN_INNER1, offset = 0;
 	  if(nr == 2)
@@ -1389,7 +1391,7 @@ moves_loop: // When in check, search starts here
       {
 	      bool T1 = value <= alpha;
 	      double P = predict(1, C);
-	      bool T2 = P > 0;
+	      bool T2 = P > 0.5;
 	      dbg_hit_on(T1 != T2, 0);
 	      dbg_hit_on(!T2, T1 != T2, 1);
 	      dbg_hit_on(T2, T1 != T2, 2);
