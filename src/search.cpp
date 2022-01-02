@@ -45,8 +45,8 @@ namespace Stockfish {
   constexpr int NN_HIDDEN2 = 1;
   constexpr int NN_INNER2 = NN_IN2 * NN_IN2;
 
-  constexpr int NN_PARAMS1 =  NN_INNER1*(NN_IN1+1) + (NN_HIDDEN1-1)*NN_INNER1*(NN_INNER1+1) + NN_INNER1 + 1;
-  constexpr int NN_PARAMS2 =  NN_INNER2*(NN_IN2+1) + (NN_HIDDEN2-1)*NN_INNER2*(NN_INNER2+1) + NN_INNER2 + 1;
+  constexpr int NN_PARAMS1 =  (NN_HIDDEN1 == 0 ? NN_IN1 + 1 : NN_INNER1*(NN_IN1+1) + (NN_HIDDEN1-1)*NN_INNER1*(NN_INNER1+1) + NN_INNER1 + 1);
+  constexpr int NN_PARAMS2 =  (NN_HIDDEN2 == 0 ? NN_IN2 + 1 : NN_INNER2*(NN_IN2+1) + (NN_HIDDEN2-1)*NN_INNER2*(NN_INNER2+1) + NN_INNER2 + 1);
   constexpr int NN_PARAMS = NN_PARAMS1 + NN_PARAMS2;
 
   std::vector<int> params(NN_PARAMS, 0);
@@ -94,7 +94,7 @@ namespace Stockfish {
 		  {
 		  	val += params[offset++] * v[ind][i];
 		  }
-		}
+        }
 	constexpr double A = 1;
 	val = 1 / (1 + std::exp(-A * val));
 	return val;
@@ -1285,7 +1285,7 @@ moves_loop: // When in check, search starts here
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
-	  bool P = predict(1, C) >= 0.5;
+	  bool P = predict(1, C) > 0.5;
 	  if(P) r++;
 
 	  CC = true;
@@ -1395,7 +1395,7 @@ moves_loop: // When in check, search starts here
 	      bool T1 = value <= alpha;
 	      double P = predict(1, C);
 	      //std::cerr << "P " << P << std::endl;
-	      bool T2 = P >= 0.5;
+	      bool T2 = P > 0.5;
 	      dbg_hit_on(T1 != T2, 0);
 	      dbg_hit_on(!T2, T1 != T2, 1);
 	      dbg_hit_on(T2, T1 != T2, 2);
