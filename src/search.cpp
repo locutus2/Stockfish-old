@@ -38,7 +38,7 @@
 namespace Stockfish {
 
   constexpr int NN_IN1 = 11;
-  constexpr int NN_HIDDEN1 = 1;
+  constexpr int NN_HIDDEN1 = 0;
   constexpr int NN_INNER1 = NN_IN1 * NN_IN1;
 
   constexpr int NN_IN2 = 5;
