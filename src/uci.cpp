@@ -256,7 +256,8 @@ namespace {
     //constexpr int64_t L = 10000;
     //constexpr int64_t L = 100000;
     //constexpr int64_t L = 1000000;
-    constexpr double L = 0;
+    constexpr double W = 0;
+    constexpr double L = 1;
     Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
@@ -270,18 +271,26 @@ namespace {
 
     TimePoint elapsed = now();
 
-    double valBest = iteration(pos, list, nodes, states, bm, errors);
+    double val = iteration(pos, list, nodes, states, bm, errors);
     bm = bestMoves;
+
+    for(int i = 0; i < (int)params.size(); ++i)
+        params[i] += std::rand() % 3 - 1;
+    val = iteration(pos, list, nodes, states, bm, errors);
+
     int it = 0;
     std::cerr << "Reduction " << seed << std::endl;
     std::cerr << "Seed " << seed << std::endl;
+    std::cerr << "W " << W << std::endl;
     std::cerr << "L " << L << std::endl;
     if (method == SPSA)
        std::cerr << "Method: SPSA" << std::endl;
     if (method == HILL_CLIMB)
        std::cerr << "Method: Hill climbing" << std::endl;
 
-    std::cerr << "Iter " << it << " val=" << valBest << " err=" << errors << " loss=" << valBest+L*errors << std::endl;
+    double valBest = W * val + L * errors;
+    std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << valBest << std::endl;
+
     std::cerr << "=>";
     for(int i = 0; i < (int)params.size(); ++i)
     {
@@ -294,7 +303,6 @@ namespace {
         std::vector<int> orig = params;
         ++it;
 
-	double val;
 	double valg;
 	int errorsp;
 	int errorsm;
@@ -316,7 +324,7 @@ namespace {
             params = paramsm;
             double valm = iteration(pos, list, nodes, states, bm, errorsm);
 
-	    if (valp  + L * errorsp <= valm + L * errorsm)
+	    if (W * valp  + L * errorsp <= W * valm + L * errorsm)
 	    {
 		    params = paramsp;
 		    errors = errorsp;
@@ -338,12 +346,12 @@ namespace {
 
             val = iteration(pos, list, nodes, states, bm, errors);
 
-	    if(val + L * errors > valBest)
+	    if(W * val + L * errors > valBest)
                 params = orig;
 	}
-	valg = val + L * errors;
+	valg = W * val + L * errors;
 
-        std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << val+L*errors << std::endl;
+        std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << W * val+L*errors << std::endl;
 	if(valg < valBest)
 	{
 	    valBest = valg;
