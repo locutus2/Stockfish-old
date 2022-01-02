@@ -38,7 +38,7 @@
 namespace Stockfish {
 
   constexpr int NN_IN1 = 11;
-  constexpr int NN_HIDDEN1 = 1;
+  constexpr int NN_HIDDEN1 = 0;
   constexpr int NN_INNER1 = NN_IN1 * NN_IN1;
 
   constexpr int NN_IN2 = 5;
@@ -47,7 +47,7 @@ namespace Stockfish {
 
   constexpr int NN_PARAMS1 =  (NN_HIDDEN1 == 0 ? NN_IN1 + 1 : NN_INNER1*(NN_IN1+1) + (NN_HIDDEN1-1)*NN_INNER1*(NN_INNER1+1) + NN_INNER1 + 1);
   constexpr int NN_PARAMS2 =  (NN_HIDDEN2 == 0 ? NN_IN2 + 1 : NN_INNER2*(NN_IN2+1) + (NN_HIDDEN2-1)*NN_INNER2*(NN_INNER2+1) + NN_INNER2 + 1);
-  constexpr int NN_PARAMS = NN_PARAMS1 + NN_PARAMS2;
+  constexpr int NN_PARAMS = NN_PARAMS1 + 0*NN_PARAMS2;
 
   std::vector<int> params(NN_PARAMS, 0);
   std::vector<Move> bestMoves;
@@ -1400,8 +1400,8 @@ moves_loop: // When in check, search starts here
 	      dbg_hit_on(!T2, T1 != T2, 1);
 	      dbg_hit_on(T2, T1 != T2, 2);
 
-	      //dbg_crossentropy_of(T1, P, 0);
-	      if(T2) dbg_crossentropy_of(T1, P, 0);
+	      dbg_crossentropy_of(T1, P, 0);
+	      //if(T2) dbg_crossentropy_of(T1, P, 0);
       }
 
       if (value > bestValue)
