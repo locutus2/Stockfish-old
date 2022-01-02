@@ -968,10 +968,9 @@ moves_loop: // When in check, search starts here
     value = bestValue;
     moveCountPruning = false;
 
-    // Indicate PvNodes that will probably fail low if the node was searched
+    // Indicate nodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
-    bool likelyFailLow =    (PvNode || !cutNode)
-                         && ttMove
+    bool likelyFailLow =    ttMove
                          && (tte->bound() & BOUND_UPPER)
                          && tte->depth() >= depth;
 
