@@ -322,8 +322,8 @@ void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+
 void dbg_gain_ratio(bool x, bool y, int n, int w) { gain[n][0] += w; gain[n][2*x+y+1] += w;}
 void dbg_crossentropy_of(bool x, double p, int n, double w) {
 	cross[n][0] = cross[n][0] + w;
-	constexpr double A = 1;
-	p =  1 / (1 + std::exp(-A*p));
+	//constexpr double A = 1;
+	//p =  1 / (1 + std::exp(-A*p));
 		cross[n][1] = cross[n][1] - w * (x ? std::log(p) : std::log(1-p));
 }
 
@@ -459,6 +459,7 @@ void dbg_clear() {
 	  for(int i = 0; i < 2; ++i)
 	  {
 		  hits[n][i] = 0;
+		  means[n][i] = 0;
 		  cross[n][i] = 0;
 	  }
 }
