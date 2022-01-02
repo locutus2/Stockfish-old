@@ -1400,7 +1400,8 @@ moves_loop: // When in check, search starts here
 	      dbg_hit_on(!T2, T1 != T2, 1);
 	      dbg_hit_on(T2, T1 != T2, 2);
 
-	      if(T2) dbg_crossentropy_of(T1, P, 0);
+	      dbg_crossentropy_of(T1, P, 0);
+	      //if(T2) dbg_crossentropy_of(T1, P, 0);
       }
 
       if (value > bestValue)
