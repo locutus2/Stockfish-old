@@ -1285,7 +1285,7 @@ moves_loop: // When in check, search starts here
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
-	  bool P = predict(1, C) > 0.0;
+	  bool P = predict(1, C) >= 0.5;
 	  if(P) r++;
 
 	  CC = true;
@@ -1394,7 +1394,7 @@ moves_loop: // When in check, search starts here
       {
 	      bool T1 = value <= alpha;
 	      double P = predict(1, C);
-	      bool T2 = P > 0.5;
+	      bool T2 = P >= 0.5;
 	      dbg_hit_on(T1 != T2, 0);
 	      dbg_hit_on(!T2, T1 != T2, 1);
 	      dbg_hit_on(T2, T1 != T2, 2);

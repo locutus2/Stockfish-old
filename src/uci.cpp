@@ -256,7 +256,7 @@ namespace {
     //constexpr int64_t L = 10000;
     //constexpr int64_t L = 100000;
     //constexpr int64_t L = 1000000;
-    constexpr double W = 0;
+    constexpr double W = 1;
     constexpr double L = 1;
     Method method = SPSA;
     uint64_t nodes = 0;
@@ -279,7 +279,7 @@ namespace {
     val = iteration(pos, list, nodes, states, bm, errors);
 
     int it = 0;
-    std::cerr << "Reduction " << seed << std::endl;
+    std::cerr << "Reduction " << std::endl;
     std::cerr << "Seed " << seed << std::endl;
     std::cerr << "W " << W << std::endl;
     std::cerr << "L " << L << std::endl;
