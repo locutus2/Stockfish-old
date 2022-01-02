@@ -56,7 +56,7 @@ namespace Stockfish {
 
   double predictInternal(int nn_in, int nn_hidden, int nn_inner, int offset, const std::vector<bool>& C)
   {
-	  int val = 0;
+	  double val = 0;
 	  if(nn_hidden == 0)
 	  {
 		  val = params[offset++];
@@ -95,8 +95,8 @@ namespace Stockfish {
 		  	val += params[offset++] * v[ind][i];
 		  }
 		}
-	  constexpr double A = 1;
-	  val = 1 / (1 + std::exp(-A * val));
+	constexpr double A = 1;
+	val = 1 / (1 + std::exp(-A * val));
 	return val;
   }
 
@@ -1394,12 +1394,13 @@ moves_loop: // When in check, search starts here
       {
 	      bool T1 = value <= alpha;
 	      double P = predict(1, C);
+	      //std::cerr << "P " << P << std::endl;
 	      bool T2 = P >= 0.5;
 	      dbg_hit_on(T1 != T2, 0);
 	      dbg_hit_on(!T2, T1 != T2, 1);
 	      dbg_hit_on(T2, T1 != T2, 2);
 
-	      dbg_crossentropy_of(T1, P, 0);
+	      if(T2) dbg_crossentropy_of(T1, P, 0);
       }
 
       if (value > bestValue)
