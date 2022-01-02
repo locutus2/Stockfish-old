@@ -69,9 +69,9 @@ namespace {
   // Reductions lookup table, initialized at startup
   int Reductions[MAX_MOVES]; // [depth or moveNumber]
 
-  Depth reduction(bool i, Depth d, int mn, bool rangeReduction, Value delta, Value rootDelta) {
+  Depth reduction(bool i, Depth d, int mn, Value delta, Value rootDelta) {
     int r = Reductions[d] * Reductions[mn];
-    return (r + 1358 - int(delta) * 1024 / int(rootDelta)) / 1024 + (!i && r > 904) + rangeReduction;
+    return (r + 1358 - int(delta) * 1024 / int(rootDelta)) / 1024 + (!i && r > 904);
   }
 
   constexpr int futility_move_count(bool improving, Depth depth) {
@@ -550,7 +550,7 @@ namespace {
     if (   ss->ply > 10
         && search_explosion(thisThread) == MUST_CALM_DOWN
         && depth > (ss-1)->depth)
-       depth = (ss-1)->depth;
+        depth = (ss-1)->depth;
 
     constexpr bool PvNode = nodeType != NonPV;
     constexpr bool rootNode = nodeType == Root;
@@ -938,8 +938,6 @@ namespace {
 
 moves_loop: // When in check, search starts here
 
-    int rangeReduction = 0;
-
     // Step 11. A small Probcut idea, when we are in check (~0 Elo)
     probCutBeta = beta + 409;
     if (   ss->inCheck
@@ -1026,7 +1024,7 @@ moves_loop: // When in check, search starts here
           moveCountPruning = moveCount >= futility_move_count(improving, depth);
 
           // Reduced depth of the next LMR search
-          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta), 0);
+          int lmrDepth = std::max(newDepth - reduction(improving, depth, moveCount, delta, thisThread->rootDelta), 0);
 
           if (   captureOrPromotion
               || givesCheck)
@@ -1159,7 +1157,7 @@ moves_loop: // When in check, search starts here
               || !captureOrPromotion
               || (cutNode && (ss-1)->moveCount > 1)))
       {
-          Depth r = reduction(improving, depth, moveCount, rangeReduction > 2, delta, thisThread->rootDelta);
+          Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
           // Decrease reduction at some PvNodes (~2 Elo)
           if (   PvNode
@@ -1206,13 +1204,9 @@ moves_loop: // When in check, search starts here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          // Range reductions (~3 Elo)
-          if (ss->staticEval - value < 30 && depth > 7)
-              rangeReduction++;
-
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
-          doDeeperSearch = value > alpha + 88;
+          doDeeperSearch = value > (alpha + 62 + 20 * (newDepth - d));
           didLMR = true;
       }
       else
@@ -1280,7 +1274,7 @@ moves_loop: // When in check, search starts here
                   rm.pv.push_back(*m);
 
               // We record how often the best move has been changed in each iteration.
-              // This information is used for time management and LMR. In MultiPV mode,
+              // This information is used for time management. In MultiPV mode,
               // we must take care to only do this for the first PV line.
               if (   moveCount > 1
                   && !thisThread->pvIdx)
