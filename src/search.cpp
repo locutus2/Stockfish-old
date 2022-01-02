@@ -1182,7 +1182,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if(likelyFailLow && !priorCapture && (ss-1)->moveCount != 1)
+          if(!PvNode && !cutNode && !priorCapture && (ss-1)->moveCount != 1)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
