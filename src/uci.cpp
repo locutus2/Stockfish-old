@@ -282,7 +282,7 @@ namespace {
     int it = 0;
     std::cerr << "Reduction " << std::endl;
     std::cerr << "Seed " << seed << std::endl;
-    std::cerr << "PARAMS " << N_PARAMS << std::endl;
+    std::cerr << "PARAMS " << params.size() << std::endl;
     std::cerr << "W " << W << std::endl;
     std::cerr << "L " << L << std::endl;
     if (method == SPSA)
