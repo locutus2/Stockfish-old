@@ -235,7 +235,8 @@ namespace {
 		    ++errors;
     }
 
-    return dbg_get_crossentropy_of(0); // cross entropy
+    return nodes;
+    //return dbg_get_crossentropy_of(0); // cross entropy
     //return dbg_get_hit_on(0); // 1-accuracy
     //return dbg_get_hit_on(1); // false negative
     //return dbg_get_hit_on(2); // false positive
@@ -257,7 +258,7 @@ namespace {
     //constexpr int64_t L = 100000;
     //constexpr int64_t L = 1000000;
     constexpr double W = 1;
-    constexpr double L = 1;
+    constexpr double L = 100000;
     Method method = SPSA;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
