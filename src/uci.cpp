@@ -198,6 +198,9 @@ namespace {
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
 
+  enum LOSS {LOSS_CROSSENTROPY, LOSS_NODES, LOSS_ERROR_RATE};
+  constexpr LOSS lossF = LOSS_CROSSENTROPY;
+
   double iteration(Position& pos, const std::vector<string> &list, uint64_t& nodes, StateListPtr& states, const std::vector<Move> &bm, int& errors) {
 
     string token;
@@ -235,7 +238,20 @@ namespace {
 		    ++errors;
     }
 
-    return nodes;
+    double val = 0;
+    switch(lossF)
+    {
+	    case LOSS_CROSSENTROPY:
+    		val = dbg_get_crossentropy_of(0); // cross entropy
+		    break;
+	    case LOSS_NODES:
+		val = nodes;
+		    break;
+	    case LOSS_ERROR_RATE:
+    		val = dbg_get_hit_on(0); // 1-accuracy
+		    break;
+    }
+    return val;
     //return dbg_get_crossentropy_of(0); // cross entropy
     //return dbg_get_hit_on(0); // 1-accuracy
     //return dbg_get_hit_on(1); // false negative
@@ -249,17 +265,23 @@ namespace {
 	  V operator()() const { return (*this)[0] + L * (*this)[1]; }
   };
 
+  enum Method {HILL_CLIMB, SPSA};
+
+    constexpr Method method = SPSA;
+
   void learn(Position& pos, istream& args, StateListPtr& states) {
 
-    enum Method {HILL_CLIMB, SPSA};
 
     //constexpr int64_t L = 50000;
     //constexpr int64_t L = 10000;
     //constexpr int64_t L = 100000;
     //constexpr int64_t L = 1000000;
-    constexpr double W = 1;
-    constexpr double L = 100000;
-    Method method = SPSA;
+    constexpr double W = lossF == LOSS_CROSSENTROPY ? 1.0*558 :
+	                 lossF == LOSS_ERROR_RATE   ? 1.0 :
+			 lossF == LOSS_NODES        ? 1.0 : 1.0;
+    constexpr double L = lossF == LOSS_CROSSENTROPY ? 1.0 :
+	                 lossF == LOSS_ERROR_RATE   ? 1.0 :
+			 lossF == LOSS_NODES        ? 100000.0 : 1.0;
     uint64_t nodes = 0;
     size_t seed = std::time(nullptr);
     //std::srand(12345);
