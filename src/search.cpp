@@ -37,9 +37,9 @@
 
 namespace Stockfish {
 
-  constexpr int NN_IN1 = 11;
-  constexpr int NN_HIDDEN1 = 0;
-  constexpr int NN_INNER1 = NN_IN1 * NN_IN1;
+  constexpr int NN_IN1 = 10;
+  constexpr int NN_HIDDEN1 = 1;
+  constexpr int NN_INNER1 = NN_IN1;// * NN_IN1;
 
   constexpr int NN_IN2 = 5;
   constexpr int NN_HIDDEN2 = 1;
@@ -1235,7 +1235,6 @@ moves_loop: // When in check, search starts here
 	ttCapture,
 	priorCapture,
 	likelyFailLow,
-	bool(rangeReduction),
 	(ss-1)->moveCount == 1
       };
 
@@ -1283,10 +1282,13 @@ moves_loop: // When in check, search starts here
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
-	  bool P = predict(1, C) > 0.5;
-	  if(P) r++;
+	  CC = depth <= 3;
+	  if(CC)
+	  {
+	      bool P = predict(1, C) > 0.5;
+	      if(P) r++;
+	  }
 
-	  CC = true;
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
