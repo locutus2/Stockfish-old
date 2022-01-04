@@ -269,6 +269,10 @@ namespace {
 
     constexpr Method method = SPSA;
 
+  enum Gradiant {G_ALL1, G_ONE1};
+
+    constexpr Gradiant gradiant = G_ONE1;
+
   void learn(Position& pos, istream& args, StateListPtr& states) {
 
 
@@ -299,8 +303,13 @@ namespace {
     double val = iteration(pos, list, nodes, states, bm, errors);
     bm = bestMoves;
 
-    for(int i = 0; i < (int)params.size(); ++i)
-        params[i] += std::rand() % 3 - 1;
+    if (gradiant == G_ALL1)
+        for(int i = 0; i < (int)params.size(); ++i)
+            params[i] += std::rand() % 3 - 1;
+
+    if (gradiant == G_ONE1)
+            params[std::rand()%params.size()] += 2 * (std::rand() % 2) - 1;
+    
     val = iteration(pos, list, nodes, states, bm, errors);
 
     int it = 0;
@@ -313,6 +322,11 @@ namespace {
        std::cerr << "Method: SPSA" << std::endl;
     if (method == HILL_CLIMB)
        std::cerr << "Method: Hill climbing" << std::endl;
+
+    if (gradiant == G_ALL1)
+       std::cerr << "Gradiant: all (-1,1)" << std::endl;
+    if (gradiant == G_ONE1)
+       std::cerr << "Gradiant: one (-1,1)" << std::endl;
 
     double valBest = W * val + L * errors;
     std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << valBest << std::endl;
@@ -330,25 +344,37 @@ namespace {
         ++it;
 
 	double valg;
-	int errorsp;
-	int errorsm;
+	double valp = 0;
+	double valm = 0;
+	int errorsp = 0;
+	int errorsm = 0;
 
 	if (method == SPSA)
 	{
             std::vector<int> paramsp = params;
             std::vector<int> paramsm = params;
-	    for(int i = 0; i < (int)params.size(); ++i)
+
+            if (gradiant == G_ALL1)
+	        for(int i = 0; i < (int)params.size(); ++i)
+	        {
+                    int d = std::rand() % 3 - 1;
+		    paramsp[i] += d;
+		    paramsm[i] -= d;
+	        }
+
+            else if (gradiant == G_ONE1)
 	    {
-                int d = std::rand() % 3 - 1;
-		paramsp[i] += d;
-		paramsm[i] -= d;
+                int j = std::rand()&params.size();
+		int d = 2 * (std::rand() % 2) - 1;
+                paramsp[j] += d;
+                paramsm[j] -= d;
 	    }
 
             params = paramsp;
-            double valp = iteration(pos, list, nodes, states, bm, errorsp);
+            valp = iteration(pos, list, nodes, states, bm, errorsp);
 
             params = paramsm;
-            double valm = iteration(pos, list, nodes, states, bm, errorsm);
+            valm = iteration(pos, list, nodes, states, bm, errorsm);
 
 	    if (W * valp  + L * errorsp <= W * valm + L * errorsm)
 	    {
@@ -365,10 +391,12 @@ namespace {
 	}
 	else if (method == HILL_CLIMB)
 	{
-	    for(int i = 0; i < (int)params.size(); ++i)
-	    {
-		params[i] += std::rand() % 3 - 1;
-	    }
+            if (gradiant == G_ALL1)
+	        for(int i = 0; i < (int)params.size(); ++i)
+	      	    params[i] += std::rand() % 3 - 1;
+
+            else if (gradiant == G_ONE1)
+                params[std::rand()%params.size()] += 2 * (std::rand() % 2) - 1;
 
             val = iteration(pos, list, nodes, states, bm, errors);
 
@@ -388,6 +416,8 @@ namespace {
             }
             std::cerr << std::endl;
 	}
+        std::cerr << "+ " << " val=" << valp << " err=" << errorsp << " loss=" << W * valp+L*errorsp << std::endl;
+        std::cerr << "- " << " val=" << valm << " err=" << errorsm << " loss=" << W * valm+L*errorsm << std::endl;
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
