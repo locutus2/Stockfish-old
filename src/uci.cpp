@@ -269,9 +269,9 @@ namespace {
 
     constexpr Method method = SPSA;
 
-  enum Gradiant {G_ALL1, G_ONE1};
+  enum Gradiant {G_ALL1, G_ONE1, G_DYN1};
 
-    constexpr Gradiant gradiant = G_ONE1;
+    constexpr Gradiant gradiant = G_DYN1;
 
   void learn(Position& pos, istream& args, StateListPtr& states) {
 
@@ -294,6 +294,7 @@ namespace {
     std::vector<Move> bm;
     int errors = 0;
     std::srand(seed);
+    int steps = 1;
 
     vector<string> list = setup_bench(pos, args);
     //num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
@@ -303,6 +304,7 @@ namespace {
     double val = iteration(pos, list, nodes, states, bm, errors);
     bm = bestMoves;
 
+    /*
     if (gradiant == G_ALL1)
         for(int i = 0; i < (int)params.size(); ++i)
             params[i] += std::rand() % 3 - 1;
@@ -310,7 +312,12 @@ namespace {
     if (gradiant == G_ONE1)
             params[std::rand()%params.size()] += 2 * (std::rand() % 2) - 1;
     
+    if (gradiant == G_DYN1)
+        for(int i = 0; i < steps; ++i)
+            params[std::rand()%params.size()] += 2 * (std::rand() % 2) - 1;
+
     val = iteration(pos, list, nodes, states, bm, errors);
+    */
 
     int it = 0;
     std::cerr << "Reduction " << std::endl;
@@ -320,16 +327,21 @@ namespace {
     std::cerr << "L " << L << std::endl;
     if (method == SPSA)
        std::cerr << "Method: SPSA" << std::endl;
-    if (method == HILL_CLIMB)
+    else if (method == HILL_CLIMB)
        std::cerr << "Method: Hill climbing" << std::endl;
 
     if (gradiant == G_ALL1)
-       std::cerr << "Gradiant: all (-1,1)" << std::endl;
-    if (gradiant == G_ONE1)
+       std::cerr << "Gradiant: all (-1,0,1)" << std::endl;
+    else if (gradiant == G_ONE1)
        std::cerr << "Gradiant: one (-1,1)" << std::endl;
+    else if (gradiant == G_DYN1)
+       std::cerr << "Gradiant: dynamic (-1,1)" << std::endl;
 
     double valBest = W * val + L * errors;
-    std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << valBest << std::endl;
+    std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << valBest;
+    if (gradiant == G_DYN1)
+        std::cerr << " steps=" << steps;
+    std::cerr << std::endl;
 
     std::cerr << "=>";
     for(int i = 0; i < (int)params.size(); ++i)
@@ -370,6 +382,17 @@ namespace {
                 paramsm[j] -= d;
 	    }
 
+            else if (gradiant == G_DYN1)
+	    {
+                for(int i = 0; i < steps; ++i)
+		{
+                    int j = std::rand()&params.size();
+		    int d = 2 * (std::rand() % 2) - 1;
+                    paramsp[j] += d;
+                    paramsm[j] -= d;
+		}
+	    }
+
             params = paramsp;
             valp = iteration(pos, list, nodes, states, bm, errorsp);
 
@@ -398,6 +421,10 @@ namespace {
             else if (gradiant == G_ONE1)
                 params[std::rand()%params.size()] += 2 * (std::rand() % 2) - 1;
 
+            else if (gradiant == G_DYN1)
+                for(int i = 0; i < steps; ++i)
+                    params[std::rand()%params.size()] += 2 * (std::rand() % 2) - 1;
+
             val = iteration(pos, list, nodes, states, bm, errors);
 
 	    if(W * val + L * errors > valBest)
@@ -405,9 +432,13 @@ namespace {
 	}
 	valg = W * val + L * errors;
 
-        std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << W * val+L*errors << std::endl;
+        std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << W * val+L*errors;
+        if (gradiant == G_DYN1)
+            std::cerr << " steps=" << steps;
+        std::cerr << std::endl;
 	if(valg < valBest)
 	{
+            steps = 1;
 	    valBest = valg;
             std::cerr << "=>";
             for(int i = 0; i < (int)params.size(); ++i)
@@ -416,6 +447,9 @@ namespace {
             }
             std::cerr << std::endl;
 	}
+	else
+            ++steps;
+
         std::cerr << "+ " << " val=" << valp << " err=" << errorsp << " loss=" << W * valp+L*errorsp << std::endl;
         std::cerr << "- " << " val=" << valm << " err=" << errorsm << " loss=" << W * valm+L*errorsm << std::endl;
     }
