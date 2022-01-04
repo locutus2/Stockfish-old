@@ -276,10 +276,12 @@ namespace {
     //constexpr int64_t L = 10000;
     //constexpr int64_t L = 100000;
     //constexpr int64_t L = 1000000;
-    constexpr double W = lossF == LOSS_CROSSENTROPY ? 1.0*558 :
+    //constexpr double W = lossF == LOSS_CROSSENTROPY ? 1.0*558 :
+    constexpr double W = lossF == LOSS_CROSSENTROPY ? 1.0 :
 	                 lossF == LOSS_ERROR_RATE   ? 1.0 :
 			 lossF == LOSS_NODES        ? 1.0 : 1.0;
-    constexpr double L = lossF == LOSS_CROSSENTROPY ? 1.0 :
+    //constexpr double L = lossF == LOSS_CROSSENTROPY ? 1.0 :
+    constexpr double L = lossF == LOSS_CROSSENTROPY ? 0.0 :
 	                 lossF == LOSS_ERROR_RATE   ? 1.0 :
 			 lossF == LOSS_NODES        ? 100000.0 : 1.0;
     uint64_t nodes = 0;
