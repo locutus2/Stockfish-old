@@ -1182,7 +1182,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (depth <= 3)
+          if (depth <= 3 && (ss-1)->moveCount == 1)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
