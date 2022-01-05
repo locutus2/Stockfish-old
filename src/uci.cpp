@@ -295,6 +295,8 @@ namespace {
     int errors = 0;
     std::srand(seed);
     int steps = 1;
+    int Ksteps = 2 * params.size();
+    int ksteps = 0;
 
     vector<string> list = setup_bench(pos, args);
     //num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
@@ -340,7 +342,10 @@ namespace {
     double valBest = W * val + L * errors;
     std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << valBest;
     if (gradiant == G_DYN1)
-        std::cerr << " steps=" << steps;
+    {
+            std::cerr << " steps=" << steps;
+            std::cerr << " substeps=" << Ksteps-ksteps;
+    }
     std::cerr << std::endl;
 
     std::cerr << "=>";
@@ -434,11 +439,17 @@ namespace {
 
         std::cerr << "Iter " << it << " val=" << val << " err=" << errors << " loss=" << W * val+L*errors;
         if (gradiant == G_DYN1)
+	{
             std::cerr << " steps=" << steps;
+            std::cerr << " substeps=" << Ksteps-ksteps;
+	}
         std::cerr << std::endl;
+
 	if(valg < valBest)
 	{
             steps = 1;
+            Ksteps = 2 * params.size();
+            ksteps = 0;
 	    valBest = valg;
             std::cerr << "=>";
             for(int i = 0; i < (int)params.size(); ++i)
@@ -448,10 +459,18 @@ namespace {
             std::cerr << std::endl;
 	}
 	else
-            ++steps;
+	{
+            ++ksteps;
+	    if(ksteps >= Ksteps)
+	    {
+		    ksteps = 0;
+		    steps++;
+		    Ksteps = Ksteps * 2 * (params.size() - steps + 1) / steps;
+	    }
+	}
 
-        std::cerr << "+ " << " val=" << valp << " err=" << errorsp << " loss=" << W * valp+L*errorsp << std::endl;
-        std::cerr << "- " << " val=" << valm << " err=" << errorsm << " loss=" << W * valm+L*errorsm << std::endl;
+        //std::cerr << "+ " << " val=" << valp << " err=" << errorsp << " loss=" << W * valp+L*errorsp << std::endl;
+        //std::cerr << "- " << " val=" << valm << " err=" << errorsm << " loss=" << W * valm+L*errorsm << std::endl;
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
