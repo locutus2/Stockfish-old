@@ -39,8 +39,9 @@ std::string pretty(Bitboard b);
 
 } // namespace Stockfish::Bitboards
 
-constexpr Bitboard AllSquares = ~Bitboard(0);
+constexpr Bitboard AllSquares  = ~Bitboard(0);
 constexpr Bitboard DarkSquares = 0xAA55AA55AA55AA55ULL;
+constexpr Bitboard Corners     =  1ULL << SQ_A1 | 1ULL << SQ_H1 | 1ULL << SQ_A8 | 1ULL << SQ_H8;
 
 constexpr Bitboard FileABB = 0x0101010101010101ULL;
 constexpr Bitboard FileBBB = FileABB << 1;

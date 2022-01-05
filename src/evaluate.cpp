@@ -1046,8 +1046,6 @@ make_v:
 
   Value fix_FRC(const Position& pos) {
 
-    constexpr Bitboard Corners =  1ULL << SQ_A1 | 1ULL << SQ_H1 | 1ULL << SQ_A8 | 1ULL << SQ_H8;
-
     if (!(pos.pieces(BISHOP) & Corners))
         return VALUE_ZERO;
 
