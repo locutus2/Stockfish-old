@@ -1182,6 +1182,11 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (   type_of(movedPiece) == ROOK
+              && !captureOrPromotion
+              && more_than_one(pos.pieces(us, PAWN) & rank_bb(to_sq(move)) & adjacent_files_bb(to_sq(move))))
+              r++;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
