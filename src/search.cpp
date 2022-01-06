@@ -1040,8 +1040,7 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // SEE based pruning (~9 Elo)
-              if (   !(givesCheck && (*contHist[0])[movedPiece][to_sq(move)] > 0)
-                  && !pos.see_ge(move, Value(-218) * depth))
+              if (!pos.see_ge(move, Value(-218 - (*contHist[0])[movedPiece][to_sq(move)] / 1024) * depth))
                   continue;
           }
           else
