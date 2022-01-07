@@ -258,6 +258,7 @@ namespace {
   };
 
   constexpr Value CorneredBishop = Value(50);
+  constexpr Value CorneredKnight = Value(150);
 
   // Assorted bonuses and penalties
   constexpr Score UncontestedOutpost  = S(  1, 10);
@@ -1042,35 +1043,61 @@ make_v:
   }
 
 
-  /// Fisher Random Chess: correction for cornered bishops, to fix chess960 play with NNUE
+  /// Fisher Random Chess: correction for cornered bishops and knights, to fix chess960 play with NNUE
 
   Value fix_FRC(const Position& pos) {
 
     constexpr Bitboard Corners =  1ULL << SQ_A1 | 1ULL << SQ_H1 | 1ULL << SQ_A8 | 1ULL << SQ_H8;
 
-    if (!(pos.pieces(BISHOP) & Corners))
-        return VALUE_ZERO;
+    Value v = VALUE_ZERO;
 
-    int correction = 0;
+    if (pos.pieces(BISHOP) & Corners)
+    {
+        int correction = 0;
 
-    if (   pos.piece_on(SQ_A1) == W_BISHOP
-        && pos.piece_on(SQ_B2) == W_PAWN)
-        correction -= CorneredBishop;
+        if (   pos.piece_on(SQ_A1) == W_BISHOP
+            && pos.piece_on(SQ_B2) == W_PAWN)
+            correction -= CorneredBishop;
 
-    if (   pos.piece_on(SQ_H1) == W_BISHOP
-        && pos.piece_on(SQ_G2) == W_PAWN)
-        correction -= CorneredBishop;
+        if (   pos.piece_on(SQ_H1) == W_BISHOP
+            && pos.piece_on(SQ_G2) == W_PAWN)
+            correction -= CorneredBishop;
 
-    if (   pos.piece_on(SQ_A8) == B_BISHOP
-        && pos.piece_on(SQ_B7) == B_PAWN)
-        correction += CorneredBishop;
+        if (   pos.piece_on(SQ_A8) == B_BISHOP
+            && pos.piece_on(SQ_B7) == B_PAWN)
+            correction += CorneredBishop;
 
-    if (   pos.piece_on(SQ_H8) == B_BISHOP
-        && pos.piece_on(SQ_G7) == B_PAWN)
-        correction += CorneredBishop;
+        if (   pos.piece_on(SQ_H8) == B_BISHOP
+            && pos.piece_on(SQ_G7) == B_PAWN)
+            correction += CorneredBishop;
 
-    return pos.side_to_move() == WHITE ?  Value(5 * correction)
-                                       : -Value(5 * correction);
+        v += 5 * correction;
+    }
+
+    if (pos.pieces(KNIGHT) & Corners)
+    {
+        if (   pos.piece_on(SQ_A1) == W_KNIGHT
+            && pos.piece_on(SQ_B3) == W_PAWN
+            && pos.piece_on(SQ_C2) == W_PAWN)
+            v -= CorneredKnight;
+
+        if (   pos.piece_on(SQ_H1) == W_KNIGHT
+            && pos.piece_on(SQ_G3) == W_PAWN
+            && pos.piece_on(SQ_F2) == W_PAWN)
+            v -= CorneredKnight;
+
+        if (   pos.piece_on(SQ_A8) == B_KNIGHT
+            && pos.piece_on(SQ_B6) == B_PAWN
+            && pos.piece_on(SQ_C7) == B_PAWN)
+            v += CorneredKnight;
+
+        if (   pos.piece_on(SQ_H8) == B_KNIGHT
+            && pos.piece_on(SQ_G6) == B_PAWN
+            && pos.piece_on(SQ_F7) == B_PAWN)
+            v += CorneredKnight;
+    }
+
+    return pos.side_to_move() == WHITE ? v : -v;
   }
 
 } // namespace Eval
