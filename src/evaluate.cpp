@@ -258,7 +258,7 @@ namespace {
   };
 
   constexpr Value CorneredBishop = Value(50);
-  constexpr Value CorneredKnight = Value(75);
+  constexpr Value CorneredKnight = Value(150);
 
   // Assorted bonuses and penalties
   constexpr Score UncontestedOutpost  = S(  1, 10);
@@ -1078,22 +1078,30 @@ make_v:
     {
         if (   pos.piece_on(SQ_A1) == W_KNIGHT
             && pos.piece_on(SQ_B3) == W_PAWN
-            && pos.piece_on(SQ_C2) == W_PAWN)
+            && pos.piece_on(SQ_C2) == W_PAWN
+            && !pos.empty(SQ_B4)
+            && !pos.empty(SQ_C3))
             v -= CorneredKnight;
 
         if (   pos.piece_on(SQ_H1) == W_KNIGHT
             && pos.piece_on(SQ_G3) == W_PAWN
-            && pos.piece_on(SQ_F2) == W_PAWN)
+            && pos.piece_on(SQ_F2) == W_PAWN
+            && !pos.empty(SQ_G4)
+            && !pos.empty(SQ_F3))
             v -= CorneredKnight;
 
         if (   pos.piece_on(SQ_A8) == B_KNIGHT
             && pos.piece_on(SQ_B6) == B_PAWN
-            && pos.piece_on(SQ_C7) == B_PAWN)
+            && pos.piece_on(SQ_C7) == B_PAWN
+            && !pos.empty(SQ_B5)
+            && !pos.empty(SQ_C6))
             v += CorneredKnight;
 
         if (   pos.piece_on(SQ_H8) == B_KNIGHT
             && pos.piece_on(SQ_G6) == B_PAWN
-            && pos.piece_on(SQ_F7) == B_PAWN)
+            && pos.piece_on(SQ_F7) == B_PAWN
+            && !pos.empty(SQ_G5)
+            && !pos.empty(SQ_F6))
             v += CorneredKnight;
     }
 
