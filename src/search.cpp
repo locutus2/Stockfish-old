@@ -60,6 +60,7 @@ namespace {
 
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV, Root };
+  enum SearchType { StandardSearch, OrderSearch };
 
   // Futility margin
   Value futility_margin(Depth d, bool improving) {
@@ -131,10 +132,10 @@ namespace {
     Move best = MOVE_NONE;
   };
 
-  template <NodeType nodeType>
+  template <NodeType nodeType, SearchType searchType>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode);
 
-  template <NodeType nodeType>
+  template <NodeType nodeType, SearchType searchType>
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth = 0);
 
   Value value_to_tt(Value v, int ply);
@@ -353,23 +354,38 @@ void Thread::search() {
       for (RootMove& rm : rootMoves)
           rm.previousScore = rm.score;
 
-      size_t pvFirst = 0;
-      pvLast = 0;
-
       if (!Threads.increaseDepth)
          searchAgainCounter++;
+
+      pvLast = 0;
+
+      for (pvLast++; pvLast < rootMoves.size(); pvLast++)
+          if (rootMoves[pvLast].tbRank != rootMoves[0].tbRank)
+              break;
+
+      if (rootDepth >= 4)
+      {
+          Value prev = rootMoves[0].averageScore;
+          delta = Value(17) + int(prev) * prev / 16384;
+          alpha = std::max(prev - delta,-VALUE_INFINITE);
+          beta  = std::min(prev + delta, VALUE_INFINITE);
+
+          // Adjust trend and optimism based on root move's previousScore
+          int tr = sigmoid(prev, 0, 0, 147, 113, 1);
+          trend = (us == WHITE ?  make_score(tr, tr / 2)
+                               : -make_score(tr, tr / 2));
+
+          int opt = sigmoid(prev, 0, 25, 147, 14464, 256);
+          optimism[ us] = Value(opt);
+          optimism[~us] = -optimism[us];
+
+          Depth adjustedDepth = std::max(1, (rootDepth - searchAgainCounter) / 2);
+          Stockfish::search<Root, OrderSearch>(rootPos, ss, alpha, beta, adjustedDepth, false);
+      }
 
       // MultiPV loop. We perform a full root search for each PV line
       for (pvIdx = 0; pvIdx < multiPV && !Threads.stop; ++pvIdx)
       {
-          if (pvIdx == pvLast)
-          {
-              pvFirst = pvLast;
-              for (pvLast++; pvLast < rootMoves.size(); pvLast++)
-                  if (rootMoves[pvLast].tbRank != rootMoves[pvFirst].tbRank)
-                      break;
-          }
-
           // Reset UCI info selDepth for each depth and each PV line
           selDepth = 0;
 
@@ -398,7 +414,7 @@ void Thread::search() {
           while (true)
           {
               Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
-              bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
+              bestValue = Stockfish::search<Root, StandardSearch>(rootPos, ss, alpha, beta, adjustedDepth, false);
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
@@ -447,7 +463,7 @@ void Thread::search() {
           }
 
           // Sort the PV lines searched so far and update the GUI
-          std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
+          std::stable_sort(rootMoves.begin(), rootMoves.begin() + pvIdx + 1);
 
           if (    mainThread
               && (Threads.stop || pvIdx + 1 == multiPV || Time.elapsed() > 3000))
@@ -541,7 +557,7 @@ namespace {
 
   // search<>() is the main search function for both PV and non-PV nodes
 
-  template <NodeType nodeType>
+  template <NodeType nodeType, SearchType searchType>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
     Thread* thisThread = pos.this_thread();
@@ -570,7 +586,7 @@ namespace {
 
     // Dive into quiescence search when the depth reaches zero
     if (depth <= 0)
-        return qsearch<PvNode ? PV : NonPV>(pos, ss, alpha, beta);
+        return qsearch<PvNode ? PV : NonPV, searchType>(pos, ss, alpha, beta);
 
     assert(-VALUE_INFINITE <= alpha && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
@@ -833,7 +849,7 @@ namespace {
 
         pos.do_null_move(st);
 
-        Value nullValue = -search<NonPV>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
+        Value nullValue = -search<NonPV, searchType>(pos, ss+1, -beta, -beta+1, depth-R, !cutNode);
 
         pos.undo_null_move();
 
@@ -853,7 +869,7 @@ namespace {
             thisThread->nmpMinPly = ss->ply + 3 * (depth-R) / 4;
             thisThread->nmpColor = us;
 
-            Value v = search<NonPV>(pos, ss, beta-1, beta, depth-R, false);
+            Value v = search<NonPV, searchType>(pos, ss, beta-1, beta, depth-R, false);
 
             thisThread->nmpMinPly = 0;
 
@@ -902,20 +918,21 @@ namespace {
                 pos.do_move(move, st);
 
                 // Perform a preliminary qsearch to verify that the move holds
-                value = -qsearch<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1);
+                value = -qsearch<NonPV, searchType>(pos, ss+1, -probCutBeta, -probCutBeta+1);
 
                 // If the qsearch held, perform the regular search
                 if (value >= probCutBeta)
-                    value = -search<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1, depth - 4, !cutNode);
+                    value = -search<NonPV, searchType>(pos, ss+1, -probCutBeta, -probCutBeta+1, depth - 4, !cutNode);
 
                 pos.undo_move(move);
 
                 if (value >= probCutBeta)
                 {
                     // if transposition table doesn't have equal or more deep info write probCut data into it
-                    if ( !(ss->ttHit
-                       && tte->depth() >= depth - 3
-                       && ttValue != VALUE_NONE))
+                    if (  !(   ss->ttHit
+                            && tte->depth() >= depth - 3
+                            && ttValue != VALUE_NONE)
+                        && searchType == StandardSearch)
                         tte->save(posKey, value_to_tt(value, ss->ply), ttPv,
                             BOUND_LOWER,
                             depth - 3, move, ss->staticEval);
@@ -963,7 +980,8 @@ moves_loop: // When in check, search starts here
                                       &captureHistory,
                                       contHist,
                                       countermove,
-                                      ss->killers);
+                                      ss->killers,
+                                      rootNode);
 
     value = bestValue;
     moveCountPruning = false;
@@ -998,7 +1016,7 @@ moves_loop: // When in check, search starts here
 
       ss->moveCount = ++moveCount;
 
-      if (rootNode && thisThread == Threads.main() && Time.elapsed() > 3000)
+      if (searchType == StandardSearch && rootNode && thisThread == Threads.main() && Time.elapsed() > 3000)
           sync_cout << "info depth " << depth
                     << " currmove " << UCI::move(move, pos.is_chess960())
                     << " currmovenumber " << moveCount + thisThread->pvIdx << sync_endl;
@@ -1088,7 +1106,7 @@ moves_loop: // When in check, search starts here
           Depth singularDepth = (depth - 1) / 2;
 
           ss->excludedMove = move;
-          value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
+          value = search<NonPV, searchType>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
           ss->excludedMove = MOVE_NONE;
 
           if (value < singularBeta)
@@ -1152,6 +1170,7 @@ moves_loop: // When in check, search starts here
       // been searched. In general we would like to reduce them, but there are many
       // cases where we extend a son if it has good chances to be "interesting".
       if (    depth >= 3
+          && !(rootNode && searchType == OrderSearch)
           &&  moveCount > 1 + 2 * rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
@@ -1202,7 +1221,7 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+          value = -search<NonPV, searchType>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
@@ -1218,7 +1237,10 @@ moves_loop: // When in check, search starts here
       // Step 17. Full depth search when LMR is skipped or fails high
       if (doFullDepthSearch)
       {
-          value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, newDepth + doDeeperSearch, !cutNode);
+          if (rootNode && searchType == OrderSearch)
+              value = -search<NonPV, searchType>(pos, ss+1, -beta, -alpha, newDepth + doDeeperSearch, !cutNode);
+          else
+              value = -search<NonPV, searchType>(pos, ss+1, -(alpha+1), -alpha, newDepth + doDeeperSearch, !cutNode);
 
           // If the move passed LMR update its stats
           if (didLMR && !captureOrPromotion)
@@ -1238,8 +1260,8 @@ moves_loop: // When in check, search starts here
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
 
-          value = -search<PV>(pos, ss+1, -beta, -alpha,
-                              std::min(maxNextDepth, newDepth), false);
+          value = -search<PV, searchType>(pos, ss+1, -beta, -alpha,
+                                          std::min(maxNextDepth, newDepth), false);
       }
 
       // Step 18. Undo move
@@ -1254,7 +1276,14 @@ moves_loop: // When in check, search starts here
       if (Threads.stop.load(std::memory_order_relaxed))
           return VALUE_ZERO;
 
-      if (rootNode)
+      if (rootNode && searchType == OrderSearch)
+      {
+          RootMove& rm = *std::find(thisThread->rootMoves.begin(),
+                                    thisThread->rootMoves.end(), move);
+          rm.orderScore = value;
+      }
+
+      if (rootNode && searchType == StandardSearch)
       {
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
@@ -1298,7 +1327,10 @@ moves_loop: // When in check, search starts here
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
 
-              if (PvNode && value < beta) // Update alpha! Always alpha < beta
+              if (rootNode && searchType == OrderSearch)
+                  bestMoveCount++;
+
+              else if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
                   alpha = value;
                   bestMoveCount++;
@@ -1373,7 +1405,7 @@ moves_loop: // When in check, search starts here
         ss->ttPv = ss->ttPv && (ss+1)->ttPv;
 
     // Write gathered information in transposition table
-    if (!excludedMove && !(rootNode && thisThread->pvIdx))
+    if (!excludedMove && !(rootNode && thisThread->pvIdx) && searchType == StandardSearch)
         tte->save(posKey, value_to_tt(bestValue, ss->ply), ss->ttPv,
                   bestValue >= beta ? BOUND_LOWER :
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
@@ -1387,7 +1419,7 @@ moves_loop: // When in check, search starts here
 
   // qsearch() is the quiescence search function, which is called by the main search
   // function with zero depth, or recursively with further decreasing depth per call.
-  template <NodeType nodeType>
+  template <NodeType nodeType, SearchType searchType>
   Value qsearch(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth) {
 
     static_assert(nodeType != Root);
@@ -1476,7 +1508,7 @@ moves_loop: // When in check, search starts here
         if (bestValue >= beta)
         {
             // Save gathered info in transposition table
-            if (!ss->ttHit)
+            if (!ss->ttHit && searchType == StandardSearch)
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), false, BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval);
 
@@ -1566,7 +1598,7 @@ moves_loop: // When in check, search starts here
 
       // Make and search the move
       pos.do_move(move, st, givesCheck);
-      value = -qsearch<nodeType>(pos, ss+1, -beta, -alpha, depth - 1);
+      value = -qsearch<nodeType, searchType>(pos, ss+1, -beta, -alpha, depth - 1);
       pos.undo_move(move);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
@@ -1601,9 +1633,10 @@ moves_loop: // When in check, search starts here
     }
 
     // Save gathered info in transposition table
-    tte->save(posKey, value_to_tt(bestValue, ss->ply), pvHit,
-              bestValue >= beta ? BOUND_LOWER : BOUND_UPPER,
-              ttDepth, bestMove, ss->staticEval);
+    if (searchType == StandardSearch)
+        tte->save(posKey, value_to_tt(bestValue, ss->ply), pvHit,
+                  bestValue >= beta ? BOUND_LOWER : BOUND_UPPER,
+                  ttDepth, bestMove, ss->staticEval);
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 

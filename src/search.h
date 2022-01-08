@@ -68,12 +68,13 @@ struct RootMove {
   bool operator==(const Move& m) const { return pv[0] == m; }
   bool operator<(const RootMove& m) const { // Sort in descending order
     return m.score != score ? m.score < score
-                            : m.previousScore < previousScore;
+                            : m.orderScore < orderScore;
   }
 
   Value score = -VALUE_INFINITE;
   Value previousScore = -VALUE_INFINITE;
   Value averageScore = -VALUE_INFINITE;
+  Value orderScore = -VALUE_INFINITE;
   int selDepth = 0;
   int tbRank = 0;
   Value tbScore;

@@ -19,12 +19,14 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "thread.h"
 
 namespace Stockfish {
 
 namespace {
 
   enum Stages {
+    ROOT_TT, ROOT_INIT, ROOT_MOVES,
     MAIN_TT, CAPTURE_INIT, GOOD_CAPTURE, REFUTATION, QUIET_INIT, QUIET, BAD_CAPTURE,
     EVASION_TT, EVASION_INIT, EVASION,
     PROBCUT_TT, PROBCUT_INIT, PROBCUT,
@@ -60,13 +62,14 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
                                                              const CapturePieceToHistory* cph,
                                                              const PieceToHistory** ch,
                                                              Move cm,
-                                                             const Move* killers)
+                                                             const Move* killers,
+                                                             bool rootNode)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
              ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d)
 {
   assert(d > 0);
 
-  stage = (pos.checkers() ? EVASION_TT : MAIN_TT) +
+  stage = (rootNode ? ROOT_TT : pos.checkers() ? EVASION_TT : MAIN_TT) +
           !(ttm && pos.pseudo_legal(ttm));
 }
 
@@ -155,12 +158,25 @@ Move MovePicker::next_move(bool skipQuiets) {
 top:
   switch (stage) {
 
+  case ROOT_TT:
   case MAIN_TT:
   case EVASION_TT:
   case QSEARCH_TT:
   case PROBCUT_TT:
       ++stage;
       return ttMove;
+
+  case ROOT_INIT:
+      cur = endMoves = moves;
+
+      for (auto& rm : pos.this_thread()->rootMoves)
+          *endMoves++ = { rm.pv[0], int(rm.orderScore) };
+
+      ++stage;
+      [[fallthrough]];
+
+  case ROOT_MOVES:
+      return select<Best>([](){ return true; });
 
   case CAPTURE_INIT:
   case PROBCUT_INIT:
