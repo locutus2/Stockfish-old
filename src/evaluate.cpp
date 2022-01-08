@@ -1079,29 +1079,25 @@ make_v:
         if (   pos.piece_on(SQ_A1) == W_KNIGHT
             && pos.piece_on(SQ_B3) == W_PAWN
             && pos.piece_on(SQ_C2) == W_PAWN
-            && !pos.empty(SQ_B4)
-            && !pos.empty(SQ_C3))
+            && pos.piece_on(SQ_C3) == B_PAWN)
             v -= CorneredKnight;
 
         if (   pos.piece_on(SQ_H1) == W_KNIGHT
             && pos.piece_on(SQ_G3) == W_PAWN
             && pos.piece_on(SQ_F2) == W_PAWN
-            && !pos.empty(SQ_G4)
-            && !pos.empty(SQ_F3))
+            && pos.piece_on(SQ_F3) == B_PAWN)
             v -= CorneredKnight;
 
         if (   pos.piece_on(SQ_A8) == B_KNIGHT
             && pos.piece_on(SQ_B6) == B_PAWN
             && pos.piece_on(SQ_C7) == B_PAWN
-            && !pos.empty(SQ_B5)
-            && !pos.empty(SQ_C6))
+            && pos.piece_on(SQ_C6) == W_PAWN)
             v += CorneredKnight;
 
         if (   pos.piece_on(SQ_H8) == B_KNIGHT
             && pos.piece_on(SQ_G6) == B_PAWN
             && pos.piece_on(SQ_F7) == B_PAWN
-            && !pos.empty(SQ_G5)
-            && !pos.empty(SQ_F6))
+            && pos.piece_on(SQ_F6) == W_PAWN)
             v += CorneredKnight;
     }
 
