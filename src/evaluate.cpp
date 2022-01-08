@@ -258,7 +258,7 @@ namespace {
   };
 
   constexpr Value CorneredBishop = Value(50);
-  constexpr Value CorneredKnight = Value(50);
+  constexpr Value CorneredKnight = Value(100);
 
   // Assorted bonuses and penalties
   constexpr Score UncontestedOutpost  = S(  1, 10);
