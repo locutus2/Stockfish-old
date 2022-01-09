@@ -1081,33 +1081,25 @@ make_v:
 
         if (   pos.piece_on(SQ_B3) == W_PAWN
             && pos.piece_on(SQ_C2) == W_PAWN
-            && (pos.piece_on(SQ_B1) == W_BISHOP || pos.piece_on(SQ_A2) == W_BISHOP)
-            && !pos.empty(SQ_B4)
-            && !pos.empty(SQ_C3))
+            && (pos.piece_on(SQ_B1) == W_BISHOP || pos.piece_on(SQ_A2) == W_BISHOP))
             correction -= CorneredBishop;
 
         if (   pos.piece_on(SQ_G3) == W_PAWN
             && pos.piece_on(SQ_F2) == W_PAWN
-            && (pos.piece_on(SQ_G1) == W_BISHOP || pos.piece_on(SQ_H2) == W_BISHOP)
-            && !pos.empty(SQ_G4)
-            && !pos.empty(SQ_F3))
+            && (pos.piece_on(SQ_G1) == W_BISHOP || pos.piece_on(SQ_H2) == W_BISHOP))
             correction -= CorneredBishop;
 
         if (   pos.piece_on(SQ_B6) == B_PAWN
             && pos.piece_on(SQ_C7) == B_PAWN
-            && (pos.piece_on(SQ_B8) == B_BISHOP || pos.piece_on(SQ_A7) == B_BISHOP)
-            && !pos.empty(SQ_B5)
-            && !pos.empty(SQ_C6))
+            && (pos.piece_on(SQ_B8) == B_BISHOP || pos.piece_on(SQ_A7) == B_BISHOP))
             correction += CorneredBishop;
 
         if (   pos.piece_on(SQ_G6) == B_PAWN
             && pos.piece_on(SQ_F7) == B_PAWN
-            && (pos.piece_on(SQ_G8) == B_BISHOP || pos.piece_on(SQ_H7) == B_BISHOP)
-            && !pos.empty(SQ_G5)
-            && !pos.empty(SQ_F6))
+            && (pos.piece_on(SQ_G8) == B_BISHOP || pos.piece_on(SQ_H7) == B_BISHOP))
             correction += CorneredBishop;
 
-        v += 5 * correction;
+        v += 3 * correction;
     }
 
     return pos.side_to_move() == WHITE ? v : -v;
