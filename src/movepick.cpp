@@ -134,7 +134,7 @@ void MovePicker::score() {
           {
               Search::RootMove& rm = *std::find(pos.this_thread()->rootMoves.begin(),
                                                 pos.this_thread()->rootMoves.end(), m);
-              m.value += rm.orderScore - average;
+              m.value += 1000 * (rm.orderScore - average);
           }
       }
       else // Type == EVASIONS
