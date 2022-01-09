@@ -1042,7 +1042,7 @@ make_v:
   }
 
 
-  /// Fisher Random Chess: correction for cornered bishops and knights, to fix chess960 play with NNUE
+  /// Fisher Random Chess: correction for cornered bishops, to fix chess960 play with NNUE
 
   Value fix_FRC(const Position& pos) {
 
