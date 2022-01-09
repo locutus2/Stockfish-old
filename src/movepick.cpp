@@ -107,6 +107,16 @@ void MovePicker::score() {
 
   static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
 
+  int average = 0;
+
+  if (Type == QUIETS && rootNode)
+  {
+      const auto& rms = pos.this_thread()->rootMoves;
+      for(const auto& rm : rms)
+	      average += rm.orderScore;
+      average /= rms.size();
+  }
+
   for (auto& m : *this)
       if constexpr (Type == CAPTURES)
           m.value =  int(PieceValue[MG][pos.piece_on(to_sq(m))]) * 6
@@ -124,7 +134,7 @@ void MovePicker::score() {
           {
               Search::RootMove& rm = *std::find(pos.this_thread()->rootMoves.begin(),
                                                 pos.this_thread()->rootMoves.end(), m);
-              m.value += rm.orderScore;
+              m.value += rm.orderScore - average;
           }
       }
       else // Type == EVASIONS

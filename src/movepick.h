@@ -147,7 +147,7 @@ private:
   Value threshold;
   Depth depth;
   ExtMove moves[MAX_MOVES];
-  bool rootNode;
+  bool rootNode = false;
 };
 
 } // namespace Stockfish
