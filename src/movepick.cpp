@@ -170,7 +170,7 @@ top:
       cur = endMoves = moves;
 
       for (auto& rm : pos.this_thread()->rootMoves)
-          *endMoves++ = { rm.pv[0], int(rm.orderScore) + int(rm.previousScore)};
+          *endMoves++ = { rm.pv[0], int(rm.orderScore) };
 
       ++stage;
       [[fallthrough]];
