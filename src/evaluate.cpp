@@ -1079,32 +1079,32 @@ make_v:
     {
         int correction = 0;
 
-        if (   pos.piece_on(SQ_B3) == W_PAWN
+        if (   (pos.piece_on(SQ_B1) == W_BISHOP || pos.piece_on(SQ_A2) == W_BISHOP)
             && pos.piece_on(SQ_C2) == W_PAWN
-            && (pos.piece_on(SQ_B1) == W_BISHOP || pos.piece_on(SQ_A2) == W_BISHOP)
-            && !pos.empty(SQ_B4)
-            && !pos.empty(SQ_C3))
+            && !pos.empty(SQ_C3)
+            && (   (pos.piece_on(SQ_B3) == W_PAWN && !pos.empty(SQ_B4))
+                || (pos.piece_on(SQ_A2) == W_PAWN && !pos.empty(SQ_A3))))
             correction -= CorneredBishop;
 
-        if (   pos.piece_on(SQ_G3) == W_PAWN
+        if (   (pos.piece_on(SQ_G1) == W_BISHOP || pos.piece_on(SQ_H2) == W_BISHOP)
             && pos.piece_on(SQ_F2) == W_PAWN
-            && (pos.piece_on(SQ_G1) == W_BISHOP || pos.piece_on(SQ_H2) == W_BISHOP)
-            && !pos.empty(SQ_G4)
-            && !pos.empty(SQ_F3))
+            && !pos.empty(SQ_F3)
+            && (   (pos.piece_on(SQ_G3) == W_PAWN && !pos.empty(SQ_G4))
+                || (pos.piece_on(SQ_H2) == W_PAWN && !pos.empty(SQ_H3))))
             correction -= CorneredBishop;
 
-        if (   pos.piece_on(SQ_B6) == B_PAWN
-            && pos.piece_on(SQ_C7) == B_PAWN
-            && (pos.piece_on(SQ_B8) == B_BISHOP || pos.piece_on(SQ_A7) == B_BISHOP)
-            && !pos.empty(SQ_B5)
-            && !pos.empty(SQ_C6))
+        if (   (pos.piece_on(SQ_B8) == W_BISHOP || pos.piece_on(SQ_A7) == W_BISHOP)
+            && pos.piece_on(SQ_C7) == W_PAWN
+            && !pos.empty(SQ_C6)
+            && (   (pos.piece_on(SQ_B6) == W_PAWN && !pos.empty(SQ_B5))
+                || (pos.piece_on(SQ_A7) == W_PAWN && !pos.empty(SQ_A6))))
             correction += CorneredBishop;
 
-        if (   pos.piece_on(SQ_G6) == B_PAWN
-            && pos.piece_on(SQ_F7) == B_PAWN
-            && (pos.piece_on(SQ_G8) == B_BISHOP || pos.piece_on(SQ_H7) == B_BISHOP)
-            && !pos.empty(SQ_G5)
-            && !pos.empty(SQ_F6))
+        if (   (pos.piece_on(SQ_G8) == W_BISHOP || pos.piece_on(SQ_H7) == W_BISHOP)
+            && pos.piece_on(SQ_F7) == W_PAWN
+            && !pos.empty(SQ_F6)
+            && (   (pos.piece_on(SQ_G6) == W_PAWN && !pos.empty(SQ_G5))
+                || (pos.piece_on(SQ_H7) == W_PAWN && !pos.empty(SQ_H6))))
             correction += CorneredBishop;
 
         v += 3 * correction;
