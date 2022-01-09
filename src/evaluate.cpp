@@ -1048,6 +1048,8 @@ make_v:
   Value fix_FRC(const Position& pos) {
 
     constexpr Bitboard Corners =  1ULL << SQ_A1 | 1ULL << SQ_H1 | 1ULL << SQ_A8 | 1ULL << SQ_H8;
+    constexpr Bitboard BesideCorners =  1ULL << SQ_A2 | 1ULL << SQ_H2 | 1ULL << SQ_A7 | 1ULL << SQ_H7
+                                      | 1ULL << SQ_B1 | 1ULL << SQ_G1 | 1ULL << SQ_B8 | 1ULL << SQ_G8;
 
     Value v = VALUE_ZERO;
 
@@ -1074,29 +1076,36 @@ make_v:
         v += 3 * correction;
     }
 
-    if (   pos.piece_on(SQ_B3) == W_PAWN
-        && pos.piece_on(SQ_C2) == W_PAWN
-        && !pos.empty(SQ_B4)
-        && !pos.empty(SQ_C3))
-        v -= ((pos.piece_on(SQ_A1) == W_KNIGHT) + (pos.piece_on(SQ_B1) == W_BISHOP || pos.piece_on(SQ_A2) == W_BISHOP)) * CorneredMinor;
+    if (pos.pieces(BISHOP) & BesideCorners)
+    {
+        if (   pos.piece_on(SQ_B3) == W_PAWN
+            && pos.piece_on(SQ_C2) == W_PAWN
+            && (pos.piece_on(SQ_B1) == W_BISHOP || pos.piece_on(SQ_A2) == W_BISHOP)
+            && !pos.empty(SQ_B4)
+            && !pos.empty(SQ_C3))
+            v -= CorneredBishop;
 
-    if (   pos.piece_on(SQ_G3) == W_PAWN
-        && pos.piece_on(SQ_F2) == W_PAWN
-        && !pos.empty(SQ_G4)
-        && !pos.empty(SQ_F3))
-        v -= ((pos.piece_on(SQ_H1) == W_KNIGHT) + (pos.piece_on(SQ_G1) == W_BISHOP || pos.piece_on(SQ_H2) == W_BISHOP)) * CorneredMinor;
+        if (   pos.piece_on(SQ_G3) == W_PAWN
+            && pos.piece_on(SQ_F2) == W_PAWN
+            && (pos.piece_on(SQ_G1) == W_BISHOP || pos.piece_on(SQ_H2) == W_BISHOP)
+            && !pos.empty(SQ_G4)
+            && !pos.empty(SQ_F3))
+            v -= CorneredBishop;
 
-    if (   pos.piece_on(SQ_B6) == B_PAWN
-        && pos.piece_on(SQ_C7) == B_PAWN
-        && !pos.empty(SQ_B5)
-        && !pos.empty(SQ_C6))
-        v += ((pos.piece_on(SQ_A8) == B_KNIGHT) + (pos.piece_on(SQ_B8) == B_BISHOP || pos.piece_on(SQ_A7) == B_BISHOP)) * CorneredMinor;
+        if (   pos.piece_on(SQ_B6) == B_PAWN
+            && pos.piece_on(SQ_C7) == B_PAWN
+            && (pos.piece_on(SQ_B8) == B_BISHOP || pos.piece_on(SQ_A7) == B_BISHOP)
+            && !pos.empty(SQ_B5)
+            && !pos.empty(SQ_C6))
+            v += CorneredBishop;
 
-    if (   pos.piece_on(SQ_G6) == B_PAWN
-        && pos.piece_on(SQ_F7) == B_PAWN
-        && !pos.empty(SQ_G5)
-        && !pos.empty(SQ_F6))
-        v += ((pos.piece_on(SQ_H8) == B_KNIGHT) + (pos.piece_on(SQ_G8) == B_BISHOP || pos.piece_on(SQ_H7) == B_BISHOP)) * CorneredMinor;
+        if (   pos.piece_on(SQ_G6) == B_PAWN
+            && pos.piece_on(SQ_F7) == B_PAWN
+            && (pos.piece_on(SQ_G8) == B_BISHOP || pos.piece_on(SQ_H7) == B_BISHOP)
+            && !pos.empty(SQ_G5)
+            && !pos.empty(SQ_F6))
+            v += CorneredBishop;
+    }
 
     return pos.side_to_move() == WHITE ? v : -v;
   }
