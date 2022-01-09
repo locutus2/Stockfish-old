@@ -379,7 +379,7 @@ void Thread::search() {
           optimism[ us] = Value(opt);
           optimism[~us] = -optimism[us];
 
-          Depth adjustedDepth = std::max(1, (rootDepth - searchAgainCounter) / 3);
+          Depth adjustedDepth = std::max(1, (rootDepth - searchAgainCounter) / 2);
           Stockfish::search<Root, OrderSearch>(rootPos, ss, alpha, beta, adjustedDepth, false);
       }
 
