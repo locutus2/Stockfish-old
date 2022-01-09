@@ -366,7 +366,7 @@ void Thread::search() {
       if (rootDepth >= 4)
       {
           Value prev = rootMoves[0].averageScore;
-          delta = 2 * (Value(17) + int(prev) * prev / 16384);
+          delta = Value(17) + int(prev) * prev / 16384;
           alpha = std::max(prev - delta,-VALUE_INFINITE);
           beta  = std::min(prev + delta, VALUE_INFINITE);
 
@@ -379,7 +379,7 @@ void Thread::search() {
           optimism[ us] = Value(opt);
           optimism[~us] = -optimism[us];
 
-          Depth adjustedDepth = std::max(1, (rootDepth - searchAgainCounter) / 2);
+          Depth adjustedDepth = std::max(1, rootDepth - searchAgainCounter - 3);
           Stockfish::search<Root, OrderSearch>(rootPos, ss, alpha, beta, adjustedDepth, false);
       }
 
