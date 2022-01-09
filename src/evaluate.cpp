@@ -1107,7 +1107,7 @@ make_v:
             && !pos.empty(SQ_F6))
             correction += CorneredBishop;
 
-        v += 3 * correction;
+        v += 4 * correction;
     }
 
     return pos.side_to_move() == WHITE ? v : -v;
