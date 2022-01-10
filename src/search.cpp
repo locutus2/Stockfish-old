@@ -1015,6 +1015,8 @@ moves_loop: // When in check, search starts here
 
       Value delta = beta - alpha;
 
+      bool CC = false;
+      int V = 0;
       // Step 13. Pruning at shallow depth (~98 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1040,8 +1042,15 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // SEE based pruning (~9 Elo)
+	         //std::cerr << captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] << ";" << int(!pos.see_ge(move, Value(-218) * depth)) << std::endl;
+
               if (!pos.see_ge(move, Value(-218) * depth))
-                  continue;
+	      {
+		      CC = true;
+	          //   dbg_hit_on(true, !pos.see_ge(move, Value(-218) * depth), 10 + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 1000);
+	          V = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))];
+                  if(!CC) continue;
+	      }
           }
           else
           {
@@ -1285,6 +1294,12 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, V/1000+10);
       }
 
       if (value > bestValue)
