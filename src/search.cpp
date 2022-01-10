@@ -1040,7 +1040,7 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // SEE based pruning (~9 Elo)
-              if (   captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 10000
+              if (   captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] < 9000
                   && !pos.see_ge(move, Value(-218) * depth))
                   continue;
           }
