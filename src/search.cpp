@@ -661,7 +661,7 @@ namespace {
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     ttCapture = ttMove && pos.capture_or_promotion(ttMove);
     if (!excludedMove)
-        ss->ttPv = PvNode || (ss->ttHit && tte->is_pv()) || ss->ply <= 1;
+        ss->ttPv = PvNode || (ss->ttHit && tte->is_pv()) || ss->ply <= 2;
 
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
