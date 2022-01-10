@@ -1048,7 +1048,8 @@ moves_loop: // When in check, search starts here
 	      {
 		      CC = true;
 	          //   dbg_hit_on(true, !pos.see_ge(move, Value(-218) * depth), 10 + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 1000);
-	          V = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))];
+	          //V = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 1000 + 10;
+	          V = (*contHist[0])[movedPiece][to_sq(move)] / 1000 + 29;
                   if(!CC) continue;
 	      }
           }
@@ -1299,7 +1300,8 @@ moves_loop: // When in check, search starts here
       if(CC)
       {
 	      bool T = value > alpha;
-	      dbg_hit_on(T, V/1000+10);
+	      dbg_hit_on(T, V);
+	      dbg_hit_on(V >= 56, 1000);
       }
 
       if (value > bestValue)
