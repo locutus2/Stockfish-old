@@ -1063,7 +1063,7 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
-              if (   (*contHist[0])[movedPiece][to_sq(move)] < 25000
+              if (   (type_of(movedPiece) != PAWN || (*contHist[0])[movedPiece][to_sq(move)] < 20000)
                   && !pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))
                   continue;
           }
