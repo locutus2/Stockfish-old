@@ -1182,6 +1182,9 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (PvNode && bestMove && from_sq(move) == from_sq(bestMove))
+              r++;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
