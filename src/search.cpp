@@ -1202,7 +1202,7 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
-          if (d < newDepth / 2)
+          if (d < newDepth / 2 && !ss->inCheck && !captureOrPromotion && !givesCheck)
           {
               pos.undo_move(move);
               continue;
