@@ -395,6 +395,7 @@ void Thread::search() {
           // high/low, re-search with a bigger window until we don't fail
           // high/low anymore.
           int failedHighCnt = 0;
+          int failedLowCnt = 0;
           while (true)
           {
               Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
@@ -426,20 +427,37 @@ void Thread::search() {
               // re-search, otherwise exit the loop.
               if (bestValue <= alpha)
               {
+                  dbg_hit_on(true, 100 * failedLowCnt + 10 * failedHighCnt);
+                  dbg_hit_on(false, 100 * failedLowCnt + 10 * failedHighCnt + 1);
+                  dbg_hit_on(false, 100 * failedLowCnt + 10 * failedHighCnt + 2);
+                  dbg_mean_of(bestValue - alpha - 1, 100 * failedLowCnt + 10 * failedHighCnt);
+                  //dbg_mean_of(0, 100 * failedLowCnt + 10 * failedHighCnt + 1);
                   beta = (alpha + beta) / 2;
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
                   failedHighCnt = 0;
+                  ++failedLowCnt;
                   if (mainThread)
                       mainThread->stopOnPonderhit = false;
               }
               else if (bestValue >= beta)
               {
+                  dbg_hit_on(false, 100 * failedLowCnt + 10 * failedHighCnt);
+                  dbg_hit_on(false, 100 * failedLowCnt + 10 * failedHighCnt + 1);
+                  dbg_hit_on(true, 100 * failedLowCnt + 10 * failedHighCnt + 2);
+                  //dbg_mean_of(0, 100 * failedLowCnt + 10 * failedHighCnt);
+                  dbg_mean_of(bestValue - beta + 1, 100 * failedLowCnt + 10 * failedHighCnt + 1);
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
                   ++failedHighCnt;
+                  failedLowCnt = 0;
               }
               else
+	      {
+                  dbg_hit_on(false, 100 * failedLowCnt + 10 * failedHighCnt);
+                  dbg_hit_on(true, 100 * failedLowCnt + 10 * failedHighCnt + 1);
+                  dbg_hit_on(false, 100 * failedLowCnt + 10 * failedHighCnt + 2);
                   break;
+              }
 
               delta += delta / 4 + 5;
 
