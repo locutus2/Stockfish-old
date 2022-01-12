@@ -1202,7 +1202,7 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
-          if (d < newDepth / 2 + 1 && d > 1)
+          if (d < newDepth / 2 - 1 && d > 1)
               d--;
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
