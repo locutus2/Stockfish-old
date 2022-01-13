@@ -1044,7 +1044,7 @@ moves_loop: // When in check, search starts here
               // SEE based pruning (~9 Elo)
 	         //std::cerr << captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] << ";" << int(!pos.see_ge(move, Value(-218) * depth)) << std::endl;
 
-              if (!pos.see_ge(move, Value(-218) * depth))
+              if (!pos.see_ge(move, Value(-217) * depth))
 	      {
 		      CC = true;
 	          //   dbg_hit_on(true, !pos.see_ge(move, Value(-218) * depth), 10 + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 1000);
@@ -1061,7 +1061,7 @@ moves_loop: // When in check, search starts here
 
               // Continuation history based pruning (~2 Elo)
               if (   lmrDepth < 5
-                  && history < -3000 * depth + 3000)
+                  && history < -3875 * (depth - 1))
                   continue;
 
               history += thisThread->mainHistory[us][from_to(move)];
@@ -1069,7 +1069,7 @@ moves_loop: // When in check, search starts here
               // Futility pruning: parent node (~9 Elo)
               if (   !ss->inCheck
                   && lmrDepth < 8
-                  && ss->staticEval + 142 + 139 * lmrDepth + history / 64 <= alpha)
+                  && ss->staticEval + 138 + 137 * lmrDepth + history / 64 <= alpha)
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
