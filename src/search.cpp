@@ -1308,8 +1308,8 @@ moves_loop: // When in check, search starts here
       {
 	      bool T = value > alpha;
 	      dbg_hit_on(T, V);
-	      dbg_hit_on(T, V < K, 1000+K);
-	      dbg_hit_on(V <K, 2000+K);
+	      dbg_hit_on(V < K, T, 1000+K);
+	      dbg_hit_on(V < K, 2000+K);
       }
 
       if (value > bestValue)
