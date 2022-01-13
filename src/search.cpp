@@ -1066,7 +1066,7 @@ moves_loop: // When in check, search starts here
               if (!pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))
                   continue;
 
-              if ((*contHist[0])[movedPiece][to_sq(move)] < -5000 - 2000 * depth)
+              if ((*contHist[0])[movedPiece][to_sq(move)] < -16000 - 1000 * depth)
                   continue;
           }
       }
