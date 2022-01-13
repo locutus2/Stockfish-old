@@ -1081,7 +1081,7 @@ moves_loop: // When in check, search starts here
 	          //   dbg_hit_on(true, !pos.see_ge(move, Value(-218) * depth), 10 + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 1000);
 	          //V = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 1000 + 10;
 	          V = (*contHist[0])[movedPiece][to_sq(move)] / 1000 + 29;
-		  K = 10;
+		  K = 11;
           }
       }
 
