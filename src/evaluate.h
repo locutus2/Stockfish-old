@@ -31,6 +31,7 @@ class Position;
 namespace Eval {
 
   std::string trace(Position& pos);
+  Value simpleEvaluate(const Position& pos);
   Value evaluate(const Position& pos);
 
   extern bool useNNUE;

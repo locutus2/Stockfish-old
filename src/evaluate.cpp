@@ -292,7 +292,7 @@ namespace {
     Evaluation() = delete;
     explicit Evaluation(const Position& p) : pos(p) {}
     Evaluation& operator=(const Evaluation&) = delete;
-    Value value();
+    Value value(bool simple = false);
 
   private:
     template<Color Us> void initialize();
@@ -965,7 +965,7 @@ namespace {
   // of view of the side to move.
 
   template<Tracing T>
-  Value Evaluation<T>::value() {
+  Value Evaluation<T>::value(bool simple) {
 
     assert(!pos.checkers());
 
@@ -993,7 +993,7 @@ namespace {
                                                         + pos.non_pawn_material() / 32;
     };
 
-    if (lazy_skip(LazyThreshold1))
+    if (simple || lazy_skip(LazyThreshold1))
         goto make_v;
 
     // Main evaluation begins here
@@ -1075,6 +1075,9 @@ make_v:
 
 } // namespace Eval
 
+Value Eval::simpleEvaluate(const Position& pos) {
+  return Evaluation<NO_TRACE>(pos).value(true);
+}
 
 /// evaluate() is the evaluator for the outer world. It returns a static
 /// evaluation of the position from the point of view of the side to move.
