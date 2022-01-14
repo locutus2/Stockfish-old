@@ -804,7 +804,15 @@ namespace {
                   :                                    200;
 
     improving = improvement > 0;
-    complexity = abs(ss->staticEval - Eval::simpleEvaluate(pos));
+    complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
+    {
+    int complexity2 = abs(ss->staticEval - Eval::simpleEvaluate(pos));
+    dbg_mean_of(complexity, 0);
+    dbg_mean_of(complexity2, 1);
+    dbg_std_of(complexity, 0);
+    dbg_std_of(complexity2, 1);
+    dbg_corr_of(complexity, complexity2, 0);
+    }
 
     // Step 7. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
