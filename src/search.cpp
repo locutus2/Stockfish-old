@@ -294,6 +294,7 @@ void Thread::search() {
   double timeReduction = 1, totBestMoveChanges = 0;
   Color us = rootPos.side_to_move();
   int iterIdx = 0;
+  int complexity = 0;
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
@@ -324,6 +325,9 @@ void Thread::search() {
   // use behind the scenes to retrieve a set of possible moves.
   if (skill.enabled())
       multiPV = std::max(multiPV, (size_t)4);
+
+  if (!rootPos.checkers())
+      complexity = std::abs(evaluate(rootPos) - (rootPos.side_to_move() == WHITE ? eg_value(rootPos.psq_score()) : -eg_value(rootPos.psq_score())));
 
   multiPV = std::min(multiPV, rootMoves.size());
 
@@ -496,7 +500,11 @@ void Thread::search() {
           double reduction = (1.47 + mainThread->previousTimeReduction) / (2.32 * timeReduction);
           double bestMoveInstability = 1.073 + std::max(1.0, 2.25 - 9.9 / rootDepth)
                                               * totBestMoveChanges / Threads.size();
-          double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability;
+
+          double complexPosition = 1.0 + (rootPos.checkers() ? 0.0 : (complexity - 232) / 3500.0);
+          complexPosition = std::clamp(complexPosition, 0.5, 1.5);
+
+          double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability * complexPosition;
 
           // Cap used time in case of a single legal move for a better viewer experience in tournaments
           // yielding correct scores and sufficiently fast moves.
