@@ -504,11 +504,15 @@ dbg_std_of(10000*cp1);
 [0] Total 13000 Std 499.571
 */
 	  double cp0 = 1.0 + (complexity - 232) / 1750.0;
-	  /*
 dbg_mean_of(10000*cp0);
 dbg_std_of(10000*cp0);
+	  /*
 [0] Total 13000 Mean 10253.5
 [0] Total 13000 Std 999.162
+
+late average
+[0] Total 13000 Mean 10124.9
+[0] Total 13000 Std 744.906
 */
 	  double cp2 = 1.0 + (complexity - 276) / 1750.0;
 	  /*
@@ -532,7 +536,7 @@ dbg_std_of(10000*cp2);
           double bestMoveInstability = 1.073 + std::max(1.0, 2.25 - 9.9 / rootDepth)
                                               * totBestMoveChanges / Threads.size();
           int complexity = mainThread->complexityAverage.value();
-          double complexPosition = std::clamp(1.0 + (complexity - 232) / 3500.0, 0.5, 1.5);
+          double complexPosition = std::clamp(1.0 + (complexity - 232) / 1750.0, 0.5, 1.5);
 
           double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability * complexPosition;
 
@@ -1378,6 +1382,9 @@ moves_loop: // When in check, search starts here
     // return a fail low score.
 
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
+
+    //if(!ss->inCheck)
+//	    thisThread->complexityAverage.update(complexity);
 
     if (!moveCount)
         bestValue = excludedMove ? alpha :
