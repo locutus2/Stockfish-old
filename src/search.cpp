@@ -482,7 +482,41 @@ void Thread::search() {
           totBestMoveChanges += th->bestMoveChanges;
           th->bestMoveChanges = 0;
       }
-
+          int complexity = mainThread->complexityAverage.value();
+/*
+dbg_mean_of(complexity);
+dbg_std_of(complexity);
+ * [0] Total 13000 Mean 276.435
+ * [0] Total 13000 Std 174.856
+ * */
+	  double cp = 1.0 + (complexity - 276) / 174.856;
+	  /*
+dbg_mean_of(10000*cp);
+dbg_std_of(10000*cp);
+[0] Total 13000 Mean 10024.4
+[0] Total 13000 Std 2855.38
+*/
+	  double cp1 = 1.0 + (complexity - 232) / 3500.0;
+	  /*
+dbg_mean_of(10000*cp1);
+dbg_std_of(10000*cp1);
+[0] Total 13000 Mean 10126.6
+[0] Total 13000 Std 499.571
+*/
+	  double cp0 = 1.0 + (complexity - 232) / 1750.0;
+	  /*
+dbg_mean_of(10000*cp0);
+dbg_std_of(10000*cp0);
+[0] Total 13000 Mean 10253.5
+[0] Total 13000 Std 999.162
+*/
+	  double cp2 = 1.0 + (complexity - 276) / 1750.0;
+	  /*
+dbg_mean_of(10000*cp2);
+dbg_std_of(10000*cp2);
+[0] Total 13000 Mean 10002
+	[0] Total 13000 Std 999.187
+*/
       // Do we have time for the next iteration? Can we stop searching now?
       if (    Limits.use_time_management()
           && !Threads.stop
