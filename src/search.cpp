@@ -810,8 +810,6 @@ namespace {
     improving = improvement > 0;
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
 
-    thisThread->complexityAverage.update(complexity, depth);
-
     // Step 7. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
     if (   !ss->ttPv
@@ -1346,7 +1344,7 @@ moves_loop: // When in check, search starts here
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
 
     if (!ss->inCheck)
-        thisThread->complexityAverage.update(complexity);
+        thisThread->complexityAverage.update(complexity, depth);
 
     if (!moveCount)
         bestValue = excludedMove ? alpha :
