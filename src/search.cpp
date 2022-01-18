@@ -810,7 +810,7 @@ namespace {
     improving = improvement > 0;
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
 
-    thisThread->complexityAverage.update(complexity, depth);
+    thisThread->complexityAverage.update(complexity, depth * (1 + PvNode));
 
     // Step 7. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
