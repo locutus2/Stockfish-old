@@ -94,24 +94,30 @@ class RunningAverage {
       RunningAverage() {}
 
       // Reset the running average to rational value p / q
-      void set(int64_t p, int64_t q)
-        { average = p * PERIOD * RESOLUTION / q; }
+      void set(int64_t p, int64_t q = 1, int64_t w = 1)
+      {
+          average = w * p * PERIOD * RESOLUTION / q;
+          weights = w * PERIOD * RESOLUTION;
+      }
 
       // Update average with value v
-      void update(int64_t v)
-        { average = RESOLUTION * v + (PERIOD - 1) * average / PERIOD; }
+      void update(int64_t v, int64_t w = 1)
+      {
+          average = RESOLUTION * w * v + (PERIOD - 1) * average / PERIOD;
+          weights = RESOLUTION * w + (PERIOD - 1) * weights / PERIOD;
+      }
 
       // Test if average is strictly greater than rational a / b
       bool is_greater(int64_t a, int64_t b)
-        { return b * average > a * PERIOD * RESOLUTION ; }
+        { return b * average > a * weights ; }
 
       int64_t value()
-        { return average / (PERIOD * RESOLUTION); }
+        { return average / weights; }
 
   private :
       static constexpr int64_t PERIOD     = 4096;
       static constexpr int64_t RESOLUTION = 1024;
-      int64_t average;
+      int64_t average, weights;
 };
 
 template <typename T, std::size_t MaxSize>

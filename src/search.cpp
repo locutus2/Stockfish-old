@@ -329,7 +329,7 @@ void Thread::search() {
 
   doubleExtensionAverage[WHITE].set(0, 100);  // initialize the running average at 0%
   doubleExtensionAverage[BLACK].set(0, 100);  // initialize the running average at 0%
-  complexityAverage.set(232, 1);
+  complexityAverage.set(232);
 
   nodesLastExplosive = nodes;
   nodesLastNormal    = nodes;
@@ -810,7 +810,7 @@ namespace {
     improving = improvement > 0;
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
 
-    thisThread->complexityAverage.update(complexity);
+    thisThread->complexityAverage.update(complexity, depth);
 
     // Step 7. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
