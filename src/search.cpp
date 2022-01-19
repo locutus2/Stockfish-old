@@ -1199,7 +1199,7 @@ moves_loop: // When in check, search starts here
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -=  ss->statScore / 14721
-              + (ss->statScore - thisThread->statScoreAverage.value() - 1200) / 29900;
+              + (ss->statScore - thisThread->statScoreAverage.value() + 1200) / 29900;
 
           thisThread->statScoreAverage.update(ss->statScore);
 
