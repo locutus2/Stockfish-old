@@ -330,7 +330,8 @@ void Thread::search() {
   doubleExtensionAverage[WHITE].set(0, 100);  // initialize the running average at 0%
   doubleExtensionAverage[BLACK].set(0, 100);  // initialize the running average at 0%
   complexityAverage.set(232, 1);
-  statScoreAverage.set(0, 1);
+  statScoreAverage[WHITE].set(0, 1);
+  statScoreAverage[BLACK].set(0, 1);
 
   nodesLastExplosive = nodes;
   nodesLastNormal    = nodes;
@@ -1199,9 +1200,9 @@ moves_loop: // When in check, search starts here
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -=  ss->statScore / 14721
-              + (ss->statScore - thisThread->statScoreAverage.value() - 1200) / 29900;
+              + (ss->statScore - thisThread->statScoreAverage[us].value() + 2060) / 29766;
 
-          thisThread->statScoreAverage.update(ss->statScore);
+          thisThread->statScoreAverage[us].update(ss->statScore);
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
