@@ -58,6 +58,11 @@ using namespace Search;
 
 namespace {
 
+	double kernal(double m, double s, double x)
+	{
+		return std::pow((x-m)/s, 2);
+	}
+
   bool probratio(int x1, int x2, int x3, int x4, int x5)
   {
 	       double C0 = 95.074;
@@ -82,7 +87,7 @@ namespace {
 	       double s13 = 8533.65;
 	       double s14 = 8200.29;
 	       double s15 = 7814.67;
-	   return std::pow((x1-m01)/s01,2)+std::pow((x2-m02)/s02,2)+std::pow((x3-m03)/s03,2)+std::pow((x4-m04)/s04,2)+std::pow((x5-m05)/s05,2)
+	   return kernal(m01,s01,x1)+std::pow((x2-m02)/s02,2)+std::pow((x3-m03)/s03,2)+std::pow((x4-m04)/s04,2)+std::pow((x5-m05)/s05,2)
 	    -std::pow((x1-m11)/s11,2)-std::pow((x2-m12)/s12,2)-std::pow((x3-m13)/s13,2)-std::pow((x4-m14)/s14,2)-std::pow((x5-m15)/s15,2)
 	     > -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
   }
