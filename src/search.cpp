@@ -1155,6 +1155,12 @@ moves_loop: // When in check, search starts here
 
       bool doDeeperSearch = false;
 
+      bool CC = false;
+      int V1 = 0;
+      int V2 = 0;
+      int V3 = 0;
+      int V4 = 0;
+      int V5 = 0;
       // Step 16. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1196,6 +1202,12 @@ moves_loop: // When in check, search starts here
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          - 4923;
 
+	  CC = true;
+          V1 =  thisThread->mainHistory[us][from_to(move)];
+          V2 = (*contHist[0])[movedPiece][to_sq(move)];
+          V3 = (*contHist[1])[movedPiece][to_sq(move)];
+          V4 = (*contHist[3])[movedPiece][to_sq(move)];
+          V5 = (*contHist[5])[movedPiece][to_sq(move)];
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
@@ -1293,6 +1305,24 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(!T, 0);
+	      dbg_hit_on(T, 1);
+
+	      dbg_mean_of(V1, 100*T+1);
+	      dbg_mean_of(V2, 100*T+2);
+	      dbg_mean_of(V3, 100*T+3);
+	      dbg_mean_of(V4, 100*T+4);
+	      dbg_mean_of(V5, 100*T+5);
+	      dbg_std_of(V1, 100*T+1);
+	      dbg_std_of(V2, 100*T+2);
+	      dbg_std_of(V3, 100*T+3);
+	      dbg_std_of(V4, 100*T+4);
+	      dbg_std_of(V5, 100*T+5);
       }
 
       if (value > bestValue)
