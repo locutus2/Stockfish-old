@@ -63,8 +63,64 @@ namespace {
 		return std::pow((x-m)/s, 2);
 	}
 
-  bool probratio(int x1, int x2, int x3, int x4, int x5)
+	/*
+	 * [1] Total 30701717 Mean -4090.57
+	 * [2] Total 30701717 Mean 629.761
+	 * [3] Total 30701717 Mean -429.49
+	 * [4] Total 30701717 Mean -299.858
+	 * [5] Total 30701717 Mean -1064.89
+	 * [6] Total 30701717 Mean -9113.15
+	 * [101] Total 1590715 Mean 516.124
+	 * [102] Total 1590715 Mean 4528.09
+	 * [103] Total 1590715 Mean 3398.5
+	 * [104] Total 1590715 Mean 3238.46
+	 * [105] Total 1590715 Mean 2215.47
+	 * [106] Total 1590715 Mean 6758.17
+	 * [1] Total 30701717 Std 8979.32
+	 * [2] Total 30701717 Std 6853.11
+	 * [3] Total 30701717 Std 7278.19
+	 * [4] Total 30701717 Std 6963.07
+	 * [5] Total 30701717 Std 6746.41
+	 * [6] Total 30701717 Std 15157
+	 * [101] Total 1590715 Std 8766.47
+	 * [102] Total 1590715 Std 8194.26
+	 * [103] Total 1590715 Std 8533.65
+	 * [104] Total 1590715 Std 8200.29
+	 * [105] Total 1590715 Std 7814.67
+	 * [106] Total 1590715 Std 14769.2
+	 * [1] Total 30701717 Mean -4090.57
+	 * [2] Total 30701717 Mean 629.761
+	 * [3] Total 30701717 Mean -429.49
+	 * [4] Total 30701717 Mean -299.858
+	 * [5] Total 30701717 Mean -1064.89
+	 * [6] Total 30701717 Mean -9113.15
+	 * [101] Total 1590715 Mean 516.124
+	 * [102] Total 1590715 Mean 4528.09
+	 * [103] Total 1590715 Mean 3398.5
+	 * [104] Total 1590715 Mean 3238.46
+	 * [105] Total 1590715 Mean 2215.47
+	 * [106] Total 1590715 Mean 6758.17
+	 * [1] Total 30701717 Std 8979.32
+	 * [2] Total 30701717 Std 6853.11
+	 * [3] Total 30701717 Std 7278.19
+	 * [4] Total 30701717 Std 6963.07
+	 * [5] Total 30701717 Std 6746.41
+	 * [6] Total 30701717 Std 15157
+	 * [101] Total 1590715 Std 8766.47
+	 * [102] Total 1590715 Std 8194.26
+	 * [103] Total 1590715 Std 8533.65
+	 * [104] Total 1590715 Std 8200.29
+	 * [105] Total 1590715 Std 7814.67
+	 * [106] Total 1590715 Std 14769.2
+	 */
+  bool probratio(int x1, int x2, int x3, int x4, int x5, int x6)
   {
+	  bool use1 = false;
+	  bool use2 = false;
+	  bool use3 = false;
+	  bool use4 = false;
+	  bool use5 = false;
+	  bool use6 = true;
 	       double C0 = 95.074;
 	       double C1 = 4.92597;
 	       double m01 = -4090.57;
@@ -72,23 +128,32 @@ namespace {
 	       double m03 = -429.49;
 	       double m04 = -299.858;
 	       double m05 = -1064.89;
+	       double m06 = -9113.15;
 	       double m11 = 516.124;
 	       double m12 = 4528.09;
 	       double m13 = 3398.5;
 	       double m14 = 3238.46;
 	       double m15 = 2215.47;
-	       double s01 = 8979.32;
-	       double s02 = 6853.11;
-	       double s03 = 7278.19;
-	       double s04 = 6963.07;
-	       double s05 = 6746.41;
-	       double s11 = 8766.47;
-	       double s12 = 8194.26;
-	       double s13 = 8533.65;
-	       double s14 = 8200.29;
-	       double s15 = 7814.67;
-	   return kernal(m01,s01,x1)+std::pow((x2-m02)/s02,2)+std::pow((x3-m03)/s03,2)+std::pow((x4-m04)/s04,2)+std::pow((x5-m05)/s05,2)
-	    -std::pow((x1-m11)/s11,2)-std::pow((x2-m12)/s12,2)-std::pow((x3-m13)/s13,2)-std::pow((x4-m14)/s14,2)-std::pow((x5-m15)/s15,2)
+	       double m16 = 6758.17;
+	       double s01 = use1 ? 8979.32 : 1.0;
+	       double s02 = use2 ? 6853.11 : 1.0;
+	       double s03 = use3 ? 7278.19 : 1.0;
+	       double s04 = use4 ? 6963.07 : 1.0;
+	       double s05 = use5 ? 6746.41 : 1.0;
+	       double s06 = use6 ? 15157 : 1.0;
+	       double s11 = use1 ? 8766.47 : 1.0;
+	       double s12 = use2 ? 8194.26 : 1.0;
+	       double s13 = use3 ? 8533.65 : 1.0;
+	       double s14 = use4 ? 8200.29 : 1.0;
+	       double s15 = use5 ? 7814.67 : 1.0;
+	       double s16 = use6 ? 14769.2 : 1.0;
+	   return 
+	      (use1 ? kernal(m01, s01, x1) - kernal(m11, s11, x1): 0.0)
+	    + (use2 ? kernal(m02, s02, x2) - kernal(m12, s12, x2): 0.0)
+	    + (use3 ? kernal(m03, s03, x3) - kernal(m13, s13, x3): 0.0)
+	    + (use4 ? kernal(m04, s04, x4) - kernal(m14, s14, x4): 0.0)
+	    + (use5 ? kernal(m05, s05, x5) - kernal(m15, s15, x5): 0.0)
+	    + (use6 ? kernal(m06, s06, x6) - kernal(m16, s16, x6): 0.0)
 	     > -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
   }
 
@@ -1195,6 +1260,7 @@ moves_loop: // When in check, search starts here
       int V3 = 0;
       int V4 = 0;
       int V5 = 0;
+      int V6 = 0;
       // Step 16. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1242,6 +1308,8 @@ moves_loop: // When in check, search starts here
           V3 = (*contHist[1])[movedPiece][to_sq(move)];
           V4 = (*contHist[3])[movedPiece][to_sq(move)];
           V5 = (*contHist[5])[movedPiece][to_sq(move)];
+          V6 = ss->statScore;
+	      //CC = probratio(V1, V2, V3, V4, V5);
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
@@ -1352,11 +1420,13 @@ moves_loop: // When in check, search starts here
 	      dbg_mean_of(V3, 100*T+3);
 	      dbg_mean_of(V4, 100*T+4);
 	      dbg_mean_of(V5, 100*T+5);
+	      dbg_mean_of(V6, 100*T+6);
 	      dbg_std_of(V1, 100*T+1);
 	      dbg_std_of(V2, 100*T+2);
 	      dbg_std_of(V3, 100*T+3);
 	      dbg_std_of(V4, 100*T+4);
 	      dbg_std_of(V5, 100*T+5);
+	      dbg_std_of(V6, 100*T+6);
 	      /*
 	       * [0] Total 32292432 Hits 30701717 hit rate (%) 95.074
 	       * [1] Total 32292432 Hits 1590715 hit rate (%) 4.92597
@@ -1383,7 +1453,38 @@ moves_loop: // When in check, search starts here
 	       *
 	       * */
 
-	      bool T2 = probratio(V1, V2, V3, V4, V5);
+	      bool T2 = probratio(V1, V2, V3, V4, V5, V6);
+	      /*
+	       * [0] Total 854632 Hits 629923 hit rate (%) 73.7069
+	       * [1] Total 854632 Hits 224709 hit rate (%) 26.2931
+	       * [1000] Total 854632 Hits 0 hit rate (%) 0
+	       * [1001] Total 854632 Hits 0 hit rate (%) 0
+	       * [1010] Total 854632 Hits 629923 hit rate (%) 73.7069
+	       * [1011] Total 854632 Hits 224709 hit rate (%) 26.2931
+	       * [1101] Total 854632 Hits 224709 hit rate (%) 26.2931
+	       * [1] Total 629923 Mean 5551.54
+	       * [2] Total 629923 Mean 7832.7
+	       * [3] Total 629923 Mean 11271.3
+	       * [4] Total 629923 Mean 13167.2
+	       * [5] Total 629923 Mean 12028
+	       * [101] Total 224709 Mean 6990.51
+	       * [102] Total 224709 Mean 11758.4
+	       * [103] Total 224709 Mean 13793.6
+	       * [104] Total 224709 Mean 14162.5
+	       * [105] Total 224709 Mean 11728.6
+	       * [1] Total 629923 Std 7814.47
+	       * [2] Total 629923 Std 10803.8
+	       * [3] Total 629923 Std 9503.58
+	       * [4] Total 629923 Std 8505.72
+	       * [5] Total 629923 Std 8762.29
+	       * [101] Total 224709 Std 6761.68
+	       * [102] Total 224709 Std 9642.28
+	       * [103] Total 224709 Std 8427.58
+	       * [104] Total 224709 Std 7980.55
+	       * [105] Total 224709 Std 8802.15
+	       *
+	       */
+
 	      for(int i : {0, 1, 10, 11})
 	         dbg_hit_on(10*T2+T == i, 1000+i);
 	      dbg_hit_on( T2 == T, 1100 + T2);
