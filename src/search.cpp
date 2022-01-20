@@ -58,6 +58,35 @@ using namespace Search;
 
 namespace {
 
+  bool probratio(int x1, int x2, int x3, int x4, int x5)
+  {
+	       double C0 = 95.074;
+	       double C1 = 4.92597;
+	       double m01 = -4090.57;
+	       double m02 = 629.761;
+	       double m03 = -429.49;
+	       double m04 = -299.858;
+	       double m05 = -1064.89;
+	       double m11 = 516.124;
+	       double m12 = 4528.09;
+	       double m13 = 3398.5;
+	       double m14 = 3238.46;
+	       double m15 = 2215.47;
+	       double s01 = 8979.32;
+	       double s02 = 6853.11;
+	       double s03 = 7278.19;
+	       double s04 = 6963.07;
+	       double s05 = 6746.41;
+	       double s11 = 8766.47;
+	       double s12 = 8194.26;
+	       double s13 = 8533.65;
+	       double s14 = 8200.29;
+	       double s15 = 7814.67;
+	   return std::pow((x1-m01)/s01,2)+std::pow((x2-m02)/s02,2)+std::pow((x3-m03)/s03,2)+std::pow((x4-m04)/s04,2)+std::pow((x5-m05)/s05,2)
+	    -std::pow((x1-m11)/s11,2)-std::pow((x2-m12)/s12,2)-std::pow((x3-m13)/s13,2)-std::pow((x4-m14)/s14,2)-std::pow((x5-m15)/s15,2)
+	     > -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
+  }
+
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV, Root };
 
@@ -1323,6 +1352,36 @@ moves_loop: // When in check, search starts here
 	      dbg_std_of(V3, 100*T+3);
 	      dbg_std_of(V4, 100*T+4);
 	      dbg_std_of(V5, 100*T+5);
+	      /*
+	       * [0] Total 32292432 Hits 30701717 hit rate (%) 95.074
+	       * [1] Total 32292432 Hits 1590715 hit rate (%) 4.92597
+	       * [1] Total 30701717 Mean -4090.57
+	       * [2] Total 30701717 Mean 629.761
+	       * [3] Total 30701717 Mean -429.49
+	       * [4] Total 30701717 Mean -299.858
+	       * [5] Total 30701717 Mean -1064.89
+	       * [101] Total 1590715 Mean 516.124
+	       * [102] Total 1590715 Mean 4528.09
+	       * [103] Total 1590715 Mean 3398.5
+	       * [104] Total 1590715 Mean 3238.46
+	       * [105] Total 1590715 Mean 2215.47
+	       * [1] Total 30701717 Std 8979.32
+	       * [2] Total 30701717 Std 6853.11
+	       * [3] Total 30701717 Std 7278.19
+	       * [4] Total 30701717 Std 6963.07
+	       * [5] Total 30701717 Std 6746.41
+	       * [101] Total 1590715 Std 8766.47
+	       * [102] Total 1590715 Std 8194.26
+	       * [103] Total 1590715 Std 8533.65
+	       * [104] Total 1590715 Std 8200.29
+	       * [105] Total 1590715 Std 7814.67
+	       *
+	       * */
+
+	      bool T2 = probratio(V1, V2, V3, V4, V5);
+	      for(int i : {0, 1, 10, 11})
+	         dbg_hit_on(10*T2+T == i, 1000+i);
+	      dbg_hit_on( T2 == T, 1100 + T2);
       }
 
       if (value > bestValue)
