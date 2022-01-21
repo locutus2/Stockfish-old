@@ -255,6 +255,41 @@ namespace {
 	* [104] Total 622014 Std 8086.03
 	* [105] Total 622014 Std 7751.76
 	* [106] Total 622014 Std 13070.5
+	*
+	* CC=depth<=4
+	* [0] Total 12782182 Hits 11762081 hit rate (%) 92.0194
+	* [1] Total 12782182 Hits 1020101 hit rate (%) 7.98065
+	* [1000] Total 12782182 Hits 11762081 hit rate (%) 92.0194
+	* [1001] Total 12782182 Hits 1020101 hit rate (%) 7.98065
+	* [1010] Total 12782182 Hits 0 hit rate (%) 0
+	* [1011] Total 12782182 Hits 0 hit rate (%) 0
+	* [1100] Total 12782182 Hits 11762081 hit rate (%) 92.0194
+	* [1] Total 11762081 Mean -2205.91
+	* [2] Total 11762081 Mean 2313.25
+	* [3] Total 11762081 Mean 1155.19
+	* [4] Total 11762081 Mean 1159.27
+	* [5] Total 11762081 Mean -85.8774
+	* [6] Total 11762081 Mean -2501.19
+	* [101] Total 1020101 Mean 847.794
+	* [102] Total 1020101 Mean 4842.04
+	* [103] Total 1020101 Mean 3582.35
+	* [104] Total 1020101 Mean 3403.07
+	* [105] Total 1020101 Mean 2323.51
+	* [106] Total 1020101 Mean 7752.25
+	* [10000] Total 12782182 Mean 45272
+	* [10001] Total 12782182 Mean 53
+	* [1] Total 11762081 Std 8932.42
+	* [2] Total 11762081 Std 6845.8
+	* [3] Total 11762081 Std 7346.06
+	* [4] Total 11762081 Std 7107.33
+	* [5] Total 11762081 Std 6900.68
+	* [6] Total 11762081 Std 14283.6
+	* [101] Total 1020101 Std 8665.14
+	* [102] Total 1020101 Std 8023.7
+	* [103] Total 1020101 Std 8413.96
+	* [104] Total 1020101 Std 8088.4
+	* [105] Total 1020101 Std 7753.83
+	* [106] Total 1020101 Std 13638.5
 	 */
   bool probratio(int x1, int x2, int x3, int x4, int x5, int x6)
   {
@@ -381,6 +416,7 @@ namespace {
 	       double s16 = use6 ? 15492.7 : 1.0;
 	       */
 	// CC=depth <= 3
+	/*
 	       double C0 = 90.5818;
 	       double C1 = 9.41824;
 	       double m01 = -4090.57;
@@ -407,6 +443,34 @@ namespace {
 	       double s14 = use4 ? 8200.29 : 1.0;
 	       double s15 = use5 ? 7814.67 : 1.0;
 	       double s16 = use6 ? 13070.5 : 1.0;
+	       */
+	// CC=depth<=4
+	       double C0 = 92.0194;
+	       double C1 = 7.98065;
+	       double m01 = -4090.57;
+	       double m02 = 629.761;
+	       double m03 = -429.49;
+	       double m04 = -299.858;
+	       double m05 = -1064.89;
+	       double m06 = -2501.19;
+	       double m11 = 516.124;
+	       double m12 = 4528.09;
+	       double m13 = 3398.5;
+	       double m14 = 3238.46;
+	       double m15 = 2215.47;
+	       double m16 = 7752.25;
+	       double s01 = use1 ? 8979.32 : 1.0;
+	       double s02 = use2 ? 6853.11 : 1.0;
+	       double s03 = use3 ? 7278.19 : 1.0;
+	       double s04 = use4 ? 6963.07 : 1.0;
+	       double s05 = use5 ? 6746.41 : 1.0;
+	       double s06 = use6 ? 14283.6 : 1.0;
+	       double s11 = use1 ? 8766.47 : 1.0;
+	       double s12 = use2 ? 8194.26 : 1.0;
+	       double s13 = use3 ? 8533.65 : 1.0;
+	       double s14 = use4 ? 8200.29 : 1.0;
+	       double s15 = use5 ? 7814.67 : 1.0;
+	       double s16 = use6 ? 13638.5 : 1.0;
 
 	     double L = -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
 	      dbg_mean_of(10000*L, 10000);
@@ -1569,7 +1633,7 @@ moves_loop: // When in check, search starts here
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          - 4923;
 
-	  CC = depth <= 3;//!PvNode && !cutNode;
+	  CC = depth <= 4;//!PvNode && !cutNode;
           V1 =  thisThread->mainHistory[us][from_to(move)];
           V2 = (*contHist[0])[movedPiece][to_sq(move)];
           V3 = (*contHist[1])[movedPiece][to_sq(move)];
@@ -1725,7 +1789,8 @@ moves_loop: // When in check, search starts here
 	      //bool T2 = V6 >= 31000; // CC = PvNode [1101] Total 27176 Hits 4634 hit rate (%) 17.0518
 	      //bool T2 = V6 >= 38000; // CC = cutNode [1101] Total 240822 Hits 101273 hit rate (%) 42.0531
 	      //bool T2 = V6 >= 52000; // CC = !PvNode&&!cutNode [1101] Total 27450 Hits 10613 hit rate (%) 38.663
-	      bool T2 = V6 >= 53000; // CC = depth <= 3 [1101] Total 37713 Hits 18708 hit rate (%) 49.6062
+	      //bool T2 = V6 >= 53000; // CC = depth <= 3 [1101] Total 37713 Hits 18708 hit rate (%) 49.6062
+	      bool T2 = V6 >= 51000; // CC = depth <= 4 [1101] Total 73518 Hits 35322 hit rate (%) 48.0454
 	      /*
 	       * [0] Total 854632 Hits 629923 hit rate (%) 73.7069
 	       * [1] Total 854632 Hits 224709 hit rate (%) 26.2931
