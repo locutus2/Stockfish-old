@@ -112,6 +112,42 @@ namespace {
 	 * [104] Total 1590715 Std 8200.29
 	 * [105] Total 1590715 Std 7814.67
 	 * [106] Total 1590715 Std 14769.2
+	 *
+	 * CC=PvNode
+	 * [0] Total 3028974 Hits 2933561 hit rate (%) 96.85
+	 * [1] Total 3028974 Hits 95413 hit rate (%) 3.15001
+	 * [1000] Total 3028974 Hits 2894207 hit rate (%) 95.5507
+	 * [1001] Total 3028974 Hits 87991 hit rate (%) 2.90498
+	 * [1010] Total 3028974 Hits 39354 hit rate (%) 1.29925
+	 * [1011] Total 3028974 Hits 7422 hit rate (%) 0.245033
+	 * [1100] Total 2982198 Hits 2894207 hit rate (%) 97.0495
+	 * [1101] Total 46776 Hits 7422 hit rate (%) 15.8671
+	 * [1] Total 2933561 Mean -7014.96
+	 * [2] Total 2933561 Mean -670.778
+	 * [3] Total 2933561 Mean -1484.12
+	 * [4] Total 2933561 Mean -866.453
+	 * [5] Total 2933561 Mean -889.977
+	 * [6] Total 2933561 Mean -14959.3
+	 * [101] Total 95413 Mean -1794.38
+	 * [102] Total 95413 Mean 2972.88
+	 * [103] Total 95413 Mean 2074.21
+	 * [104] Total 95413 Mean 1857.68
+	 * [105] Total 95413 Mean 1009.5
+	 * [106] Total 95413 Mean 187.389
+	* [10000] Total 3028974 Mean 68515
+		* [10001] Total 3028974 Mean 31
+		* [1] Total 2933561 Std 8336.04
+		* [2] Total 2933561 Std 6383.74
+		* [3] Total 2933561 Std 6565.04
+		* [4] Total 2933561 Std 5561.72
+		* [5] Total 2933561 Std 5063.66
+		* [6] Total 2933561 Std 13133.2
+		* [101] Total 95413 Std 8689.18
+		* [102] Total 95413 Std 7466.88
+		* [103] Total 95413 Std 7234.51
+		* [104] Total 95413 Std 6636.38
+		* [105] Total 95413 Std 6293.44
+		* [106] Total 95413 Std 15450.9
 	 */
   bool probratio(int x1, int x2, int x3, int x4, int x5, int x6)
   {
@@ -121,6 +157,8 @@ namespace {
 	  bool use4 = false;
 	  bool use5 = false;
 	  bool use6 = true;
+	  //CC=true
+	  /*
 	       double C0 = 95.074;
 	       double C1 = 4.92597;
 	       double m01 = -4090.57;
@@ -147,6 +185,35 @@ namespace {
 	       double s14 = use4 ? 8200.29 : 1.0;
 	       double s15 = use5 ? 7814.67 : 1.0;
 	       double s16 = use6 ? 14769.2 : 1.0;
+	       */
+	  //CC=PvNode
+	       double C0 = 96.85;
+	       double C1 = 3.15001;
+	       double m01 = -4090.57;
+	       double m02 = 629.761;
+	       double m03 = -429.49;
+	       double m04 = -299.858;
+	       double m05 = -1064.89;
+	       double m06 = -14959.3;
+	       double m11 = 516.124;
+	       double m12 = 4528.09;
+	       double m13 = 3398.5;
+	       double m14 = 3238.46;
+	       double m15 = 2215.47;
+	       double m16 = 187.389;
+	       double s01 = use1 ? 8979.32 : 1.0;
+	       double s02 = use2 ? 6853.11 : 1.0;
+	       double s03 = use3 ? 7278.19 : 1.0;
+	       double s04 = use4 ? 6963.07 : 1.0;
+	       double s05 = use5 ? 6746.41 : 1.0;
+	       double s06 = use6 ? 13133.2 : 1.0;
+	       double s11 = use1 ? 8766.47 : 1.0;
+	       double s12 = use2 ? 8194.26 : 1.0;
+	       double s13 = use3 ? 8533.65 : 1.0;
+	       double s14 = use4 ? 8200.29 : 1.0;
+	       double s15 = use5 ? 7814.67 : 1.0;
+	       double s16 = use6 ? 15450.9 : 1.0;
+	  
 	     double L = -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
 	      dbg_mean_of(10000*L, 10000);
 	      double TH = L * s06 * s06;
@@ -1460,7 +1527,9 @@ moves_loop: // When in check, search starts here
 	       * */
 
 	      //bool T2 = probratio(V1, V2, V3, V4, V5, V6);
-	      bool T2 = V6 >= 41000; // CC = true [1101] Total 285227 Hits 111723 hit rate (%) 39.1699
+	      //bool T2 = V6 >= 41000; // CC = true [1101] Total 285227 Hits 111723 hit rate (%) 39.1699
+	      bool T2 = V6 >= 31000; // CC = PvNode [1101] Total 27176 Hits 4634 hit rate (%) 17.0518
+	      //bool T2 = V6 >= 41000; // CC = cutNode 
 	      /*
 	       * [0] Total 854632 Hits 629923 hit rate (%) 73.7069
 	       * [1] Total 854632 Hits 224709 hit rate (%) 26.2931
