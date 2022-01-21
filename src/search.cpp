@@ -147,6 +147,12 @@ namespace {
 	       double s14 = use4 ? 8200.29 : 1.0;
 	       double s15 = use5 ? 7814.67 : 1.0;
 	       double s16 = use6 ? 14769.2 : 1.0;
+	     double L = -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
+	      dbg_mean_of(10000*L, 10000);
+	      double TH = L * s06 * s06;
+	      TH = TH - m06 * m06 + m16 * m16;
+	      TH = TH / 2 / (m16 - m06);
+	      dbg_mean_of(TH / 1000, 10001);
 	   return 
 	      (use1 ? kernal(m01, s01, x1) - kernal(m11, s11, x1): 0.0)
 	    + (use2 ? kernal(m02, s02, x2) - kernal(m12, s12, x2): 0.0)
@@ -154,7 +160,7 @@ namespace {
 	    + (use4 ? kernal(m04, s04, x4) - kernal(m14, s14, x4): 0.0)
 	    + (use5 ? kernal(m05, s05, x5) - kernal(m15, s15, x5): 0.0)
 	    + (use6 ? kernal(m06, s06, x6) - kernal(m16, s16, x6): 0.0)
-	     > -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
+	     > L;
   }
 
   // Different node types, used as a template parameter
@@ -1302,7 +1308,7 @@ moves_loop: // When in check, search starts here
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          - 4923;
 
-	  CC = true;
+	  CC = PvNode;
           V1 =  thisThread->mainHistory[us][from_to(move)];
           V2 = (*contHist[0])[movedPiece][to_sq(move)];
           V3 = (*contHist[1])[movedPiece][to_sq(move)];
@@ -1453,7 +1459,8 @@ moves_loop: // When in check, search starts here
 	       *
 	       * */
 
-	      bool T2 = probratio(V1, V2, V3, V4, V5, V6);
+	      //bool T2 = probratio(V1, V2, V3, V4, V5, V6);
+	      bool T2 = V6 >= 41000; // CC = true [1101] Total 285227 Hits 111723 hit rate (%) 39.1699
 	      /*
 	       * [0] Total 854632 Hits 629923 hit rate (%) 73.7069
 	       * [1] Total 854632 Hits 224709 hit rate (%) 26.2931
