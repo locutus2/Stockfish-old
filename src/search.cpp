@@ -148,6 +148,45 @@ namespace {
 		* [104] Total 95413 Std 6636.38
 		* [105] Total 95413 Std 6293.44
 		* [106] Total 95413 Std 15450.9
+		
+	* CC=cutNode
+	* [0] Total 11690597 Hits 10742007 hit rate (%) 91.8859
+	* [1] Total 11690597 Hits 948590 hit rate (%) 8.11413
+	* [1000] Total 11690597 Hits 10312562 hit rate (%) 88.2124
+	* [1001] Total 11690597 Hits 749951 hit rate (%) 6.41499
+	* [1010] Total 11690597 Hits 429445 hit rate (%) 3.67342
+	* [1011] Total 11690597 Hits 198639 hit rate (%) 1.69913
+	* [1100] Total 11062513 Hits 10312562 hit rate (%) 93.2208
+	* [1101] Total 628084 Hits 198639 hit rate (%) 31.6262
+	* [1] Total 10742007 Mean -3783.47
+	* [2] Total 10742007 Mean 1295
+	* [3] Total 10742007 Mean 224.489
+	* [4] Total 10742007 Mean 269.643
+	* [5] Total 10742007 Mean -736.454
+	* [6] Total 10742007 Mean -6917.34
+	* [101] Total 948590 Mean 1026.51
+	* [102] Total 948590 Mean 4788.75
+	* [103] Total 948590 Mean 4151.68
+	* [104] Total 948590 Mean 3886.25
+	* [105] Total 948590 Mean 2647.33
+	* [106] Total 948590 Mean 8930.19
+	* [10000] Total 11690597 Mean 68515
+	* [10001] Total 11690597 Mean 31
+	* [1] Total 10742007 Std 8786.98
+	* [2] Total 10742007 Std 7105.26
+	* [3] Total 10742007 Std 7468.85
+	* [4] Total 10742007 Std 7228.12
+	* [5] Total 10742007 Std 7118.71
+	* [6] Total 10742007 Std 15721.2
+	* [101] Total 948590 Std 8696.3
+	* [102] Total 948590 Std 8337.14
+	* [103] Total 948590 Std 8777.99
+	* [104] Total 948590 Std 8463
+	* [105] Total 948590 Std 7989.94
+	* [106] Total 948590 Std 13799.1
+		
+	* CC=!PvNpde && !cutNode
+	*
 	 */
   bool probratio(int x1, int x2, int x3, int x4, int x5, int x6)
   {
@@ -187,6 +226,7 @@ namespace {
 	       double s16 = use6 ? 14769.2 : 1.0;
 	       */
 	  //CC=PvNode
+	  /*
 	       double C0 = 96.85;
 	       double C1 = 3.15001;
 	       double m01 = -4090.57;
@@ -213,7 +253,35 @@ namespace {
 	       double s14 = use4 ? 8200.29 : 1.0;
 	       double s15 = use5 ? 7814.67 : 1.0;
 	       double s16 = use6 ? 15450.9 : 1.0;
-	  
+	       */
+	 // CC=cutNode 
+	       double C0 = 91.8859;
+	       double C1 = 8.11413;
+	       double m01 = -4090.57;
+	       double m02 = 629.761;
+	       double m03 = -429.49;
+	       double m04 = -299.858;
+	       double m05 = -1064.89;
+	       double m06 = -6917.34;
+	       double m11 = 516.124;
+	       double m12 = 4528.09;
+	       double m13 = 3398.5;
+	       double m14 = 3238.46;
+	       double m15 = 2215.47;
+	       double m16 = 8930.19;
+	       double s01 = use1 ? 8979.32 : 1.0;
+	       double s02 = use2 ? 6853.11 : 1.0;
+	       double s03 = use3 ? 7278.19 : 1.0;
+	       double s04 = use4 ? 6963.07 : 1.0;
+	       double s05 = use5 ? 6746.41 : 1.0;
+	       double s06 = use6 ? 15721.2 : 1.0;
+	       double s11 = use1 ? 8766.47 : 1.0;
+	       double s12 = use2 ? 8194.26 : 1.0;
+	       double s13 = use3 ? 8533.65 : 1.0;
+	       double s14 = use4 ? 8200.29 : 1.0;
+	       double s15 = use5 ? 7814.67 : 1.0;
+	       double s16 = use6 ? 13799.1 : 1.0;
+
 	     double L = -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
 	      dbg_mean_of(10000*L, 10000);
 	      double TH = L * s06 * s06;
@@ -1375,7 +1443,7 @@ moves_loop: // When in check, search starts here
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          - 4923;
 
-	  CC = PvNode;
+	  CC = !PvNode && !cutNode;
           V1 =  thisThread->mainHistory[us][from_to(move)];
           V2 = (*contHist[0])[movedPiece][to_sq(move)];
           V3 = (*contHist[1])[movedPiece][to_sq(move)];
@@ -1526,10 +1594,10 @@ moves_loop: // When in check, search starts here
 	       *
 	       * */
 
-	      //bool T2 = probratio(V1, V2, V3, V4, V5, V6);
+	      bool T2 = probratio(V1, V2, V3, V4, V5, V6);
 	      //bool T2 = V6 >= 41000; // CC = true [1101] Total 285227 Hits 111723 hit rate (%) 39.1699
-	      bool T2 = V6 >= 31000; // CC = PvNode [1101] Total 27176 Hits 4634 hit rate (%) 17.0518
-	      //bool T2 = V6 >= 41000; // CC = cutNode 
+	      //bool T2 = V6 >= 31000; // CC = PvNode [1101] Total 27176 Hits 4634 hit rate (%) 17.0518
+	      //bool T2 = V6 >= 38000; // CC = cutNode [1101] Total 240822 Hits 101273 hit rate (%) 42.0531
 	      /*
 	       * [0] Total 854632 Hits 629923 hit rate (%) 73.7069
 	       * [1] Total 854632 Hits 224709 hit rate (%) 26.2931
