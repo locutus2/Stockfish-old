@@ -1032,7 +1032,11 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
-              if (!pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))
+              if (     thisThread->mainHistory[us][from_to(move)]
+                     + (*contHist[0])[movedPiece][to_sq(move)]
+                     + (*contHist[1])[movedPiece][to_sq(move)]
+                     + (*contHist[3])[movedPiece][to_sq(move)] < 65923
+                  && !pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))
                   continue;
           }
       }
