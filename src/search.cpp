@@ -64,232 +64,41 @@ namespace {
 	}
 
 	/*
-	 * [1] Total 30701717 Mean -4090.57
-	 * [2] Total 30701717 Mean 629.761
-	 * [3] Total 30701717 Mean -429.49
-	 * [4] Total 30701717 Mean -299.858
-	 * [5] Total 30701717 Mean -1064.89
-	 * [6] Total 30701717 Mean -9113.15
-	 * [101] Total 1590715 Mean 516.124
-	 * [102] Total 1590715 Mean 4528.09
-	 * [103] Total 1590715 Mean 3398.5
-	 * [104] Total 1590715 Mean 3238.46
-	 * [105] Total 1590715 Mean 2215.47
-	 * [106] Total 1590715 Mean 6758.17
-	 * [1] Total 30701717 Std 8979.32
-	 * [2] Total 30701717 Std 6853.11
-	 * [3] Total 30701717 Std 7278.19
-	 * [4] Total 30701717 Std 6963.07
-	 * [5] Total 30701717 Std 6746.41
-	 * [6] Total 30701717 Std 15157
-	 * [101] Total 1590715 Std 8766.47
-	 * [102] Total 1590715 Std 8194.26
-	 * [103] Total 1590715 Std 8533.65
-	 * [104] Total 1590715 Std 8200.29
-	 * [105] Total 1590715 Std 7814.67
-	 * [106] Total 1590715 Std 14769.2
-	 * [1] Total 30701717 Mean -4090.57
-	 * [2] Total 30701717 Mean 629.761
-	 * [3] Total 30701717 Mean -429.49
-	 * [4] Total 30701717 Mean -299.858
-	 * [5] Total 30701717 Mean -1064.89
-	 * [6] Total 30701717 Mean -9113.15
-	 * [101] Total 1590715 Mean 516.124
-	 * [102] Total 1590715 Mean 4528.09
-	 * [103] Total 1590715 Mean 3398.5
-	 * [104] Total 1590715 Mean 3238.46
-	 * [105] Total 1590715 Mean 2215.47
-	 * [106] Total 1590715 Mean 6758.17
-	 * [1] Total 30701717 Std 8979.32
-	 * [2] Total 30701717 Std 6853.11
-	 * [3] Total 30701717 Std 7278.19
-	 * [4] Total 30701717 Std 6963.07
-	 * [5] Total 30701717 Std 6746.41
-	 * [6] Total 30701717 Std 15157
-	 * [101] Total 1590715 Std 8766.47
-	 * [102] Total 1590715 Std 8194.26
-	 * [103] Total 1590715 Std 8533.65
-	 * [104] Total 1590715 Std 8200.29
-	 * [105] Total 1590715 Std 7814.67
-	 * [106] Total 1590715 Std 14769.2
+	 * CC=true
+	 * [0] Total 7069081 Hits 7027002 hit rate (%) 99.4047
+	 * [1] Total 7069081 Hits 42079 hit rate (%) 0.595254
+		* [1001] Total 7069081 Hits 41161 hit rate (%) 0.582268
+		* [1010] Total 7069081 Hits 5108 hit rate (%) 0.0722583
+		* [1011] Total 7069081 Hits 918 hit rate (%) 0.0129861
+		* [1100] Total 7063055 Hits 7021894 hit rate (%) 99.4172
+		* [1101] Total 6026 Hits 918 hit rate (%) 15.234
+	 * [1] Total 7027002 Mean -4299.79
+	 * [2] Total 7027002 Mean 711.165
+	 * [3] Total 7027002 Mean -332.496
+	 * [4] Total 7027002 Mean -272.457
+	 * [5] Total 7027002 Mean -1878.62
+	 * [6] Total 7027002 Mean -9116.58
+	 * [101] Total 42079 Mean 3630.76
+	 * [102] Total 42079 Mean 5181.52
+	 * [103] Total 42079 Mean 4082.46
+	 * [104] Total 42079 Mean 3930.2
+	 * [105] Total 42079 Mean 2173.06
+	 * [106] Total 42079 Mean 11901.9
+	 * [10000] Total 7069081 Mean 102359
+	 * [10001] Total 7069081 Mean 61
+	 * [1] Total 7027002 Std 9403.8
+	 * [2] Total 7027002 Std 7233.44
+	 * [3] Total 7027002 Std 7384.97
+	 * [4] Total 7027002 Std 7047.77
+	 * [5] Total 7027002 Std 6962.94
+	 * [6] Total 7027002 Std 15655.8
+	 * [101] Total 42079 Std 8748.49
+	 * [102] Total 42079 Std 8424.7
+	 * [103] Total 42079 Std 8547.64
+	 * [104] Total 42079 Std 8448.93
+	 * [105] Total 42079 Std 8579.17
+	 * [106] Total 42079 Std 10150.3
 	 *
-	 * CC=PvNode
-	 * [0] Total 3028974 Hits 2933561 hit rate (%) 96.85
-	 * [1] Total 3028974 Hits 95413 hit rate (%) 3.15001
-	 * [1000] Total 3028974 Hits 2894207 hit rate (%) 95.5507
-	 * [1001] Total 3028974 Hits 87991 hit rate (%) 2.90498
-	 * [1010] Total 3028974 Hits 39354 hit rate (%) 1.29925
-	 * [1011] Total 3028974 Hits 7422 hit rate (%) 0.245033
-	 * [1100] Total 2982198 Hits 2894207 hit rate (%) 97.0495
-	 * [1101] Total 46776 Hits 7422 hit rate (%) 15.8671
-	 * [1] Total 2933561 Mean -7014.96
-	 * [2] Total 2933561 Mean -670.778
-	 * [3] Total 2933561 Mean -1484.12
-	 * [4] Total 2933561 Mean -866.453
-	 * [5] Total 2933561 Mean -889.977
-	 * [6] Total 2933561 Mean -14959.3
-	 * [101] Total 95413 Mean -1794.38
-	 * [102] Total 95413 Mean 2972.88
-	 * [103] Total 95413 Mean 2074.21
-	 * [104] Total 95413 Mean 1857.68
-	 * [105] Total 95413 Mean 1009.5
-	 * [106] Total 95413 Mean 187.389
-	* [10000] Total 3028974 Mean 68515
-		* [10001] Total 3028974 Mean 31
-		* [1] Total 2933561 Std 8336.04
-		* [2] Total 2933561 Std 6383.74
-		* [3] Total 2933561 Std 6565.04
-		* [4] Total 2933561 Std 5561.72
-		* [5] Total 2933561 Std 5063.66
-		* [6] Total 2933561 Std 13133.2
-		* [101] Total 95413 Std 8689.18
-		* [102] Total 95413 Std 7466.88
-		* [103] Total 95413 Std 7234.51
-		* [104] Total 95413 Std 6636.38
-		* [105] Total 95413 Std 6293.44
-		* [106] Total 95413 Std 15450.9
-		
-	* CC=cutNode
-	* [0] Total 11690597 Hits 10742007 hit rate (%) 91.8859
-	* [1] Total 11690597 Hits 948590 hit rate (%) 8.11413
-	* [1000] Total 11690597 Hits 10312562 hit rate (%) 88.2124
-	* [1001] Total 11690597 Hits 749951 hit rate (%) 6.41499
-	* [1010] Total 11690597 Hits 429445 hit rate (%) 3.67342
-	* [1011] Total 11690597 Hits 198639 hit rate (%) 1.69913
-	* [1100] Total 11062513 Hits 10312562 hit rate (%) 93.2208
-	* [1101] Total 628084 Hits 198639 hit rate (%) 31.6262
-	* [1] Total 10742007 Mean -3783.47
-	* [2] Total 10742007 Mean 1295
-	* [3] Total 10742007 Mean 224.489
-	* [4] Total 10742007 Mean 269.643
-	* [5] Total 10742007 Mean -736.454
-	* [6] Total 10742007 Mean -6917.34
-	* [101] Total 948590 Mean 1026.51
-	* [102] Total 948590 Mean 4788.75
-	* [103] Total 948590 Mean 4151.68
-	* [104] Total 948590 Mean 3886.25
-	* [105] Total 948590 Mean 2647.33
-	* [106] Total 948590 Mean 8930.19
-	* [10000] Total 11690597 Mean 68515
-	* [10001] Total 11690597 Mean 31
-	* [1] Total 10742007 Std 8786.98
-	* [2] Total 10742007 Std 7105.26
-	* [3] Total 10742007 Std 7468.85
-	* [4] Total 10742007 Std 7228.12
-	* [5] Total 10742007 Std 7118.71
-	* [6] Total 10742007 Std 15721.2
-	* [101] Total 948590 Std 8696.3
-	* [102] Total 948590 Std 8337.14
-	* [103] Total 948590 Std 8777.99
-	* [104] Total 948590 Std 8463
-	* [105] Total 948590 Std 7989.94
-	* [106] Total 948590 Std 13799.1
-		
-	* CC=!PvNpde && !cutNode
-	* [0] Total 17572861 Hits 17026149 hit rate (%) 96.8889
-	* [1] Total 17572861 Hits 546712 hit rate (%) 3.11112
-	* [1000] Total 17572861 Hits 17026149 hit rate (%) 96.8889
-	* [1001] Total 17572861 Hits 546712 hit rate (%) 3.11112
-	* [1010] Total 17572861 Hits 0 hit rate (%) 0
-	* [1011] Total 17572861 Hits 0 hit rate (%) 0
-	* [1100] Total 17572861 Hits 17026149 hit rate (%) 96.8889
-	* [1] Total 17026149 Mean -3780.45
-	* [2] Total 17026149 Mean 434.131
-	* [3] Total 17026149 Mean -660.384
-	* [4] Total 17026149 Mean -561.541
-	* [5] Total 17026149 Mean -1302.25
-	* [6] Total 17026149 Mean -9491.24
-	* [101] Total 546712 Mean 33.7925
-	* [102] Total 546712 Mean 4347.23
-	* [103] Total 546712 Mean 2322.79
-	* [104] Total 546712 Mean 2355.47
-	* [105] Total 546712 Mean 1676.63
-	* [106] Total 546712 Mean 4136.28
-	* [10000] Total 17572861 Mean 48538
-	* [10001] Total 17572861 Mean 38
-	* [1] Total 17026149 Std 9114.5
-	* [2] Total 17026149 Std 6723.54
-	* [3] Total 17026149 Std 7237.7
-	* [4] Total 17026149 Std 6986.19
-	* [5] Total 17026149 Std 6749.2
-	* [6] Total 17026149 Std 14816.6
-	* [101] Total 546712 Std 8808.88
-	* [102] Total 546712 Std 8028.88
-	* [103] Total 546712 Std 8161.59
-	* [104] Total 546712 Std 7865.01
-	* [105] Total 546712 Std 7690.29
-	* [106] Total 546712 Std 15492.7
-	*
-	* CC=depth <= 3
-	* [0] Total 6604358 Hits 5982344 hit rate (%) 90.5818
-	* [1] Total 6604358 Hits 622014 hit rate (%) 9.41824
-	* [1000] Total 6604358 Hits 5946528 hit rate (%) 90.0395
-	* [1001] Total 6604358 Hits 592146 hit rate (%) 8.96599
-	* [1010] Total 6604358 Hits 35816 hit rate (%) 0.542309
-	* [1011] Total 6604358 Hits 29868 hit rate (%) 0.452247
-	* [1100] Total 6538674 Hits 5946528 hit rate (%) 90.9439
-	* [1101] Total 65684 Hits 29868 hit rate (%) 45.4723
-	* [1] Total 5982344 Mean -1875.01
-	* [2] Total 5982344 Mean 2672.49
-	* [3] Total 5982344 Mean 1529.9
-	* [4] Total 5982344 Mean 1537.91
-	* [5] Total 5982344 Mean 197.019
-	* [6] Total 5982344 Mean -1057.71
-	* [101] Total 622014 Mean 1033.79
-	* [102] Total 622014 Mean 5017.75
-	* [103] Total 622014 Mean 3724.15
-	* [104] Total 622014 Mean 3566.62
-	* [105] Total 622014 Mean 2415.34
-	* [106] Total 622014 Mean 8419.31
-	* [10000] Total 6604358 Mean 68771
-	* [10001] Total 6604358 Mean 52
-	* [1] Total 5982344 Std 8895.54
-	* [2] Total 5982344 Std 6916.67
-	* [3] Total 5982344 Std 7488.07
-	* [4] Total 5982344 Std 7285.8
-	* [5] Total 5982344 Std 7017.72
-	* [6] Total 5982344 Std 14402.3
-	* [101] Total 622014 Std 8606.67
-	* [102] Total 622014 Std 7984.95
-	* [103] Total 622014 Std 8371.46
-	* [104] Total 622014 Std 8086.03
-	* [105] Total 622014 Std 7751.76
-	* [106] Total 622014 Std 13070.5
-	*
-	* CC=depth<=4
-	* [0] Total 12782182 Hits 11762081 hit rate (%) 92.0194
-	* [1] Total 12782182 Hits 1020101 hit rate (%) 7.98065
-	* [1000] Total 12782182 Hits 11762081 hit rate (%) 92.0194
-	* [1001] Total 12782182 Hits 1020101 hit rate (%) 7.98065
-	* [1010] Total 12782182 Hits 0 hit rate (%) 0
-	* [1011] Total 12782182 Hits 0 hit rate (%) 0
-	* [1100] Total 12782182 Hits 11762081 hit rate (%) 92.0194
-	* [1] Total 11762081 Mean -2205.91
-	* [2] Total 11762081 Mean 2313.25
-	* [3] Total 11762081 Mean 1155.19
-	* [4] Total 11762081 Mean 1159.27
-	* [5] Total 11762081 Mean -85.8774
-	* [6] Total 11762081 Mean -2501.19
-	* [101] Total 1020101 Mean 847.794
-	* [102] Total 1020101 Mean 4842.04
-	* [103] Total 1020101 Mean 3582.35
-	* [104] Total 1020101 Mean 3403.07
-	* [105] Total 1020101 Mean 2323.51
-	* [106] Total 1020101 Mean 7752.25
-	* [10000] Total 12782182 Mean 45272
-	* [10001] Total 12782182 Mean 53
-	* [1] Total 11762081 Std 8932.42
-	* [2] Total 11762081 Std 6845.8
-	* [3] Total 11762081 Std 7346.06
-	* [4] Total 11762081 Std 7107.33
-	* [5] Total 11762081 Std 6900.68
-	* [6] Total 11762081 Std 14283.6
-	* [101] Total 1020101 Std 8665.14
-	* [102] Total 1020101 Std 8023.7
-	* [103] Total 1020101 Std 8413.96
-	* [104] Total 1020101 Std 8088.4
-	* [105] Total 1020101 Std 7753.83
-	* [106] Total 1020101 Std 13638.5
 	 */
   bool probratio(int x1, int x2, int x3, int x4, int x5, int x6)
   {
@@ -300,177 +109,32 @@ namespace {
 	  bool use5 = false;
 	  bool use6 = true;
 	  //CC=true
-	  /*
-	       double C0 = 95.074;
-	       double C1 = 4.92597;
+	       double C0 = 99.4047;
+	       double C1 = 0.595254;
 	       double m01 = -4090.57;
 	       double m02 = 629.761;
 	       double m03 = -429.49;
 	       double m04 = -299.858;
 	       double m05 = -1064.89;
-	       double m06 = -9113.15;
+	       double m06 = -9116.58;
 	       double m11 = 516.124;
 	       double m12 = 4528.09;
 	       double m13 = 3398.5;
 	       double m14 = 3238.46;
 	       double m15 = 2215.47;
-	       double m16 = 6758.17;
+	       double m16 = 11901.9;
 	       double s01 = use1 ? 8979.32 : 1.0;
 	       double s02 = use2 ? 6853.11 : 1.0;
 	       double s03 = use3 ? 7278.19 : 1.0;
 	       double s04 = use4 ? 6963.07 : 1.0;
 	       double s05 = use5 ? 6746.41 : 1.0;
-	       double s06 = use6 ? 15157 : 1.0;
+	       double s06 = use6 ? 15655.8 : 1.0;
 	       double s11 = use1 ? 8766.47 : 1.0;
 	       double s12 = use2 ? 8194.26 : 1.0;
 	       double s13 = use3 ? 8533.65 : 1.0;
 	       double s14 = use4 ? 8200.29 : 1.0;
 	       double s15 = use5 ? 7814.67 : 1.0;
-	       double s16 = use6 ? 14769.2 : 1.0;
-	       */
-	  //CC=PvNode
-	  /*
-	       double C0 = 96.85;
-	       double C1 = 3.15001;
-	       double m01 = -4090.57;
-	       double m02 = 629.761;
-	       double m03 = -429.49;
-	       double m04 = -299.858;
-	       double m05 = -1064.89;
-	       double m06 = -14959.3;
-	       double m11 = 516.124;
-	       double m12 = 4528.09;
-	       double m13 = 3398.5;
-	       double m14 = 3238.46;
-	       double m15 = 2215.47;
-	       double m16 = 187.389;
-	       double s01 = use1 ? 8979.32 : 1.0;
-	       double s02 = use2 ? 6853.11 : 1.0;
-	       double s03 = use3 ? 7278.19 : 1.0;
-	       double s04 = use4 ? 6963.07 : 1.0;
-	       double s05 = use5 ? 6746.41 : 1.0;
-	       double s06 = use6 ? 13133.2 : 1.0;
-	       double s11 = use1 ? 8766.47 : 1.0;
-	       double s12 = use2 ? 8194.26 : 1.0;
-	       double s13 = use3 ? 8533.65 : 1.0;
-	       double s14 = use4 ? 8200.29 : 1.0;
-	       double s15 = use5 ? 7814.67 : 1.0;
-	       double s16 = use6 ? 15450.9 : 1.0;
-	       */
-	 // CC=cutNode 
-	  /*
-	       double C0 = 91.8859;
-	       double C1 = 8.11413;
-	       double m01 = -4090.57;
-	       double m02 = 629.761;
-	       double m03 = -429.49;
-	       double m04 = -299.858;
-	       double m05 = -1064.89;
-	       double m06 = -6917.34;
-	       double m11 = 516.124;
-	       double m12 = 4528.09;
-	       double m13 = 3398.5;
-	       double m14 = 3238.46;
-	       double m15 = 2215.47;
-	       double m16 = 8930.19;
-	       double s01 = use1 ? 8979.32 : 1.0;
-	       double s02 = use2 ? 6853.11 : 1.0;
-	       double s03 = use3 ? 7278.19 : 1.0;
-	       double s04 = use4 ? 6963.07 : 1.0;
-	       double s05 = use5 ? 6746.41 : 1.0;
-	       double s06 = use6 ? 15721.2 : 1.0;
-	       double s11 = use1 ? 8766.47 : 1.0;
-	       double s12 = use2 ? 8194.26 : 1.0;
-	       double s13 = use3 ? 8533.65 : 1.0;
-	       double s14 = use4 ? 8200.29 : 1.0;
-	       double s15 = use5 ? 7814.67 : 1.0;
-	       double s16 = use6 ? 13799.1 : 1.0;
-	       */
-	 // CC=!PvNode&&!cutNode 
-	 /*
-	       double C0 = 96.8889;
-	       double C1 = 3.11112;
-	       double m01 = -4090.57;
-	       double m02 = 629.761;
-	       double m03 = -429.49;
-	       double m04 = -299.858;
-	       double m05 = -1064.89;
-	       double m06 = -9491.24;
-	       double m11 = 516.124;
-	       double m12 = 4528.09;
-	       double m13 = 3398.5;
-	       double m14 = 3238.46;
-	       double m15 = 2215.47;
-	       double m16 = 4136.28;
-	       double s01 = use1 ? 8979.32 : 1.0;
-	       double s02 = use2 ? 6853.11 : 1.0;
-	       double s03 = use3 ? 7278.19 : 1.0;
-	       double s04 = use4 ? 6963.07 : 1.0;
-	       double s05 = use5 ? 6746.41 : 1.0;
-	       double s06 = use6 ? 14816.6 : 1.0;
-	       double s11 = use1 ? 8766.47 : 1.0;
-	       double s12 = use2 ? 8194.26 : 1.0;
-	       double s13 = use3 ? 8533.65 : 1.0;
-	       double s14 = use4 ? 8200.29 : 1.0;
-	       double s15 = use5 ? 7814.67 : 1.0;
-	       double s16 = use6 ? 15492.7 : 1.0;
-	       */
-	// CC=depth <= 3
-	/*
-	       double C0 = 90.5818;
-	       double C1 = 9.41824;
-	       double m01 = -4090.57;
-	       double m02 = 629.761;
-	       double m03 = -429.49;
-	       double m04 = -299.858;
-	       double m05 = -1064.89;
-	       double m06 = -1057.71;
-	       double m11 = 516.124;
-	       double m12 = 4528.09;
-	       double m13 = 3398.5;
-	       double m14 = 3238.46;
-	       double m15 = 2215.47;
-	       double m16 = 8419.31;
-	       double s01 = use1 ? 8979.32 : 1.0;
-	       double s02 = use2 ? 6853.11 : 1.0;
-	       double s03 = use3 ? 7278.19 : 1.0;
-	       double s04 = use4 ? 6963.07 : 1.0;
-	       double s05 = use5 ? 6746.41 : 1.0;
-	       double s06 = use6 ? 14402.3 : 1.0;
-	       double s11 = use1 ? 8766.47 : 1.0;
-	       double s12 = use2 ? 8194.26 : 1.0;
-	       double s13 = use3 ? 8533.65 : 1.0;
-	       double s14 = use4 ? 8200.29 : 1.0;
-	       double s15 = use5 ? 7814.67 : 1.0;
-	       double s16 = use6 ? 13070.5 : 1.0;
-	       */
-	// CC=depth<=4
-	       double C0 = 92.0194;
-	       double C1 = 7.98065;
-	       double m01 = -4090.57;
-	       double m02 = 629.761;
-	       double m03 = -429.49;
-	       double m04 = -299.858;
-	       double m05 = -1064.89;
-	       double m06 = -2501.19;
-	       double m11 = 516.124;
-	       double m12 = 4528.09;
-	       double m13 = 3398.5;
-	       double m14 = 3238.46;
-	       double m15 = 2215.47;
-	       double m16 = 7752.25;
-	       double s01 = use1 ? 8979.32 : 1.0;
-	       double s02 = use2 ? 6853.11 : 1.0;
-	       double s03 = use3 ? 7278.19 : 1.0;
-	       double s04 = use4 ? 6963.07 : 1.0;
-	       double s05 = use5 ? 6746.41 : 1.0;
-	       double s06 = use6 ? 14283.6 : 1.0;
-	       double s11 = use1 ? 8766.47 : 1.0;
-	       double s12 = use2 ? 8194.26 : 1.0;
-	       double s13 = use3 ? 8533.65 : 1.0;
-	       double s14 = use4 ? 8200.29 : 1.0;
-	       double s15 = use5 ? 7814.67 : 1.0;
-	       double s16 = use6 ? 13638.5 : 1.0;
+	       double s16 = use6 ? 10150.3 : 1.0;
 
 	     double L = -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
 	      dbg_mean_of(10000*L, 10000);
@@ -1452,6 +1116,25 @@ moves_loop: // When in check, search starts here
       newDepth = depth - 1;
 
       Value delta = beta - alpha;
+          ss->statScore =  thisThread->mainHistory[us][from_to(move)]
+                         + (*contHist[0])[movedPiece][to_sq(move)]
+                         + (*contHist[1])[movedPiece][to_sq(move)]
+                         + (*contHist[3])[movedPiece][to_sq(move)]
+                         - 4923;
+
+      bool CC = false;
+      int V1 = 0;
+      int V2 = 0;
+      int V3 = 0;
+      int V4 = 0;
+      int V5 = 0;
+      int V6 = 0;
+          V1 =  thisThread->mainHistory[us][from_to(move)];
+          V2 = (*contHist[0])[movedPiece][to_sq(move)];
+          V3 = (*contHist[1])[movedPiece][to_sq(move)];
+          V4 = (*contHist[3])[movedPiece][to_sq(move)];
+          V5 = (*contHist[5])[movedPiece][to_sq(move)];
+          V6 = ss->statScore;
 
       // Step 13. Pruning at shallow depth (~98 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
@@ -1502,7 +1185,11 @@ moves_loop: // When in check, search starts here
 
               // Prune moves with negative SEE (~3 Elo)
               if (!pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))
-                  continue;
+	      {
+		  CC = true;
+	          //CC = probratio(V1, V2, V3, V4, V5);
+                  if(!CC) continue;
+	      }
           }
       }
 
@@ -1585,13 +1272,6 @@ moves_loop: // When in check, search starts here
 
       bool doDeeperSearch = false;
 
-      bool CC = false;
-      int V1 = 0;
-      int V2 = 0;
-      int V3 = 0;
-      int V4 = 0;
-      int V5 = 0;
-      int V6 = 0;
       // Step 16. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1627,20 +1307,6 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          ss->statScore =  thisThread->mainHistory[us][from_to(move)]
-                         + (*contHist[0])[movedPiece][to_sq(move)]
-                         + (*contHist[1])[movedPiece][to_sq(move)]
-                         + (*contHist[3])[movedPiece][to_sq(move)]
-                         - 4923;
-
-	  CC = depth <= 4;//!PvNode && !cutNode;
-          V1 =  thisThread->mainHistory[us][from_to(move)];
-          V2 = (*contHist[0])[movedPiece][to_sq(move)];
-          V3 = (*contHist[1])[movedPiece][to_sq(move)];
-          V4 = (*contHist[3])[movedPiece][to_sq(move)];
-          V5 = (*contHist[5])[movedPiece][to_sq(move)];
-          V6 = ss->statScore;
-	      //CC = probratio(V1, V2, V3, V4, V5);
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
@@ -1758,69 +1424,8 @@ moves_loop: // When in check, search starts here
 	      dbg_std_of(V4, 100*T+4);
 	      dbg_std_of(V5, 100*T+5);
 	      dbg_std_of(V6, 100*T+6);
-	      /*
-	       * [0] Total 32292432 Hits 30701717 hit rate (%) 95.074
-	       * [1] Total 32292432 Hits 1590715 hit rate (%) 4.92597
-	       * [1] Total 30701717 Mean -4090.57
-	       * [2] Total 30701717 Mean 629.761
-	       * [3] Total 30701717 Mean -429.49
-	       * [4] Total 30701717 Mean -299.858
-	       * [5] Total 30701717 Mean -1064.89
-	       * [101] Total 1590715 Mean 516.124
-	       * [102] Total 1590715 Mean 4528.09
-	       * [103] Total 1590715 Mean 3398.5
-	       * [104] Total 1590715 Mean 3238.46
-	       * [105] Total 1590715 Mean 2215.47
-	       * [1] Total 30701717 Std 8979.32
-	       * [2] Total 30701717 Std 6853.11
-	       * [3] Total 30701717 Std 7278.19
-	       * [4] Total 30701717 Std 6963.07
-	       * [5] Total 30701717 Std 6746.41
-	       * [101] Total 1590715 Std 8766.47
-	       * [102] Total 1590715 Std 8194.26
-	       * [103] Total 1590715 Std 8533.65
-	       * [104] Total 1590715 Std 8200.29
-	       * [105] Total 1590715 Std 7814.67
-	       *
-	       * */
-
 	      //bool T2 = probratio(V1, V2, V3, V4, V5, V6);
-	      //bool T2 = V6 >= 41000; // CC = true [1101] Total 285227 Hits 111723 hit rate (%) 39.1699
-	      //bool T2 = V6 >= 31000; // CC = PvNode [1101] Total 27176 Hits 4634 hit rate (%) 17.0518
-	      //bool T2 = V6 >= 38000; // CC = cutNode [1101] Total 240822 Hits 101273 hit rate (%) 42.0531
-	      //bool T2 = V6 >= 52000; // CC = !PvNode&&!cutNode [1101] Total 27450 Hits 10613 hit rate (%) 38.663
-	      //bool T2 = V6 >= 53000; // CC = depth <= 3 [1101] Total 37713 Hits 18708 hit rate (%) 49.6062
-	      bool T2 = V6 >= 51000; // CC = depth <= 4 [1101] Total 73518 Hits 35322 hit rate (%) 48.0454
-	      /*
-	       * [0] Total 854632 Hits 629923 hit rate (%) 73.7069
-	       * [1] Total 854632 Hits 224709 hit rate (%) 26.2931
-	       * [1000] Total 854632 Hits 0 hit rate (%) 0
-	       * [1001] Total 854632 Hits 0 hit rate (%) 0
-	       * [1010] Total 854632 Hits 629923 hit rate (%) 73.7069
-	       * [1011] Total 854632 Hits 224709 hit rate (%) 26.2931
-	       * [1101] Total 854632 Hits 224709 hit rate (%) 26.2931
-	       * [1] Total 629923 Mean 5551.54
-	       * [2] Total 629923 Mean 7832.7
-	       * [3] Total 629923 Mean 11271.3
-	       * [4] Total 629923 Mean 13167.2
-	       * [5] Total 629923 Mean 12028
-	       * [101] Total 224709 Mean 6990.51
-	       * [102] Total 224709 Mean 11758.4
-	       * [103] Total 224709 Mean 13793.6
-	       * [104] Total 224709 Mean 14162.5
-	       * [105] Total 224709 Mean 11728.6
-	       * [1] Total 629923 Std 7814.47
-	       * [2] Total 629923 Std 10803.8
-	       * [3] Total 629923 Std 9503.58
-	       * [4] Total 629923 Std 8505.72
-	       * [5] Total 629923 Std 8762.29
-	       * [101] Total 224709 Std 6761.68
-	       * [102] Total 224709 Std 9642.28
-	       * [103] Total 224709 Std 8427.58
-	       * [104] Total 224709 Std 7980.55
-	       * [105] Total 224709 Std 8802.15
-	       *
-	       */
+	      bool T2 = V6 > 61000; // CC = true [1101] Total 6026 Hits 918 hit rate (%) 15.234
 
 	      for(int i : {0, 1, 10, 11})
 	         dbg_hit_on(10*T2+T == i, 1000+i);
