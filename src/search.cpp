@@ -64,6 +64,7 @@ namespace {
 	}
 
 	/*
+	 * quiet SEE pruning
 	 * CC=true
 	 * [0] Total 7069081 Hits 7027002 hit rate (%) 99.4047
 	 * [1] Total 7069081 Hits 42079 hit rate (%) 0.595254
@@ -99,6 +100,42 @@ namespace {
 	 * [105] Total 42079 Std 8579.17
 	 * [106] Total 42079 Std 10150.3
 	 *
+	 * ##############################
+	 * quiet history pruning
+	 * CC=true
+	 * [0] Total 5613381 Hits 5287878 hit rate (%) 94.2013
+	 * [1] Total 5613381 Hits 325503 hit rate (%) 5.7987
+	 * [1000] Total 5613381 Hits 5287878 hit rate (%) 94.2013
+	 * [1001] Total 5613381 Hits 325503 hit rate (%) 5.7987
+	 * [1010] Total 5613381 Hits 0 hit rate (%) 0
+	 * [1011] Total 5613381 Hits 0 hit rate (%) 0
+	 * [1100] Total 5613381 Hits 5287878 hit rate (%) 94.2013
+	 * [1] Total 5287878 Mean -1221.86
+	 * [2] Total 5287878 Mean -7136.84
+	 * [3] Total 5287878 Mean -8651.98
+	 * [4] Total 5287878 Mean -8234.41
+	 * [5] Total 5287878 Mean -5915.98
+	 * [6] Total 5287878 Mean -30168.1
+	 * [101] Total 325503 Mean 2858.64
+	 * [102] Total 325503 Mean -1648.27
+	 * [103] Total 325503 Mean -5107.48
+	 * [104] Total 325503 Mean -4886.03
+	 * [105] Total 325503 Mean -1341.56
+	 * [106] Total 325503 Mean -13706.1
+	 * [10000] Total 5613381 Mean 103297
+	 * [10001] Total 5613381 Mean 347
+	 * [1] Total 5287878 Std 9424.17
+	 * [2] Total 5287878 Std 9551.87
+	 * [3] Total 5287878 Std 8099.6
+	 * [4] Total 5287878 Std 7948.62
+	 * [5] Total 5287878 Std 9278.83
+	 * [6] Total 5287878 Std -nan
+	 * [101] Total 325503 Std 8623.12
+	 * [102] Total 325503 Std 7160.35
+	 * [103] Total 325503 Std 6852.28
+	 * [104] Total 325503 Std 6919.53
+	* [105] Total 325503 Std 8261.42
+		* [106] Total 325503 Std 9163.81
 	 */
   bool probratio(int x1, int x2, int x3, int x4, int x5, int x6)
   {
@@ -108,7 +145,9 @@ namespace {
 	  bool use4 = false;
 	  bool use5 = false;
 	  bool use6 = true;
+	  // quiet SEE pruning
 	  //CC=true
+	  /*
 	       double C0 = 99.4047;
 	       double C1 = 0.595254;
 	       double m01 = -4090.57;
@@ -135,6 +174,36 @@ namespace {
 	       double s14 = use4 ? 8200.29 : 1.0;
 	       double s15 = use5 ? 7814.67 : 1.0;
 	       double s16 = use6 ? 10150.3 : 1.0;
+	       */
+	 // ##############################
+	 //quiet history pruning
+	 //CC=true
+	       double C0 = 99.4319;
+	       double C1 = 0.568127;
+	       double m01 = -4090.57;
+	       double m02 = 629.761;
+	       double m03 = -429.49;
+	       double m04 = -299.858;
+	       double m05 = -1064.89;
+	       double m06 = -14893.4;
+	       double m11 = 516.124;
+	       double m12 = 4528.09;
+	       double m13 = 3398.5;
+	       double m14 = 3238.46;
+	       double m15 = 2215.47;
+	       double m16 = -11857.8;
+	       double s01 = use1 ? 8979.32 : 1.0;
+	       double s02 = use2 ? 6853.11 : 1.0;
+	       double s03 = use3 ? 7278.19 : 1.0;
+	       double s04 = use4 ? 6963.07 : 1.0;
+	       double s05 = use5 ? 6746.41 : 1.0;
+	       double s06 = use6 ? 14554.2 : 1.0;
+	       double s11 = use1 ? 8766.47 : 1.0;
+	       double s12 = use2 ? 8194.26 : 1.0;
+	       double s13 = use3 ? 8533.65 : 1.0;
+	       double s14 = use4 ? 8200.29 : 1.0;
+	       double s15 = use5 ? 7814.67 : 1.0;
+	       double s16 = use6 ? 13598.7 : 1.0;
 
 	     double L = -2 * std::log(C1/C0 * (s01 * s02 * s03 * s04 * s05) / (s11 * s12 * s13 * s14 * s15)) ;
 	      dbg_mean_of(10000*L, 10000);
@@ -1173,7 +1242,11 @@ moves_loop: // When in check, search starts here
               // Continuation history based pruning (~2 Elo)
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1))
-                  continue;
+	      {
+		  CC = true;
+	          //CC = probratio(V1, V2, V3, V4, V5);
+                  if(!CC) continue;
+	      }
 
               history += thisThread->mainHistory[us][from_to(move)];
 
@@ -1185,11 +1258,7 @@ moves_loop: // When in check, search starts here
 
               // Prune moves with negative SEE (~3 Elo)
               if (!pos.see_ge(move, Value(-21 * lmrDepth * lmrDepth - 21 * lmrDepth)))
-	      {
-		  CC = true;
-	          //CC = probratio(V1, V2, V3, V4, V5);
-                  if(!CC) continue;
-	      }
+                  continue;
           }
       }
 
@@ -1424,8 +1493,8 @@ moves_loop: // When in check, search starts here
 	      dbg_std_of(V4, 100*T+4);
 	      dbg_std_of(V5, 100*T+5);
 	      dbg_std_of(V6, 100*T+6);
-	      //bool T2 = probratio(V1, V2, V3, V4, V5, V6);
-	      bool T2 = V6 > 61000; // CC = true [1101] Total 6026 Hits 918 hit rate (%) 15.234
+	      bool T2 = probratio(V1, V2, V3, V4, V5, V6);
+	      //bool T2 = V6 > 347000; // CC = true 
 
 	      for(int i : {0, 1, 10, 11})
 	         dbg_hit_on(10*T2+T == i, 1000+i);
