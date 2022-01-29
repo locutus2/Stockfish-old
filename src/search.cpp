@@ -1153,7 +1153,7 @@ moves_loop: // When in check, search starts here
 
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
-              r += 1 + (PvNode && bestMove == ttMove && 2 * ss->ply > depth);
+              r += 1 + (PvNode && bestMove == ttMove && ss->ply > 2 * depth);
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
