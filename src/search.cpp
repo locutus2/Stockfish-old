@@ -33,6 +33,7 @@
 #include "timeman.h"
 #include "tt.h"
 #include "uci.h"
+#include "qlearn.h"
 #include "syzygy/tbprobe.h"
 
 namespace Stockfish {
@@ -57,6 +58,11 @@ using Eval::evaluate;
 using namespace Search;
 
 namespace {
+
+  QLearn learn;
+  Environment env;
+  State state;
+  Action action;
 
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV, Root };
@@ -1120,6 +1126,7 @@ moves_loop: // When in check, search starts here
 
       bool doDeeperSearch = false;
 
+      bool CC = false;
       // Step 16. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1163,6 +1170,10 @@ moves_loop: // When in check, search starts here
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
+
+	  CC = true;
+	  action = learn.offPolicyAction(state);
+	  r += action.getRed();
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
@@ -1258,6 +1269,15 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	  State s;
+	  env.execute(state, action, s);
+          double reward = value > alpha ? 1.0 : 0.0;
+	  learn.update(state, action, s, reward);
+	  state = s;
       }
 
       if (value > bestValue)
