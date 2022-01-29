@@ -59,7 +59,7 @@ using namespace Search;
 
 namespace {
 
-  QLearn learn;
+  Learn learn;
   Environment env;
   State state;
   Action action;
