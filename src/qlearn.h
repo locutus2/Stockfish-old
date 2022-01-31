@@ -135,7 +135,7 @@ class QLearn
         Q[s0][a].set_value(q);
 	//std::cerr << " => " << q << " " << Q[s0][a].value() << std::endl;
 
-	std::vector<bool> C;
+	std::vector<bool> C = { true };
 	print(env.getState(C));
     }
 

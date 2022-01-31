@@ -1172,7 +1172,7 @@ moves_loop: // When in check, search starts here
           r -= ss->statScore / 14721;
 
 	  CC = true;
-	  std::vector<bool> C;
+	  std::vector<bool> C = { captureOrPromotion };
 	  state = env.getState(C);
 	  action = learn.behaviorPolicyAction(state);
 	  r += action.getRed();
