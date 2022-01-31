@@ -22,6 +22,7 @@ class State
     int state = 0;
 
     public:
+    State(int s = -1) : state(s) {}
     std::vector<Action> getActions() const
     {
         return { Action(-1), Action(0), Action(1) };
@@ -35,15 +36,31 @@ class State
         std::vector<Action> a = getActions();
 	return a[std::rand() % a.size()];
     }
+
+    bool isTerminal() const
+    {
+        return state == -1;
+    }
 };
 
 template <typename S = State, typename A = Action>
 class Environment
 {
     public:
+    S getStartState()
+    {
+	    return S(0);
+    }
+
+    S getState(int s)
+    {
+	    return S(s);
+    }
+
     double execute(const S& s0, const A& a, S& s1)
     {
-        s1 = s0;
+        //s1 = s0;
+	s1 = S();
         return 0;
     }
 };
@@ -57,6 +74,7 @@ class Policy
 template <typename S = State, typename A = Action, typename P = Policy<S, A>, typename E = Environment<S, A>>
 class QLearn
 {
+    static constexpr double EPS = 0.1;
     static constexpr double DISCOUNT = 0.9;
     static constexpr double INIT_VALUE = 0.0;
     static constexpr int PRINT_ITERATION = 10000;
@@ -74,9 +92,15 @@ class QLearn
 
     int iteration;
     std::map<State, std::map<Action, Entry>> Q;
+    E& env;
+
+    double rnd() const
+    {
+        return std::rand() / (double)RAND_MAX;
+    }
 
     public:
-    QLearn()
+    QLearn(E& e) : env(e)
     {
         init();
     }
@@ -95,21 +119,24 @@ class QLearn
         Q[s0][a].inc_count();
         double alpha = 1.0 / Q[s0][a].count();
         double q = Q[s0][a].value();
-	double maxQ = bestActionValue(s1);
+	//double maxQ = bestActionValue(s1);
+	double maxQ = Q[s1][targetPolicyAction(s1)].value();
         double d = alpha * (reward + DISCOUNT * maxQ - q);
 	//std::cerr << "# S0=" << s0.getState() << " A=" << a.getRed() << " S1=" << s1.getState() << " Q=" << q << " r=" << reward << " maxQ=" << maxQ;
         q += d;
         Q[s0][a].set_value(q);
 	//std::cerr << " => " << q << " " << Q[s0][a].value() << std::endl;
 
-	print();
+	print(env.getStartState());
     }
 
+    /*
     double bestActionValue(const S& s) 
     {
         auto best = std::max_element(Q[s].begin(), Q[s].end(), [](auto& a, auto& b) { return a.second.value() < b.second.value(); });
         return best != Q[s].end() ? best->second.value() : INIT_VALUE;
     }
+    */
 
     Action bestAction(const S& s) 
     {
@@ -117,10 +144,19 @@ class QLearn
         return best != Q[s].end() ? best->first : s.randomAction();
     }
 
-    Action offPolicyAction(const S& s)
+    Action targetPolicyAction(const S& s)
     {
-        return s.randomAction();
+        return bestAction(s);
     }
+
+    Action behaviorPolicyAction(const S& s)
+    {
+        if (rnd() < EPS)
+            return s.randomAction();
+	else
+            return targetPolicyAction(s);
+    }
+
 
     void print(const S& s = S(), std::ostream& out = std::cerr)
     {

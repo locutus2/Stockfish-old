@@ -59,8 +59,8 @@ using namespace Search;
 
 namespace {
 
-  Learn learn;
   Environment env;
+  Learn learn(env);
   State state;
   Action action;
 
@@ -1172,7 +1172,7 @@ moves_loop: // When in check, search starts here
           r -= ss->statScore / 14721;
 
 	  CC = true;
-	  action = learn.offPolicyAction(state);
+	  action = learn.behaviorPolicyAction(state);
 	  r += action.getRed();
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
@@ -1277,7 +1277,7 @@ moves_loop: // When in check, search starts here
 	  env.execute(state, action, s);
           double reward = value > alpha ? 1.0 : 0.0;
 	  learn.update(state, action, s, reward);
-	  state = s;
+	  state = s.isTerminal() ? env.getStartState() : s;
       }
 
       if (value > bestValue)
