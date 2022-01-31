@@ -1156,7 +1156,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (ss->inCheck && int(thisThread->nodes & 0x3F) < thisThread->incheckAverage.value())
+          if (ss->inCheck && int(thisThread->nodes & 0x7F) < thisThread->incheckAverage.value())
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
