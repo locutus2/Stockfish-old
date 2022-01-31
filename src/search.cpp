@@ -304,8 +304,8 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
-  moveAverage.set(26, 100);
-  incheckAverage.set(40, 100);
+  moveAverage.set(5, 100);
+  incheckAverage.set(17, 100);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -1268,10 +1268,13 @@ moves_loop: // When in check, search starts here
               rm.score = -VALUE_INFINITE;
       }
 
-      thisThread->moveAverage.update(value > alpha);
+      if (didLMR)
+      {
+          thisThread->moveAverage.update(value > alpha);
 
-      if(ss->inCheck)
-          thisThread->incheckAverage.update(value > alpha);
+          if(ss->inCheck)
+              thisThread->incheckAverage.update(value > alpha);
+      }
 
       if (value > bestValue)
       {
