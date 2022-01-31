@@ -57,10 +57,18 @@ class Environment
 	    return S(s);
     }
 
+    S getState(const std::vector<bool>& C)
+    {
+	    int index = 0;
+	    for(int i = 0 ; i <(int)C.size(); ++i)
+		    index = 2 * index + C[i];
+	    return index;
+    }
+
     double execute(const S& s0, const A& a, S& s1)
     {
         //s1 = s0;
-	s1 = S();
+	s1 = S(-1);
         return 0;
     }
 };
@@ -127,7 +135,8 @@ class QLearn
         Q[s0][a].set_value(q);
 	//std::cerr << " => " << q << " " << Q[s0][a].value() << std::endl;
 
-	print(env.getStartState());
+	std::vector<bool> C;
+	print(env.getState(C));
     }
 
     /*
