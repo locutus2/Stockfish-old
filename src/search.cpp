@@ -304,6 +304,8 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
+  moveAverage.set(5, 100);
+  incheckAverage.set(10, 100);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -1155,6 +1157,9 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (ss->inCheck && thisThread->incheckAverage < thisThread->moveAverage)
+              r++;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1262,6 +1267,11 @@ moves_loop: // When in check, search starts here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
+
+      thisThread->moveAverage.update(value > alpha);
+
+      if(ss->inCheck)
+          thisThread->incheckAverage.update(value > alpha);
 
       if (value > bestValue)
       {

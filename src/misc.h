@@ -108,6 +108,9 @@ class RunningAverage {
       int64_t value()
         { return average / (PERIOD * RESOLUTION); }
 
+      bool operator<(const RunningAverage& ra) const
+        { return average < ra.average; }
+
   private :
       static constexpr int64_t PERIOD     = 4096;
       static constexpr int64_t RESOLUTION = 1024;
