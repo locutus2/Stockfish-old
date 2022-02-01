@@ -305,6 +305,7 @@ void Thread::search() {
 
   complexityAverage.set(232, 1);
   complexityAverage2.set(232, 1);
+  complexityAverage3.set(232, 1);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -775,9 +776,10 @@ namespace {
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
 
     thisThread->complexityAverage.update(complexity);
-    thisThread->complexityAverage2.update(thisThread->complexityAverage.value());
+    thisThread->complexityAverage2.update(thisThread->complexityAverage);
+    thisThread->complexityAverage3.update(complexity);
     if (++it % 10000 == 0)
-        std::cerr << thisThread->complexityAverage.value() << ";" << thisThread->complexityAverage2.value() << std::endl;
+        std::cerr << thisThread->complexityAverage.value() << ";" << thisThread->complexityAverage2.value() << ";" << thisThread->complexityAverage3.value() << std::endl;
 
     // Step 7. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
