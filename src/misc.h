@@ -87,7 +87,7 @@ static inline const bool IsLittleEndian = (Le.c[0] == 4);
 
 // RunningAverage : a class to calculate a running average of a series of values.
 // For efficiency, all computations are done with integers.
-template <int64_t PERIOD = 1024>
+template <int64_t PERIOD = 4096>
 class RunningAverage {
   public:
 

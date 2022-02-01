@@ -60,9 +60,9 @@ public:
   Pawns::Table pawnsTable;
   Material::Table materialTable;
   size_t pvIdx, pvLast;
-  RunningAverage<1024*16> complexityAverage;
-  RunningAverage<512> complexityAverage2;
-  RunningAverage<> complexityAverage3;
+  RunningAverage<4096 * 8> complexityAverage;
+  RunningAverage<4096 * 8 / 2> complexityAverage2;
+  RunningAverage<4096 * 8 > complexityAverage3;
   std::atomic<uint64_t> nodes, tbHits, bestMoveChanges;
   int selDepth, nmpMinPly;
   Color nmpColor;

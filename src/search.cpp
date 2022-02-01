@@ -774,10 +774,10 @@ namespace {
 
     improving = improvement > 0;
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
+    complexity2 = complexity + thisThread->complexityAverage2.value() - thisThread->complexityAverage3.value();
+    //complexity += complexity - thisThread->complexityAverage.value();
 
     thisThread->complexityAverage.update(complexity);
-
-    complexity2 = complexity + thisThread->complexityAverage2.value() - thisThread->complexityAverage3.value();
     thisThread->complexityAverage2.update(complexity2);
     thisThread->complexityAverage3.update(complexity2);
 
