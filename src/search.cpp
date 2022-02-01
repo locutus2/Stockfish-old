@@ -560,7 +560,7 @@ namespace {
     bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount, bestMoveCount, improvement, complexity;
+    int moveCount, captureCount, quietCount, bestMoveCount, improvement, complexity, complexity2;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -776,8 +776,11 @@ namespace {
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
 
     thisThread->complexityAverage.update(complexity);
-    thisThread->complexityAverage2.update(thisThread->complexityAverage);
-    thisThread->complexityAverage3.update(complexity);
+
+    complexity2 = complexity + thisThread->complexityAverage2.value() - thisThread->complexityAverage3.value();
+    thisThread->complexityAverage2.update(complexity2);
+    thisThread->complexityAverage3.update(complexity2);
+
     if (++it % 10000 == 0)
         std::cerr << thisThread->complexityAverage.value() << ";" << thisThread->complexityAverage2.value() << ";" << thisThread->complexityAverage3.value() << std::endl;
 
@@ -1270,6 +1273,9 @@ moves_loop: // When in check, search starts here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
+
+      //if (!ss->inCheck)
+      //     thisThread->complexityAverage.update(complexity);
 
       if (value > bestValue)
       {
