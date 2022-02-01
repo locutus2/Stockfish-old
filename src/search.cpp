@@ -1263,6 +1263,9 @@ moves_loop: // When in check, search starts here
               rm.score = -VALUE_INFINITE;
       }
 
+      if (!ss->inCheck)
+          thisThread->complexityAverage.update(complexity);
+
       if (value > bestValue)
       {
           bestValue = value;
