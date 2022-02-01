@@ -304,6 +304,7 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
+  fastComplexityAverage.set(232, 1);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -769,9 +770,11 @@ namespace {
                   :                                    200;
 
     improving = improvement > 0;
-    complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
+    complexity =  abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())))
+                + thisThread->fastComplexityAverage.value() - thisThread->complexityAverage.value();
 
     thisThread->complexityAverage.update(complexity);
+    thisThread->fastComplexityAverage.update(complexity);
 
     // Step 7. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
