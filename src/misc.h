@@ -110,7 +110,7 @@ class RunningAverage {
 
   private :
       static constexpr int64_t PERIOD     = 4096;
-      static constexpr int64_t RESOLUTION = 512;
+      static constexpr int64_t RESOLUTION = 2048;
       int64_t average;
 };
 
