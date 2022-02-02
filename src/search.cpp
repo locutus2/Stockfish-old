@@ -1165,7 +1165,7 @@ moves_loop: // When in check, search starts here
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
-          if (thisThread->lmrAverage.is_greater(14, 100))
+          if (thisThread->lmrAverage.is_greater(18, 100))
               r--;
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
