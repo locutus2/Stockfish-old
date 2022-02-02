@@ -1120,6 +1120,7 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
+      bool CC = false;
 
       // Step 16. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1177,9 +1178,39 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
-          dbg_hit_on(value > alpha);
-	  thisThread->lmrAverage.update(100 * (value > alpha));
-          dbg_mean_of(thisThread->lmrAverage.value());
+
+	  /* 
+	   * CC = true; // 0.22873846839008131535474772497672
+	   * [0] Total 31753910 Hits 2344460 hit rate (%) 7.38322
+	   * [0] Total 31753910 Mean 6.05928
+	   * [1] Total 31753910 Mean 6.05947
+	   * [10] Total 29409450 Mean 5.96388
+	   * [11] Total 2344460 Mean 7.25608
+	   * [10] Total 29409450 Std 3.19884
+	   * [11] Total 2344460 Std 4.65633
+	   * */
+	  //CC = ss->inCheck; // 0.19559935750690989309324924433518
+	  /*
+	  CC = !ss->inCheck;  // 0.22628522229338340164289980610142
+	  [0] Total 30469730 Hits 2240470 hit rate (%) 7.3531
+	  [0] Total 30469730 Mean 5.99467
+	  [1] Total 30469730 Mean 5.99487
+	  [10] Total 28229260 Mean 5.90167
+	  [11] Total 2240470 Mean 7.16646
+	  [10] Total 28229260 Std 3.17301
+	  [11] Total 2240470 Std 4.60141
+	  */
+	  CC=thisThread->lmrAverage.value() > 16;
+	  if(true)
+	  {
+              dbg_hit_on(value > alpha, 0);
+              dbg_hit_on(CC, value > alpha, 1);
+              dbg_mean_of(thisThread->lmrAverage.value(), 0);
+	      dbg_mean_of(thisThread->lmrAverage.value(), 10 + (value > alpha));
+	      dbg_std_of(thisThread->lmrAverage.value(), 10 + (value > alpha));
+	      thisThread->lmrAverage.update(100 * (value > alpha));
+              dbg_mean_of(thisThread->lmrAverage.value(), 1);
+	  }
 
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
