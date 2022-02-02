@@ -304,8 +304,7 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
-  complexityAverage2.set(232, 1);
-  complexityAverage3.set(232, 1);
+  lmrAverage.set(7, 100);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -518,8 +517,6 @@ namespace {
 
   // search<>() is the main search function for both PV and non-PV nodes
 
-	int64_t it = 0;
-
   template <NodeType nodeType>
   Value search(Position& pos, Stack* ss, Value alpha, Value beta, Depth depth, bool cutNode) {
 
@@ -560,7 +557,7 @@ namespace {
     bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
-    int moveCount, captureCount, quietCount, bestMoveCount, improvement, complexity, complexity2;
+    int moveCount, captureCount, quietCount, bestMoveCount, improvement, complexity;
 
     // Step 1. Initialize node
     Thread* thisThread = pos.this_thread();
@@ -774,15 +771,8 @@ namespace {
 
     improving = improvement > 0;
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
-    complexity2 = complexity + thisThread->complexityAverage2.value() - thisThread->complexityAverage3.value();
-    //complexity += complexity - thisThread->complexityAverage.value();
 
     thisThread->complexityAverage.update(complexity);
-    thisThread->complexityAverage2.update(complexity2);
-    thisThread->complexityAverage3.update(complexity2);
-
-    if (++it % 10000 == 0)
-        std::cerr << thisThread->complexityAverage.value() << ";" << thisThread->complexityAverage2.value() << ";" << thisThread->complexityAverage3.value() << std::endl;
 
     // Step 7. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
@@ -1187,6 +1177,9 @@ moves_loop: // When in check, search starts here
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+          dbg_hit_on(value > alpha);
+	  thisThread->lmrAverage.update(100 * (value > alpha));
+          dbg_mean_of(thisThread->lmrAverage.value());
 
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
@@ -1273,9 +1266,6 @@ moves_loop: // When in check, search starts here
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
       }
-
-      //if (!ss->inCheck)
-      //     thisThread->complexityAverage.update(complexity);
 
       if (value > bestValue)
       {
