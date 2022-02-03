@@ -304,7 +304,10 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
-  lmrAverage.set(7, 100);
+  //lmrAverage.set(6, 100); //CC=true
+  //lmrAverage.set(24, 1000); //CC=ss->inCheck
+  //lmrAverage.set(6, 100); //CC=!ss->inCheck
+  lmrAverage.set(54, 1000); //CC=givesCheck
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -1182,34 +1185,71 @@ moves_loop: // When in check, search starts here
 	  /* 
 	   * CC = true; // 0.22873846839008131535474772497672
 	   * [0] Total 31753910 Hits 2344460 hit rate (%) 7.38322
-	   * [0] Total 31753910 Mean 6.05928
-	   * [1] Total 31753910 Mean 6.05947
-	   * [10] Total 29409450 Mean 5.96388
-	   * [11] Total 2344460 Mean 7.25608
-	   * [10] Total 29409450 Std 3.19884
-	   * [11] Total 2344460 Std 4.65633
+	   * [1] Total 1271141 Hits 230862 hit rate (%) 18.1618  avg > 12
+	   * [0] Total 31753910 Mean 6.05815
+	   * [1] Total 31753910 Mean 6.05834
+	   * [10] Total 29409450 Mean 5.96274
+	   * [11] Total 2344460 Mean 7.25493
+	   * [0] Total 31753910 Std 3.34632
+	   * [1] Total 31753910 Std 3.34619
+	   * [10] Total 29409450 Std 3.19973
+	   * [11] Total 2344460 Std 4.65713
 	   * */
-	  //CC = ss->inCheck; // 0.19559935750690989309324924433518
+	  /*CC = ss->inCheck; // 0.19559935750690989309324924433518
+	   * [0] Total 1284180 Hits 103990 hit rate (%) 8.09777
+	   * [1] Total 81241 Hits 11868 hit rate (%) 14.6084  avg > 9
+	   * [0] Total 1284180 Mean 2.3731
+	   * [1] Total 1284180 Mean 2.37405
+	   * [10] Total 1180190 Mean 2.28879
+	   * [11] Total 103990 Mean 3.32996
+	   * [0] Total 1284180 Std 3.36027
+	   * [1] Total 1284180 Std 3.36026
+	   * [10] Total 1180190 Std 3.26
+	   * [11] Total 103990 Std 4.22241
+	   * */
 	  /*
 	  CC = !ss->inCheck;  // 0.22628522229338340164289980610142
 	  [0] Total 30469730 Hits 2240470 hit rate (%) 7.3531
-	  [0] Total 30469730 Mean 5.99467
-	  [1] Total 30469730 Mean 5.99487
-	  [10] Total 28229260 Mean 5.90167
-	  [11] Total 2240470 Mean 7.16646
-	  [10] Total 28229260 Std 3.17301
-	  [11] Total 2240470 Std 4.60141
+	  [1] Total 1156936 Hits 211482 hit rate (%) 18.2795  avg > 12
+	  [0] Total 30469730 Mean 5.99348
+	  [1] Total 30469730 Mean 5.99367
+	  [10] Total 28229260 Mean 5.90048
+	  [11] Total 2240470 Mean 7.16521
+	  [0] Total 30469730 Std 3.31656
+	  [1] Total 30469730 Std 3.31642
+	  [10] Total 28229260 Std 3.17394
+	  [11] Total 2240470 Std 4.60223
 	  */
-	  CC=thisThread->lmrAverage.value() > 16;
-	  if(true)
+	  /*
+	  CC = givesCheck;
+	  [0] Total 2428954 Hits 313567 hit rate (%) 12.9095
+	  [1] Total 128993 Hits 37643 hit rate (%) 29.1822  avg > 18
+	  [0] Total 2428954 Mean 5.36959
+	  [1] Total 2428954 Mean 5.37113
+	  [10] Total 2115387 Mean 4.99123
+	  [11] Total 313567 Mean 7.92209
+	  [0] Total 2428954 Std 6.47178
+	  [1] Total 2428954 Std 6.47161
+	  [10] Total 2115387 Std 6.0134
+	  [11] Total 313567 Std 8.54467
+	  */
+	  //CC = true;//!ss->inCheck;
+	  CC = givesCheck;
+	  bool C = thisThread->lmrAverage.value() > 18;
+	  //C=thisThread->lmrAverage.value() > 16;
+	  if(CC)
 	  {
               dbg_hit_on(value > alpha, 0);
-              dbg_hit_on(CC, value > alpha, 1);
+              dbg_hit_on(C, value > alpha, 1);
               dbg_mean_of(thisThread->lmrAverage.value(), 0);
+	      dbg_std_of(thisThread->lmrAverage.value(), 0);
 	      dbg_mean_of(thisThread->lmrAverage.value(), 10 + (value > alpha));
 	      dbg_std_of(thisThread->lmrAverage.value(), 10 + (value > alpha));
+
 	      thisThread->lmrAverage.update(100 * (value > alpha));
+
               dbg_mean_of(thisThread->lmrAverage.value(), 1);
+	      dbg_std_of(thisThread->lmrAverage.value(), 1);
 	  }
 
           // If the son is reduced and fails high it will be re-searched at full depth
