@@ -304,7 +304,7 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
-  lmrAverage.set(6, 100);
+  lmrAverage.set(5, 100);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -1165,7 +1165,7 @@ moves_loop: // When in check, search starts here
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 14721;
 
-          if (thisThread->lmrAverage.is_greater(10, 100))
+          if (givesCheck && thisThread->lmrAverage.is_greater(16, 100))
               r--;
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
@@ -1181,7 +1181,8 @@ moves_loop: // When in check, search starts here
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          thisThread->lmrAverage.update(value > alpha);
+	  if (givesCheck)
+              thisThread->lmrAverage.update(value > alpha);
 
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
