@@ -19,6 +19,7 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "thread.h"
 
 namespace Stockfish {
 
@@ -60,9 +61,10 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
                                                              const CapturePieceToHistory* cph,
                                                              const PieceToHistory** ch,
                                                              Move cm,
-                                                             const Move* killers)
+                                                             const Move* killers,
+                                                             bool root)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
-             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d)
+             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), rootNode(root)
 {
   assert(d > 0);
 
@@ -111,12 +113,22 @@ void MovePicker::score() {
                    + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if constexpr (Type == QUIETS)
-          m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
+      {
+          if (rootNode)
+          {
+              auto rm = std::find(pos.this_thread()->rootMoves.begin(),
+                                  pos.this_thread()->rootMoves.end(), m);
 
+              m.value = rm == pos.this_thread()->rootMoves.end() ? -VALUE_INFINITE
+                                                                 : rm->averageScore;
+          }
+          else
+              m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
+                       + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                       +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                       +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                       +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
+      }
       else // Type == EVASIONS
       {
           if (pos.capture(m))
