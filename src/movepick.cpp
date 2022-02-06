@@ -19,6 +19,7 @@
 #include <cassert>
 
 #include "movepick.h"
+#include "thread.h"
 
 namespace Stockfish {
 
@@ -206,7 +207,7 @@ top:
           endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, -3000 * depth);
+          partial_insertion_sort(cur, endMoves, -(3000 + pos.this_thread()->complexityAverage.value()) * depth);
       }
 
       ++stage;
