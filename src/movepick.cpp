@@ -114,20 +114,19 @@ void MovePicker::score() {
 
       else if constexpr (Type == QUIETS)
       {
+          m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
+                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                   +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                   +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                   +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
           if (rootNode)
           {
               auto rm = std::find(pos.this_thread()->rootMoves.begin(),
                                   pos.this_thread()->rootMoves.end(), m);
 
-              m.value = rm == pos.this_thread()->rootMoves.end() ? -VALUE_INFINITE
-                                                                 : rm->averageScore;
+              m.value += rm == pos.this_thread()->rootMoves.end() ? -VALUE_INFINITE
+                                                                  : rm->averageScore;
           }
-          else
-              m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                       + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                       +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                       +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                       +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
       }
       else // Type == EVASIONS
       {
