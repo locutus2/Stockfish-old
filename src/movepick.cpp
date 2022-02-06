@@ -125,7 +125,7 @@ void MovePicker::score() {
                                   pos.this_thread()->rootMoves.end(), m);
 
               m.value += rm == pos.this_thread()->rootMoves.end() ? -VALUE_INFINITE
-                                                                  : rm->previousScore / 2;
+                                                                  : rm->previousScore / 4;
           }
       }
       else // Type == EVASIONS
