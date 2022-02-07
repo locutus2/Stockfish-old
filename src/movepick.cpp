@@ -207,7 +207,7 @@ top:
           endMoves = generate<QUIETS>(pos, cur);
 
           score<QUIETS>();
-          partial_insertion_sort(cur, endMoves, -3000 * depth - 18 * pos.this_thread()->complexityAverage.value());
+          partial_insertion_sort(cur, endMoves, -3000 * depth - 12 * pos.this_thread()->complexityAverage.value() + 3000);
       }
 
       ++stage;
