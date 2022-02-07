@@ -944,7 +944,7 @@ moves_loop: // When in check, search starts here
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      rootNode);
+                                      rootNode || ss->ply == 2);
 
     value = bestValue;
     moveCountPruning = false;
