@@ -304,6 +304,7 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
+  searchComplexityAverage.set(255, 1);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -470,8 +471,10 @@ void Thread::search() {
                                               * totBestMoveChanges / Threads.size();
           int complexity = mainThread->complexityAverage.value();
           double complexPosition = std::clamp(1.0 + (complexity - 232) / 1750.0, 0.5, 1.5);
+          int searchComplexity = mainThread->searchComplexityAverage.value();
+          double searchComplexPosition = std::clamp(1.0 + (searchComplexity - 255) / 1724.5, 0.5, 1.5);
 
-          double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability * complexPosition;
+          double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability * complexPosition * searchComplexPosition;
 
           // Cap used time in case of a single legal move for a better viewer experience in tournaments
           // yielding correct scores and sufficiently fast moves.
@@ -1347,6 +1350,9 @@ moves_loop: // When in check, search starts here
 
         update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth) * (1 + extraBonus));
     }
+
+    if (ss->staticEval != VALUE_NONE && abs(bestValue) < VALUE_KNOWN_WIN)
+        thisThread->searchComplexityAverage.update(abs(ss->staticEval - bestValue));
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
