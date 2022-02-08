@@ -1349,7 +1349,7 @@ moves_loop: // When in check, search starts here
     }
 
     if (ss->staticEval != VALUE_NONE && abs(bestValue) < VALUE_KNOWN_WIN)
-        thisThread->complexityAverage.update(abs(ss->staticEval - bestValue), 2);
+        thisThread->complexityAverage.update(abs(ss->staticEval - bestValue), 3);
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
