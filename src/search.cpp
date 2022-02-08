@@ -304,7 +304,6 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(232, 1);
-  searchComplexityAverage.set(255, 1);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -801,8 +800,7 @@ namespace {
         && (ss-1)->statScore < 23767
         &&  eval >= beta
         &&  eval >= ss->staticEval
-        &&  ss->staticEval >=  beta - 20 * depth - improvement / 15 + 204 + complexity / 25
-                             + int(thisThread->searchComplexityAverage.value()) / 25
+        &&  ss->staticEval >= beta - 20 * depth - improvement / 15 + 204 + complexity / 25
         && !excludedMove
         &&  pos.non_pawn_material(us)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
@@ -1351,7 +1349,7 @@ moves_loop: // When in check, search starts here
     }
 
     if (ss->staticEval != VALUE_NONE && abs(bestValue) < VALUE_KNOWN_WIN)
-        thisThread->searchComplexityAverage.update(abs(ss->staticEval - bestValue));
+        thisThread->complexityAverage.update(abs(ss->staticEval - bestValue));
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
