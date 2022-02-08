@@ -303,7 +303,7 @@ void Thread::search() {
 
   multiPV = std::min(multiPV, rootMoves.size());
 
-  complexityAverage.set(232, 1, 3);
+  complexityAverage.set(232);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(25);
@@ -771,7 +771,7 @@ namespace {
     improving = improvement > 0;
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
 
-    thisThread->complexityAverage.update(complexity, 3);
+    thisThread->complexityAverage.update(complexity);
 
     // Step 7. Razoring.
     // If eval is really low check with qsearch if it can exceed alpha, if it can't,
@@ -1349,7 +1349,7 @@ moves_loop: // When in check, search starts here
     }
 
     if (ss->staticEval != VALUE_NONE && abs(bestValue) < VALUE_KNOWN_WIN)
-        thisThread->complexityAverage.update(abs(ss->staticEval - bestValue));
+        thisThread->complexityAverage.update(abs(ss->staticEval - bestValue), 2);
 
     if (PvNode)
         bestValue = std::min(bestValue, maxValue);
