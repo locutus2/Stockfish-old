@@ -1112,7 +1112,8 @@ Value Eval::evaluate(const Position& pos) {
 
   // Damp down the evaluation linearly when shuffling
   Phase gamePhase = Material::probe(pos)->game_phase();
-  int rule50 = (gamePhase * pos.rule50_count() + (PHASE_MIDGAME - gamePhase) * 100) / PHASE_MIDGAME;
+  int rule50 = pos.rule50_count();
+  rule50 = (gamePhase * rule50 + (PHASE_MIDGAME - gamePhase) * std::max(100 - pos.count<PAWN>(), rule50)) / PHASE_MIDGAME;
   v = v * (208 - rule50) / 208;
 
   // Guarantee evaluation does not hit the tablebase range
