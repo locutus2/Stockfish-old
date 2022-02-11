@@ -1169,7 +1169,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (failedNMP && !captureOrPromotion)
+          if (failedNMP && captureOrPromotion)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
