@@ -1142,6 +1142,7 @@ moves_loop: // When in check, search starts here
           &&  moveCount > 1 + rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
+              || failedNMP
               || (cutNode && (ss-1)->moveCount > 1)))
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
@@ -1167,9 +1168,6 @@ moves_loop: // When in check, search starts here
 
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
-              r++;
-
-          if (failedNMP)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
