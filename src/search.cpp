@@ -1003,11 +1003,6 @@ moves_loop: // When in check, search starts here
       // Step 14. Pruning at shallow depth (~98 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
           && pos.non_pawn_material(us)
-          && !(   move == threatCounterMove
-               && move != ttMove
-               && move != ss->killers[0]
-               && move != ss->killers[1]
-               && move != countermove)
           && bestValue > VALUE_TB_LOSS_IN_MAX_PLY)
       {
           // Skip quiet moves if movecount exceeds our FutilityMoveCount threshold (~7 Elo)
@@ -1170,6 +1165,12 @@ moves_loop: // When in check, search starts here
           // Increase reduction for cut nodes (~3 Elo)
           if (cutNode && move != ss->killers[0])
               r += 2;
+
+          if (   move == threatCounterMove
+              && move != ss->killers[0]
+              && move != ss->killers[1]
+              && move != countermove)
+              r--;
 
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
