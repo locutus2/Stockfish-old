@@ -1114,13 +1114,6 @@ moves_loop: // When in check, search starts here
                    && move == ss->killers[0]
                    && (*contHist[0])[movedPiece][to_sq(move)] >= 7546)
               extension = 1;
-
-          else if (   move == threatCounterMove
-                   && move != ttMove
-                   && move != ss->killers[0]
-                   && move != ss->killers[1]
-                   && move != countermove)
-              extension = 1;
       }
 
       // Add extension to new depth
@@ -1176,6 +1169,13 @@ moves_loop: // When in check, search starts here
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
               r++;
+
+          if (   move == threatCounterMove
+              && move != ttMove
+              && move != ss->killers[0]
+              && move != ss->killers[1]
+              && move != countermove)
+              r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
