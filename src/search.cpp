@@ -550,7 +550,7 @@ namespace {
 
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove;
+    Move ttMove, move, excludedMove, bestMove, threatMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
@@ -566,6 +566,7 @@ namespace {
     moveCount          = bestMoveCount = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
+    threatMove         = MOVE_NONE;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -842,6 +843,8 @@ namespace {
             if (v >= beta)
                 return nullValue;
         }
+        else
+            threatMove = (ss+1)->currentMove;
     }
 
     probCutBeta = beta + 229 - 47 * improving;
@@ -939,6 +942,7 @@ moves_loop: // When in check, search starts here
                                           nullptr                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move counterThreatMove = threatMove ? thisThread->counterMoves[pos.piece_on(from_sq(threatMove))][to_sq(threatMove)] : MOVE_NONE;
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &captureHistory,
@@ -1165,6 +1169,9 @@ moves_loop: // When in check, search starts here
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
               r++;
+
+          if (move == counterThreatMove)
+              r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
