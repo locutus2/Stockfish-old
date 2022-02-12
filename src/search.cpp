@@ -942,12 +942,12 @@ moves_loop: // When in check, search starts here
                                           nullptr                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-    Move counterThreatMove = threatMove ? thisThread->counterMoves[pos.piece_on(from_sq(threatMove))][to_sq(threatMove)] : MOVE_NONE;
+    Move threatCounterMove = threatMove ? thisThread->counterMoves[pos.piece_on(from_sq(threatMove))][to_sq(threatMove)] : MOVE_NONE;
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &captureHistory,
                                       contHist,
-                                      counterThreatMove ? counterThreatMove : countermove,
+                                      threatCounterMove ? threatCounterMove : countermove,
                                       ss->killers);
 
     value = bestValue;
