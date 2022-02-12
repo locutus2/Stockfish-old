@@ -947,7 +947,7 @@ moves_loop: // When in check, search starts here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &captureHistory,
                                       contHist,
-                                      threatCounterMove ? threatCounterMove : countermove,
+                                      threatCounterMove && !pos.capture_or_promotion(threatCounterMove) ? threatCounterMove : countermove,
                                       ss->killers);
 
     value = bestValue;
