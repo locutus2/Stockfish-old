@@ -947,7 +947,7 @@ moves_loop: // When in check, search starts here
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &captureHistory,
                                       contHist,
-                                      threatCounterMove && !pos.capture_or_promotion(threatCounterMove) ? threatCounterMove : countermove,
+                                      countermove,
                                       ss->killers);
 
     value = bestValue;
@@ -1113,6 +1113,13 @@ moves_loop: // When in check, search starts here
                    && move == ttMove
                    && move == ss->killers[0]
                    && (*contHist[0])[movedPiece][to_sq(move)] >= 7546)
+              extension = 1;
+
+          else if (   move == threatCounterMove
+                   && move != ttMove
+                   && move != ss->killers[0]
+                   && move != ss->killers[1]
+                   && move != countermove)
               extension = 1;
       }
 
