@@ -1140,8 +1140,7 @@ moves_loop: // When in check, search starts here
           &&  moveCount > 1 + rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
-              || (cutNode && (ss-1)->moveCount > 1))
-         && (!captureOrPromotion || move != counterCapture))
+              || (cutNode && (ss-1)->moveCount > 1)))
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
@@ -1167,6 +1166,9 @@ moves_loop: // When in check, search starts here
           // Increase reduction if ttMove is a capture (~3 Elo)
           if (ttCapture)
               r++;
+
+          if (move == counterCapture && captureOrPromotion)
+              r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
