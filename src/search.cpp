@@ -1744,7 +1744,7 @@ moves_loop: // When in check, search starts here
     update_continuation_histories(ss, pos.moved_piece(move), to_sq(move), bonus);
 
     // Update countermove history
-    if (is_ok((ss-1)->currentMove))
+    if (is_ok((ss-1)->currentMove) && !ss->inCheck)
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
