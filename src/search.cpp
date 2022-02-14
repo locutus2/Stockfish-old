@@ -1014,7 +1014,7 @@ moves_loop: // When in check, search starts here
           if (   captureOrPromotion
               || givesCheck)
           {
-      C = move == counterCapture && cutNode;
+      C = move == counterCapture && type_of(movedPiece) != PAWN;
       //C = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] > 0;
       //C = move == counterCapture && pos.see_ge(move);
               // Futility pruning for captures (~0 Elo)
