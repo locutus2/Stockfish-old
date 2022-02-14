@@ -957,6 +957,8 @@ moves_loop: // When in check, search starts here
                          && (tte->bound() & BOUND_UPPER)
                          && tte->depth() >= depth;
 
+    std::vector<std::pair<bool,bool>> data;
+
     // Step 13. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1012,7 +1014,7 @@ moves_loop: // When in check, search starts here
           if (   captureOrPromotion
               || givesCheck)
           {
-      C = move == counterCapture && pos.see_ge(move, Value(-214*2) * depth);
+      C = move == counterCapture && cutNode;
       //C = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] > 0;
       //C = move == counterCapture && pos.see_ge(move);
               // Futility pruning for captures (~0 Elo)
@@ -1291,9 +1293,10 @@ moves_loop: // When in check, search starts here
 	      bool T = value > alpha;
 	      dbg_hit_on(T, 0);
 	      dbg_hit_on(T, 10+C);
+	      data.push_back({C, T});
       }
 
-      if (value > bestValue)
+      if (!CC && value > bestValue)
       {
           bestValue = value;
 
@@ -1342,6 +1345,18 @@ moves_loop: // When in check, search starts here
     // return a fail low score.
 
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
+
+    if(!data.empty())
+    {
+	    bool T = bestMove;
+	    for(auto x : data)
+	    {
+	        dbg_hit_on(T&&!x.first, 0);
+	        dbg_hit_on(!T&&x.first, 1);
+	        dbg_hit_on(T&&!x.first, 10*(1+x.second));
+	        dbg_hit_on(!T&&x.first, 10*(1+x.second)+1);
+	    }
+    }
 
     if (!moveCount)
         bestValue = excludedMove ? alpha :
