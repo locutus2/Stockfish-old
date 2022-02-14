@@ -997,6 +997,7 @@ moves_loop: // When in check, search starts here
 
       Value delta = beta - alpha;
 
+      bool CC = false, C = false;
       // Step 14. Pruning at shallow depth (~98 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1011,6 +1012,9 @@ moves_loop: // When in check, search starts here
           if (   captureOrPromotion
               || givesCheck)
           {
+      C = move == counterCapture;
+      //C = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] > 0;
+      //C = move == counterCapture && pos.see_ge(move);
               // Futility pruning for captures (~0 Elo)
               if (   !pos.empty(to_sq(move))
                   && !givesCheck
@@ -1019,11 +1023,17 @@ moves_loop: // When in check, search starts here
                   && !ss->inCheck
                   && ss->staticEval + 424 + 138 * lmrDepth + PieceValue[EG][pos.piece_on(to_sq(move))]
                    + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 7 < alpha)
-                  continue;
+	      {
+                  CC = captureOrPromotion && !PvNode && !cutNode;
+                  if(!CC) continue;
+	      }
 
               // SEE based pruning (~9 Elo)
               if (!pos.see_ge(move, Value(-214) * depth))
+	      {
+                  //CC = captureOrPromotion;
                   continue;
+	      }
           }
           else
           {
@@ -1140,9 +1150,7 @@ moves_loop: // When in check, search starts here
           &&  moveCount > 1 + rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
-              || (cutNode && (ss-1)->moveCount > 1))
-          && (   move != counterCapture
-              || !mp.isBadCapture()))
+              || (cutNode && (ss-1)->moveCount > 1)))
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
@@ -1275,6 +1283,13 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      dbg_hit_on(T, 10+C);
       }
 
       if (value > bestValue)
