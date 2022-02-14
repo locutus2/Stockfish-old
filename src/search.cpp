@@ -1012,7 +1012,7 @@ moves_loop: // When in check, search starts here
           if (   captureOrPromotion
               || givesCheck)
           {
-      C = move == counterCapture;
+      C = move == counterCapture && pos.see_ge(move, Value(-214*2) * depth);
       //C = captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] > 0;
       //C = move == counterCapture && pos.see_ge(move);
               // Futility pruning for captures (~0 Elo)
@@ -1024,15 +1024,16 @@ moves_loop: // When in check, search starts here
                   && ss->staticEval + 424 + 138 * lmrDepth + PieceValue[EG][pos.piece_on(to_sq(move))]
                    + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 7 < alpha)
 	      {
-                  CC = captureOrPromotion && !PvNode && !cutNode;
+                  CC = false;
+                  //CC = captureOrPromotion && cutNode && pos.see_ge(move);
                   if(!CC) continue;
 	      }
 
               // SEE based pruning (~9 Elo)
               if (!pos.see_ge(move, Value(-214) * depth))
 	      {
-                  //CC = captureOrPromotion;
-                  continue;
+                  CC = captureOrPromotion;
+                  if(!CC)continue;
 	      }
           }
           else
