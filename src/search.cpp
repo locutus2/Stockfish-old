@@ -1017,6 +1017,7 @@ moves_loop: // When in check, search starts here
                   && !PvNode
                   && lmrDepth < 7
                   && !ss->inCheck
+                  && (move != counterCapture || !cutNode)
                   && ss->staticEval + 424 + 138 * lmrDepth + PieceValue[EG][pos.piece_on(to_sq(move))]
                    + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 7 < alpha)
                   continue;
@@ -1140,11 +1141,7 @@ moves_loop: // When in check, search starts here
           &&  moveCount > 1 + rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
-              || (cutNode && (ss-1)->moveCount > 1))
-          && (   PvNode
-              || cutNode
-              || move != counterCapture
-              || !captureOrPromotion))
+              || (cutNode && (ss-1)->moveCount > 1)))
 
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
