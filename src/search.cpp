@@ -1176,8 +1176,8 @@ moves_loop: // When in check, search starts here
               && !givesCheck
               && !ss->inCheck
               && !captureOrPromotion
-              && ss->statScore < -17000
-              && (ss-1)->moveCount > 1
+              && ss->statScore < 0
+              && (ss-1)->moveCount > 7
               && move != countermove
               && move != ss->killers[0]
               && move != ss->killers[1]
