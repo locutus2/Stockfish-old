@@ -117,7 +117,7 @@ namespace {
   Value value_from_tt(Value v, int ply, int r50c);
   void update_pv(Move* pv, Move move, Move* childPv);
   void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus);
-  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus);
+  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, Move* quietsSearched, int quietCount);
   void update_all_stats(const Position& pos, Stack* ss, Move bestMove, Value bestValue, Value beta, Square prevSq,
                         Move* quietsSearched, int quietCount, Move* capturesSearched, int captureCount, Depth depth);
 
@@ -643,7 +643,7 @@ namespace {
             {
                 // Bonus for a quiet ttMove that fails high (~3 Elo)
                 if (!ttCapture)
-                    update_quiet_stats(pos, ss, ttMove, stat_bonus(depth));
+                    update_quiet_stats(pos, ss, ttMove, stat_bonus(depth), quietsSearched, 0);
 
                 // Extra penalty for early quiet moves of the previous ply (~0 Elo)
                 if ((ss-1)->moveCount <= 2 && !priorCapture)
@@ -1682,7 +1682,7 @@ moves_loop: // When in check, search starts here
     if (!pos.capture_or_promotion(bestMove))
     {
         // Increase stats for the best move in case it was a quiet move
-        update_quiet_stats(pos, ss, bestMove, bonus2);
+        update_quiet_stats(pos, ss, bestMove, bonus2, quietsSearched, quietCount);
 
         // Decrease stats for all non-best quiet moves
         for (int i = 0; i < quietCount; ++i)
@@ -1729,7 +1729,7 @@ moves_loop: // When in check, search starts here
 
   // update_quiet_stats() updates move sorting heuristics
 
-  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus) {
+  void update_quiet_stats(const Position& pos, Stack* ss, Move move, int bonus, Move* quietsSearched, int quietCount) {
 
     // Update killers
     if (ss->killers[0] != move)
@@ -1748,7 +1748,7 @@ moves_loop: // When in check, search starts here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         Move lastCounter = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
-        if (pos.pseudo_legal(lastCounter))
+        if (pos.pseudo_legal(lastCounter) && std::find(quietsSearched, quietsSearched + quietCount, lastCounter) == quietsSearched + quietCount)
             update_continuation_histories(ss, pos.moved_piece(lastCounter), to_sq(lastCounter), bonus / 2);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
