@@ -1180,10 +1180,7 @@ moves_loop: // When in check, search starts here
               && (ss-1)->moveCount > 1
               && move != countermove
               && move != ss->killers[0]
-              && move != ss->killers[1]
-              && !pos.capture_or_promotion(thisThread->counterMoves[movedPiece][to_sq(move)])
-              && pos.pseudo_legal(thisThread->counterMoves[movedPiece][to_sq(move)])
-              && pos.legal(thisThread->counterMoves[movedPiece][to_sq(move)]))
+              && move != ss->killers[1])
               r++;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
