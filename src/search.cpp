@@ -1166,18 +1166,25 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (   !givesCheck
-              && !ss->inCheck
-              && !captureOrPromotion
-              && pos.pseudo_legal(thisThread->counterMoves[movedPiece][to_sq(move)])
-              && pos.legal(thisThread->counterMoves[movedPiece][to_sq(move)]))
-              r++;
-
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          - 4123;
+
+          if (   !PvNode
+              && !givesCheck
+              && !ss->inCheck
+              && !captureOrPromotion
+              && ss->statScore < 0
+              && (ss-1)->moveCount > 1
+              && move != countermove
+              && move != ss->killers[0]
+              && move != ss->killers[1]
+              && !pos.capture_or_promotion(thisThread->counterMoves[movedPiece][to_sq(move)])
+              && pos.pseudo_legal(thisThread->counterMoves[movedPiece][to_sq(move)])
+              && pos.legal(thisThread->counterMoves[movedPiece][to_sq(move)]))
+              r++;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 17417;
