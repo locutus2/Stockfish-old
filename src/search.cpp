@@ -1747,6 +1747,9 @@ moves_loop: // When in check, search starts here
     if (is_ok((ss-1)->currentMove))
     {
         Square prevSq = to_sq((ss-1)->currentMove);
+        Move lastCounter = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+        if (pos.pseudo_legal(lastCounter))
+            update_continuation_histories(ss, pos.moved_piece(lastCounter), to_sq(lastCounter), bonus / 2);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
   }
