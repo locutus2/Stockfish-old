@@ -948,6 +948,7 @@ moves_loop: // When in check, search starts here
                                       &captureHistory,
                                       contHist,
                                       countermove,
+                                      threatCounterMove,
                                       ss->killers);
 
     value = bestValue;
@@ -1143,10 +1144,7 @@ moves_loop: // When in check, search starts here
           &&  moveCount > 1 + rootNode
           && (   !ss->ttPv
               || !captureOrPromotion
-              || (cutNode && (ss-1)->moveCount > 1))
-          && !(   move == threatCounterMove
-               && move != ss->killers[0]
-               && move != ss->killers[1]))
+              || (cutNode && (ss-1)->moveCount > 1)))
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
