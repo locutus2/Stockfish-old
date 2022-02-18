@@ -556,6 +556,7 @@ namespace {
     bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
+    Square extendedSq;
     int moveCount, captureCount, quietCount, bestMoveCount, improvement, complexity;
 
     // Step 1. Initialize node
@@ -1051,7 +1052,8 @@ moves_loop: // When in check, search starts here
 
       // Step 15. Extensions (~66 Elo)
       // We take care to not overdo to avoid search getting stuck.
-      if (ss->ply < thisThread->rootDepth * 2)
+      if (   ss->ply < thisThread->rootDepth * 2
+          && thisThread->reverseExtended[movedPiece][to_sq(move)] != from_sq(move))
       {
           // Singular extension search (~58 Elo). If all moves but one fail low on a
           // search of (alpha-s, beta-s), and just one fails high on (alpha, beta),
@@ -1110,7 +1112,14 @@ moves_loop: // When in check, search starts here
                    && move == ss->killers[0]
                    && (*contHist[0])[movedPiece][to_sq(move)] >= 5491)
               extension = 1;
+
+          if (extension > 0)
+          {
+              extendedSq = thisThread->reverseExtended[movedPiece][from_sq(move)];
+              thisThread->reverseExtended[movedPiece][from_sq(move)] = to_sq(move);
+          }
       }
+
 
       // Add extension to new depth
       newDepth += extension;
@@ -1231,6 +1240,9 @@ moves_loop: // When in check, search starts here
 
       // Step 19. Undo move
       pos.undo_move(move);
+
+      if (extension > 0)
+          thisThread->reverseExtended[movedPiece][from_sq(move)] = extendedSq;
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
