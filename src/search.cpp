@@ -948,6 +948,7 @@ moves_loop: // When in check, search starts here
 
     value = bestValue;
     moveCountPruning = false;
+    int maxExtension = 0;
 
     // Indicate PvNodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -1110,6 +1111,9 @@ moves_loop: // When in check, search starts here
                    && move == ss->killers[0]
                    && (*contHist[0])[movedPiece][to_sq(move)] >= 5491)
               extension = 1;
+
+          maxExtension = std::max(extension, maxExtension);
+          newDepth -= maxExtension;
       }
 
       // Add extension to new depth
