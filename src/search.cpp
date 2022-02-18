@@ -1145,7 +1145,7 @@ moves_loop: // When in check, search starts here
               || !captureOrPromotion
               || (cutNode && (ss-1)->moveCount > 1)))
       {
-          Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
+          Depth r = reduction(improving, depth - maxExtension, moveCount, delta, thisThread->rootDelta);
 
           // Decrease reduction at some PvNodes (~2 Elo)
           if (   PvNode
