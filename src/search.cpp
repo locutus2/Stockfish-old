@@ -304,6 +304,7 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(202, 1);
+  extensionAverage.set(0, 1);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(39);
@@ -1233,6 +1234,16 @@ moves_loop: // When in check, search starts here
       pos.undo_move(move);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
+
+      if (extension > 0 && move != ttMove)
+      {
+          dbg_hit_on(value > alpha);
+	  bool C = thisThread->extensionAverage.value() < 50;
+	  if(C) dbg_mean_of(100*(value > alpha));
+      }
+
+      if (extension > 0 && move != ttMove)
+          thisThread->extensionAverage.update(1000 * (value > alpha));
 
       // Step 20. Check for a new best move
       // Finished searching the move. If a stop occurred, the return value of
