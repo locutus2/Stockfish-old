@@ -65,7 +65,7 @@ namespace {
   int scale(Thread* th, int lowDepthVal, int highDepthVal)
   {
       constexpr int minScale = 18;
-      constexpr int maxScale = 23;
+      constexpr int maxScale = 22;
       int scale = std::clamp(int(msb(th->nodes.load() + 1)), minScale, maxScale);
       return (highDepthVal * (scale - minScale) + lowDepthVal * (maxScale - scale)) / (maxScale - minScale);
   }
@@ -89,7 +89,7 @@ namespace {
 
   // History and stats update bonus, based on depth
   int stat_bonus(Thread* th, Depth d) {
-    return std::min((9 * d + scale(th, 281, 270)) * d - scale(th, 241, 311) , scale(th, 1949, 2145));
+    return std::min((scale(th, 8, 9) * d + scale(th, 281, 270)) * d - scale(th, 241, 311) , scale(th, 1949, 2145));
   }
 
   // Add a small random component to draw evaluations to avoid 3-fold blindness
@@ -358,16 +358,16 @@ void Thread::search() {
           if (rootDepth >= 4)
           {
               Value prev = rootMoves[pvIdx].averageScore;
-              delta = Value(16) + int(prev) * prev / 19178;
+              delta = Value(scale(this, 19, 16)) + int(prev) * prev / scale(this, 18321, 19178);
               alpha = std::max(prev - delta,-VALUE_INFINITE);
               beta  = std::min(prev + delta, VALUE_INFINITE);
 
               // Adjust trend and optimism based on root move's previousScore
-              int tr = sigmoid(prev, 3, 8, 90, 125, 1);
+              int tr = sigmoid(prev, scale(this, 4, 3), scale(this, 11, 8), scale(this, 92, 90), scale(this, 119, 125), 1);
               trend = (us == WHITE ?  make_score(tr, tr / 2)
                                    : -make_score(tr, tr / 2));
 
-              int opt = sigmoid(prev, 8, 17, 144, 13966, 183);
+              int opt = sigmoid(prev, scale(this, 9, 8), scale(this, 18, 17), scale(this, 115, 144), scale(this, 12250, 13966), scale(this, 187, 183));
               optimism[ us] = Value(opt);
               optimism[~us] = -optimism[us];
           }
@@ -468,17 +468,17 @@ void Thread::search() {
           && !Threads.stop
           && !mainThread->stopOnPonderhit)
       {
-          double fallingEval = (69 + 12 * (mainThread->bestPreviousAverageScore - bestValue)
-                                    +  6 * (mainThread->iterValue[iterIdx] - bestValue)) / 781.4;
+          double fallingEval = (scale(this, 66, 69) + 12 * (mainThread->bestPreviousAverageScore - bestValue)
+                                    +  6 * (mainThread->iterValue[iterIdx] - bestValue)) / double(scale(this, 810, 781));
           fallingEval = std::clamp(fallingEval, 0.5, 1.5);
 
           // If the bestMove is stable over several iterations, reduce time accordingly
-          timeReduction = lastBestMoveDepth + 10 < completedDepth ? 1.63 : 0.73;
-          double reduction = (1.56 + mainThread->previousTimeReduction) / (2.20 * timeReduction);
+          timeReduction = 0.01 * (lastBestMoveDepth + scale(this, 8, 10) < completedDepth ? scale(this, 173, 163) : scale(this, 94, 73));
+          double reduction = (scale(this, 166, 156) + 100 * mainThread->previousTimeReduction) / (scale(this, 235, 220) * timeReduction);
           double bestMoveInstability = 1.073 + std::max(1.0, 2.25 - 9.9 / rootDepth)
                                               * totBestMoveChanges / Threads.size();
           int complexity = mainThread->complexityAverage.value();
-          double complexPosition = std::clamp(1.0 + (complexity - 326) / 1618.1, 0.5, 1.5);
+          double complexPosition = std::clamp(1.0 + (complexity - scale(this, 293, 326)) / double(scale(this, 1525, 1618)), 0.5, 1.5);
 
           double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability * complexPosition;
 
@@ -499,7 +499,7 @@ void Thread::search() {
           }
           else if (   Threads.increaseDepth
                    && !mainThread->ponder
-                   && Time.elapsed() > totalTime * 0.43)
+                   && Time.elapsed() > totalTime * 0.01 * scale(this, 49, 43))
                    Threads.increaseDepth = false;
           else
                    Threads.increaseDepth = true;
@@ -786,7 +786,7 @@ namespace {
     // If eval is really low check with qsearch if it can exceed alpha, if it can't,
     // return a fail low.
     if (   !PvNode
-        && depth <= 7
+        && depth <= scale(thisThread, 6, 7)
         && eval < alpha - scale(thisThread, 486, 348) - scale(thisThread, 314, 258) * depth * depth)
     {
         value = qsearch<NonPV>(pos, ss, alpha - 1, alpha);
@@ -809,7 +809,7 @@ namespace {
         && (ss-1)->statScore < scale(thisThread, 15075, 14695)
         &&  eval >= beta
         &&  eval >= ss->staticEval
-        &&  ss->staticEval >= beta - 15 * depth - improvement / 15 + scale(thisThread, 215, 198) + complexity / 28
+        &&  ss->staticEval >= beta - scale(thisThread, 18, 15) * depth - improvement / scale(thisThread, 19, 15) + scale(thisThread, 215, 198) + complexity / scale(thisThread, 30, 28)
         && !excludedMove
         &&  pos.non_pawn_material(us)
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
@@ -817,7 +817,7 @@ namespace {
         assert(eval - beta >= 0);
 
         // Null move dynamic reduction based on depth, eval and complexity of position
-        Depth R = std::min(int(eval - beta) / scale(thisThread, 184, 147), 5) + depth / 3 + 4 - (complexity > scale(thisThread, 799, 753));
+        Depth R = std::min(int(eval - beta) / scale(thisThread, 184, 147), scale(thisThread, 4, 5)) + depth / 3 + 4 - (complexity > scale(thisThread, 799, 753));
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
@@ -1023,10 +1023,10 @@ moves_loop: // When in check, search starts here
               if (   !pos.empty(to_sq(move))
                   && !givesCheck
                   && !PvNode
-                  && lmrDepth < 6
+                  && lmrDepth < scale(thisThread, 7, 6)
                   && !ss->inCheck
                   && ss->staticEval + scale(thisThread, 424, 281) + scale(thisThread, 138, 179) * lmrDepth + PieceValue[EG][pos.piece_on(to_sq(move))]
-                   + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 6 < alpha)
+                   + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / scale(thisThread, 7, 6) < alpha)
                   continue;
 
               // SEE based pruning (~9 Elo)
@@ -1049,11 +1049,11 @@ moves_loop: // When in check, search starts here
               // Futility pruning: parent node (~9 Elo)
               if (   !ss->inCheck
                   && lmrDepth < 11
-                  && ss->staticEval + scale(thisThread, 147, 122) + scale(thisThread, 125, 138) * lmrDepth + history / 60 <= alpha)
+                  && ss->staticEval + scale(thisThread, 147, 122) + scale(thisThread, 125, 138) * lmrDepth + history / scale(thisThread, 64, 60) <= alpha)
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
-              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - scale(thisThread, 31, 20) * lmrDepth)))
+              if (!pos.see_ge(move, Value(-scale(thisThread, 23, 25) * lmrDepth * lmrDepth - scale(thisThread, 31, 20) * lmrDepth)))
                   continue;
           }
       }
@@ -1068,7 +1068,7 @@ moves_loop: // When in check, search starts here
           // a reduced search on all the other moves but the ttMove and if the
           // result is lower than ttValue minus a margin, then we will extend the ttMove.
           if (   !rootNode
-              &&  depth >= 4 + 2 * (PvNode && tte->is_pv())
+              &&  depth >= scale(thisThread, 6, 4) + 2 * (PvNode && tte->is_pv())
               &&  move == ttMove
               && !excludedMove // Avoid recursive singular search
            /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
@@ -1076,7 +1076,7 @@ moves_loop: // When in check, search starts here
               && (tte->bound() & BOUND_LOWER)
               &&  tte->depth() >= depth - 3)
           {
-              Value singularBeta = ttValue - 3 * depth;
+              Value singularBeta = ttValue - scale(thisThread, 4, 3) * depth;
               Depth singularDepth = (depth - 1) / 2;
 
               ss->excludedMove = move;
@@ -1109,7 +1109,7 @@ moves_loop: // When in check, search starts here
 
           // Check extensions (~1 Elo)
           else if (   givesCheck
-                   && depth > 9
+                   && depth > scale(thisThread, 8, 9)
                    && abs(ss->staticEval) > scale(thisThread, 81, 71))
               extension = 1;
 
@@ -1188,9 +1188,9 @@ moves_loop: // When in check, search starts here
           // are really negative and movecount is low, we allow this move to be searched
           // deeper than the first move (this may lead to hidden double extensions).
           int deeper =   r >= -1                   ? 0
-                       : moveCount <= 4            ? 2
-                       : PvNode && depth > 4       ? 1
-                       : cutNode && moveCount <= 8 ? 1
+                       : moveCount <= scale(thisThread, 5, 4)            ? 2
+                       : PvNode && depth > scale(thisThread, 3, 4)       ? 1
+                       : cutNode && moveCount <= scale(thisThread, 7, 8) ? 1
                        :                             0;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
@@ -1199,7 +1199,7 @@ moves_loop: // When in check, search starts here
 
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
-          doDeeperSearch = value > (alpha + 78 + 11 * (newDepth - d));
+          doDeeperSearch = value > (alpha + scale(thisThread, 76, 78) + 11 * (newDepth - d));
           didLMR = true;
       }
       else
@@ -1351,7 +1351,7 @@ moves_loop: // When in check, search starts here
         //or fail low was really bad
         bool extraBonus =    PvNode
                           || cutNode
-                          || bestValue < alpha - 70 * depth;
+                          || bestValue < alpha - scale(thisThread, 71, 70) * depth;
 
         update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(thisThread, depth) * (1 + extraBonus));
     }
