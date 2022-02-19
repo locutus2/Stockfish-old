@@ -64,8 +64,8 @@ namespace {
   // Using root depth for linear scaling search factors with time control
   int scale(Thread* th, int lowDepthVal, int highDepthVal)
   {
-      constexpr int minScale = 19;
-      constexpr int maxScale = 23;
+      constexpr int minScale = 18;
+      constexpr int maxScale = 21;
       int scale = std::clamp(int(msb(th->nodes.load() + 1)), minScale, maxScale);
       return (highDepthVal * (scale - minScale) + lowDepthVal * (maxScale - scale)) / (maxScale - minScale);
   }
