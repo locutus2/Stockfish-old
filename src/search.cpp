@@ -65,7 +65,7 @@ namespace {
   int scale(Thread* th, int lowDepthVal, int highDepthVal)
   {
       constexpr int minScale = 18;
-      constexpr int maxScale = 21;
+      constexpr int maxScale = 23;
       int scale = std::clamp(int(msb(th->nodes.load() + 1)), minScale, maxScale);
       return (highDepthVal * (scale - minScale) + lowDepthVal * (maxScale - scale)) / (maxScale - minScale);
   }
