@@ -57,6 +57,7 @@ Thread::~Thread() {
 
 void Thread::clear() {
 
+  nodesAverage = 1 << 22;
   counterMoves.fill(MOVE_NONE);
   mainHistory.fill(0);
   captureHistory.fill(0);

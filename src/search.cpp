@@ -66,7 +66,7 @@ namespace {
   {
       constexpr int minScale = 18;
       constexpr int maxScale = 22;
-      int scale = std::clamp(int(msb(th->nodes.load() + 1)), minScale, maxScale);
+      int scale = std::clamp(int(msb(th->nodesAverage)), minScale, maxScale);
       return (highDepthVal * (scale - minScale) + lowDepthVal * (maxScale - scale)) / (maxScale - minScale);
   }
 
@@ -508,6 +508,8 @@ void Thread::search() {
       mainThread->iterValue[iterIdx] = bestValue;
       iterIdx = (iterIdx + 1) & 3;
   }
+
+  nodesAverage = (3 * nodesAverage + nodes) / 4;
 
   if (!mainThread)
       return;
