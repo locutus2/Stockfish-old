@@ -138,8 +138,8 @@ TTEntry* TranspositionTable::probe(const Key key, Color sideToMove, bool& found)
       // is needed to keep the unrelated lowest n bits from affecting
       // the result) to calculate the entry age correctly even after
       // generation8 overflows into the next cycle.
-      if (  replace->depth8 - ((GENERATION_CYCLE + generation8 - replace->genBound8) & GENERATION_MASK) + (sideToMove == replace->sideToMove())
-          >   tte[i].depth8 - ((GENERATION_CYCLE + generation8 -   tte[i].genBound8) & GENERATION_MASK) + (sideToMove == tte[i].sideToMove()))
+      if (  replace->depth8 - ((GENERATION_CYCLE + generation8 - replace->genBound8) & GENERATION_MASK) + 2 * (sideToMove == replace->sideToMove())
+          >   tte[i].depth8 - ((GENERATION_CYCLE + generation8 -   tte[i].genBound8) & GENERATION_MASK) + 2 * (sideToMove == tte[i].sideToMove()))
           replace = &tte[i];
 
   return found = false, replace;
