@@ -1353,7 +1353,7 @@ moves_loop: // When in check, search starts here
     // If no good move is found and the previous position was ttPv, then the previous
     // opponent move is probably good and the new position is added to the search tree.
     if (bestValue <= alpha)
-        ss->ttPv = ss->ttPv || ((ss-1)->ttPv && depth > 3 && (ss-1)->depth <= 2 * depth);
+        ss->ttPv = ss->ttPv || ((ss-1)->ttPv && depth > 3 && 2 * (ss-1)->depth <= 3 * depth);
 
     // Otherwise, a counter move has been found and if the position is the last leaf
     // in the search tree, remove the position from the search tree.
