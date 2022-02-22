@@ -83,13 +83,13 @@ class TranspositionTable {
 public:
  ~TranspositionTable() { aligned_large_pages_free(table); }
   void new_search() { generation8 += GENERATION_DELTA; } // Lower bits are used for other things
-  TTEntry* probe(const Key key, bool& found) const;
+  TTEntry* probe(const Key key, Color c, bool& found) const;
   int hashfull() const;
   void resize(size_t mbSize);
   void clear();
 
-  TTEntry* first_entry(const Key key) const {
-    return &table[mul_hi64(key, clusterCount)].entry[0];
+  TTEntry* first_entry(const Key key, Color c) const {
+    return &table[(mul_hi64(key, clusterCount) & ~(Key)1) ^ c].entry[0];
   }
 
 private:
