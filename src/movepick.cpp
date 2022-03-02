@@ -180,7 +180,6 @@ top:
                               true : (*endBadCaptures++ = *cur, false); }))
       {
           score<CAPTURES>();
-          partial_insertion_sort(cur, endMoves, -3000 * depth);
           return *(cur - 1);
       }
 
