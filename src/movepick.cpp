@@ -178,7 +178,14 @@ top:
                        return pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
+      {
+          if (depth > 3)
+          {
+              score<CAPTURES>();
+              partial_insertion_sort(cur, endMoves, -3000 * depth);
+          }
           return *(cur - 1);
+      }
 
       // Prepare the pointers to loop over the refutations array
       cur = std::begin(refutations);
@@ -197,6 +204,7 @@ top:
                                     && !pos.capture(*cur)
                                     &&  pos.pseudo_legal(*cur); }))
           return *(cur - 1);
+
       ++stage;
       [[fallthrough]];
 
@@ -224,13 +232,11 @@ top:
       cur = moves;
       endMoves = endBadCaptures;
 
-      score<CAPTURES>();
-
       ++stage;
       [[fallthrough]];
 
   case BAD_CAPTURE:
-      return select<Best>([](){ return true; });
+      return select<Next>([](){ return true; });
 
   case EVASION_INIT:
       cur = moves;
