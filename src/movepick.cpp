@@ -179,7 +179,7 @@ top:
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
       {
-          if (depth > 2)
+          if (depth > 4)
               score<CAPTURES>();
 
           return *(cur - 1);
