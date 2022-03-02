@@ -178,10 +178,7 @@ top:
                        return pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
-      {
-          score<CAPTURES>();
           return *(cur - 1);
-      }
 
       // Prepare the pointers to loop over the refutations array
       cur = std::begin(refutations);
@@ -227,11 +224,13 @@ top:
       cur = moves;
       endMoves = endBadCaptures;
 
+      score<CAPTURES>();
+
       ++stage;
       [[fallthrough]];
 
   case BAD_CAPTURE:
-      return select<Next>([](){ return true; });
+      return select<Best>([](){ return true; });
 
   case EVASION_INIT:
       cur = moves;
