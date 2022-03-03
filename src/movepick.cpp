@@ -60,10 +60,9 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
                                                              const CapturePieceToHistory* cph,
                                                              const PieceToHistory** ch,
                                                              Move cm,
-                                                             const Move* killers,
-                                                             bool cutNode)
+                                                             const Move* killers)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
-             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), CutNode(cutNode)
+             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d)
 {
   assert(d > 0);
 
@@ -175,16 +174,19 @@ top:
       goto top;
 
   case GOOD_CAPTURE:
+      if (cur != endMoves)
+      {
+          ExtMove* tmp = endMoves;
+          endMoves = cur + 1;
+          score<CAPTURES>();
+          endMoves = tmp;
+      }
+
       if (select<Next>([&](){
                        return pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
-      {
-          if (CutNode && depth > 3)
-              score<CAPTURES>();
-
           return *(cur - 1);
-      }
 
       // Prepare the pointers to loop over the refutations array
       cur = std::begin(refutations);
