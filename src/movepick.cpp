@@ -97,36 +97,43 @@ MovePicker::MovePicker(const Position& p, Move ttm, Value th, Depth d, const Cap
                              && pos.see_ge(ttm, threshold));
 }
 
-/// MovePicker::score() assigns a numerical value to each move in a list, used
-/// for sorting. Captures are ordered by Most Valuable Victim (MVV), preferring
+/// MovePicker::score_move() assigns a numerical value to given move.
+/// Captures are ordered by Most Valuable Victim (MVV), preferring
 /// captures with a good history. Quiets moves are ordered using the histories.
 template<GenType Type>
-void MovePicker::score() {
+void MovePicker::score_move(ExtMove& m) {
 
   static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
 
-  for (auto& m : *this)
-      if constexpr (Type == CAPTURES)
-          m.value =  int(PieceValue[MG][pos.piece_on(to_sq(m))]) * 6
-                   + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
+  if constexpr (Type == CAPTURES)
+      m.value =  int(PieceValue[MG][pos.piece_on(to_sq(m))]) * 6
+               + (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
-      else if constexpr (Type == QUIETS)
+  else if constexpr (Type == QUIETS)
+      m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
+               + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+               +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+               +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
+               +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
+
+  else // Type == EVASIONS
+  {
+      if (pos.capture(m))
+          m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
+                   - Value(type_of(pos.moved_piece(m)));
+      else
           m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
                    + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)];
+                   - (1 << 28);
+  }
+}
 
-      else // Type == EVASIONS
-      {
-          if (pos.capture(m))
-              m.value =  PieceValue[MG][pos.piece_on(to_sq(m))]
-                       - Value(type_of(pos.moved_piece(m)));
-          else
-              m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                       + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                       - (1 << 28);
-      }
+/// MovePicker::score() assigns a numerical value to each move in a list, used for sorting.
+template<GenType Type>
+void MovePicker::score() {
+
+  for (auto& m : *this)
+      score_move<Type>(m);
 }
 
 /// MovePicker::select() returns the next move satisfying a predicate function.
@@ -174,15 +181,8 @@ top:
       goto top;
 
   case GOOD_CAPTURE:
-      if (cur != endMoves)
-      {
-          ExtMove* tmp = endMoves;
-          endMoves = cur + 1;
-          score<CAPTURES>();
-          endMoves = tmp;
-      }
-
       if (select<Next>([&](){
+                       score_move<CAPTURES>(*cur);
                        return pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
