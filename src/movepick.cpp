@@ -61,9 +61,9 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
                                                              const PieceToHistory** ch,
                                                              Move cm,
                                                              const Move* killers,
-                                                             bool aNode)
+                                                             bool cutNode)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
-             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), allNode(aNode)
+             ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d), CutNode(cutNode)
 {
   assert(d > 0);
 
@@ -180,7 +180,7 @@ top:
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
       {
-          if (allNode && depth > 3)
+          if (CutNode && depth > 3)
               score<CAPTURES>();
 
           return *(cur - 1);
