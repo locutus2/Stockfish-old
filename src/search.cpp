@@ -945,7 +945,7 @@ moves_loop: // When in check, search starts here
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      PvNode);
+                                      !PvNode && !cutNode);
 
     value = bestValue;
     moveCountPruning = false;

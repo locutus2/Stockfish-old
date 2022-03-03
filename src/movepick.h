@@ -146,7 +146,7 @@ private:
   Square recaptureSquare;
   Value threshold;
   Depth depth;
-  bool PvNode;
+  bool allNode;
   ExtMove moves[MAX_MOVES];
 };
 
