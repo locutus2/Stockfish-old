@@ -182,7 +182,8 @@ top:
 
   case GOOD_CAPTURE:
       if (select<Next>([&](){
-                       score_move<CAPTURES>(*cur);
+                       if (depth > 3)
+                           score_move<CAPTURES>(*cur);
                        return pos.see_ge(*cur, Value(-69 * cur->value / 1024)) ?
                               // Move losing capture to endBadCaptures to be tried later
                               true : (*endBadCaptures++ = *cur, false); }))
