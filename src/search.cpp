@@ -944,7 +944,8 @@ moves_loop: // When in check, search starts here
                                       &captureHistory,
                                       contHist,
                                       countermove,
-                                      ss->killers);
+                                      ss->killers,
+                                      PvNode);
 
     value = bestValue;
     moveCountPruning = false;
