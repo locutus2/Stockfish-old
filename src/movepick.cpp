@@ -190,11 +190,20 @@ top:
           --endMoves;
 
       score<QUIETS>();
+      partial_insertion_sort(cur, endMoves, std::numeric_limits<int>::min());
+      if (   std::distance(cur, endMoves) > 2
+          && refutations[0].move
+          && refutations[1].move)
+      {
+          refutations[2].move = MOVE_NONE;
+          --endMoves;
+      }
+
       ++stage;
       [[fallthrough]];
 
   case REFUTATION:
-      if (select<Best>([&](){ return    *cur != MOVE_NONE
+      if (select<Next>([&](){ return    *cur != MOVE_NONE
                                     && !pos.capture(*cur)
                                     &&  pos.pseudo_legal(*cur); }))
           return *(cur - 1);
