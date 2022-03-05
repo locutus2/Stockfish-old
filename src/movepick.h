@@ -29,6 +29,10 @@
 
 namespace Stockfish {
 
+/// In stats table, D=0 means that the template parameter is not used
+enum StatsParams { NOT_USED = 0 };
+enum StatsType { NoCaptures, Captures };
+
 /// StatsEntry stores the stat table value. It is usually a number but could
 /// be a move or even a nested history. We use a class instead of naked value
 /// to directly call history update operator<<() on the entry so to use stats
@@ -54,6 +58,24 @@ public:
   }
 };
 
+template<>
+class StatsEntry<Move, NOT_USED> {
+
+  Move entry[2];
+
+public:
+  void operator=(const Move& m) {
+      if (m != entry[0])
+      {
+          entry[1] = entry[0];
+          entry[0] = m;
+      }
+  }
+  Move* operator&() { return entry; }
+  Move* operator->() { return entry; }
+  operator const Move* () const { return entry; }
+};
+
 /// Stats is a generic N-dimensional array used to store various statistics.
 /// The first template parameter T is the base type of the array, the second
 /// template parameter D limits the range of updates in [-D, D] when we update
@@ -77,10 +99,6 @@ struct Stats : public std::array<Stats<T, D, Sizes...>, Size>
 
 template <typename T, int D, int Size>
 struct Stats<T, D, Size> : public std::array<StatsEntry<T, D>, Size> {};
-
-/// In stats table, D=0 means that the template parameter is not used
-enum StatsParams { NOT_USED = 0 };
-enum StatsType { NoCaptures, Captures };
 
 /// ButterflyHistory records how often quiet moves have been successful or
 /// unsuccessful during the current search, and is used for reduction and move
@@ -120,7 +138,7 @@ public:
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*,
                                            const CapturePieceToHistory*,
                                            const PieceToHistory**,
-                                           Move,
+                                           const Move*,
                                            const Move*);
   MovePicker(const Position&, Move, Depth, const ButterflyHistory*,
                                            const CapturePieceToHistory*,
@@ -140,7 +158,7 @@ private:
   const CapturePieceToHistory* captureHistory;
   const PieceToHistory** continuationHistory;
   Move ttMove;
-  ExtMove refutations[3], *cur, *endMoves, *endBadCaptures;
+  ExtMove refutations[4], *cur, *endMoves, *endBadCaptures;
   int stage;
   Square recaptureSquare;
   Value threshold;
