@@ -35,6 +35,12 @@ namespace {
   // a given limit. The order of moves smaller than the limit is left unspecified.
   void partial_insertion_sort(ExtMove* begin, ExtMove* end, int limit) {
 
+    int n = std::distance(begin, end) / 2;
+    if (n > 8)
+        for (ExtMove *p = begin + n; p < end; ++p)
+            if ((p - n)->value < p->value)
+                std::iter_swap(p - n, p);
+
     for (ExtMove *sortedEnd = begin, *p = begin + 1; p < end; ++p)
         if (p->value >= limit)
         {
