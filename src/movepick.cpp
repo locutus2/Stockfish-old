@@ -193,11 +193,12 @@ top:
           || refutations[1].move == refutations[2].move)
           refutations[2].move = MOVE_NONE;
 
+      score<QUIETS>();
       ++stage;
       [[fallthrough]];
 
   case REFUTATION:
-      if (select<Next>([&](){ return    *cur != MOVE_NONE
+      if (select<Best>([&](){ return    *cur != MOVE_NONE
                                     && !pos.capture(*cur)
                                     &&  pos.pseudo_legal(*cur); }))
           return *(cur - 1);

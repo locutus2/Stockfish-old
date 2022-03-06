@@ -65,6 +65,10 @@ class StatsEntry<Move, NOT_USED> {
 
 public:
   void operator=(const Move& m) {
+      entry[0] = m;
+      entry[1] = MOVE_NONE;
+  }
+  void operator+=(const Move& m) {
       if (m != entry[0])
       {
           entry[1] = entry[0];
