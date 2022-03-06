@@ -38,7 +38,7 @@ namespace {
     int n = std::distance(begin, end) / 2;
     if (n > 16)
         for (ExtMove *p = begin + n; p < end; ++p)
-            if ((p - n)->value < p->value)
+            if (p->value >= limit && (p - n)->value < p->value)
                 std::iter_swap(p - n, p);
 
     for (ExtMove *sortedEnd = begin, *p = begin + 1; p < end; ++p)
