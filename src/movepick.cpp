@@ -36,7 +36,7 @@ namespace {
   void partial_insertion_sort(ExtMove* begin, ExtMove* end, int limit) {
 
     int n = std::distance(begin, end) / 2;
-    if (n > 8)
+    if (n > 12)
         for (ExtMove *p = begin + n; p < end; ++p)
             if ((p - n)->value < p->value)
                 std::iter_swap(p - n, p);
