@@ -803,8 +803,7 @@ namespace {
         &&  ss->staticEval >= beta - 15 * depth - improvement / 15 + 198 + complexity / 28
         && !excludedMove
         &&  pos.non_pawn_material(us)
-        && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor)
-        && !(thisThread->id() % 8 == 7 && !(thisThread->nodes & 7)))
+        && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
 
@@ -826,7 +825,8 @@ namespace {
             if (nullValue >= VALUE_TB_WIN_IN_MAX_PLY)
                 nullValue = beta;
 
-            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14))
+            if (   thisThread->nmpMinPly
+                || (abs(beta) < VALUE_KNOWN_WIN && depth < 14 && thisThread->id() % 8 != 7))
                 return nullValue;
 
             assert(!thisThread->nmpMinPly); // Recursive verification is not allowed
