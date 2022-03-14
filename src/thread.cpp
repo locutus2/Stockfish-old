@@ -124,7 +124,7 @@ void Thread::idle_loop() {
 Move Thread::selectFirstRootMove() const {
 
     int index = pvIdx;
-    if (index + 1 < int(rootMoves.size()) && idx % 2 == 1)
+    if (index + 1 < int(rootMoves.size()) && idx % 8 == 7)
         index += nodes % 2;
     return rootMoves[index].pv[0];
 }
