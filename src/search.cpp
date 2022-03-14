@@ -825,7 +825,7 @@ namespace {
             if (nullValue >= VALUE_TB_WIN_IN_MAX_PLY)
                 nullValue = beta;
 
-            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14 && !(ss-2)->inCheck))
+            if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14 && ss->ttHit))
                 return nullValue;
 
             assert(!thisThread->nmpMinPly); // Recursive verification is not allowed
