@@ -207,7 +207,7 @@ top:
       if (!skipQuiets)
       {
           for (auto& m : *this)
-              m.value -= 20000;
+              m.value = 2 * m.value - 20000;
 
           cur = endBadCaptures;
           endMoves = generate<QUIETS>(pos, cur);
