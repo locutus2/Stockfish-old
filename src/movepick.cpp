@@ -201,13 +201,14 @@ top:
       [[fallthrough]];
 
   case QUIET_INIT:
-      if (skipQuiets)
+      cur = moves;
+      endMoves = endBadCaptures;
+
+      if (!skipQuiets)
       {
-          cur = moves;
-          endMoves = endBadCaptures;
-      }
-      else
-      {
+          for (auto& m : *this)
+              m.value -= 40000;
+
           cur = endBadCaptures;
           endMoves = generate<QUIETS>(pos, cur);
 
