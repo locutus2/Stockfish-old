@@ -803,7 +803,8 @@ namespace {
         &&  ss->staticEval >= beta - 15 * depth - improvement / 15 + 198 + complexity / 28
         && !excludedMove
         &&  pos.non_pawn_material(us)
-        && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
+        && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor)
+        && !(thisThread->id() % 2 == 1 && (thisThread->nodes & 1)))
     {
         assert(eval - beta >= 0);
 
