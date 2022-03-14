@@ -56,6 +56,7 @@ public:
   void start_searching();
   void wait_for_search_finished();
   size_t id() const { return idx; }
+  Move selectFirstRootMove() const;
 
   Pawns::Table pawnsTable;
   Material::Table materialTable;

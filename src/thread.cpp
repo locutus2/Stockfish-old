@@ -121,6 +121,14 @@ void Thread::idle_loop() {
   }
 }
 
+Move Thread::selectFirstRootMove() const {
+
+    int index = pvIdx;
+    if (index + 1 < int(rootMoves.size()) && idx > 0)
+        index += nodes % 2;
+    return rootMoves[index].pv[0];
+}
+
 /// ThreadPool::set() creates/destroys threads to match the requested number.
 /// Created and launched threads will immediately go to sleep in idle_loop.
 /// Upon resizing, threads are recreated to allow for binding if necessary.
