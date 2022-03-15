@@ -1596,12 +1596,8 @@ moves_loop: // When in check, search starts here
 
     // All legal moves have been searched. A special case: if we're in check
     // and no legal moves were found, it is checkmate.
-    if (!moveCount)
-    {
-        assert(!ss->inCheck || !MoveList<LEGAL>(pos).size());
-
+    if (!moveCount && (ss->inCheck || !MoveList<LEGAL>(pos).size()))
         return ss->inCheck ? mated_in(ss->ply) : VALUE_DRAW; // Plies to mate from the root
-    }
 
     // Save gathered info in transposition table
     tte->save(posKey, value_to_tt(bestValue, ss->ply), pvHit,
