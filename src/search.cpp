@@ -799,7 +799,7 @@ namespace {
         && (ss-1)->currentMove != MOVE_NULL
         && (ss-1)->statScore < 14695
         &&  eval >= beta
-        &&  eval >= ss->staticEval - 150
+        &&  eval >= ss->staticEval - 200 * cutNode
         &&  ss->staticEval >= beta - 15 * depth - improvement / 15 + 198 + complexity / 28
         && !excludedMove
         &&  pos.non_pawn_material(us)
