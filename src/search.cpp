@@ -550,10 +550,10 @@ namespace {
 
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove;
+    Move ttMove, move, excludedMove, bestMove, singularExtensionMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
-    bool givesCheck, improving, didLMR, priorCapture, singularExtension;
+    bool givesCheck, improving, didLMR, priorCapture;
     bool captureOrPromotion, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
     int moveCount, captureCount, quietCount, bestMoveCount, improvement, complexity;
@@ -948,7 +948,7 @@ moves_loop: // When in check, search starts here
 
     value = bestValue;
     moveCountPruning = false;
-    singularExtension = false;
+    singularExtensionMove = MOVE_NONE;
 
     // Indicate PvNodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -1078,7 +1078,6 @@ moves_loop: // When in check, search starts here
               if (value < singularBeta)
               {
                   extension = 1;
-                  singularExtension = true;
 
                   // Avoid search explosion by limiting the number of double extensions
                   if (  !PvNode
@@ -1098,6 +1097,9 @@ moves_loop: // When in check, search starts here
               // If the eval of ttMove is greater than beta, we reduce it (negative extension)
               else if (ttValue >= beta)
                   extension = -2;
+
+              else
+                  singularExtensionMove = ss->currentMove;
           }
 
           // Check extensions (~1 Elo)
@@ -1173,7 +1175,7 @@ moves_loop: // When in check, search starts here
           if (PvNode && !ss->inCheck && abs(ss->staticEval - bestValue) > 250)
               r--;
 
-          if (singularExtension && !ttCapture && captureOrPromotion)
+          if (move == singularExtensionMove)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
