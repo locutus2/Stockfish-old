@@ -550,7 +550,7 @@ namespace {
 
     TTEntry* tte;
     Key posKey;
-    Move ttMove, move, excludedMove, bestMove, singularSearchMove;
+    Move ttMove, move, excludedMove, bestMove, singularBestMove;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
@@ -948,7 +948,7 @@ moves_loop: // When in check, search starts here
 
     value = bestValue;
     moveCountPruning = false;
-    singularSearchMove = MOVE_NONE;
+    singularBestMove = MOVE_NONE;
 
     // Indicate PvNodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -1099,7 +1099,7 @@ moves_loop: // When in check, search starts here
                   extension = -2;
 
               else
-                  singularSearchMove = ss->currentMove;
+                  singularBestMove = ss->currentMove;
           }
 
           // Check extensions (~1 Elo)
@@ -1175,7 +1175,7 @@ moves_loop: // When in check, search starts here
           if (PvNode && !ss->inCheck && abs(ss->staticEval - bestValue) > 250)
               r--;
 
-          if (move == singularSearchMove)
+          if (move == singularBestMove)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
