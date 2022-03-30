@@ -146,7 +146,7 @@ void MovePicker::score() {
   Bitboard threatened, threatenedByPawn, threatenedByMinor, threatenedByRook;
   if constexpr (Type == QUIETS)
   {
-      if (depth <= 3)
+      if (!ttMove)
       {
           // squares threatened by pawns
           threatenedByPawn   = pos.side_to_move() == WHITE ? threatsByPawn<BLACK>(pos)  : threatsByPawn<WHITE>(pos);
@@ -186,7 +186,7 @@ void MovePicker::score() {
                    +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
-                   +     (depth <= 3 && threatened & from_sq(m) ?
+                   +     (!ttMove && threatened & from_sq(m) ?
                            (type_of(pos.piece_on(from_sq(m))) == QUEEN && !(to_sq(m) & threatenedByRook)  ? 50000
                           : type_of(pos.piece_on(from_sq(m))) == ROOK  && !(to_sq(m) & threatenedByMinor) ? 25000
                           :                                               !(to_sq(m) & threatenedByPawn)  ? 15000
