@@ -946,7 +946,7 @@ moves_loop: // When in check, search starts here
                                       contHist,
                                       countermove,
                                       ss->killers,
-                                      !ss->ttPv || cutNode || !ttMove || improving);
+                                      !ss->ttPv);
 
     value = bestValue;
     moveCountPruning = false;
