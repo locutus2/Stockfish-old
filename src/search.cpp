@@ -1167,6 +1167,9 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
+          if (givesCheck && !(pos.checkers() & to_sq(move)))
+              r--;
+
           // Decrease reduction at PvNodes if bestvalue
           // is vastly different from static evaluation
           if (PvNode && !ss->inCheck && abs(ss->staticEval - bestValue) > 250)
