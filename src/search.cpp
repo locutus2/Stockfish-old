@@ -1167,7 +1167,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (givesCheck && capture && !(pos.checkers() & to_sq(move)))
+          if (givesCheck && capture && more_than_one(pos.checkers()))
               r--;
 
           // Decrease reduction at PvNodes if bestvalue
