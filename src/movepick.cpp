@@ -143,7 +143,7 @@ void MovePicker::score() {
 
   static_assert(Type == CAPTURES || Type == QUIETS || Type == EVASIONS, "Wrong type");
 
-  Bitboard threatened, threatenedByPawn, threatenedByMinor, threatenedByRook;
+  Bitboard threatened, threatenedByPawn, threatenedByMinor, threatenedByRook, blockersForKing;
   if constexpr (Type == QUIETS)
   {
       // squares threatened by pawns
@@ -162,6 +162,8 @@ void MovePicker::score() {
                                                : ((pos.pieces(BLACK, QUEEN) & threatenedByRook) |
                                                   (pos.pieces(BLACK, ROOK) & threatenedByMinor) |
                                                   (pos.pieces(BLACK, KNIGHT, BISHOP) & threatenedByPawn));
+
+      blockersForKing = pos.blockers_for_king(~pos.side_to_move());
   }
   else
   {
@@ -170,6 +172,7 @@ void MovePicker::score() {
       (void) threatenedByPawn;
       (void) threatenedByMinor;
       (void) threatenedByRook;
+      (void) blockersForKing;
   }
 
   for (auto& m : *this)
@@ -183,6 +186,7 @@ void MovePicker::score() {
                    +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
+                   +     (blockersForKing & from_sq(m) ? 20000 : 0)
                    +     (threatened & from_sq(m) ?
                            (type_of(pos.piece_on(from_sq(m))) == QUEEN && !(to_sq(m) & threatenedByRook)  ? 50000
                           : type_of(pos.piece_on(from_sq(m))) == ROOK  && !(to_sq(m) & threatenedByMinor) ? 25000
