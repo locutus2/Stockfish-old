@@ -123,7 +123,6 @@ void MovePicker::score() {
                   | (pos.pieces(us, KNIGHT, BISHOP) & threatenedByPawn);
 
       discoveredChecks =   pos.blockers_for_king(~pos.side_to_move())
-                        & ~pos.pieces(pos.side_to_move(), KING)
                         & ~(pos.pieces(pos.side_to_move(), PAWN) & file_bb(pos.square<KING>(~pos.side_to_move())));
   }
   else
