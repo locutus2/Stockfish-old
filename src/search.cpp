@@ -1168,7 +1168,7 @@ moves_loop: // When in check, search starts here
               r++;
 
           if (givesCheck && capture && more_than_one(pos.checkers()))
-              r--;
+              r -= 2;
 
           // Decrease reduction at PvNodes if bestvalue
           // is vastly different from static evaluation
