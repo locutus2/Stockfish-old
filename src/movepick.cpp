@@ -137,17 +137,20 @@ void MovePicker::score() {
                    +     (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if constexpr (Type == QUIETS)
+      {
+          int givesCheck = pos.gives_check(m);
           m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
+                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)][givesCheck]
+                   +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)][givesCheck]
+                   +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)][givesCheck]
+                   +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)][givesCheck]
                    +     (threatened & from_sq(m) ?
                            (type_of(pos.moved_piece(m)) == QUEEN && !(to_sq(m) & threatenedByRook)  ? 50000
                           : type_of(pos.moved_piece(m)) == ROOK  && !(to_sq(m) & threatenedByMinor) ? 25000
                           :                                         !(to_sq(m) & threatenedByPawn)  ? 15000
                           :                                                                           0)
                           :                                                                           0);
+      }
 
       else // Type == EVASIONS
       {
@@ -156,7 +159,7 @@ void MovePicker::score() {
                        - Value(type_of(pos.moved_piece(m)));
           else
               m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                       + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                       + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)][pos.gives_check(m)]
                        - (1 << 28);
       }
 }
