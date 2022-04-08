@@ -284,12 +284,11 @@ template<> inline int distance<File>(Square x, Square y) { return std::abs(file_
 template<> inline int distance<Rank>(Square x, Square y) { return std::abs(rank_of(x) - rank_of(y)); }
 template<> inline int distance<Square>(Square x, Square y) { return SquareDistance[x][y]; }
 
-constexpr inline int edge_distance(File f) { return std::min(f, File(FILE_H - f)); }
-constexpr inline int edge_distance(Rank r) { return std::min(r, Rank(RANK_8 - r)); }
-constexpr inline int edge_distance(Square s) { return std::min(edge_distance(rank_of(s)), edge_distance(file_of(s))); }
+inline int edge_distance(File f) { return std::min(f, File(FILE_H - f)); }
+inline int edge_distance(Rank r) { return std::min(r, Rank(RANK_8 - r)); }
 
-constexpr int sector_of(Square s) {
-    return edge_distance(s);
+inline int length_of(Move m) {
+  return distance(from_sq(m), to_sq(m));
 }
 
 
