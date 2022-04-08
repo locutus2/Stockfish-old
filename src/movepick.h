@@ -103,7 +103,7 @@ typedef Stats<int16_t, 29952, PIECE_NB, SQUARE_NB> PieceToHistory;
 /// PieceToHistory instead of ButterflyBoards.
 typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, SQUARE_NB> ContinuationHistory;
 
-typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, 8> ContinuationSectorHistory;
+typedef Stats<PieceToHistory, NOT_USED, PIECE_NB, 15> ContinuationSectorHistory;
 
 
 /// MovePicker class is used to pick one pseudo-legal move at a time from the
