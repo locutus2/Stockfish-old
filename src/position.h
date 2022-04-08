@@ -129,6 +129,7 @@ public:
   bool gives_check(Move m) const;
   Piece moved_piece(Move m) const;
   Piece captured_piece() const;
+  int sector_of(Move m) const;
 
   // Piece specific
   bool pawn_passed(Color c, Square s) const;
@@ -376,6 +377,10 @@ inline bool Position::capture(Move m) const {
 
 inline Piece Position::captured_piece() const {
   return st->capturedPiece;
+}
+
+inline int Position::sector_of(Move m) const {
+  return distance(square<KING>(~side_to_move()), to_sq(m));
 }
 
 inline Thread* Position::this_thread() const {
