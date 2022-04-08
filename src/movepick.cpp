@@ -20,6 +20,7 @@
 
 #include "bitboard.h"
 #include "movepick.h"
+#include "misc.h"
 
 namespace Stockfish {
 
@@ -137,12 +138,13 @@ void MovePicker::score() {
                    +     (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if constexpr (Type == QUIETS)
+      {
           m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
                    + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[6])[pos.moved_piece(m)][to_sq(m)]
+                   //+     (*continuationHistory[6])[pos.moved_piece(m)][to_sq(m)]
                    +     (threatened & from_sq(m) ?
                            (type_of(pos.moved_piece(m)) == QUEEN && !(to_sq(m) & threatenedByRook)  ? 50000
                           : type_of(pos.moved_piece(m)) == ROOK  && !(to_sq(m) & threatenedByMinor) ? 25000
@@ -150,6 +152,10 @@ void MovePicker::score() {
                           :                                                                           0)
                           :                                                                           0);
 
+	  if (pos.moved_piece(m) == W_PAWN)
+	      for(Square s = SQ_A1; s <= SQ_H8; ++s)
+		  dbg_corr_of((*continuationHistory[0])[pos.moved_piece(m)][s], (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)], s + 100 * to_sq(m));
+      }
       else // Type == EVASIONS
       {
           if (pos.capture(m))
