@@ -454,7 +454,7 @@ constexpr int from_to(Move m) {
 }
 
 constexpr int sector_of(Square s) {
- return rank_of(s) / 4;
+ return file_of(s) / 4;
 }
 
 constexpr MoveType type_of(Move m) {
