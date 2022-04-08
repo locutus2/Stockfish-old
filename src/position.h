@@ -380,7 +380,7 @@ inline Piece Position::captured_piece() const {
 }
 
 inline int Position::sector_of(Move m) const {
-  return distance(square<KING>(~side_to_move()), to_sq(m));
+  return distance(square<KING>(side_to_move()), to_sq(m));
 }
 
 inline Thread* Position::this_thread() const {
