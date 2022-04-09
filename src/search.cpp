@@ -276,7 +276,11 @@ void Thread::search() {
   {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
       (ss-i)->continuationSectorHistory = &this->continuationSectorHistory[0][0][NO_PIECE][0]; // Use as a sentinel
+      (ss-i)->continuationHistoryAll = &this->continuationHistory[0][0];
+      (ss-i)->index = 0;
   }
+  ss->continuationHistoryAll = &this->continuationHistory[0][0];
+  ss->index = 0;
 
   for (int i = 0; i <= MAX_PLY + 2; ++i)
       (ss+i)->ply = i;
@@ -815,6 +819,8 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
+        ss->index = 0;
+	ss->continuationHistoryAll = &thisThread->continuationHistory[0][0];
         ss->continuationSectorHistory = &thisThread->continuationSectorHistory[0][0][NO_PIECE][0];
 
         pos.do_null_move(st);
@@ -884,6 +890,8 @@ namespace {
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
+                ss->index = to_sq(move);
+                ss->continuationHistoryAll = &thisThread->continuationHistory[ss->inCheck][captureOrPromotion];
                 ss->continuationSectorHistory = &thisThread->continuationSectorHistory[ss->inCheck]
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
@@ -954,7 +962,9 @@ moves_loop: // When in check, search starts here
                                       &captureHistory,
                                       contHist,
                                       countermove,
-                                      ss->killers);
+                                      ss->killers,
+				      ss->continuationHistoryAll,
+				      ss->index);
 
     value = bestValue;
     moveCountPruning = false;
@@ -1135,6 +1145,8 @@ moves_loop: // When in check, search starts here
                                                                 [capture]
                                                                 [movedPiece]
                                                                 [to_sq(move)];
+      ss->index = to_sq(move);
+      ss->continuationHistoryAll = &thisThread->continuationHistory[ss->inCheck][capture];
       ss->continuationSectorHistory = &thisThread->continuationSectorHistory[ss->inCheck]
                                                                 [capture]
                                                                 [movedPiece]
@@ -1560,6 +1572,8 @@ moves_loop: // When in check, search starts here
                                                                 [capture]
                                                                 [pos.moved_piece(move)]
                                                                 [to_sq(move)];
+      ss->index = to_sq(move);
+      ss->continuationHistoryAll = &thisThread->continuationHistory[ss->inCheck] [capture];
       ss->continuationSectorHistory = &thisThread->continuationSectorHistory[ss->inCheck]
                                                                 [capture]
                                                                 [pos.moved_piece(move)]
@@ -1830,7 +1844,7 @@ void MainThread::check_time() {
   if (tick - lastInfoTime >= 1000)
   {
       lastInfoTime = tick;
-      dbg_print();
+      //dbg_print();
   }
 
   // We should not stop pondering until told so by the GUI

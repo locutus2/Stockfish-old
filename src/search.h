@@ -42,7 +42,9 @@ constexpr int CounterMovePruneThreshold = 0;
 struct Stack {
   Move* pv;
   PieceToHistory* continuationHistory;
+  ContinuationHistory* continuationHistoryAll;
   PieceToHistory* continuationSectorHistory;
+  int index;
   int ply;
   Move currentMove;
   Move excludedMove;

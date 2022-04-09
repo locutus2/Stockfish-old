@@ -62,8 +62,10 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
                                                              const CapturePieceToHistory* cph,
                                                              const PieceToHistory** ch,
                                                              Move cm,
-                                                             const Move* killers)
-           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
+                                                             const Move* killers,
+							     const ContinuationHistory* cha,
+							     int ind)
+           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), continuationHistoryAll(cha), index(ind),
              ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d)
 {
   assert(d > 0);
@@ -152,9 +154,20 @@ void MovePicker::score() {
                           :                                                                           0)
                           :                                                                           0);
 
-	  if (pos.moved_piece(m) == W_PAWN)
+	  if (continuationHistoryAll)
+	  //if (pos.moved_piece(m) == W_PAWN)
 	      for(Square s = SQ_A1; s <= SQ_H8; ++s)
-		  dbg_corr_of((*continuationHistory[0])[pos.moved_piece(m)][s], (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)], s + 100 * to_sq(m));
+	      {
+		  if(distance(s, index) == 1)
+		  {
+		      const PieceToHistory &h = ((*continuationHistoryAll)[pos.moved_piece(m)][s]);
+		      if(s < index)
+		          dbg_corr_of(h[pos.moved_piece(m)][to_sq(m)], (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)], s + 100 * index);
+		      else if(s > index)
+		          dbg_corr_of((*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)], h[pos.moved_piece(m)][to_sq(m)], 100 * s + index);
+		      //dbg_corr_of((*continuationHistory[0])[pos.moved_piece(m)][s], (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)], s + 100 * to_sq(m));
+		  }
+	      }
       }
       else // Type == EVASIONS
       {
