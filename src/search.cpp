@@ -277,10 +277,10 @@ void Thread::search() {
       (ss-i)->continuationHistory = &this->continuationHistory[0][0][NO_PIECE][0]; // Use as a sentinel
       (ss-i)->continuationSectorHistory = &this->continuationSectorHistory[0][0][NO_PIECE][0]; // Use as a sentinel
       (ss-i)->continuationHistoryAll = &this->continuationHistory[0][0];
-      (ss-i)->index = 0;
+      (ss-i)->index = SQ_A1;
   }
   ss->continuationHistoryAll = &this->continuationHistory[0][0];
-  ss->index = 0;
+  ss->index = SQ_A1;
 
   for (int i = 0; i <= MAX_PLY + 2; ++i)
       (ss+i)->ply = i;
@@ -819,7 +819,7 @@ namespace {
 
         ss->currentMove = MOVE_NULL;
         ss->continuationHistory = &thisThread->continuationHistory[0][0][NO_PIECE][0];
-        ss->index = 0;
+        ss->index = SQ_A1;
 	ss->continuationHistoryAll = &thisThread->continuationHistory[0][0];
         ss->continuationSectorHistory = &thisThread->continuationSectorHistory[0][0][NO_PIECE][0];
 

@@ -64,7 +64,7 @@ MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHist
                                                              Move cm,
                                                              const Move* killers,
 							     const ContinuationHistory* cha,
-							     int ind)
+							     Square ind)
            : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), continuationHistoryAll(cha), index(ind),
              ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d)
 {

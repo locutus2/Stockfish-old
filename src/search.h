@@ -44,7 +44,7 @@ struct Stack {
   PieceToHistory* continuationHistory;
   ContinuationHistory* continuationHistoryAll;
   PieceToHistory* continuationSectorHistory;
-  int index;
+  Square index;
   int ply;
   Move currentMove;
   Move excludedMove;
