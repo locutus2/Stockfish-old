@@ -1724,9 +1724,7 @@ moves_loop: // When in check, search starts here
         if (ss->inCheck && i > 2)
             break;
         // Only update from second continuation histories on if previous move was the tt move
-        if ((ss-1)->currentMove != (ss-1)->ttMove && i > 1)
-            break;
-        if (is_ok((ss-i)->currentMove))
+        if (is_ok((ss-i)->currentMove) && ((ss-i+1)->currentMove == (ss-i+1)->ttMove || i == 1))
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
     }
   }
