@@ -20,6 +20,7 @@
 
 #include "bitboard.h"
 #include "movepick.h"
+#include "thread.h"
 
 namespace Stockfish {
 
@@ -138,8 +139,8 @@ void MovePicker::score() {
 
       else if constexpr (Type == QUIETS)
       {
-          m.value =  2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
+          m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
+                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
                    +     (threatened & from_sq(m) ?
@@ -149,25 +150,22 @@ void MovePicker::score() {
                           :                                                                           0)
                           :                                                                           0);
 
-          int next = (*mainHistory)[pos.side_to_move()][from_to(m)];
+          int next = (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)];
           if (type_of(pos.moved_piece(m)) != PAWN)
           {
+              const PieceToHistory& cmh = pos.this_thread()->continuationHistory[false]
+                                                                                [false]
+                                                                                [pos.moved_piece(m)]
+                                                                                [to_sq(m)];
               Bitboard attacks = attacks_bb(type_of(pos.moved_piece(m)), to_sq(m), pos.pieces()) & ~pos.pieces();
-
               while(attacks)
-              {
-                  Move move = make_move(to_sq(m), pop_lsb(attacks));
-                  next = std::max(next, int((*mainHistory)[pos.side_to_move()][from_to(move)]));
-              }
+                  next = std::max(next, int(cmh[pos.moved_piece(m)][pop_lsb(attacks)]));
           }
 
           else if (type_of(m) != PROMOTION && pos.empty(to_sq(m) + pawn_push(pos.side_to_move())))
-          {
-              Move move = make_move(to_sq(m), to_sq(m) + pawn_push(pos.side_to_move()));
-              next = std::max(next, int((*mainHistory)[pos.side_to_move()][from_to(move)]));
-          }
+              next = std::max(next, int((*continuationHistory[1])[pos.moved_piece(m)][to_sq(m) + pawn_push(pos.side_to_move())]));
 
-          m.value += (next + (*mainHistory)[pos.side_to_move()][from_to(m)]) / 2;
+          m.value += (next + (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]) / 2;
       }
 
       else // Type == EVASIONS
