@@ -622,8 +622,8 @@ namespace {
     posKey = excludedMove == MOVE_NONE ? pos.key() : pos.key() ^ make_key(excludedMove);
     tte = TT.probe(posKey, ss->ttHit);
     ttValue = ss->ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
-    ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
-            : ss->ttHit    ? tte->move() : MOVE_NONE;
+    ss->ttMove = ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
+                         : ss->ttHit    ? tte->move() : MOVE_NONE;
     ttCapture = ttMove && pos.capture(ttMove);
     if (!excludedMove)
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
@@ -1722,6 +1722,9 @@ moves_loop: // When in check, search starts here
     {
         // Only update first 2 continuation histories if we are in check
         if (ss->inCheck && i > 2)
+            break;
+        // Only update from second continuation histories on if previous move was the tt move
+        if ((ss-1)->currentMove != (ss-1)->ttMove && i > 1)
             break;
         if (is_ok((ss-i)->currentMove))
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
