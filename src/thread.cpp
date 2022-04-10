@@ -71,7 +71,7 @@ void Thread::clear() {
 
           for (auto& to : continuationSectorHistory[inCheck][c])
                 for (auto& h : to)
-                      h->fill(-71);
+                      h->fill(0);
       }
 }
 

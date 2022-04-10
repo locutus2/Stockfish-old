@@ -60,9 +60,10 @@ namespace {
 MovePicker::MovePicker(const Position& p, Move ttm, Depth d, const ButterflyHistory* mh,
                                                              const CapturePieceToHistory* cph,
                                                              const PieceToHistory** ch,
+                                                             const PieceToHistory** csh,
                                                              Move cm,
                                                              const Move* killers)
-           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch),
+           : pos(p), mainHistory(mh), captureHistory(cph), continuationHistory(ch), continuationSectorHistory(csh),
              ttMove(ttm), refutations{{killers[0], 0}, {killers[1], 0}, {cm, 0}}, depth(d)
 {
   assert(d > 0);
@@ -142,7 +143,10 @@ void MovePicker::score() {
                    +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
-                   +     (*continuationHistory[6])[pos.moved_piece(m)][to_sq(m)] / 16
+                   +     (   (*continuationSectorHistory[0])[pos.moved_piece(m)][to_sq(m)]
+                           + (*continuationSectorHistory[1])[pos.moved_piece(m)][to_sq(m)]
+                           + (*continuationSectorHistory[3])[pos.moved_piece(m)][to_sq(m)]
+                           + (*continuationSectorHistory[5])[pos.moved_piece(m)][to_sq(m)]) / 16
                    +     (threatened & from_sq(m) ?
                            (type_of(pos.moved_piece(m)) == QUEEN && !(to_sq(m) & threatenedByRook)  ? 50000
                           : type_of(pos.moved_piece(m)) == ROOK  && !(to_sq(m) & threatenedByMinor) ? 25000

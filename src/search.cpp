@@ -945,14 +945,17 @@ moves_loop: // When in check, search starts here
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
                                           nullptr                   , (ss-4)->continuationHistory,
-                                          nullptr                   , (ss-6)->continuationHistory,
-                                         (ss-1)->continuationSectorHistory };
+                                          nullptr                   , (ss-6)->continuationHistory };
+    const PieceToHistory* contSectorHist[] = { (ss-1)->continuationSectorHistory, (ss-2)->continuationSectorHistory,
+                                                nullptr                         , (ss-4)->continuationSectorHistory,
+                                                nullptr                         , (ss-6)->continuationSectorHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &captureHistory,
                                       contHist,
+                                      contSectorHist,
                                       countermove,
                                       ss->killers);
 
@@ -1743,9 +1746,7 @@ moves_loop: // When in check, search starts here
         if (is_ok((ss-i)->currentMove))
         {
             (*(ss-i)->continuationHistory)[pc][to] << bonus;
-
-            if(i == 1)
-                (*(ss-i)->continuationSectorHistory)[pc][to] << bonus;
+            (*(ss-i)->continuationSectorHistory)[pc][to] << bonus;
         }
     }
   }
