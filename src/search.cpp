@@ -606,6 +606,7 @@ namespace {
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     ss->depth            = depth;
     Square prevSq        = to_sq((ss-1)->currentMove);
+    Square prevSq2       = to_sq((ss-2)->currentMove);
 
     // Initialize statScore to zero for the grandchildren of the current position.
     // So statScore is shared between all grandchildren and only the first grandchild
@@ -940,11 +941,13 @@ moves_loop: // When in check, search starts here
                                           nullptr                   , (ss-6)->continuationHistory };
 
     Move countermove = thisThread->counterMoves[pos.piece_on(prevSq)][prevSq];
+    Move followupmove = thisThread->followupMoves[pos.piece_on(prevSq2)][prevSq2];
 
     MovePicker mp(pos, ttMove, depth, &thisThread->mainHistory,
                                       &captureHistory,
                                       contHist,
                                       countermove,
+                                      followupmove,
                                       ss->killers);
 
     value = bestValue;
@@ -1750,6 +1753,13 @@ moves_loop: // When in check, search starts here
     {
         Square prevSq = to_sq((ss-1)->currentMove);
         thisThread->counterMoves[pos.piece_on(prevSq)][prevSq] = move;
+    }
+
+    // Update followup history
+    if (is_ok((ss-2)->currentMove) && (ss-1)->moveCount == 1)
+    {
+        Square prevSq = to_sq((ss-2)->currentMove);
+        thisThread->followupMoves[pos.piece_on(prevSq)][prevSq] = move;
     }
   }
 
