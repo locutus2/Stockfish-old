@@ -137,8 +137,8 @@ void MovePicker::score() {
                    +     (*captureHistory)[pos.moved_piece(m)][to_sq(m)][type_of(pos.piece_on(to_sq(m)))];
 
       else if constexpr (Type == QUIETS)
-          m.value =      (*mainHistory)[pos.side_to_move()][from_to(m)]
-                   + 2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
+      {
+          m.value =  2 * (*continuationHistory[0])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[1])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[3])[pos.moved_piece(m)][to_sq(m)]
                    +     (*continuationHistory[5])[pos.moved_piece(m)][to_sq(m)]
@@ -148,6 +148,27 @@ void MovePicker::score() {
                           :                                         !(to_sq(m) & threatenedByPawn)  ? 15000
                           :                                                                           0)
                           :                                                                           0);
+
+          int next = (*mainHistory)[pos.side_to_move()][from_to(m)];
+          if (type_of(pos.moved_piece(m)) != PAWN)
+          {
+              Bitboard attacks = attacks_bb(type_of(pos.moved_piece(m)), to_sq(m), pos.pieces()) & ~pos.pieces();
+
+              while(attacks)
+              {
+                  Move move = make_move(to_sq(m), pop_lsb(attacks));
+                  next = std::max(next, int((*mainHistory)[pos.side_to_move()][from_to(move)]));
+              }
+          }
+
+          else if (type_of(m) != PROMOTION && pos.empty(to_sq(m) + pawn_push(pos.side_to_move())))
+          {
+              Move move = make_move(to_sq(m), to_sq(m) + pawn_push(pos.side_to_move()));
+              next = std::max(next, int((*mainHistory)[pos.side_to_move()][from_to(move)]));
+          }
+
+          m.value += (next + (*mainHistory)[pos.side_to_move()][from_to(m)]) / 2;
+      }
 
       else // Type == EVASIONS
       {
