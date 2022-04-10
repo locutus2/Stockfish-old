@@ -623,8 +623,8 @@ namespace {
     posKey = excludedMove == MOVE_NONE ? pos.key() : pos.key() ^ make_key(excludedMove);
     tte = TT.probe(posKey, ss->ttHit);
     ttValue = ss->ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
-    ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
-            : ss->ttHit    ? tte->move() : MOVE_NONE;
+    ss->ttMove = ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
+                         : ss->ttHit    ? tte->move() : MOVE_NONE;
     ttCapture = ttMove && pos.capture(ttMove);
     if (!excludedMove)
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
@@ -1756,7 +1756,7 @@ moves_loop: // When in check, search starts here
     }
 
     // Update followup history
-    if (is_ok((ss-2)->currentMove) && (ss-1)->moveCount == 1 && (ss-1)->ttHit)
+    if (is_ok((ss-2)->currentMove) && (ss-1)->currentMove == (ss-1)->ttMove)
     {
         Square prevSq = to_sq((ss-2)->currentMove);
         thisThread->followupMoves[pos.piece_on(prevSq)][prevSq] = move;
