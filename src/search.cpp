@@ -879,7 +879,7 @@ namespace {
                 ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
                                                                           [captureOrPromotion]
                                                                           [pos.moved_piece(move)]
-                                                                          [to_sq(move)];
+                                                                          [sector_of(to_sq(move))];
 
                 pos.do_move(move, st);
 
@@ -1125,7 +1125,7 @@ moves_loop: // When in check, search starts here
       ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
                                                                 [capture]
                                                                 [movedPiece]
-                                                                [to_sq(move)];
+                                                                [sector_of(to_sq(move))];
 
       // Step 16. Make the move
       pos.do_move(move, st, givesCheck);
@@ -1546,7 +1546,7 @@ moves_loop: // When in check, search starts here
       ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
                                                                 [capture]
                                                                 [pos.moved_piece(move)]
-                                                                [to_sq(move)];
+                                                                [sector_of(to_sq(move))];
 
       // Continuation history based pruning (~2 Elo)
       if (  !capture

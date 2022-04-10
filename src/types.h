@@ -453,6 +453,10 @@ constexpr int from_to(Move m) {
  return m & 0xFFF;
 }
 
+constexpr int sector_of(Square s) {
+ return ((s >> 2) & 12) ^ ((s >> 1) & 3);
+}
+
 constexpr MoveType type_of(Move m) {
   return MoveType(m & (3 << 14));
 }
