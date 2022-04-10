@@ -454,7 +454,7 @@ constexpr int from_to(Move m) {
 }
 
 constexpr int sector_of(Square s) {
-  return ((s >> 1) & 0x18) ^ (s & 3);
+  return s >> 1;
 }
 
 constexpr MoveType type_of(Move m) {
