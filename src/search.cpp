@@ -1756,7 +1756,7 @@ moves_loop: // When in check, search starts here
     }
 
     // Update followup history
-    if (is_ok((ss-2)->currentMove) && ss->ttPv)
+    if (is_ok((ss-2)->currentMove) && (ss-1)->moveCount == 1 && (ss-1)->ttHit)
     {
         Square prevSq = to_sq((ss-2)->currentMove);
         thisThread->followupMoves[pos.piece_on(prevSq)][prevSq] = move;
