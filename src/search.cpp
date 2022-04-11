@@ -773,7 +773,7 @@ namespace {
 
     thisThread->complexityAverage.update(complexity);
 
-    if (ss->ply <= 1)
+    if (ss->ply <= 2)
         goto moves_loop;
 
     // Step 7. Razoring.
