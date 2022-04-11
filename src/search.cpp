@@ -1688,14 +1688,18 @@ moves_loop: // When in check, search starts here
     {
         if (!pos.capture(secondBestMove))
         {
+            int bonus3 = bonus2 / 2;
             // Increase stats for the second best move in case it was a quiet move
-            update_quiet_stats(pos, ss, secondBestMove, bonus2);
+            update_quiet_stats(pos, ss, secondBestMove, bonus3);
 
-            // Decrease stats for all non-best quiet moves
-            for (int i = 0; i < quietCount; ++i)
+            if (pos.capture(bestMove))
             {
-                thisThread->mainHistory[us][from_to(quietsSearched[i])] << -bonus2;
-                update_continuation_histories(ss, pos.moved_piece(quietsSearched[i]), to_sq(quietsSearched[i]), -bonus2);
+                // Decrease stats for all non-best quiet moves
+                for (int i = 0; i < quietCount; ++i)
+                {
+                    thisThread->mainHistory[us][from_to(quietsSearched[i])] << -bonus3;
+                    update_continuation_histories(ss, pos.moved_piece(quietsSearched[i]), to_sq(quietsSearched[i]), -bonus3);
+                }
             }
         }
         else
@@ -1703,7 +1707,7 @@ moves_loop: // When in check, search starts here
             // Increase stats for the second best move in case it was a capture move
             Piece moved_piece2 = pos.moved_piece(secondBestMove);
             PieceType captured2 = type_of(pos.piece_on(to_sq(secondBestMove)));
-            captureHistory[moved_piece2][to_sq(secondBestMove)][captured2] << bonus1;
+            captureHistory[moved_piece2][to_sq(secondBestMove)][captured2] << bonus1 / 2;
         }
     }
 
