@@ -773,9 +773,6 @@ namespace {
 
     thisThread->complexityAverage.update(complexity);
 
-    if (ss->ply <= 1 && !priorCapture)
-        goto moves_loop;
-
     // Step 7. Razoring.
     // If eval is really low check with qsearch if it can exceed alpha, if it can't,
     // return a fail low.
@@ -806,6 +803,7 @@ namespace {
         &&  ss->staticEval >= beta - 15 * depth - improvement / 15 + 198 + complexity / 28
         && !excludedMove
         &&  pos.non_pawn_material(us)
+        &&  ss->ply >= 2
         && (ss->ply >= thisThread->nmpMinPly || us != thisThread->nmpColor))
     {
         assert(eval - beta >= 0);
