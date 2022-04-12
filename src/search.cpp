@@ -866,7 +866,6 @@ namespace {
 
         MovePicker mp(pos, ttMove, probCutBeta - ss->staticEval, depth - 3, &captureHistory);
         bool ttPv = ss->ttPv;
-        bool captureOrPromotion;
         ss->ttPv = false;
 
         while ((move = mp.next_move()) != MOVE_NONE)
@@ -874,11 +873,9 @@ namespace {
             {
                 assert(pos.capture(move) || promotion_type(move) == QUEEN);
 
-                captureOrPromotion = true;
-
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
-                                                                          [captureOrPromotion]
+                                                                          [pos.capture(move)]
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
 
