@@ -280,8 +280,10 @@ void Thread::search() {
 
   ss->pv = pv;
 
-  bestValue = delta = alpha = -VALUE_INFINITE;
-  beta = VALUE_INFINITE;
+  globalAlpha = bestValue = delta = alpha = -VALUE_INFINITE;
+  globalBeta = beta = VALUE_INFINITE;
+  globalAlpha = VALUE_INFINITE;
+  globalBeta = -VALUE_INFINITE;
 
   if (mainThread)
   {
@@ -394,10 +396,13 @@ void Thread::search() {
                   && Time.elapsed() > 3000)
                   sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
 
+              globalBeta = std::max(bestValue, globalBeta);
+              globalAlpha = std::min(bestValue, globalAlpha);
               // In case of failing low/high increase aspiration window and
               // re-search, otherwise exit the loop.
               if (bestValue <= alpha)
               {
+                  //globalBeta = std::min(alpha, globalBeta);
                   beta = (alpha + beta) / 2;
                   alpha = std::max(bestValue - delta, -VALUE_INFINITE);
 
@@ -407,6 +412,7 @@ void Thread::search() {
               }
               else if (bestValue >= beta)
               {
+                  //globalAlpha = std::max(beta, globalAlpha);
                   beta = std::min(bestValue + delta, VALUE_INFINITE);
                   ++failedHighCnt;
               }
@@ -414,9 +420,12 @@ void Thread::search() {
                   break;
 
               delta += delta / 4 + 2;
+	      //dbg_hit_on(globalAlpha > globalBeta);
+//	      std::cerr << "# " << rootDepth << " " << globalAlpha << " <= " << bestValue << " <= " << globalBeta << (globalAlpha > globalBeta ?  " CONRADICTION" : "") << std::endl;
 
               assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
+//	      std::cerr << "# " << rootDepth << " " << globalAlpha << " <= " << bestValue << " <= " << globalBeta << (globalAlpha > globalBeta ?  " CONRADICTION" : "") << std::endl;
 
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
@@ -1131,6 +1140,8 @@ moves_loop: // When in check, search starts here
       // Step 16. Make the move
       pos.do_move(move, st, givesCheck);
 
+      bool CC = false, C = false;
+      int V = 0;
       bool doDeeperSearch = false;
 
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
@@ -1145,6 +1156,8 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
+	  CC = true;
+	  V = thisThread->globalBeta - thisThread->globalAlpha;
           // Decrease reduction at some PvNodes (~2 Elo)
           if (   PvNode
               && bestMoveCount <= 3)
@@ -1238,6 +1251,12 @@ moves_loop: // When in check, search starts here
 
       // Step 19. Undo move
       pos.undo_move(move);
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, V);
+      }
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
