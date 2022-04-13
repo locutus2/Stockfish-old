@@ -1156,8 +1156,11 @@ moves_loop: // When in check, search starts here
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
-	  CC = true;
-	  V = thisThread->globalBeta - thisThread->globalAlpha;
+	  if (thisThread->globalBeta > thisThread->globalAlpha)
+	  {
+	      CC = true;
+	      V = std::log((float)(thisThread->globalBeta - thisThread->globalAlpha)) / std::log(2) * 8 / thisThread->rootDepth;
+	  }
           // Decrease reduction at some PvNodes (~2 Elo)
           if (   PvNode
               && bestMoveCount <= 3)
@@ -1256,6 +1259,7 @@ moves_loop: // When in check, search starts here
       {
 	      bool T = value > alpha;
 	      dbg_hit_on(T, V);
+	      dbg_hit_on(V >= 16, 1000);
       }
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
