@@ -1159,7 +1159,9 @@ moves_loop: // When in check, search starts here
 	  if (thisThread->globalBeta > thisThread->globalAlpha)
 	  {
 	      CC = true;
+	      //V = std::log((float)(thisThread->globalBeta - thisThread->globalAlpha)) / std::log(2) * 8 / thisThread->rootDepth;
 	      V = std::log((float)(thisThread->globalBeta - thisThread->globalAlpha)) / std::log(2) * 8 / thisThread->rootDepth;
+	      //std::cerr << thisThread->rootDepth << ";" << thisThread->globalBeta - thisThread->globalAlpha << std::endl;
 	  }
           // Decrease reduction at some PvNodes (~2 Elo)
           if (   PvNode
@@ -1258,8 +1260,10 @@ moves_loop: // When in check, search starts here
       if(CC)
       {
 	      bool T = value > alpha;
-	      dbg_hit_on(T, V);
-	      dbg_hit_on(V >= 16, 1000);
+	      //dbg_hit_on(T, V);
+	      //dbg_hit_on(V >= 16, 1000);
+	      dbg_mean_of(thisThread->globalBeta - thisThread->globalAlpha, thisThread->rootDepth);
+	      dbg_corr_of(thisThread->globalBeta - thisThread->globalAlpha, thisThread->rootDepth, 0);
       }
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
