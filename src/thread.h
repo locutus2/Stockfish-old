@@ -65,6 +65,7 @@ public:
   int selDepth, nmpMinPly;
   Color nmpColor;
   Value bestValue, optimism[COLOR_NB];
+  int searchValueRange;
 
   Position rootPos;
   StateInfo rootState;

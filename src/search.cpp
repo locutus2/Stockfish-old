@@ -270,6 +270,7 @@ void Thread::search() {
   double timeReduction = 1, totBestMoveChanges = 0;
   Color us = rootPos.side_to_move();
   int iterIdx = 0;
+  int minSearchValue = 0, maxSearchValue = 0;
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
@@ -282,6 +283,7 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
+  searchValueRange = 0;
 
   if (mainThread)
   {
@@ -371,6 +373,16 @@ void Thread::search() {
           {
               Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
               bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
+
+              if (rootDepth > 1)
+              {
+                  minSearchValue = std::min(minSearchValue, int(bestValue));
+                  maxSearchValue = std::max(maxSearchValue, int(bestValue));
+              }
+              else
+                  minSearchValue = maxSearchValue = int(bestValue);
+
+              searchValueRange = msb(maxSearchValue - minSearchValue + 1);
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
@@ -1172,6 +1184,9 @@ moves_loop: // When in check, search starts here
           // is vastly different from static evaluation
           if (PvNode && !ss->inCheck && abs(ss->staticEval - bestValue) > 250)
               r--;
+
+          if (thisThread->searchValueRange >= 2 * thisThread->rootDepth)
+              r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
