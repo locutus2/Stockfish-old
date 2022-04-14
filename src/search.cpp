@@ -382,7 +382,7 @@ void Thread::search() {
               else
                   minSearchValue = maxSearchValue = int(bestValue);
 
-              searchValueRange = msb(maxSearchValue - minSearchValue + 1);
+              searchValueRange = msb(maxSearchValue - minSearchValue + 2);
 
               // Bring the best move to the front. It is critical that sorting
               // is done with a stable algorithm because all the values but the
@@ -1185,7 +1185,7 @@ moves_loop: // When in check, search starts here
           if (PvNode && !ss->inCheck && abs(ss->staticEval - bestValue) > 250)
               r--;
 
-          if (thisThread->searchValueRange >= 2 * thisThread->rootDepth)
+          if (thisThread->searchValueRange >= 3 * thisThread->rootDepth)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
