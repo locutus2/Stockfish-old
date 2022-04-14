@@ -1294,7 +1294,7 @@ moves_loop: // When in check, search starts here
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
-                  if (move == ttMove && beta < VALUE_INFINITE)
+                  if (beta < VALUE_INFINITE)
                       alpha = (7 * value + beta - 1) / 8;
                   else
                       alpha = value;
