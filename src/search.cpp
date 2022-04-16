@@ -1168,7 +1168,7 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (PvNode && eval < bestValue)
+          if (!PvNode && eval < bestValue)
               r++;
 
           // Decrease reduction at PvNodes if bestvalue
