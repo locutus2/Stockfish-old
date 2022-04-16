@@ -304,6 +304,7 @@ void Thread::search() {
   multiPV = std::min(multiPV, rootMoves.size());
 
   complexityAverage.set(202, 1);
+  evalAverage.set(0, 1);
 
   trend         = SCORE_ZERO;
   optimism[ us] = Value(39);
@@ -470,8 +471,9 @@ void Thread::search() {
                                               * totBestMoveChanges / Threads.size();
           int complexity = mainThread->complexityAverage.value();
           double complexPosition = std::clamp(1.0 + (complexity - 326) / 1618.1, 0.5, 1.5);
+          double staticEvalDiff = std::clamp(1 + (int(bestValue) - evalAverage.value()) / 6080.0, 0.8, 1.2);
 
-          double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability * complexPosition;
+          double totalTime = Time.optimum() * fallingEval * reduction * bestMoveInstability * complexPosition * staticEvalDiff;
 
           // Cap used time in case of a single legal move for a better viewer experience in tournaments
           // yielding correct scores and sufficiently fast moves.
@@ -773,6 +775,7 @@ namespace {
     complexity = abs(ss->staticEval - (us == WHITE ? eg_value(pos.psq_score()) : -eg_value(pos.psq_score())));
 
     thisThread->complexityAverage.update(complexity);
+    thisThread->evalAverage.update(ss->staticEval);
 
     // Step 7. Razoring.
     // If eval is really low check with qsearch if it can exceed alpha, if it can't,
