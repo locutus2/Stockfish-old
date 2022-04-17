@@ -1296,14 +1296,14 @@ moves_loop: // When in check, search starts here
               if (PvNode && !rootNode) // Update pv even in fail-high case
                   update_pv(ss->pv, move, (ss+1)->pv);
 
-              if (PvNode && value < beta && value < eval + depth) // Update alpha! Always alpha < beta
+              if (PvNode && value < beta && value <= ttValue) // Update alpha! Always alpha < beta
               {
                   alpha = value;
                   bestMoveCount++;
               }
               else
               {
-                  assert(value >= beta || value >= eval + depth); // Fail high or early cutoff
+                  assert(value >= beta || value > ttValue); // Fail high or early cutoff
                   break;
               }
           }
