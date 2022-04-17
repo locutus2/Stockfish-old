@@ -1294,7 +1294,7 @@ moves_loop: // When in check, search starts here
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
-                  alpha = std::min(value + ss->ply, beta - 1);
+                  alpha = std::min(value + 2 * ss->ply, beta - 1);
                   bestMoveCount++;
               }
               else
