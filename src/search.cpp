@@ -1180,7 +1180,7 @@ bool DELAY = false;
           if (PvNode)
               r -= 15 / ( 3 + depth );
 
-	  CC = SB && secondBestValue > -VALUE_INFINITE;
+	  CC = SB && bestMove && secondBestValue > -VALUE_INFINITE;
 	  C = true;
 	  V = std::clamp(int(bestValue - secondBestValue), 0, 200);
 	  //C = true;
