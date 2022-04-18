@@ -1168,8 +1168,8 @@ moves_loop: // When in check, search starts here
           if (ttCapture)
               r++;
 
-          if (PvNode && ttValue + depth <= bestValue)
-              r++;
+          if (PvNode && bestMove && ttValue < bestValue)
+              r += 2;
 
           // Decrease reduction at PvNodes if bestvalue
           // is vastly different from static evaluation
