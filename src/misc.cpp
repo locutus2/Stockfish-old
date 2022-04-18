@@ -6,7 +6,6 @@
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
   (at your option) any later version.
-
   Stockfish is distributed in the hope that it will be useful,
   but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -47,6 +46,7 @@ typedef WORD(*fun5_t)();
 #include <sstream>
 #include <vector>
 #include <cstdlib>
+#include <cmath>
 
 #if defined(__linux__) && !defined(__ANDROID__)
 #include <stdlib.h>
@@ -66,6 +66,9 @@ using namespace std;
 namespace Stockfish {
 
 namespace {
+
+const int DBG_N = 16384;
+const int DBG_C = 6;
 
 /// Version number. If Version is left empty, then compile date in the format
 /// DD-MM-YY and show in engine_info.
@@ -279,23 +282,334 @@ std::string compiler_info() {
   return compiler;
 }
 
+template<int a, int b>
+struct POW
+{
+    enum { value = a * POW<a, b-1>::value };
+};
+
+template<int a>
+struct POW<a, 0>
+{
+    enum { value = 1 };
+};
+
+const int DBG_C2 = POW<2, DBG_C>::value;
+const int DBG_C3 = POW<3, DBG_C>::value;
 
 /// Debug functions used mainly to collect run-time statistics
-static std::atomic<int64_t> hits[2], means[2];
+static std::atomic<int64_t> hits[DBG_N][2], means[DBG_N][2], stds[DBG_N][3], covs[DBG_N][6], corrs[DBG_N][6], biforms[DBG_N][7], cramer[DBG_N][5],
+                            chi2[DBG_N][5], gain[DBG_N][5], linc[DBG_N][5+2];
 
-void dbg_hit_on(bool b) { ++hits[0]; if (b) ++hits[1]; }
-void dbg_hit_on(bool c, bool b) { if (c) dbg_hit_on(b); }
-void dbg_mean_of(int v) { ++means[0]; means[1] += v; }
+static std::atomic<int64_t> Chits[DBG_N][DBG_C3][2];
+static std::atomic<int64_t> ChitsCmp[DBG_N][DBG_C3][3];
+
+void dbg_hit_on(bool b, int n, int w) { hits[n][0] += w; if (b) hits[n][1] += w; }
+void dbg_hit_on(bool c, bool b, int n, int w) { if (c) dbg_hit_on(b, n, w); }
+void dbg_mean_of(int v, int n, int w) { means[n][0] += w; means[n][1] += w*v; }
+void dbg_std_of(int v, int n, int w) { stds[n][0] += w; stds[n][1] += w*v; stds[n][2] += w*v*v; }
+void dbg_cov_of(int x, int y, int n, int w) { covs[n][0] += w; covs[n][1] += w*x; covs[n][2] += w*y; covs[n][3] += w*x*x; covs[n][4] += w*y*y; covs[n][5] += w*x*y;}
+void dbg_corr_of(int x, int y, int n, int w) { corrs[n][0] += w; corrs[n][1] += w*x; corrs[n][2] += w*y; corrs[n][3] += w*x*x; corrs[n][4] += w*y*y; corrs[n][5] += w*x*y;}
+void dbg_bi_form(int x1, int x2, int y, int n, int w) { biforms[n][0] += w; biforms[n][1] += w*x1*x1; biforms[n][2] += w*x2*x2; biforms[n][3] += w*x1*x2; 
+	                                                biforms[n][4] += w*y*x1; biforms[n][5] += w*y*x2; biforms[n][6] += w*y*y; }
+void dbg_linc(int x1, int x2, int y, int n, int w) { linc[n][0] += w; linc[n][1] += w*x1*x1; linc[n][2] += w*x2*x2; linc[n][3] += w*x1*x2; 
+	                                                linc[n][4] += w*y*x1; linc[n][5] += w*y*x2; linc[n][6] += w*y*y; }
+//void dbg_linc(int x1, int x2, int y, int n, int w) { linc[n][0] += w; linc[n][1] += w*(y-x2)*(x1-x2); linc[n][2] += w*(x1-x2)*(x1-x2); 
+//                                                     linc[n][3] += w*(y+x2)*(y+x2); linc[n][4] += w*(y+x2)*(x1-x2); }
+void dbg_cramer_of(bool x, bool y, int n, int w) { cramer[n][0] += w; cramer[n][2*x+y+1] += w;}
+void dbg_chi2_of(bool x, bool y, int n, int w) { chi2[n][0] += w; chi2[n][2*x+y+1] += w;}
+void dbg_gain_ratio(bool x, bool y, int n, int w) { gain[n][0] += w; gain[n][2*x+y+1] += w;}
+
+void dbg_hit_on(std::vector<bool>& c, bool b, int n, int w) { 
+	const int cn = (int)c.size();
+	const int CN = 1 << cn;
+	assert(CN <= DBG_C2);
+
+	for(int i = 0; i  < CN; ++i)
+	{
+		int k = 0;
+		for(int j = cn-1; j >= 0; --j)
+		{
+			k *= 3;
+			if(i & (1<<j))
+				k += 2 - c[j];
+		}
+		assert(k < DBG_C3);
+		Chits[n][k][0] += w; if (b) Chits[n][k][1] += w; 
+	}	
+}
+
+void dbg_hit_on_cmp(std::vector<bool>& c, bool b, int n, int m, int w) { 
+	const int cn = (int)c.size();
+	const int CN = 1 << cn;
+	assert(CN <= DBG_C2);
+
+	for(int i = 0; i  < CN; ++i)
+	{
+		int k = 0;
+		for(int j = cn-1; j >= 0; --j)
+		{
+			k *= 3;
+			if(i & (1<<j))
+				k += 2 - c[j];
+		}
+		assert(k < DBG_C3);
+		ChitsCmp[n][k][0] += w; 
+        if (b) ChitsCmp[n][k][1] += w;
+        ChitsCmp[n][k][2] = m;         
+	}	
+}
+
+void printCondition(int k, std::ostream& out = std::cerr)
+{
+              bool first = true;
+	      for(int i = 0; i < DBG_C; ++i)
+	      {
+		      if(k % 3)
+		      {
+		         if(!first) out << " & ";
+			 first = false;
+			 if(k % 3 == 1)
+				 out << "c" << i;
+			 else
+				 out << "!c" << i;
+		      }
+                      k /= 3;
+	      }
+}
+
+void dbg_printc() {
+
+  const bool SORT = true;
+  int x[DBG_C3], m;
+
+  for(int n = 0; n < DBG_N; ++n)
+  {
+      for(int k = 0; k < DBG_C3; ++k)
+              x[k] = k;
+
+      if(SORT)
+              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (Chits[n][a][0]?Chits[n][a][1]/(double)Chits[n][a][0]:0.0)
+                                                                    > (Chits[n][b][0]?Chits[n][b][1]/(double)Chits[n][b][0]:0.0);} );
+
+      for(int k = 0; k < DBG_C3; ++k)
+          if (Chits[n][x[k]][0])
+          {
+              cerr << "[" << n << "," << x[k] << "] Total " << Chits[n][x[k]][0] << " Chits " << Chits[n][x[k]][1]
+                   << " hit rate (%) " << 100. * Chits[n][x[k]][1] / Chits[n][x[k]][0];
+              cerr << " => ";
+              printCondition(x[k], cerr);
+              cerr << std::endl;
+          }
+  }
+
+  for(int n = 0; n < DBG_N; ++n)
+  {
+      for(int k = 0; k < DBG_C3; ++k)
+              x[k] = k;
+
+      if(SORT)
+              std::stable_sort(x, x+DBG_C3, [&](int a, int b){ return (ChitsCmp[ChitsCmp[n][a][2]][a][0] ? ChitsCmp[ChitsCmp[n][a][2]][a][1]/(double)ChitsCmp[ChitsCmp[n][a][2]][a][0] :0.0)
+                                                                     -(ChitsCmp[n][a][0]                 ? ChitsCmp[n][a][1]/(double)ChitsCmp[n][a][0]                                 :0.0)
+                                                                    > (ChitsCmp[ChitsCmp[n][b][2]][b][0] ? ChitsCmp[ChitsCmp[n][b][2]][b][1]/(double)ChitsCmp[ChitsCmp[n][b][2]][b][0] :0.0)
+                                                                     -(ChitsCmp[n][b][0]                 ? ChitsCmp[n][b][1]/(double)ChitsCmp[n][b][0]                                  :0.0);} );
+
+      for(int k = 0; k < DBG_C3; ++k)
+          if (ChitsCmp[n][x[k]][0] && ChitsCmp[ChitsCmp[n][x[k]][2]][x[k]][0] && n < (m = ChitsCmp[n][x[k]][2]))
+          {
+              cerr << "[" << n << "," << x[k] << "] Total " << ChitsCmp[n][x[k]][0] << " ChitsCmp1 " << ChitsCmp[n][x[k]][1]
+                   << " hit rate (%) " << 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0]
+                   << " Total " << ChitsCmp[m][x[k]][0] << " ChitsCmp2 " << ChitsCmp[m][x[k]][1]
+                   << " hit rate (%) " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0]
+                   << " diff " << 100. * ChitsCmp[m][x[k]][1] / ChitsCmp[m][x[k]][0] - 100. * ChitsCmp[n][x[k]][1] / ChitsCmp[n][x[k]][0];
+              cerr << " => ";
+              printCondition(x[k], cerr);
+              cerr << std::endl;
+          }
+  }
+
+}
+
+double gain_ratio(double p)
+{
+	if(p > 0 && p < 1)
+		return -(p*std::log(p)+(1-p)*std::log(1-p))/std::log(2);
+	else
+		return 0;
+}
 
 void dbg_print() {
 
-  if (hits[0])
-      cerr << "Total " << hits[0] << " Hits " << hits[1]
-           << " hit rate (%) " << 100 * hits[1] / hits[0] << endl;
+  for(int n = 0; n < DBG_N; ++n)
+    if (hits[n][0])
+        cerr << "[" << n << "] Total " << hits[n][0] << " Hits " << hits[n][1]
+             << " hit rate (%) " << 100. * hits[n][1] / hits[n][0] << endl;
 
-  if (means[0])
-      cerr << "Total " << means[0] << " Mean "
-           << (double)means[1] / means[0] << endl;
+  for(int n = 0; n < DBG_N; ++n)
+    if (means[n][0])
+        cerr << "[" << n << "] Total " << means[n][0] << " Mean "
+             << (double)means[n][1] / means[n][0] << endl;
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (stds[n][0])
+        cerr << "[" << n << "] Total " << stds[n][0] << " Std "
+             << std::sqrt((double)stds[n][2] / stds[n][0] - std::pow((double)stds[n][1] / stds[n][0], 2)) << endl;
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (corrs[n][0])
+    {
+        double x = corrs[n][1] / (double)corrs[n][0];
+        double y = corrs[n][2] / (double)corrs[n][0];
+        double x2 = corrs[n][3] - corrs[n][0] * x * x;
+        double y2 = corrs[n][4] - corrs[n][0] * y * y;
+        double xy = corrs[n][5] - corrs[n][0] * x * y;
+        double w = (y2 - xy) / (x2 + y2 - 2 * xy);
+        cerr << "[" << n << "] Total " << corrs[n][0] << " Correlation(x,y) = "
+             << xy / std::sqrt(x2 * y2)
+             << " y = " << xy / x2
+             << " * x + " << y - x * xy / x2
+             << " x = " << xy / y2
+             << " * y + " << x - y * xy / y2
+             << " var_min with w(x) = " << w << endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (biforms[n][0])
+    {
+        double N = biforms[n][0];
+        double x1q = biforms[n][1] / N;
+        double x2q = biforms[n][2] / N;
+        double x1x2 = biforms[n][3] / N;
+        double yx1 = biforms[n][4] / N;
+        double yx2 = biforms[n][5] / N;
+        double yq = biforms[n][6] / N;
+        double d = x1q * x2q - x1x2 * x1x2;
+	double a = yx1 * x2q - yx2 * x1x2;
+	double b = yx2 * x1q - yx1 * x1x2;
+	if(n == 1)
+	{
+		a = 1, b =0, d = 1;
+	}
+	if(n == 2)
+	{
+		a = 0, b =1, d = 1;
+	}
+	double MSE = yq + a/d * a/d * x1q + b/d * b/d * x2q - 2 * a/d * yx1 - 2 * b/d * yx2 + 2 * a/d * b/d * x1x2;
+        cerr << "[" << n << "] Total " << biforms[n][0]
+	     << " sigma = " << std::sqrt(MSE)
+             << " y = " << a / d
+             << " * x1 + " << b / d
+             << " * x2" << std::endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (linc[n][0])
+    {
+	    /*
+        double N = linc[n][0];
+        double yd = linc[n][1] / N;
+        double d2 = linc[n][2] / N;
+        double yx2q = linc[n][3] / N;
+        double yx2d = linc[n][4] / N;
+	*/
+	//double MSE = yx2q + yd/d2 * yd/d2 * d2 - 2 * yd/d2 * yx2d;
+        double N = linc[n][0];
+        double x1q = linc[n][1] / N;
+        double x2q = linc[n][2] / N;
+        double x1x2 = linc[n][3] / N;
+        double yx1 = linc[n][4] / N;
+        double yx2 = linc[n][5] / N;
+        double yq = linc[n][6] / N;
+	double a = (yx1 - yx2 - x1x2 + x2q) / (x1q + x2q -2 * x1x2);
+	double MSE = yq + a * a * x1q + (1-a) * (1-a) * x2q - 2 * a * yx1 - 2 * (1-a) * yx2 + 2 * a * (1-a) * x1x2;
+        cerr << "[" << n << "] Total " << linc[n][0]
+	     << " sigma = " << std::sqrt(MSE)
+             << " y = " << a
+             << " * x1 + " << 1 - a
+             << " * x2" << std::endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (covs[n][0])
+    {
+        double x = covs[n][1] / (double)covs[n][0];
+        double y = covs[n][2] / (double)covs[n][0];
+        double xy = covs[n][5] / (double)covs[n][0] - x * y;
+        cerr << "[" << n << "] Total " << covs[n][0] << " Cov(x,y) = "
+             << xy << endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (cramer[n][0])
+    {
+        double a = cramer[n][1];
+        double b = cramer[n][2];
+        double c = cramer[n][3];
+        double d = cramer[n][4];
+		double cr = (a*d-b*c)/std::sqrt((a+b)*(c+d)*(a+c)*(b+d));
+        double ce = 100.*(cramer[n][2]+cramer[n][3])/(double)cramer[n][0];
+        cerr << "[" << n << "] Total " << cramer[n][0] << " CramersV(x,y) = "
+             //<< cramer[n][1] << " "
+             //<< cramer[n][2] << " "
+             //<< cramer[n][3] << " "
+             //<< cramer[n][4] << " "
+             << cr
+             << " error% =" << ce << endl;
+    }
+	
+  for(int n = 0; n < DBG_N; ++n)
+    if (chi2[n][0])
+    {
+		double m = chi2[n][0];
+        double a = chi2[n][1];
+        double b = chi2[n][2];
+        double c = chi2[n][3];
+        double d = chi2[n][4];
+		/*
+		double ax = (a+b) * (a+c) / m;
+        double bx = (a+b) * (b+d) / m;
+        double cx = (a+c) * (d+c) / m;
+        double dx = (d+b) * (d+c) / m;
+		*/
+        
+		double cr = (a*d-b*c)/std::sqrt((a+b)*(c+d)*(a+c)*(b+d));
+		double chiQ = cr*cr*m;
+        //double chiQ = std::pow(a - ax, 2) / ax + std::pow(b - bx, 2) / bx + std::pow(c - cx, 2) / cx + std::pow(d - dx, 2) / dx;
+		double p = 0.5 * std::pow(10, -chiQ/3.84);
+
+        //double chi2q = 3.84; // ChiSquare(0.95, 1) quantile
+		double chi2q = 6.63; // ChiSquare(0.99, 1) quantile
+        
+        cerr << "[" << n << "] Total " << chi2[n][0] << " ChiSquare(x,y) = "
+             << chiQ
+			 << " CV=" << cr
+			 << " p=" << p;
+		
+        if (chiQ > chi2q)
+			cerr <<  " => H0 rejected" << endl;
+		else			
+			cerr <<  " => H0 accepted" << endl;
+    }
+
+  for(int n = 0; n < DBG_N; ++n)
+    if (gain[n][0])
+    {
+        double m = gain[n][0];
+	double p = (gain[n][2]+gain[n][4])/m;
+	double p1 = gain[n][4]/double(gain[n][3]+gain[n][4]);
+	double p0 = gain[n][2]/double(gain[n][1]+gain[n][2]);
+	double entropybase = gain_ratio(p);
+	double entropy0 = gain_ratio(p0);
+	double entropy1 = gain_ratio(p1);
+	double gr = entropybase - (entropy0 * (gain[n][1] + gain[n][2]) + entropy1 * (gain[n][3] + gain[n][4]))/m;
+	double gr_rel = gr/entropybase;
+        cerr << "[" << n << "] Total " << gain[n][0] << " GainRatio(x,y) = "
+             << gr 
+             << " " << gr_rel
+	     //<< " " << p << " " << p0 << " " << p1 << " " << entropybase << " " << entropy0 << " " << entropy1
+	     << endl;
+    }
+	
 }
 
 
