@@ -552,7 +552,7 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
+    Value bestValue, secondBestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
     bool capture, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
@@ -565,7 +565,7 @@ namespace {
     priorCapture       = pos.captured_piece();
     Color us           = pos.side_to_move();
     moveCount          = bestMoveCount = captureCount = quietCount = ss->moveCount = 0;
-    bestValue          = -VALUE_INFINITE;
+    bestValue          = secondBestValue = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
 
     // Check for the available remaining time
@@ -1177,6 +1177,9 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r -= 15 / ( 3 + depth );
 
+          if (bestValue == secondBestValue)
+              r++;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1287,6 +1290,7 @@ moves_loop: // When in check, search starts here
 
       if (value > bestValue)
       {
+          secondBestValue = bestValue;
           bestValue = value;
 
           if (value > alpha)
@@ -1308,6 +1312,9 @@ moves_loop: // When in check, search starts here
               }
           }
       }
+
+      else if (value > secondBestValue)
+          secondBestValue = value;
 
       // If the move is worse than some previously searched move, remember it to update its stats later
       if (move != bestMove)
