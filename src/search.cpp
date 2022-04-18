@@ -552,7 +552,7 @@ namespace {
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
     Depth extension, newDepth;
-    Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
+    Value bestValue, secondBestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
     bool capture, doFullDepthSearch, moveCountPruning, ttCapture;
     Piece movedPiece;
@@ -565,7 +565,7 @@ namespace {
     priorCapture       = pos.captured_piece();
     Color us           = pos.side_to_move();
     moveCount          = bestMoveCount = captureCount = quietCount = ss->moveCount = 0;
-    bestValue          = -VALUE_INFINITE;
+    bestValue          = secondBestValue = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
 
     // Check for the available remaining time
@@ -1275,7 +1275,8 @@ moves_loop: // When in check, search starts here
               // This information is used for time management. In MultiPV mode,
               // we must take care to only do this for the first PV line.
               if (   moveCount > 1
-                  && !thisThread->pvIdx)
+                  && !thisThread->pvIdx
+		  && value > bestValue)
                   ++thisThread->bestMoveChanges;
           }
           else
@@ -1287,6 +1288,9 @@ moves_loop: // When in check, search starts here
 
       if (value > bestValue)
       {
+          if (rootNode)
+              secondBestValue = bestValue;
+
           bestValue = value;
 
           if (value > alpha)
@@ -1298,8 +1302,12 @@ moves_loop: // When in check, search starts here
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
-                  alpha = value;
                   bestMoveCount++;
+
+                  if (rootNode)
+                      alpha = std::max(alpha, secondBestValue);
+                  else
+                      alpha = value;
               }
               else
               {
@@ -1307,6 +1315,12 @@ moves_loop: // When in check, search starts here
                   break;
               }
           }
+      }
+
+      else if (rootNode && value > secondBestValue)
+      {
+          secondBestValue = value;
+          alpha = std::max(alpha, value);
       }
 
       // If the move is worse than some previously searched move, remember it to update its stats later
