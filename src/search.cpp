@@ -1177,7 +1177,7 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r -= 15 / ( 3 + depth );
 
-          if (secondBestValue < bestValue - 200 && secondBestValue > -VALUE_INFINITE)
+          if (PvNode && bestMove && secondBestValue < bestValue - 200 && secondBestValue > -VALUE_INFINITE)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
