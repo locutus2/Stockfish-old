@@ -1132,7 +1132,10 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
-
+bool CC = false, C = false;
+int V = 0;
+bool SB = true;//rootNode;
+bool DELAY = false;
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1176,6 +1179,11 @@ moves_loop: // When in check, search starts here
           // Increase depth based reduction if PvNode
           if (PvNode)
               r -= 15 / ( 3 + depth );
+
+	  CC = SB && secondBestValue > -VALUE_INFINITE;
+	  C = true;
+	  V = std::clamp(int(bestValue - secondBestValue), 0, 200);
+	  //C = true;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
@@ -1245,6 +1253,17 @@ moves_loop: // When in check, search starts here
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      dbg_hit_on(T, 1000+V);
+	      for(int i = 0; i <= 200; ++i)
+	      {
+	          dbg_hit_on(V >= i, 2000+i);
+	      }
+      }
+
       // Step 20. Check for a new best move
       // Finished searching the move. If a stop occurred, the return value of
       // the search cannot be trusted, and we return immediately without
@@ -1275,7 +1294,8 @@ moves_loop: // When in check, search starts here
               // This information is used for time management. In MultiPV mode,
               // we must take care to only do this for the first PV line.
               if (   moveCount > 1
-                  && !thisThread->pvIdx)
+                  && !thisThread->pvIdx
+                  && (value > bestValue || !DELAY))
                   ++thisThread->bestMoveChanges;
           }
           else
@@ -1287,7 +1307,7 @@ moves_loop: // When in check, search starts here
 
       if (value > bestValue)
       {
-          if (rootNode)
+          if (SB)
               secondBestValue = bestValue;
 
           bestValue = value;
@@ -1301,7 +1321,10 @@ moves_loop: // When in check, search starts here
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
-                  alpha = value;
+	          if(SB && DELAY)
+                      alpha = std::max(alpha, secondBestValue);
+		  else
+                      alpha = value;
                   bestMoveCount++;
               }
               else
@@ -1312,8 +1335,12 @@ moves_loop: // When in check, search starts here
           }
       }
 
-      else if (rootNode && value > secondBestValue)
+      else if (SB && value > secondBestValue)
+      {
           secondBestValue = value;
+	  if(DELAY && value > alpha)
+		  alpha = value;
+      }
 
       // If the move is worse than some previously searched move, remember it to update its stats later
       if (move != bestMove)
