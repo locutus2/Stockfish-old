@@ -1275,8 +1275,7 @@ moves_loop: // When in check, search starts here
               // This information is used for time management. In MultiPV mode,
               // we must take care to only do this for the first PV line.
               if (   moveCount > 1
-                  && !thisThread->pvIdx
-		  && value > bestValue)
+                  && !thisThread->pvIdx)
                   ++thisThread->bestMoveChanges;
           }
           else
@@ -1302,12 +1301,8 @@ moves_loop: // When in check, search starts here
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
+                  alpha = value;
                   bestMoveCount++;
-
-                  if (rootNode)
-                      alpha = std::max(alpha, secondBestValue);
-                  else
-                      alpha = value;
               }
               else
               {
@@ -1318,10 +1313,7 @@ moves_loop: // When in check, search starts here
       }
 
       else if (rootNode && value > secondBestValue)
-      {
           secondBestValue = value;
-          alpha = std::max(alpha, value);
-      }
 
       // If the move is worse than some previously searched move, remember it to update its stats later
       if (move != bestMove)
