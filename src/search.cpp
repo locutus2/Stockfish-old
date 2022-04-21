@@ -1310,7 +1310,7 @@ moves_loop: // When in check, search starts here
       }
 
       if (PvNode && bestMove)
-          alpha = std::min(alpha + 1, beta - 1);
+          alpha = std::min(alpha + 2, beta - 1);
 
       // If the move is worse than some previously searched move, remember it to update its stats later
       if (move != bestMove)
