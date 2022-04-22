@@ -1231,7 +1231,7 @@ moves_loop: // When in check, search starts here
       // high (in the latter case search only if value < beta), otherwise let the
       // parent node fail low with value <= alpha and try another move.
       bool PVsearchDone = false;
-      if (PvNode && (moveCount == 1 || (value > std::min(alpha + bool(bestMove), beta - 1) && (rootNode || value < beta))))
+      if (PvNode && (moveCount == 1 || (value > std::min(alpha + 2 * bool(bestMove), beta - 1) && (rootNode || value < beta))))
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
