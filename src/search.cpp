@@ -1230,12 +1230,10 @@ moves_loop: // When in check, search starts here
       // For PV nodes only, do a full PV search on the first move or after a fail
       // high (in the latter case search only if value < beta), otherwise let the
       // parent node fail low with value <= alpha and try another move.
-      bool PVsearchDone = false;
-      if (PvNode && (moveCount == 1 || (value > std::min(alpha + 2 * bool(bestMove), beta - 1) && (rootNode || value < beta))))
+      if (PvNode && (moveCount <= 2 || (value > alpha && (rootNode || value < beta))))
       {
           (ss+1)->pv = pv;
           (ss+1)->pv[0] = MOVE_NONE;
-          PVsearchDone = true;
 
           value = -search<PV>(pos, ss+1, -beta, -alpha,
                               std::min(maxNextDepth, newDepth), false);
@@ -1261,7 +1259,7 @@ moves_loop: // When in check, search starts here
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
 
           // PV move or new best move?
-          if (PVsearchDone && (moveCount == 1 || value > alpha))
+          if (moveCount <= 2 || value > alpha)
           {
               rm.score = value;
               rm.selDepth = thisThread->selDepth;
