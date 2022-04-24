@@ -1298,8 +1298,8 @@ moves_loop: // When in check, search starts here
 
               if (PvNode && value < beta) // Update alpha! Always alpha < beta
               {
-                  if (beta < VALUE_INFINITE && initialAlpha > -VALUE_INFINITE)
-                      alpha = std::max(value, (24 * (beta - 1) + (8 + depth) * initialAlpha) / (32 + depth));
+                  if (beta < VALUE_TB_WIN_IN_MAX_PLY && initialAlpha > VALUE_TB_LOSS_IN_MAX_PLY)
+                      alpha = std::max(value, (beta - 1 + initialAlpha) / 2);
                   else
                       alpha = value;
               }
