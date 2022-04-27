@@ -565,6 +565,7 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
+    Bound ttBound;
     Depth extension, newDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
@@ -637,6 +638,7 @@ namespace {
     posKey = excludedMove == MOVE_NONE ? pos.key() : pos.key() ^ make_key(excludedMove);
     tte = TT.probe(posKey, ss->ttHit);
     ttValue = ss->ttHit ? value_from_tt(tte->value(), ss->ply, pos.rule50_count()) : VALUE_NONE;
+    ttBound = ss->ttHit ? tte->bound() : BOUND_NONE;
     ttMove =  rootNode ? thisThread->rootMoves[thisThread->pvIdx].pv[0]
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     ttCapture = ttMove && pos.capture(ttMove);
@@ -648,8 +650,8 @@ namespace {
         && ss->ttHit
         && tte->depth() > depth - (thisThread->id() % 2 == 1)
         && ttValue != VALUE_NONE // Possible in case of TT access race
-        && (ttValue >= beta ? (tte->bound() & BOUND_LOWER)
-                            : (tte->bound() & BOUND_UPPER)))
+        && (ttValue >= beta ? (ttBound & BOUND_LOWER)
+                            : (ttBound & BOUND_UPPER)))
     {
         // If ttMove is quiet, update move sorting heuristics on TT hit (~1 Elo)
         if (ttMove)
@@ -756,7 +758,7 @@ namespace {
 
         // ttValue can be used as a better position evaluation (~4 Elo)
         if (    ttValue != VALUE_NONE
-            && (tte->bound() & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER)))
+            && (ttBound & (ttValue > eval ? BOUND_LOWER : BOUND_UPPER)))
             eval = ttValue;
     }
     else
@@ -941,7 +943,7 @@ moves_loop: // When in check, search starts here
         && !PvNode
         && depth >= 2
         && ttCapture
-        && (tte->bound() & BOUND_LOWER)
+        && (ttBound & BOUND_LOWER)
         && tte->depth() >= depth - 3
         && ttValue >= probCutBeta
         && abs(ttValue) <= VALUE_KNOWN_WIN
@@ -969,7 +971,7 @@ moves_loop: // When in check, search starts here
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
     bool likelyFailLow =    PvNode
                          && ttMove
-                         && (tte->bound() & BOUND_UPPER)
+                         && (ttBound & BOUND_UPPER)
                          && tte->depth() >= depth;
 
     // Step 13. Loop through all pseudo-legal moves until no moves remain
@@ -1080,7 +1082,7 @@ moves_loop: // When in check, search starts here
               && !excludedMove // Avoid recursive singular search
            /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
               &&  abs(ttValue) < VALUE_KNOWN_WIN
-              && (tte->bound() & BOUND_LOWER)
+              && (ttBound & BOUND_LOWER)
               &&  tte->depth() >= depth - 3)
           {
               Value singularBeta = ttValue - 3 * depth;
@@ -1190,7 +1192,8 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r -= 1 + 15 / ( 3 + depth );
 
-          if (!PvNode && (bestValue > thisThread->maxValue[us] || bestValue < thisThread->minValue[us]))
+          if (!PvNode && (   (ttBound & BOUND_LOWER && ttValue > thisThread->maxValue[us])
+                          || (ttBound & BOUND_UPPER && ttValue < thisThread->minValue[us])))
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
