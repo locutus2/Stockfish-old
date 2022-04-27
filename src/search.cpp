@@ -282,8 +282,8 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
-  minValue[WHITE] = minValue[BLACK] = -VALUE_INFINITE;
-  maxValue[WHITE] = maxValue[BLACK] =  VALUE_INFINITE;
+  maxValue[us] = -VALUE_INFINITE;
+  maxValue[~us] = VALUE_INFINITE;
 
   if (mainThread)
   {
@@ -388,16 +388,10 @@ void Thread::search() {
               if (Threads.stop)
                   break;
 
-              if (bestValue > maxValue[us] || maxValue[us] == VALUE_INFINITE)
+              if (bestValue > maxValue[us])
               {
                   maxValue[us] = bestValue;
                   maxValue[~us] = -bestValue;
-              }
-
-              if (bestValue < minValue[us] || minValue[us] == -VALUE_INFINITE)
-              {
-                  minValue[us] = bestValue;
-                  minValue[~us] = -bestValue;
               }
 
               // When failing high/low give some update (without cluttering
@@ -1192,8 +1186,7 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r -= 1 + 15 / ( 3 + depth );
 
-          if (!PvNode && (   (ttBound & BOUND_LOWER && ttValue > thisThread->maxValue[us])
-                          || (ttBound & BOUND_UPPER && ttValue < thisThread->minValue[us])))
+          if (!PvNode && ttValue != VALUE_NONE && ttBound & BOUND_LOWER && ttValue > thisThread->maxValue[us])
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
