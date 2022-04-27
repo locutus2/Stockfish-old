@@ -282,6 +282,8 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
+  minValue[WHITE] = minValue[BLACK] = -VALUE_INFINITE;
+  maxValue[WHITE] = maxValue[BLACK] =  VALUE_INFINITE;
 
   if (mainThread)
   {
@@ -385,6 +387,18 @@ void Thread::search() {
               // the previous iteration.
               if (Threads.stop)
                   break;
+
+              if (bestValue > maxValue[us] || maxValue[us] == VALUE_INFINITE)
+              {
+                  maxValue[us] = bestValue;
+                  maxValue[~us] = -bestValue;
+              }
+
+              if (bestValue < minValue[us] || minValue[us] == -VALUE_INFINITE)
+              {
+                  minValue[us] = bestValue;
+                  minValue[~us] = -bestValue;
+              }
 
               // When failing high/low give some update (without cluttering
               // the UI) before a re-search.
@@ -1175,6 +1189,9 @@ moves_loop: // When in check, search starts here
           // Decrease reduction for PvNodes based on depth
           if (PvNode)
               r -= 1 + 15 / ( 3 + depth );
+
+          if (!PvNode && ttValue != VALUE_NONE && (ttValue > thisThread->maxValue[us] || ttValue < thisThread->minValue[us]))
+              r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
