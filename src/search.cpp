@@ -1186,8 +1186,8 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r -= 1 + 15 / ( 3 + depth );
 
-          if (  !PvNode
-              && capture
+          if (   !PvNode
+              && !capture
               && ttValue != VALUE_NONE
               && ttBound & BOUND_LOWER
               && ttValue > thisThread->maxValue[us])
