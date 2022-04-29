@@ -1118,7 +1118,7 @@ Value Eval::evaluate(const Position& pos) {
   // Guarantee evaluation does not hit the tablebase range
   v = std::clamp(v, VALUE_TB_LOSS_IN_MAX_PLY + 1, VALUE_TB_WIN_IN_MAX_PLY - 1);
 
-  v = Value(sigmoid(v, 0, 0, VALUE_KNOWN_WIN, VALUE_KNOWN_WIN / 2, 1));
+  v = Value(sigmoid(v, 0, 0, VALUE_TB_WIN_IN_MAX_PLY, VALUE_TB_WIN_IN_MAX_PLY, 1));
 
   return v;
 }
