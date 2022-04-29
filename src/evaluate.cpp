@@ -1113,7 +1113,7 @@ Value Eval::evaluate(const Position& pos) {
   }
 
   if (std::abs(v) <= PawnValueEg)
-      v += 80 * v * int(PawnValueEg - std::abs(v)) / (PawnValueEg * int(PawnValueEg));
+      v += 40 * v * int(PawnValueEg - std::abs(v)) / (PawnValueEg * int(PawnValueEg));
 
   // Damp down the evaluation linearly when shuffling
   v = v * (195 - pos.rule50_count()) / 211;
