@@ -161,18 +161,30 @@ namespace {
 
     TimePoint elapsed = now();
 
-    std::vector<bool> C = { true };
-    Var x(0);
+    std::vector<bool> C = { false, true };
+    BoolVar x(0);
     std::cerr << "f(x) = " << x << std::endl;
     std::cerr << "     = " << (int)x(C) << std::endl;
 
+    BoolVar y(1);
+    std::cerr << "f(x) = " << y << std::endl;
+    std::cerr << "     = " << (int)y(C) << std::endl;
+
     Not f1(x);
-    std::cerr << "f1(x) = " << f1 << std::endl;
+    std::cerr << "f(x) = " << f1 << std::endl;
     std::cerr << "      = " << (int)f1(C) << std::endl;
 
-    Not f2(f1);
-    std::cerr << "f2(x) = " << f2 << std::endl;
+    Not f1y(y);
+    std::cerr << "f(x) = " << f1y << std::endl;
+    std::cerr << "      = " << (int)f1y(C) << std::endl;
+
+    And f2(f1,y);
+    std::cerr << "f(x) = " << f2 << std::endl;
     std::cerr << "      = " << (int)f2(C) << std::endl;
+
+    Or f3(f1,f2);
+    std::cerr << "f(x) = " << f3 << std::endl;
+    std::cerr << "      = " << (int)f3(C) << std::endl;
 
     return;
 
