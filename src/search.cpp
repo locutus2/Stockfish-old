@@ -1198,11 +1198,11 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
-	  CC = d > 1; // so more reductions possible
+	  CC = d > 1 && rootNode; // so more reductions possible
 	  if(CC)
 	  {
 		  C = {
-			  rootNode,
+			  //rootNode,
 			  PvNode,
 			  cutNode,
 			  improving,
