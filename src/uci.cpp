@@ -23,7 +23,6 @@
 #include <string>
 
 #include "evaluate.h"
-#include "genetics.h"
 #include "movegen.h"
 #include "position.h"
 #include "search.h"
@@ -151,78 +150,6 @@ namespace {
     Threads.start_thinking(pos, states, limits, ponderMode);
   }
 
-  void evolve(Position& pos, istream& args, StateListPtr& states) {
-
-    string token;
-    uint64_t num, nodes = 0, cnt = 1;
-
-    vector<string> list = setup_bench(pos, args);
-    num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
-
-    TimePoint elapsed = now();
-
-    std::vector<bool> C = { false, true };
-    BoolVar x(0);
-    std::cerr << "f(x) = " << x << std::endl;
-    std::cerr << "     = " << (int)x(C) << std::endl;
-
-    BoolVar y(1);
-    std::cerr << "f(x) = " << y << std::endl;
-    std::cerr << "     = " << (int)y(C) << std::endl;
-
-    Not f1(x);
-    std::cerr << "f(x) = " << f1 << std::endl;
-    std::cerr << "      = " << (int)f1(C) << std::endl;
-
-    Not f1y(y);
-    std::cerr << "f(x) = " << f1y << std::endl;
-    std::cerr << "      = " << (int)f1y(C) << std::endl;
-
-    And f2(f1,y);
-    std::cerr << "f(x) = " << f2 << std::endl;
-    std::cerr << "      = " << (int)f2(C) << std::endl;
-
-    Or f3(f1,f2);
-    std::cerr << "f(x) = " << f3 << std::endl;
-    std::cerr << "      = " << (int)f3(C) << std::endl;
-
-    return;
-
-    for (const auto& cmd : list)
-    {
-        istringstream is(cmd);
-        is >> skipws >> token;
-
-        if (token == "go" || token == "eval")
-        {
-            cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
-            if (token == "go")
-            {
-               go(pos, is, states);
-               Threads.main()->wait_for_search_finished();
-               nodes += Threads.nodes_searched();
-            }
-            else
-               trace_eval(pos);
-        }
-        else if (token == "setoption")  setoption(is);
-        else if (token == "position")   position(pos, is, states);
-        else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
-    }
-
-    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
-
-    dbg_print(); // Just before exiting
-    dbg_printc(); // Just before exiting
-
-    cerr << "\n==========================="
-         << "\nTotal time (ms) : " << elapsed
-         << "\nNodes searched  : " << nodes
-         << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
-  }
-
-
-  // bench() is called when engine receives the "bench" command. Firstly
   // a list of UCI commands is setup according to bench parameters, then
   // it is run one by one printing a summary at the end.
 
@@ -346,7 +273,6 @@ void UCI::loop(int argc, char* argv[]) {
       // Do not use these commands during a search!
       else if (token == "flip")     pos.flip();
       else if (token == "bench")    bench(pos, is, states);
-      else if (token == "evolve")   evolve(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
       else if (token == "eval")     trace_eval(pos);
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;

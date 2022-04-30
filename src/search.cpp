@@ -1136,6 +1136,8 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
+      bool CC = false;
+      std::vector<bool> C;
 
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1195,6 +1197,43 @@ moves_loop: // When in check, search starts here
                        :                             0;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
+
+	  CC = d > 1; // so more reductions possible
+	  if(CC)
+	  {
+		  C = {
+			  rootNode,
+			  PvNode,
+			  cutNode,
+			  improving,
+			  ttCapture,
+			  likelyFailLow,
+			  priorCapture,
+			  (ss-1)->currentMove == MOVE_NULL,
+			  bool(excludedMove),
+			  bool(ttMove),
+			  bool(bestMove),
+			  ttMove == bestMove,
+			  ss->inCheck,
+			  ss->ttPv,
+			  ss->ttHit,
+			  (ss-1)->inCheck,
+			  (ss-1)->ttPv,
+			  (ss-1)->ttHit,
+
+			  extension > 0,
+			  extension < 0,
+			  capture,
+			  type_of(move) == PROMOTION,
+			  givesCheck,
+			  moveCountPruning,
+			  move == countermove,
+			  move == ss->killers[0],
+			  move == ss->killers[1],
+			  deeper > 0,
+		  };
+	  }
+
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
@@ -1282,6 +1321,16 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(CC)
+      {
+	      //bool T = value > alpha;
+	      bool T = value <= alpha;
+	      std::cerr << int(T);
+	      for(bool c : C)
+		      std::cerr << ';' << int(c);
+	      std::cerr << std::endl;
       }
 
       if (value > bestValue)
