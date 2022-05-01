@@ -21,6 +21,7 @@ class BoolExpression
 
     virtual bool operator()(const std::vector<bool>& x) const = 0;
     virtual std::string to_string() const = 0;
+    virtual BoolExpression* copy() const = 0;
 };
 
 int BoolExpression::next_id = 0;
@@ -30,6 +31,11 @@ namespace std
     std::string to_string(const BoolExpression& e)
     {
         return e.to_string();
+    }
+
+    std::string to_string(const BoolExpression* e)
+    {
+        return e->to_string();
     }
 }
 
@@ -46,6 +52,11 @@ class BoolTerminal : public BoolExpression
         return value;
     }
    
+    BoolExpression* copy() const
+    {
+        return new BoolTerminal(this->name, value);
+    }
+   
     std::string to_string() const
     {
         return prefix() + this->name;
@@ -58,11 +69,11 @@ class UnaryBoolFunction : public BoolExpression
     BoolExpression* arg;
 
     public:
-    UnaryBoolFunction(const std::string& n, BoolExpression& a) : BoolExpression(n), arg(&a) {}
+    UnaryBoolFunction(const std::string& n, BoolExpression* a) : BoolExpression(n), arg(a) {}
    
     std::string to_string() const
     {
-        return prefix() + this->name + '(' + std::to_string(*arg) + ')';
+        return prefix() + this->name + '(' + std::to_string(arg) + ')';
     }
 };
 
@@ -72,11 +83,11 @@ class BinaryBoolFunction : public BoolExpression
     BoolExpression *arg1, *arg2;
 
     public:
-    BinaryBoolFunction(const std::string& n, BoolExpression& a1, BoolExpression& a2) : BoolExpression(n), arg1(&a1), arg2(&a2) {}
+    BinaryBoolFunction(const std::string& n, BoolExpression* a1, BoolExpression* a2) : BoolExpression(n), arg1(a1), arg2(a2) {}
    
     std::string to_string() const
     {
-        return prefix() + this->name + '(' + std::to_string(*arg1) + ", " + std::to_string(*arg2) + ')';
+        return prefix() + this->name + '(' + std::to_string(arg1) + ", " + std::to_string(arg2) + ')';
     }
 };
 
@@ -92,6 +103,11 @@ class BoolVar : public BoolExpression
         return x[n];
     }
 
+    BoolExpression* copy() const
+    {
+        return new BoolVar(n);
+    }
+   
     std::string to_string() const
     {
         return prefix() + this->name + std::to_string(n);
@@ -113,8 +129,13 @@ class True : public BoolTerminal
 class Not : public UnaryBoolFunction
 {
     public:
-    Not(BoolExpression& a) : UnaryBoolFunction("NOT", a) {}
-    Not(Not& a) : UnaryBoolFunction("NOT", a) {}
+    Not(BoolExpression* a = nullptr) : UnaryBoolFunction("NOT", a) {}
+    Not(Not* a) : UnaryBoolFunction("NOT", a) {}
+   
+    BoolExpression* copy() const
+    {
+        return new Not(arg->copy());
+    }
    
     bool operator()(const std::vector<bool>& x) const
     {
@@ -125,7 +146,12 @@ class Not : public UnaryBoolFunction
 class And : public BinaryBoolFunction
 {
     public:
-    And(BoolExpression& a1, BoolExpression& a2) : BinaryBoolFunction("AND", a1, a2) {}
+    And(BoolExpression* a1 = nullptr, BoolExpression* a2 = nullptr) : BinaryBoolFunction("AND", a1, a2) {}
+   
+    BoolExpression* copy() const
+    {
+        return new And(arg1->copy(), arg2->copy());
+    }
    
     bool operator()(const std::vector<bool>& x) const
     {
@@ -136,7 +162,12 @@ class And : public BinaryBoolFunction
 class Or : public BinaryBoolFunction
 {
     public:
-    Or(BoolExpression& a1, BoolExpression& a2) : BinaryBoolFunction("OR", a1, a2) {}
+    Or(BoolExpression* a1 = nullptr, BoolExpression* a2 = nullptr) : BinaryBoolFunction("OR", a1, a2) {}
+   
+    BoolExpression* copy() const
+    {
+        return new Or(arg1->copy(), arg2->copy());
+    }
    
     bool operator()(const std::vector<bool>& x) const
     {
@@ -147,7 +178,12 @@ class Or : public BinaryBoolFunction
 class Xor : public BinaryBoolFunction
 {
     public:
-    Xor(BoolExpression& a1, BoolExpression& a2) : BinaryBoolFunction("XOR", a1, a2) {}
+    Xor(BoolExpression* a1 = nullptr, BoolExpression* a2 = nullptr) : BinaryBoolFunction("XOR", a1, a2) {}
+   
+    BoolExpression* copy() const
+    {
+        return new Xor(arg1->copy(), arg2->copy());
+    }
    
     bool operator()(const std::vector<bool>& x) const
     {
@@ -158,7 +194,12 @@ class Xor : public BinaryBoolFunction
 class Equal : public BinaryBoolFunction
 {
     public:
-    Equal(BoolExpression& a1, BoolExpression& a2) : BinaryBoolFunction("EQ", a1, a2) {}
+    Equal(BoolExpression* a1 = nullptr, BoolExpression* a2 = nullptr) : BinaryBoolFunction("EQ", a1, a2) {}
+   
+    BoolExpression* copy() const
+    {
+        return new Equal(arg1->copy(), arg2->copy());
+    }
    
     bool operator()(const std::vector<bool>& x) const
     {
@@ -169,7 +210,12 @@ class Equal : public BinaryBoolFunction
 class NotEqual : public BinaryBoolFunction
 {
     public:
-    NotEqual(BoolExpression& a1, BoolExpression& a2) : BinaryBoolFunction("NEQ", a1, a2) {}
+    NotEqual(BoolExpression* a1 = nullptr, BoolExpression* a2 = nullptr) : BinaryBoolFunction("NEQ", a1, a2) {}
+   
+    BoolExpression* copy() const
+    {
+        return new NotEqual(arg1->copy(), arg2->copy());
+    }
    
     bool operator()(const std::vector<bool>& x) const
     {
@@ -177,7 +223,7 @@ class NotEqual : public BinaryBoolFunction
     }
 };
 
-std::ostream& operator<<(std::ostream& out, const BoolExpression& e)
+std::ostream& operator<<(std::ostream& out, const BoolExpression* e)
 {
     return out << std::to_string(e);
 }
