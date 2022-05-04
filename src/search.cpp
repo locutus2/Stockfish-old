@@ -950,6 +950,7 @@ moves_loop: // When in check, search starts here
 
     value = bestValue;
     moveCountPruning = false;
+    Depth origDepth = depth;
 
     // Indicate PvNodes that will probably fail low if the node was searched
     // at a depth equal or greater than the current depth, and the result of this search was a fail low.
@@ -1305,7 +1306,7 @@ moves_loop: // When in check, search starts here
 
                   // Reduce other moves if we have found at least one score improvement
                   if (   depth > 2
-                      && depth < ss->ply
+                      && depth < 7
                       && beta  <  VALUE_KNOWN_WIN
                       && alpha > -VALUE_KNOWN_WIN)
                      depth -= 1;
@@ -1358,19 +1359,19 @@ moves_loop: // When in check, search starts here
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
         update_all_stats(pos, ss, bestMove, bestValue, beta, prevSq,
-                         quietsSearched, quietCount, capturesSearched, captureCount, depth);
+                         quietsSearched, quietCount, capturesSearched, captureCount, origDepth);
 
     // Bonus for prior countermove that caused the fail low
-    else if (   (depth >= 4 || PvNode)
+    else if (   (origDepth >= 4 || PvNode)
              && !priorCapture)
     {
         //Assign extra bonus if current node is PvNode or cutNode
         //or fail low was really bad
         bool extraBonus =    PvNode
                           || cutNode
-                          || bestValue < alpha - 70 * depth;
+                          || bestValue < alpha - 70 * origDepth;
 
-        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(depth) * (1 + extraBonus));
+        update_continuation_histories(ss-1, pos.piece_on(prevSq), prevSq, stat_bonus(origDepth) * (1 + extraBonus));
     }
 
     if (PvNode)
@@ -1379,14 +1380,14 @@ moves_loop: // When in check, search starts here
     // If no good move is found and the previous position was ttPv, then the previous
     // opponent move is probably good and the new position is added to the search tree.
     if (bestValue <= alpha)
-        ss->ttPv = ss->ttPv || ((ss-1)->ttPv && depth > 3);
+        ss->ttPv = ss->ttPv || ((ss-1)->ttPv && origDepth > 3);
 
     // Write gathered information in transposition table
     if (!excludedMove && !(rootNode && thisThread->pvIdx))
         tte->save(posKey, value_to_tt(bestValue, ss->ply), ss->ttPv,
                   bestValue >= beta ? BOUND_LOWER :
                   PvNode && bestMove ? BOUND_EXACT : BOUND_UPPER,
-                  depth, bestMove, ss->staticEval);
+                  origDepth, bestMove, ss->staticEval);
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
