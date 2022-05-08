@@ -350,7 +350,6 @@ void Thread::search() {
 
       size_t pvFirst = 0;
       pvLast = 0;
-      SCNthreshold = rootMoves[0].previousScore + 1;
 
       if (!Threads.increaseDepth)
          searchAgainCounter++;
@@ -368,6 +367,7 @@ void Thread::search() {
 
           // Reset UCI info selDepth for each depth and each PV line
           selDepth = 0;
+          SCNthreshold = rootMoves[pvIdx].previousScore + 1;
 
           // Reset aspiration window starting size
           if (rootDepth >= 4)
