@@ -79,7 +79,7 @@ struct RootMove {
   int selDepth = 0;
   int tbRank = 0;
   Value tbScore;
-  int SCN = 0;
+  uint64_t SCN = 0;
   std::vector<Move> pv;
 };
 
