@@ -37,6 +37,29 @@
 
 namespace Stockfish {
 
+namespace SCN {
+
+  int init(bool MaxNode)
+  {
+      return MaxNode ? VALUE_INFINITE : 0;
+  }
+
+  int leaf(int threshold, Value value, bool MaxNode, bool terminal = false)
+  {
+      if (!MaxNode)
+          value = -value;
+
+      return value >= threshold ? 0 :
+             terminal           ? VALUE_INFINITE : 1;
+  }
+
+  int update(int SCN, Value value, bool MaxNode)
+  {
+      return MaxNode ? std::max(SCN, int(value)) : SCN + value;
+  }
+
+}
+
 namespace Search {
 
   LimitsType Limits;
@@ -282,6 +305,7 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
+  SCNthreshold = 0;
 
   if (mainThread)
   {
@@ -521,6 +545,8 @@ namespace {
     constexpr bool PvNode = nodeType != NonPV;
     constexpr bool rootNode = nodeType == Root;
     const Depth maxNextDepth = rootNode ? depth : depth + 1;
+    const bool MaxNode = ss->ply % 2 == 0;
+
 
     // Check if we have an upcoming move which draws by repetition, or
     // if the opponent had an alternative move earlier to this position.
@@ -531,7 +557,10 @@ namespace {
     {
         alpha = value_draw(pos.this_thread());
         if (alpha >= beta)
+        {
+            ss->SCN = SCN::leaf(pos.this_thread()->SCNthreshold, alpha, MaxNode);
             return alpha;
+        }
     }
 
     // Dive into quiescence search when the depth reaches zero
@@ -581,8 +610,12 @@ namespace {
         if (   Threads.stop.load(std::memory_order_relaxed)
             || pos.is_draw(ss->ply)
             || ss->ply >= MAX_PLY)
-            return (ss->ply >= MAX_PLY && !ss->inCheck) ? evaluate(pos)
-                                                        : value_draw(pos.this_thread());
+        {
+            value = (ss->ply >= MAX_PLY && !ss->inCheck) ? evaluate(pos)
+                                                         : value_draw(pos.this_thread());
+            ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode, pos.is_draw(ss->ply));
+            return value;
+        }
 
         // Step 3. Mate distance pruning. Even if we mate at the next move our score
         // would be at best mate_in(ss->ply+1), but if alpha is already bigger because
@@ -593,7 +626,10 @@ namespace {
         alpha = std::max(mated_in(ss->ply), alpha);
         beta = std::min(mate_in(ss->ply+1), beta);
         if (alpha >= beta)
+        {
+            ss->SCN = SCN::leaf(thisThread->SCNthreshold, alpha, MaxNode);
             return alpha;
+        }
     }
     else
         thisThread->rootDelta = beta - alpha;
@@ -606,6 +642,7 @@ namespace {
     (ss+2)->cutoffCnt    = 0;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
     ss->depth            = depth;
+    ss->SCN              = SCN::init(MaxNode);
     Square prevSq        = to_sq((ss-1)->currentMove);
 
     // Initialize statScore to zero for the grandchildren of the current position.
@@ -662,7 +699,10 @@ namespace {
         // Partial workaround for the graph history interaction problem
         // For high rule50 counts don't produce transposition table cutoffs.
         if (pos.rule50_count() < 90)
+        {
+            ss->SCN = SCN::leaf(thisThread->SCNthreshold, ttValue, MaxNode);
             return ttValue;
+        }
     }
 
     // Step 5. Tablebases probe
@@ -703,6 +743,7 @@ namespace {
                               std::min(MAX_PLY - 1, depth + 6),
                               MOVE_NONE, VALUE_NONE);
 
+                    ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
                     return value;
                 }
 
@@ -783,7 +824,10 @@ namespace {
     {
         value = qsearch<NonPV>(pos, ss, alpha - 1, alpha);
         if (value < alpha)
+        {
+            ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
             return value;
+        }
     }
 
     // Step 8. Futility pruning: child node (~25 Elo).
@@ -793,7 +837,10 @@ namespace {
         &&  eval - futility_margin(depth, improving) - (ss-1)->statScore / 256 >= beta
         &&  eval >= beta
         &&  eval < 26305) // larger than VALUE_KNOWN_WIN, but smaller than TB wins.
+    {
+        ss->SCN = SCN::leaf(thisThread->SCNthreshold, eval, MaxNode);
         return eval;
+    }
 
     // Step 9. Null move search with verification search (~22 Elo)
     if (   !PvNode
@@ -827,7 +874,10 @@ namespace {
                 nullValue = beta;
 
             if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14))
+            {
+                ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
                 return nullValue;
+            }
 
             assert(!thisThread->nmpMinPly); // Recursive verification is not allowed
 
@@ -841,7 +891,10 @@ namespace {
             thisThread->nmpMinPly = 0;
 
             if (v >= beta)
+            {
+                ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
                 return nullValue;
+            }
         }
     }
 
@@ -902,6 +955,7 @@ namespace {
                         tte->save(posKey, value_to_tt(value, ss->ply), ttPv,
                             BOUND_LOWER,
                             depth - 3, move, ss->staticEval);
+                    ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
                     return value;
                 }
             }
@@ -933,7 +987,10 @@ moves_loop: // When in check, search starts here
         && abs(ttValue) <= VALUE_KNOWN_WIN
         && abs(beta) <= VALUE_KNOWN_WIN
        )
+    {
+        ss->SCN = SCN::leaf(thisThread->SCNthreshold, probCutBeta, MaxNode);
         return probCutBeta;
+    }
 
 
     const PieceToHistory* contHist[] = { (ss-1)->continuationHistory, (ss-2)->continuationHistory,
@@ -1246,6 +1303,9 @@ moves_loop: // When in check, search starts here
       // Step 19. Undo move
       pos.undo_move(move);
 
+      if (!excludedMove)
+          ss->SCN = SCN::update(ss->SCN, value, MaxNode);
+
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
       // Step 20. Check for a new best move
@@ -1261,6 +1321,7 @@ moves_loop: // When in check, search starts here
                                     thisThread->rootMoves.end(), move);
 
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
+	  rm.SCN = ss->SCN;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
@@ -1351,9 +1412,14 @@ moves_loop: // When in check, search starts here
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
 
     if (!moveCount)
+    {
         bestValue = excludedMove ? alpha :
                     ss->inCheck  ? mated_in(ss->ply)
                                  : VALUE_DRAW;
+
+        if (!excludedMove)
+            ss->SCN = SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode, true);
+    }
 
     // If there is a move which produces search value greater than alpha we update stats of searched moves
     else if (bestMove)
@@ -1401,6 +1467,7 @@ moves_loop: // When in check, search starts here
 
     static_assert(nodeType != Root);
     constexpr bool PvNode = nodeType == PV;
+    const bool MaxNode = ss->ply % 2 == 0;
 
     assert(alpha >= -VALUE_INFINITE && alpha < beta && beta <= VALUE_INFINITE);
     assert(PvNode || (alpha == beta - 1));
@@ -1427,12 +1494,17 @@ moves_loop: // When in check, search starts here
     Thread* thisThread = pos.this_thread();
     bestMove = MOVE_NONE;
     ss->inCheck = pos.checkers();
+    ss->SCN = SCN::init(MaxNode);
     moveCount = 0;
 
     // Check for an immediate draw or maximum ply reached
     if (   pos.is_draw(ss->ply)
         || ss->ply >= MAX_PLY)
-        return (ss->ply >= MAX_PLY && !ss->inCheck) ? evaluate(pos) : VALUE_DRAW;
+    {
+        value = (ss->ply >= MAX_PLY && !ss->inCheck) ? evaluate(pos) : VALUE_DRAW;
+        ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
+        return value;
+    }
 
     assert(0 <= ss->ply && ss->ply < MAX_PLY);
 
@@ -1454,7 +1526,10 @@ moves_loop: // When in check, search starts here
         && ttValue != VALUE_NONE // Only in case of TT access race
         && (ttValue >= beta ? (tte->bound() & BOUND_LOWER)
                             : (tte->bound() & BOUND_UPPER)))
+    {
+        ss->SCN = SCN::leaf(thisThread->SCNthreshold, ttValue, MaxNode);
         return ttValue;
+    }
 
     // Evaluate the position statically
     if (ss->inCheck)
@@ -1489,6 +1564,7 @@ moves_loop: // When in check, search starts here
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), false, BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval);
 
+            ss->SCN = SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode);
             return bestValue;
         }
 
@@ -1589,6 +1665,8 @@ moves_loop: // When in check, search starts here
       value = -qsearch<nodeType>(pos, ss+1, -beta, -alpha, depth - 1);
       pos.undo_move(move);
 
+      ss->SCN = SCN::update(ss->SCN, value, MaxNode);
+
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
       // Check for a new best move
@@ -1617,6 +1695,7 @@ moves_loop: // When in check, search starts here
     {
         assert(!MoveList<LEGAL>(pos).size());
 
+        ss->SCN = SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode, true);
         return mated_in(ss->ply); // Plies to mate from the root
     }
 

@@ -55,6 +55,7 @@ struct Stack {
   bool ttHit;
   int doubleExtensions;
   int cutoffCnt;
+  int SCN;
 };
 
 
@@ -78,6 +79,7 @@ struct RootMove {
   int selDepth = 0;
   int tbRank = 0;
   Value tbScore;
+  int SCN = 0;
   std::vector<Move> pv;
 };
 
