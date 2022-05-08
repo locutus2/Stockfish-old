@@ -53,9 +53,9 @@ namespace SCN {
              terminal           ? VALUE_INFINITE : 1;
   }
 
-  int update(int SCN, Value value, bool MaxNode)
+  int update(int SCN, int SCNchild, bool MaxNode)
   {
-      return MaxNode ? std::max(SCN, int(value)) : SCN + value;
+      return MaxNode ? std::min(SCN, SCNchild) : SCN + SCNchild;
   }
 
 }
@@ -305,7 +305,6 @@ void Thread::search() {
 
   bestValue = delta = alpha = -VALUE_INFINITE;
   beta = VALUE_INFINITE;
-  SCNthreshold = 0;
 
   if (mainThread)
   {
@@ -351,6 +350,7 @@ void Thread::search() {
 
       size_t pvFirst = 0;
       pvLast = 0;
+      SCNthreshold = rootMoves[0].previousScore + 1;
 
       if (!Threads.increaseDepth)
          searchAgainCounter++;
@@ -445,6 +445,20 @@ void Thread::search() {
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
 
+	  std::cerr << "---------------------------------" << std::endl;
+	  std::cerr << "SCN threshold " << SCNthreshold << std::endl;
+	  std::cerr << "Root depth " << rootDepth << std::endl;
+	  for(auto&r : rootMoves)
+	  {
+	      std::cerr << "Move=" << UCI::move(r.pv[0], rootPos.is_chess960())
+		        << " score=" << r.score  
+		        << " prevscore=" << r.previousScore  
+		        << " avgscore=" << r.averageScore  
+		        << " SCN=" << r.SCN  
+		        << std::endl;
+	  }
+	  std::cerr << "---------------------------------" << std::endl;
+	  
           if (    mainThread
               && (Threads.stop || pvIdx + 1 == multiPV || Time.elapsed() > 3000))
               sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
@@ -1304,7 +1318,7 @@ moves_loop: // When in check, search starts here
       pos.undo_move(move);
 
       if (!excludedMove)
-          ss->SCN = SCN::update(ss->SCN, value, MaxNode);
+          ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
@@ -1556,6 +1570,7 @@ moves_loop: // When in check, search starts here
             (ss-1)->currentMove != MOVE_NULL ? evaluate(pos)
                                              : -(ss-1)->staticEval;
 
+        ss->SCN = SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode);
         // Stand pat. Return immediately if static value is at least beta
         if (bestValue >= beta)
         {
@@ -1564,7 +1579,6 @@ moves_loop: // When in check, search starts here
                 tte->save(posKey, value_to_tt(bestValue, ss->ply), false, BOUND_LOWER,
                           DEPTH_NONE, MOVE_NONE, ss->staticEval);
 
-            ss->SCN = SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode);
             return bestValue;
         }
 
@@ -1665,7 +1679,7 @@ moves_loop: // When in check, search starts here
       value = -qsearch<nodeType>(pos, ss+1, -beta, -alpha, depth - 1);
       pos.undo_move(move);
 
-      ss->SCN = SCN::update(ss->SCN, value, MaxNode);
+      ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
