@@ -1136,7 +1136,7 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
-bool CC = false, C = false;
+bool CC = false, C1 = false, C2 = false;
 int V = 0;
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1181,8 +1181,6 @@ int V = 0;
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-	  CC = true;
-	  V = PvNode ? 0 : cutNode ? 1 : 2;
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1191,6 +1189,11 @@ int V = 0;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 15914;
+
+	  C1 = capture;
+	  C2 = thisThread->nodes & 1;
+
+	  if(C2) r++;
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
@@ -1205,6 +1208,8 @@ int V = 0;
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
+	  CC = value > alpha;
+	  V = PvNode ? 0 : cutNode ? 1 : 2;
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
           doDeeperSearch = value > (alpha + 78 + 11 * (newDepth - d));
@@ -1261,7 +1266,12 @@ int V = 0;
       if(CC)
       {
 	      bool T = value > alpha;
-	      dbg_hit_on(T, V);
+	      dbg_hit_on(T, 100*C1+10*C2+V);
+	      /*
+	       * [0] Total 2988797 Hits 102052 hit rate (%) 3.41448
+	       * [1] Total 20381431 Hits 2324653 hit rate (%) 11.4057
+	       * [2] Total 29865321 Hits 1184236 hit rate (%) 3.96525
+	       * */
       }
 
       if (rootNode)
