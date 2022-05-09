@@ -1190,7 +1190,7 @@ int V = 0;
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 15914;
 
-	  C1 = ttCapture;
+	  C1 = ttCapture && capture;
 	  C2 = thisThread->nodes & 1;
 
 	  if(C2) r++;
@@ -1284,6 +1284,23 @@ int V = 0;
 	   * PV  -1,82	-2,88
 	   * cut -1,41  -1,14
 	   * all -5,20  -4,03
+	   *
+	  C1 = ttCapture && capture;
+	   * [0] Total 73108 Hits 52596 hit rate (%) 71.9429
+		   * [1] Total 1147821 Hits 883824 hit rate (%) 77.0002
+		   * [2] Total 627404 Hits 472621 hit rate (%) 75.3296
+		   * [10] Total 68825 Hits 48201 hit rate (%) 70.0341
+		   * [11] Total 1119148 Hits 845956 hit rate (%) 75.5893
+		   * [12] Total 614491 Hits 430996 hit rate (%) 70.1387
+		   * [101] Total 12799 Hits 10319 hit rate (%) 80.6235
+		   * [102] Total 3950 Hits 3073 hit rate (%) 77.7975
+		   * [111] Total 12643 Hits 10168 hit rate (%) 80.424
+		   * [112] Total 3824 Hits 2934 hit rate (%) 76.7259
+	   * 	 !(tcap&cap)	tcap&cap 
+	   * PV  -1,91		?
+	   * cut -1,41  	-0,20
+	   * all -5,19  	-1,07
+	   *
 	   * */
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
