@@ -1190,10 +1190,101 @@ int V = 0;
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 15914;
 
-	  C1 = capture;
+	  C1 = ttCapture;
 	  C2 = thisThread->nodes & 1;
 
 	  if(C2) r++;
+	  /*
+	   C1 = improving;
+	   * [0] Total 31772 Hits 22426 hit rate (%) 70.5842
+	   * [1] Total 428349 Hits 327380 hit rate (%) 76.4283
+	   * [2] Total 338263 Hits 254848 hit rate (%) 75.3402
+	   * [10] Total 29990 Hits 20552 hit rate (%) 68.5295
+	   * [11] Total 410512 Hits 307576 hit rate (%) 74.925
+	   * [12] Total 328630 Hits 230512 hit rate (%) 70.1433
+	   * [100] Total 41336 Hits 30170 hit rate (%) 72.9872
+	   * [101] Total 732271 Hits 566763 hit rate (%) 77.398
+	   * [102] Total 293091 Hits 220846 hit rate (%) 75.3507
+	   * [110] Total 38835 Hits 27649 hit rate (%) 71.1961
+	   * [111] Total 721279 Hits 548548 hit rate (%) 76.0521
+	   * [112] Total 289685 Hits 203418 hit rate (%) 70.2204
+	   * 	 !imp	imp 
+	   * PV  -2,05	-1,79
+	   * cut -1,50  -1,35
+	   * all -5,20  -5,13
+	   *
+	   C1 = capture;
+	   * [0] Total 73108 Hits 52596 hit rate (%) 71.9429
+	   * [1] Total 1076555 Hits 820484 hit rate (%) 76.2138
+	   * [2] Total 582973 Hits 433838 hit rate (%) 74.4182
+	   * [10] Total 68824 Hits 48201 hit rate (%) 70.0352
+	   * [11] Total 1050418 Hits 784811 hit rate (%) 74.7142
+	   * [12] Total 569547 Hits 392350 hit rate (%) 68.8881
+	   * [101] Total 84065 Hits 73659 hit rate (%) 87.6215
+	   * [102] Total 48381 Hits 41856 hit rate (%) 86.5133
+	   * [110] Total 1 Hits 0 hit rate (%) 0
+	   * [111] Total 81373 Hits 71313 hit rate (%) 87.6372
+	   * [112] Total 48768 Hits 41580 hit rate (%) 85.2608
+	   * 	 !cap	cap 
+	   * PV  -1,91	 ?
+	   * cut -1,50   0,02
+	   * all -5,53  -1,25
+	   *
+	    C1 = givesCheck;
+	    [0] Total 68362 Hits 48908 hit rate (%) 71.5427
+	    [1] Total 1019262 Hits 780676 hit rate (%) 76.5923
+	    [2] Total 550347 Hits 412576 hit rate (%) 74.9665
+	    [10] Total 64349 Hits 44801 hit rate (%) 69.6219
+	    [11] Total 992983 Hits 746183 hit rate (%) 75.1456
+	    [12] Total 537462 Hits 373324 hit rate (%) 69.4605
+	    [100] Total 4746 Hits 3688 hit rate (%) 77.7075
+	    [101] Total 141358 Hits 113467 hit rate (%) 80.2692
+	    [102] Total 81007 Hits 63118 hit rate (%) 77.9167
+	    [110] Total 4476 Hits 3400 hit rate (%) 75.9607
+	    [111] Total 138808 Hits 109941 hit rate (%) 79.2036
+	    [112] Total 80853 Hits 60606 hit rate (%) 74.9583
+	   * 	 !gc	gc 
+	   * PV  -1,92	-1,75
+	   * cut -0,63  -1,07
+	   * all -5,51  -2,96
+	   *
+	  C1 = ss->inCheck;
+	  [0] Total 70198 Hits 50253 hit rate (%) 71.5875
+	  [1] Total 1120680 Hits 862009 hit rate (%) 76.9184
+	  [2] Total 598921 Hits 449472 hit rate (%) 75.047
+	  [10] Total 66080 Hits 45993 hit rate (%) 69.602
+	  [11] Total 1094642 Hits 826840 hit rate (%) 75.5352
+	  [12] Total 587291 Hits 410538 hit rate (%) 69.9037
+	  [100] Total 2910 Hits 2343 hit rate (%) 80.5155
+	  [101] Total 39940 Hits 32134 hit rate (%) 80.4557
+	  [102] Total 32433 Hits 26222 hit rate (%) 80.8498
+	  [110] Total 2745 Hits 2208 hit rate (%) 80.4372
+	  [111] Total 37149 Hits 29284 hit rate (%) 78.8285
+	  [112] Total 31024 Hits 23392 hit rate (%) 75.3997
+	   * 	 !ic	ic 
+	   * PV  -1,99	-0,08
+	   * cut -1,38  -1,63
+	   * all -5,14  -5,45
+
+	  C1 = ttCapture;
+	  *
+	  * [0] Total 66162 Hits 47739 hit rate (%) 72.1547
+	  * [1] Total 1115306 Hits 860844 hit rate (%) 77.1846
+		  * [2] Total 617162 Hits 465809 hit rate (%) 75.476
+		  * [10] Total 62496 Hits 43958 hit rate (%) 70.3373
+		  * [11] Total 1087046 Hits 823751 hit rate (%) 75.7789
+		  * [12] Total 604868 Hits 425106 hit rate (%) 70.2808
+		  * [100] Total 6946 Hits 4857 hit rate (%) 69.9251
+		  * [101] Total 45314 Hits 33299 hit rate (%) 73.485
+		  * [102] Total 14192 Hits 9885 hit rate (%) 69.6519
+		  * [110] Total 6329 Hits 4243 hit rate (%) 67.0406
+		  * [111] Total 44745 Hits 32373 hit rate (%) 72.35
+		  * [112] Total 13447 Hits 8824 hit rate (%) 65.6206
+	   * 	 !tcap	tcap 
+	   * PV  -1,82	-2,88
+	   * cut -1,41  -1,14
+	   * all -5,20  -4,03
+	   * */
 
           // In general we want to cap the LMR depth search at newDepth. But if reductions
           // are really negative and movecount is low, we allow this move to be searched
