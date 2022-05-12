@@ -445,20 +445,6 @@ void Thread::search() {
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
 
-	  std::cerr << "---------------------------------" << std::endl;
-	  std::cerr << "SCN threshold " << SCNthreshold << std::endl;
-	  std::cerr << "Root depth " << rootDepth << std::endl;
-	  for(auto&r : rootMoves)
-	  {
-	      std::cerr << "Move=" << UCI::move(r.pv[0], rootPos.is_chess960())
-		        << " score=" << r.score  
-		        << " prevscore=" << r.previousScore  
-		        << " avgscore=" << r.averageScore  
-		        << " SCN=" << r.SCN  
-		        << std::endl;
-	  }
-	  std::cerr << "---------------------------------" << std::endl;
-	  
           if (    mainThread
               && (Threads.stop || pvIdx + 1 == multiPV || Time.elapsed() > 3000))
               sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
@@ -1335,7 +1321,7 @@ moves_loop: // When in check, search starts here
                                     thisThread->rootMoves.end(), move);
 
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
-	  rm.SCN = ss->SCN;
+          rm.SCN = ss->SCN;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
