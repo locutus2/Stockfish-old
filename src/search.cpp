@@ -1324,9 +1324,10 @@ int V = 0;
       if (Threads.stop.load(std::memory_order_relaxed))
           return VALUE_ZERO;
 
-      if(CC)
+      if(CC)// && !SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode))
       {
-	      bool T = value > alpha;
+	      //bool T = value > alpha;
+	      bool T =  SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
 	      dbg_hit_on(T, 0);
 	      dbg_hit_on(T, 10+C);
 	      dbg_hit_on(T, 100+V);
