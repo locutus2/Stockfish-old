@@ -1193,7 +1193,8 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
-
+bool CC = false, C = false;
+int V = 0;
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
       // been searched. In general we would like to reduce them, but there are many
@@ -1237,8 +1238,11 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (!excludedMove && ss->SCN > 120)
-              r++;
+          CC = !excludedMove;
+	  C = ss->SCN <= 0;
+	  V = std::max(0, std::min(ss->SCN, 100));
+          //if (!excludedMove && ss->SCN > 60)
+          //    r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
@@ -1317,6 +1321,14 @@ moves_loop: // When in check, search starts here
       // updating best move, PV and TT.
       if (Threads.stop.load(std::memory_order_relaxed))
           return VALUE_ZERO;
+
+      if(CC)
+      {
+	      bool T = value > alpha;
+	      dbg_hit_on(T, 0);
+	      //dbg_hit_on(T, 10+C);
+	      dbg_hit_on(T, 10+V);
+      }
 
       if (rootNode)
       {
