@@ -1239,7 +1239,7 @@ int V = 0;
               r++;
 
           CC = !excludedMove;
-	  C = ss->SCN <= 0;
+	  C = PvNode;
 	  V = std::max(0, std::min(ss->SCN, 100));
           //if (!excludedMove && ss->SCN > 60)
           //    r++;
@@ -1326,8 +1326,8 @@ int V = 0;
       {
 	      bool T = value > alpha;
 	      dbg_hit_on(T, 0);
-	      //dbg_hit_on(T, 10+C);
-	      dbg_hit_on(T, 10+V);
+	      dbg_hit_on(T, 10+C);
+	      dbg_hit_on(T, 100+V);
       }
 
       if (rootNode)
