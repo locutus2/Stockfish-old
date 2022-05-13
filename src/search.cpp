@@ -39,9 +39,11 @@ namespace Stockfish {
 
 namespace SCN {
 
+  constexpr uint64_t MAX = std::numeric_limits<uint64_t>::max();
+
   uint64_t init(bool MaxNode)
   {
-      return MaxNode ? std::numeric_limits<uint64_t>::max() : 0;
+      return MaxNode ? MAX : 0;
   }
 
   uint64_t leaf(int threshold, Value value, bool MaxNode, bool terminal = false)
@@ -50,14 +52,32 @@ namespace SCN {
           value = -value;
 
       return value >= threshold ? 0 :
-             terminal           ? std::numeric_limits<uint64_t>::max() : 1;
+             terminal           ? MAX : 1;
   }
 
   uint64_t update(uint64_t SCN, uint64_t SCNchild, bool MaxNode)
   {
-      return MaxNode ? std::min(SCN, SCNchild) : SCN + SCNchild;
+      return MaxNode                     ? std::min(SCN, SCNchild) :
+             SCN < MAX && SCNchild < MAX ? SCN + SCNchild
+                                         : MAX;
   }
 
+  void print(Thread* th, std::ostream& out = std::cerr)
+  {
+      out << "---------------------------------" << std::endl;
+      out << "SCN threshold " << th->SCNthreshold << std::endl;
+      out << "Root depth " << th->rootDepth << std::endl;
+      for(auto&r : th->rootMoves)
+      {
+          out << "Move=" << UCI::move(r.pv[0], th->rootPos.is_chess960())
+              << " score=" << r.score
+              << " prevscore=" << r.previousScore
+              << " avgscore=" << r.averageScore
+              << " SCN=" << r.SCN
+              << std::endl;
+      }
+      out << "---------------------------------" << std::endl;
+  }
 }
 
 namespace Search {
@@ -445,19 +465,7 @@ void Thread::search() {
           // Sort the PV lines searched so far and update the GUI
           std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
 
-	  std::cerr << "---------------------------------" << std::endl;
-	  std::cerr << "SCN threshold " << SCNthreshold << std::endl;
-	  std::cerr << "Root depth " << rootDepth << std::endl;
-	  for(auto&r : rootMoves)
-	  {
-	      std::cerr << "Move=" << UCI::move(r.pv[0], rootPos.is_chess960())
-		        << " score=" << r.score  
-		        << " prevscore=" << r.previousScore  
-		        << " avgscore=" << r.averageScore  
-		        << " SCN=" << r.SCN  
-		        << std::endl;
-	  }
-	  std::cerr << "---------------------------------" << std::endl;
+	  SCN::print(this);
 	  
           if (    mainThread
               && (Threads.stop || pvIdx + 1 == multiPV || Time.elapsed() > 3000))
