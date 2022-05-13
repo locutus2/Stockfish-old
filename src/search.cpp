@@ -39,23 +39,25 @@ namespace Stockfish {
 
 namespace SCN {
 
-  uint64_t init(bool MaxNode)
+  const int MAX = VALUE_INFINITE;
+
+  int init(bool MaxNode)
   {
-      return MaxNode ? std::numeric_limits<uint64_t>::max() : 0;
+      return MaxNode ? MAX : 0;
   }
 
-  uint64_t leaf(int threshold, Value value, bool MaxNode, bool terminal = false)
+  int leaf(int threshold, Value value, bool MaxNode, bool terminal = false)
   {
       if (!MaxNode)
           value = -value;
 
       return value >= threshold ? 0 :
-             terminal           ? std::numeric_limits<uint64_t>::max() : 1;
+             terminal           ? MAX : 1;
   }
 
-  uint64_t update(uint64_t SCN, uint64_t SCNchild, bool MaxNode)
+  int update(int SCN, int SCNchild, bool MaxNode)
   {
-      return MaxNode ? std::min(SCN, SCNchild) : SCN + SCNchild;
+      return MaxNode ? std::min(SCN, SCNchild) : std::min(SCN + SCNchild, MAX);
   }
 
 }
