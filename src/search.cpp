@@ -57,7 +57,9 @@ namespace SCN {
 
   uint64_t update(uint64_t SCN, uint64_t SCNchild, bool MaxNode)
   {
-      return MaxNode ? std::min(SCN, SCNchild) : SCN + SCNchild;
+      return MaxNode                     ? std::min(SCN, SCNchild) :
+             SCN < MAX && SCNchild < MAX ? SCN + SCNchild
+                                         : MAX;
   }
 
 }
@@ -1239,7 +1241,7 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (!MaxNode && !excludedMove && ss->SCN == 1)
+          if (!excludedMove && ss->SCN > 20)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
