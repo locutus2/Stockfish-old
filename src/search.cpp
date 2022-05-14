@@ -82,14 +82,14 @@ namespace SCN {
   void printStats(const Position &pos, Search::Stack* ss, Value value, const std::string& type = "",  std::ostream& out = std::cerr)
   {
       out << "=> ";
-      for(int i = ss->ply; i >= 0; i--)
+      for(int i = ss->ply; i > 0; i--)
       {
           out << " " << UCI::move((ss - i)->currentMove, pos.is_chess960());
       }
-      if(type != "") out << " => " << type;
-      out << " => ply=" << ss->ply;
-      out << " => value=" << value;
-      out << " => SCN=" << ss->SCN;
+      if(type != "") out << " [" << type << "]";
+      out << " ply=" << ss->ply;
+      out << " value=" << (ss->ply % 2 == 0 ? value : -value);
+      out << " SCN=" << ss->SCN;
       out << std::endl;
   }
 }
@@ -1181,9 +1181,11 @@ moves_loop: // When in check, search starts here
               Value singularBeta = ttValue - 3 * depth;
               Depth singularDepth = (depth - 1) / 2;
 
+              uint64_t tmpSCN = ss->SCN;
               ss->excludedMove = move;
               value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
               ss->excludedMove = MOVE_NONE;
+              ss->SCN = tmpSCN;
 
               if (value < singularBeta)
               {
@@ -1355,8 +1357,11 @@ moves_loop: // When in check, search starts here
       // Step 19. Undo move
       pos.undo_move(move);
 
-      if (!excludedMove)
+      //if (!excludedMove)
+      {
           ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
+          SCN::printStats(pos, ss, value, "update");
+      }
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
