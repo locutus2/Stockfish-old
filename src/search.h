@@ -55,7 +55,7 @@ struct Stack {
   bool ttHit;
   int doubleExtensions;
   int cutoffCnt;
-  int SCN;
+  uint64_t SCN;
 };
 
 
