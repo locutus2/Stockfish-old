@@ -925,6 +925,7 @@ namespace {
         bool ttPv = ss->ttPv;
         bool captureOrPromotion;
         ss->ttPv = false;
+	uint64_t probcutSCN = SCN::init(MaxNode);
 
         while ((move = mp.next_move()) != MOVE_NONE)
             if (move != excludedMove && pos.legal(move))
@@ -949,6 +950,7 @@ namespace {
                     value = -search<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1, depth - 4, !cutNode);
 
                 pos.undo_move(move);
+		probcutSCN = SCN::update(probcutSCN, (ss+1)->SCN, MaxNode);
 
                 if (value >= probCutBeta)
                 {
@@ -959,7 +961,7 @@ namespace {
                         tte->save(posKey, value_to_tt(value, ss->ply), ttPv,
                             BOUND_LOWER,
                             depth - 3, move, ss->staticEval);
-                    ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
+                    ss->SCN = probcutSCN;
                     return value;
                 }
             }
