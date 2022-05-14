@@ -584,7 +584,7 @@ namespace {
     constexpr bool rootNode = nodeType == Root;
     const Depth maxNextDepth = rootNode ? depth : depth + 1;
     const bool MaxNode = ss->ply % 2 == 0;
-
+    const bool DO_PRUNE = false;
 
     // Check if we have an upcoming move which draws by repetition, or
     // if the opponent had an alternative move earlier to this position.
@@ -867,6 +867,7 @@ namespace {
     // If eval is really low check with qsearch if it can exceed alpha, if it can't,
     // return a fail low.
     if (   !PvNode
+		    && DO_PRUNE
         && depth <= 7
         && eval < alpha - 348 - 258 * depth * depth)
     {
@@ -882,6 +883,7 @@ namespace {
     // Step 8. Futility pruning: child node (~25 Elo).
     // The depth condition is important for mate finding.
     if (   !ss->ttPv
+		    && DO_PRUNE
         &&  depth < 8
         &&  eval - futility_margin(depth, improving) - (ss-1)->statScore / 256 >= beta
         &&  eval >= beta
@@ -894,6 +896,7 @@ namespace {
 
     // Step 9. Null move search with verification search (~22 Elo)
     if (   !PvNode
+		    && DO_PRUNE
         && (ss-1)->currentMove != MOVE_NULL
         && (ss-1)->statScore < 14695
         &&  eval >= beta
@@ -956,6 +959,7 @@ namespace {
     // If we have a good enough capture and a reduced search returns a value
     // much above beta, we can (almost) safely prune the previous move.
     if (   !PvNode
+		    && DO_PRUNE
         &&  depth > 4
         &&  abs(beta) < VALUE_TB_WIN_IN_MAX_PLY
         // if value from transposition table is lower than probCutBeta, don't attempt probCut
@@ -1031,6 +1035,7 @@ moves_loop: // When in check, search starts here
     // Step 12. A small Probcut idea, when we are in check (~0 Elo)
     probCutBeta = beta + 481;
     if (   ss->inCheck
+		    && DO_PRUNE
         && !PvNode
         && depth >= 2
         && ttCapture
@@ -1111,6 +1116,7 @@ moves_loop: // When in check, search starts here
 
       // Step 14. Pruning at shallow depth (~98 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
+		    && DO_PRUNE
           && pos.non_pawn_material(us)
           && bestValue > VALUE_TB_LOSS_IN_MAX_PLY)
       {
@@ -1131,11 +1137,17 @@ moves_loop: // When in check, search starts here
                   && !ss->inCheck
                   && ss->staticEval + 281 + 179 * lmrDepth + PieceValue[EG][pos.piece_on(to_sq(move))]
                    + captureHistory[movedPiece][to_sq(move)][type_of(pos.piece_on(to_sq(move)))] / 6 < alpha)
-                  continue;
+	      {
+		      std::cerr << "=> ply=" << ss->ply << " PRUNE " << UCI::move(move, pos.is_chess960()) << std::endl;
+		      continue;
+	      }
 
               // SEE based pruning (~9 Elo)
               if (!pos.see_ge(move, Value(-203) * depth))
-                  continue;
+	      {
+		      std::cerr << "=> ply=" << ss->ply << " PRUNE " << UCI::move(move, pos.is_chess960()) << std::endl;
+		      continue;
+	      }
           }
           else
           {
@@ -1146,7 +1158,10 @@ moves_loop: // When in check, search starts here
               // Continuation history based pruning (~2 Elo)
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1))
-                  continue;
+	      {
+		      std::cerr << "=> ply=" << ss->ply << " PRUNE " << UCI::move(move, pos.is_chess960()) << std::endl;
+		      continue;
+	      }
 
               history += thisThread->mainHistory[us][from_to(move)];
 
@@ -1154,11 +1169,17 @@ moves_loop: // When in check, search starts here
               if (   !ss->inCheck
                   && lmrDepth < 11
                   && ss->staticEval + 122 + 138 * lmrDepth + history / 60 <= alpha)
-                  continue;
+	      {
+		      std::cerr << "=> ply=" << ss->ply << " PRUNE " << UCI::move(move, pos.is_chess960()) << std::endl;
+		      continue;
+	      }
 
               // Prune moves with negative SEE (~3 Elo)
               if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
-                  continue;
+	      {
+		      std::cerr << "=> ply=" << ss->ply << " PRUNE " << UCI::move(move, pos.is_chess960()) << std::endl;
+		      continue;
+	      }
           }
       }
 
@@ -1206,7 +1227,10 @@ moves_loop: // When in check, search starts here
               // that multiple moves fail high, and we can prune the whole subtree by returning
               // a soft bound.
               else if (singularBeta >= beta)
+	      {
+		      std::cerr << "=> ply=" << ss->ply << " SINGULAR PRUNE " << UCI::move(move, pos.is_chess960()) << std::endl;
                   return singularBeta;
+	      }
 
               // If the eval of ttMove is greater than beta, we reduce it (negative extension)
               else if (ttValue >= beta)
