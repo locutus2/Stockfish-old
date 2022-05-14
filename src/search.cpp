@@ -297,6 +297,9 @@ void MainThread::search() {
   bestPreviousScore = bestThread->rootMoves[0].score;
   bestPreviousAverageScore = bestThread->rootMoves[0].averageScore;
 
+  for (Thread* th : Threads)
+    th->previousDepth = bestThread->completedDepth;
+
   // Send again PV info if we have a new best thread
   if (bestThread != this)
       sync_cout << UCI::pv(bestThread->rootPos, bestThread->completedDepth, -VALUE_INFINITE, VALUE_INFINITE) << sync_endl;
@@ -976,7 +979,7 @@ namespace {
         bool ttPv = ss->ttPv;
         bool captureOrPromotion;
         ss->ttPv = false;
-	uint64_t probcutSCN = SCN::init(MaxNode);
+        uint64_t probcutSCN = SCN::init(MaxNode);
 
         while ((move = mp.next_move()) != MOVE_NONE)
             if (move != excludedMove && pos.legal(move))
@@ -1001,7 +1004,7 @@ namespace {
                     value = -search<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1, depth - 4, !cutNode);
 
                 pos.undo_move(move);
-		probcutSCN = SCN::update(probcutSCN, (ss+1)->SCN, MaxNode);
+                probcutSCN = SCN::update(probcutSCN, (ss+1)->SCN, MaxNode);
 
                 if (value >= probCutBeta)
                 {
@@ -1194,7 +1197,7 @@ moves_loop: // When in check, search starts here
           // a reduced search on all the other moves but the ttMove and if the
           // result is lower than ttValue minus a margin, then we will extend the ttMove.
           if (   !rootNode
-              &&  depth >= 4 + 2 * (PvNode && tte->is_pv())
+              &&  depth >= 4 - (thisThread->previousDepth > 27) + 2 * (PvNode && tte->is_pv())
               &&  move == ttMove
               && !excludedMove // Avoid recursive singular search
            /* &&  ttValue != VALUE_NONE Already implicit in the next condition */
