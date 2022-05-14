@@ -79,7 +79,7 @@ namespace SCN {
       out << "---------------------------------" << std::endl;
   }
 
-  void printStats(const Position &pos, Search::Stack* ss, Value value, const std::string& type = "",  std::ostream& out = std::cerr)
+  void printStats(const Position &pos, Search::Stack* ss, Value value, Value alpha, Value beta, const std::string& type = "",  std::ostream& out = std::cerr)
   {
       out << "=> ";
       for(int i = ss->ply; i > 0; i--)
@@ -88,8 +88,10 @@ namespace SCN {
       }
       if(type != "") out << " [" << type << "]";
       out << " ply=" << ss->ply;
-      out << " value=" << (ss->ply % 2 == 0 ? value : -value);
       out << " SCN=" << ss->SCN;
+      out << " value=" << (ss->ply % 2 == 0 ? value : -value);
+      out << " alpha=" << (ss->ply % 2 == 0 ? alpha : -alpha);
+      out << " beta=" << (ss->ply % 2 == 0 ? beta : -beta);
       out << std::endl;
   }
 }
@@ -595,7 +597,7 @@ namespace {
         if (alpha >= beta)
         {
             ss->SCN = SCN::leaf(pos.this_thread()->SCNthreshold, alpha, MaxNode);
-            SCN::printStats(pos, ss, alpha, "alpha_beta");
+            SCN::printStats(pos, ss, alpha, alpha, beta, "alpha_beta");
             return alpha;
         }
     }
@@ -605,7 +607,7 @@ namespace {
     {
         Value value = qsearch<PvNode ? PV : NonPV>(pos, ss, alpha, beta);
         ss->SCN = SCN::leaf(pos.this_thread()->SCNthreshold, value, MaxNode);
-        SCN::printStats(pos, ss, value, "qsearch");
+        SCN::printStats(pos, ss, value, alpha, beta, "qsearch");
         return value;
     }
 
@@ -656,7 +658,7 @@ namespace {
             value = (ss->ply >= MAX_PLY && !ss->inCheck) ? evaluate(pos)
                                                          : value_draw(pos.this_thread());
             ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode, pos.is_draw(ss->ply));
-            SCN::printStats(pos, ss, value, "draw");
+            SCN::printStats(pos, ss, value, alpha, beta, "draw");
             return value;
         }
 
@@ -671,7 +673,7 @@ namespace {
         if (alpha >= beta)
         {
             ss->SCN = SCN::leaf(thisThread->SCNthreshold, alpha, MaxNode);
-            SCN::printStats(pos, ss, alpha, "alpha_beta2");
+            SCN::printStats(pos, ss, alpha, alpha, beta, "alpha_beta2");
             return alpha;
         }
     }
@@ -745,7 +747,7 @@ namespace {
         if (pos.rule50_count() < 90)
         {
             ss->SCN = SCN::leaf(thisThread->SCNthreshold, ttValue, MaxNode);
-            SCN::printStats(pos, ss, ttValue, "TT_cutoff");
+            SCN::printStats(pos, ss, ttValue, alpha, beta, "TT_cutoff");
             return ttValue;
         }
     }
@@ -789,7 +791,7 @@ namespace {
                               MOVE_NONE, VALUE_NONE);
 
                     ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
-                    SCN::printStats(pos, ss, value, "TB_cutoff");
+                    SCN::printStats(pos, ss, value, alpha, beta, "TB_cutoff");
                     return value;
                 }
 
@@ -872,7 +874,7 @@ namespace {
         if (value < alpha)
         {
             ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
-            SCN::printStats(pos, ss, value, "razoring");
+            SCN::printStats(pos, ss, value, alpha, beta, "razoring");
             return value;
         }
     }
@@ -886,7 +888,7 @@ namespace {
         &&  eval < 26305) // larger than VALUE_KNOWN_WIN, but smaller than TB wins.
     {
         ss->SCN = SCN::leaf(thisThread->SCNthreshold, eval, MaxNode);
-        SCN::printStats(pos, ss, eval, "futility");
+        SCN::printStats(pos, ss, eval, alpha, beta, "futility");
         return eval;
     }
 
@@ -924,7 +926,7 @@ namespace {
             if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14))
             {
                 ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
-                SCN::printStats(pos, ss, nullValue, "nullmove");
+                SCN::printStats(pos, ss, nullValue, alpha, beta, "nullmove");
                 return nullValue;
             }
 
@@ -942,7 +944,7 @@ namespace {
             if (v >= beta)
             {
                 ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
-                SCN::printStats(pos, ss, nullValue, "verification");
+                SCN::printStats(pos, ss, nullValue, alpha, beta, "verification");
                 return nullValue;
             }
         }
@@ -1006,7 +1008,7 @@ namespace {
                             BOUND_LOWER,
                             depth - 3, move, ss->staticEval);
                     ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
-                    SCN::printStats(pos, ss, value, "probcut");
+                    SCN::printStats(pos, ss, value, alpha, beta, "probcut");
                     return value;
                 }
             }
@@ -1040,7 +1042,7 @@ moves_loop: // When in check, search starts here
        )
     {
         ss->SCN = SCN::leaf(thisThread->SCNthreshold, probCutBeta, MaxNode);
-        SCN::printStats(pos, ss, probCutBeta, "probcut2");
+        SCN::printStats(pos, ss, probCutBeta, alpha, beta, "probcut2");
         return probCutBeta;
     }
 
@@ -1360,7 +1362,7 @@ moves_loop: // When in check, search starts here
       //if (!excludedMove)
       {
           ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
-          SCN::printStats(pos, ss, value, "update");
+          SCN::printStats(pos, ss, value, alpha, beta, "update");
       }
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
@@ -1514,7 +1516,7 @@ moves_loop: // When in check, search starts here
 
     assert(bestValue > -VALUE_INFINITE && bestValue < VALUE_INFINITE);
 
-    SCN::printStats(pos, ss, bestValue, "search");
+    SCN::printStats(pos, ss, bestValue, alpha, beta, "search");
     return bestValue;
   }
 
