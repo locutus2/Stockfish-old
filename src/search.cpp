@@ -879,7 +879,7 @@ namespace {
 
             if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14))
             {
-                ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
+                ss->SCN = (ss+1)->SCN;
                 return nullValue;
             }
 
@@ -895,10 +895,7 @@ namespace {
             thisThread->nmpMinPly = 0;
 
             if (v >= beta)
-            {
-                ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
                 return nullValue;
-            }
         }
     }
 
