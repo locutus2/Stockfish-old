@@ -90,8 +90,8 @@ namespace SCN {
       out << " ply=" << ss->ply;
       out << " SCN=" << ss->SCN;
       out << " value=" << (ss->ply % 2 == 0 ? value : -value);
-      out << " alpha=" << (ss->ply % 2 == 0 ? alpha : -alpha);
-      out << " beta=" << (ss->ply % 2 == 0 ? beta : -beta);
+      out << " alpha=" << (ss->ply % 2 == 0 ? alpha : -beta);
+      out << " beta=" << (ss->ply % 2 == 0 ? beta : -alpha);
       out << std::endl;
   }
 }
