@@ -1239,6 +1239,8 @@ moves_loop: // When in check, search starts here
               // If the eval of ttMove is less than alpha and value, we reduce it (negative extension)
               else if (ttValue <= alpha && ttValue <= value)
                   extension = -1;
+
+              ss->SCN = tmpSCN;
           }
 
           // Check extensions (~1 Elo)
@@ -1383,11 +1385,8 @@ moves_loop: // When in check, search starts here
       // Step 19. Undo move
       pos.undo_move(move);
 
-      //if (!excludedMove)
-      {
-          ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
-          SCN::printStats(pos, ss, value, alpha, beta, "update");
-      }
+      ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
+      SCN::printStats(pos, ss, value, alpha, beta, "update");
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
@@ -1404,7 +1403,7 @@ moves_loop: // When in check, search starts here
                                     thisThread->rootMoves.end(), move);
 
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
-	  rm.SCN = ss->SCN;
+          rm.SCN = ss->SCN;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
