@@ -1133,6 +1133,7 @@ moves_loop: // When in check, search starts here
               Value singularBeta = ttValue - 3 * depth;
               Depth singularDepth = (depth - 1) / 2;
 
+              int tmpSCN = ss->SCN;
               ss->excludedMove = move;
               value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
               ss->excludedMove = MOVE_NONE;
@@ -1163,6 +1164,8 @@ moves_loop: // When in check, search starts here
               // If the eval of ttMove is less than alpha and value, we reduce it (negative extension)
               else if (ttValue <= alpha && ttValue <= value)
                   extension = -1;
+
+              ss->SCN = tmpSCN;
           }
 
           // Check extensions (~1 Elo)
@@ -1310,8 +1313,7 @@ moves_loop: // When in check, search starts here
       // Step 19. Undo move
       pos.undo_move(move);
 
-      if (!excludedMove)
-          ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
+      ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
