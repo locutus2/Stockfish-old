@@ -39,14 +39,14 @@ namespace Stockfish {
 
 namespace SCN {
 
-  const int MAX = VALUE_INFINITE;
+  constexpr uint64_t MAX = std::numeric_limits<uint64_t>::max();
 
-  int init(bool MaxNode)
+  uint64_t init(bool MaxNode)
   {
       return MaxNode ? MAX : 0;
   }
 
-  int leaf(int threshold, Value value, bool MaxNode, bool terminal = false)
+  uint64_t leaf(int threshold, Value value, bool MaxNode, bool terminal = false)
   {
       if (!MaxNode)
           value = -value;
@@ -55,9 +55,11 @@ namespace SCN {
              terminal           ? MAX : 1;
   }
 
-  int update(int SCN, int SCNchild, bool MaxNode)
+  uint64_t update(uint64_t SCN, uint64_t SCNchild, bool MaxNode)
   {
-      return MaxNode ? std::min(SCN, SCNchild) : std::min(SCN + SCNchild, MAX);
+      return MaxNode                     ? std::min(SCN, SCNchild) :
+             SCN < MAX && SCNchild < MAX ? SCN + SCNchild
+                                         : MAX;
   }
 
 }
@@ -877,7 +879,7 @@ namespace {
 
             if (thisThread->nmpMinPly || (abs(beta) < VALUE_KNOWN_WIN && depth < 14))
             {
-                ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
+                ss->SCN = (ss+1)->SCN;
                 return nullValue;
             }
 
@@ -893,10 +895,7 @@ namespace {
             thisThread->nmpMinPly = 0;
 
             if (v >= beta)
-            {
-                ss->SCN = SCN::leaf(thisThread->SCNthreshold, nullValue, MaxNode);
                 return nullValue;
-            }
         }
     }
 
@@ -923,6 +922,7 @@ namespace {
         bool ttPv = ss->ttPv;
         bool captureOrPromotion;
         ss->ttPv = false;
+	uint64_t probcutSCN = SCN::init(MaxNode);
 
         while ((move = mp.next_move()) != MOVE_NONE)
             if (move != excludedMove && pos.legal(move))
@@ -947,6 +947,7 @@ namespace {
                     value = -search<NonPV>(pos, ss+1, -probCutBeta, -probCutBeta+1, depth - 4, !cutNode);
 
                 pos.undo_move(move);
+		probcutSCN = SCN::update(probcutSCN, (ss+1)->SCN, MaxNode);
 
                 if (value >= probCutBeta)
                 {
@@ -957,7 +958,7 @@ namespace {
                         tte->save(posKey, value_to_tt(value, ss->ply), ttPv,
                             BOUND_LOWER,
                             depth - 3, move, ss->staticEval);
-                    ss->SCN = SCN::leaf(thisThread->SCNthreshold, value, MaxNode);
+                    ss->SCN = probcutSCN;
                     return value;
                 }
             }
@@ -1131,6 +1132,7 @@ moves_loop: // When in check, search starts here
               Value singularBeta = ttValue - 3 * depth;
               Depth singularDepth = (depth - 1) / 2;
 
+              uint64_t tmpSCN = ss->SCN;
               ss->excludedMove = move;
               value = search<NonPV>(pos, ss, singularBeta - 1, singularBeta, singularDepth, cutNode);
               ss->excludedMove = MOVE_NONE;
@@ -1161,6 +1163,8 @@ moves_loop: // When in check, search starts here
               // If the eval of ttMove is less than alpha and value, we reduce it (negative extension)
               else if (ttValue <= alpha && ttValue <= value)
                   extension = -1;
+
+              ss->SCN = tmpSCN;
           }
 
           // Check extensions (~1 Elo)
@@ -1242,7 +1246,7 @@ int V = 0;
 
           CC = !excludedMove;
 	  C = PvNode;
-	  V = std::max(0, std::min(ss->SCN, 100));
+	  V = std::max(uint64_t(0), std::min(ss->SCN, uint64_t(100)));
           //if (!excludedMove && ss->SCN > 60)
           //    r++;
 
@@ -1312,8 +1316,7 @@ int V = 0;
       // Step 19. Undo move
       pos.undo_move(move);
 
-      if (!excludedMove)
-          ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
+      ss->SCN = SCN::update(ss->SCN, (ss+1)->SCN, MaxNode);
 
       assert(value > -VALUE_INFINITE && value < VALUE_INFINITE);
 
