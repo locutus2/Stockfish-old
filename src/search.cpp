@@ -1427,9 +1427,7 @@ moves_loop: // When in check, search starts here
         bestValue = excludedMove ? alpha :
                     ss->inCheck  ? mated_in(ss->ply)
                                  : VALUE_DRAW;
-
-        if (!excludedMove)
-            ss->SCN = SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode, true);
+        ss->SCN = SCN::leaf(thisThread->SCNthreshold, bestValue, MaxNode, !excludedMove);
     }
 
     // If there is a move which produces search value greater than alpha we update stats of searched moves
