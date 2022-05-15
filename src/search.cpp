@@ -374,6 +374,7 @@ void Thread::search() {
 
           // Reset UCI info selDepth for each depth and each PV line
           selDepth = 0;
+          SCNthreshold = rootMoves[pvIdx].previousScore + 1;
 
           // Reset aspiration window starting size
           if (rootDepth >= 4)
@@ -399,7 +400,6 @@ void Thread::search() {
           int failedHighCnt = 0;
           while (true)
           {
-              SCNthreshold = rootMoves[pvIdx].score + 1;
               Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
               bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
 
@@ -1333,6 +1333,9 @@ moves_loop: // When in check, search starts here
 
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (2 * value + rm.averageScore) / 3 : value;
           rm.SCN = ss->SCN;
+
+          if (value > alpha)
+              thisThread->SCNthreshold = value + 1;
 
           // PV move or new best move?
           if (moveCount == 1 || value > alpha)
