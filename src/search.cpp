@@ -1180,7 +1180,7 @@ moves_loop: // When in check, search starts here
               r -= 1 + 15 / ( 3 + depth );
 
           // Increase reduction if next ply has a lot of fail high else reset count to 0
-          if (!PvNode && (ss+1)->cutoffCnt > 1 + 4 * cutNode)
+          if (!PvNode && (ss+1)->cutoffCnt > 2 + 2 * cutNode + (2 * cutNode - 1) * int(thisThread->nodes & 1))
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
