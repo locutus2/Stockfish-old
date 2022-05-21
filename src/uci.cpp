@@ -257,6 +257,8 @@ namespace {
             else if (token == "position")   position(pos, is, states);
             else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
         }
+        //lcs.print(r == 0);
+        lcs.print();
         lcs.DoLearning = false;
         lcs.resetStats();
     }

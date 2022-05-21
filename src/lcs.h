@@ -54,7 +54,7 @@ class LCS
     void resetStats();
     void init(int max_rules = 10);
     void learn(bool label, const std::vector<bool>& params);
-    void print(std::ostream& out = std::cerr) const;
+    void print(bool sort = true, std::ostream& out = std::cerr);
 };
 
 #endif

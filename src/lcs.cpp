@@ -13,7 +13,8 @@ LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0
 
 LCS::LCS() : NC(0), DoLearning(true)
 {
-    std::srand(123);
+    std::srand(123); // e123.txt
+    //std::srand(124); // e124.txt
 }
 
 int LCS::rnd(int n) const
@@ -113,7 +114,7 @@ int LCS::wheelSelection() const
 
 void LCS::deletionStep()
 {
-    if ((int)rules.size() > maxRules)
+    while ((int)rules.size() > maxRules)
     {
         int r = wheelSelection();
         if(--rules[r].numerosity <= 0)
@@ -151,13 +152,11 @@ void LCS::learn(bool label, const std::vector<bool>& params)
 
     ++steps;
 
-    if (steps % 1 == 0)
+    if (steps % 1000000 == 0)
     {
-        std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
-                                                                                              || (a.fitness == b.fitness && a.nPredictions > b.nPredictions); } );
 
-        printExample(label, params);
-        print();
+        //printExample(label, params);
+        //print();
     }
 }
 
@@ -232,7 +231,7 @@ void LCS::addCoveringRule(bool label, const std::vector<bool>& params)
                 rule.condition[i] = NEGATIVE;
         }
         else
-                rule.condition[i] = NONE;
+            rule.condition[i] = NONE;
     }
     updateRule(rule, label);
 
@@ -251,8 +250,11 @@ void LCS::printExample(bool label, const std::vector<bool>& params, std::ostream
     out << std::endl;
 }
 
-void LCS::print(std::ostream& out) const
+void LCS::print(bool sort, std::ostream& out)
 {
+    if(sort)
+        std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
+                                                                                          || (a.fitness == b.fitness && a.nPredictions > b.nPredictions); } );
     out << "--------- step " << steps << " ----------" << std::endl;
     for(int i = 0; i < (int)rules.size(); ++i)
     {
