@@ -87,11 +87,94 @@ void LCS::subsumption()
 {
 }
 
-void LCS::geneticStep()
+void LCS::copyRule(const Rule& r1, Rule& r2) const
 {
+    r2 = r1;
 }
 
-int LCS::wheelSelection() const
+void LCS::crossover(Rule& r1, Rule& r2) const
+{
+    for (int i = 0; i < NC; ++i)
+    {
+        if(rnd(2) == 0)
+        {
+            std::iter_swap(r1.condition.begin()+i, r2.condition.begin()+i);
+        }
+    }
+    r1.age = r2.age = 0;
+    r1.nPredictions = r2.nPredictions = 0;
+    r1.correctPredictions = r2.correctPredictions = 0;
+    r1.fitness = r2.fitness = 0;
+    r1.numerosity = r2.numerosity = 1;
+}
+
+void LCS::mutate(Rule& rule) const
+{
+    for (int i = 0; i < NC; ++i)
+        if (rnd() < MUTATION)
+            rule.condition[i] = (Condition)rnd(3);
+}
+
+void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const std::set<int>& matches)
+{
+    int parent1 = wheelSelectionBest(label, matches);
+    if(parent1 < 0) return;
+    int parent2 = wheelSelectionBest(label, matches, parent1);
+    if(parent2 < 0 || parent1 == parent2) return;
+
+    Rule child1, child2;
+
+    copyRule(rules[parent1], child1);
+    copyRule(rules[parent2], child2);
+    crossover(child1, child2);
+    mutate(child1);
+    mutate(child2);
+
+    if (matchRule(params, child1))
+    {
+        updateRule(child1, label);
+        rules.push_back(child1);
+    }
+
+    if (matchRule(params, child2))
+    {
+        updateRule(child2, label);
+        rules.push_back(child2);
+    }
+}
+
+int LCS::wheelSelectionBest(bool label, const std::set<int>& matches, int excludedRule) const
+{
+    std::vector<int> correct;
+
+    for (int r : matches)
+    {
+        if(rules[r].result == label && r != excludedRule)
+            correct.push_back(r);
+    }
+
+    if(correct.empty()) return -1;
+
+    std::vector<double> prob(rules.size());
+
+    double sum = 0;
+    for (int i = 0; i < (int)correct.size(); ++i)
+        //sum += prob[i] = std::max(0.0, std::exp(-rules[i].fitness) - std::exp(-MAX_FITNESS));
+        sum += prob[i] = rules[correct[i]].fitness - MIN_FITNESS;
+
+    double rand = rnd();
+    for (int i = 0; i < (int)correct.size(); ++i)
+    {
+       rand -= prob[i] / sum;
+       if (rand <= 0)
+           return correct[i];
+    }
+
+
+    return correct[rnd(correct.size())];
+}
+
+int LCS::wheelSelectionWorst() const
 {
     std::vector<double> prob(rules.size());
 
@@ -116,7 +199,7 @@ void LCS::deletionStep()
 {
     while ((int)rules.size() > maxRules)
     {
-        int r = wheelSelection();
+        int r = wheelSelectionWorst();
         if(--rules[r].numerosity <= 0)
             rules.erase(rules.begin() + r);
     }
@@ -146,7 +229,7 @@ void LCS::learn(bool label, const std::vector<bool>& params)
     {
         learnStep(label, params, matches);
         subsumption();
-        geneticStep();
+        ruleDiscoveryStep(label, params, matches);
         deletionStep();
     }
 
@@ -180,31 +263,34 @@ void LCS::learnStep(bool label, const std::vector<bool>& params, const std::set<
     }
 }
 
+bool LCS::matchRule(const std::vector<bool>& params, const Rule& rule) const
+{
+    assert((int)rule.condition.size() == NC);
+
+    bool isMatch = true;
+    for(int j = 0; j < NC; ++j)
+    {
+        if (params[j] && rule.condition[j] == NEGATIVE)
+        {
+            isMatch = false;
+            break;
+        }
+
+        if (!params[j] && rule.condition[j] == POSITIVE)
+        {
+            isMatch = false;
+            break;
+        }
+    }
+    return isMatch;
+}
+
 void LCS::match(const std::vector<bool>& params, std::set<int>& matches) const
 {
     assert((int)params.size() == NC);
     for (int i = 0; i < (int)rules.size(); ++i)
-    {
-        assert((int)rules[i].condition.size() == NC);
-        bool isMatch = true;
-        for(int j = 0; j < NC; ++j)
-        {
-            if (params[j] && rules[i].condition[j] == NEGATIVE)
-            {
-                isMatch = false;
-                break;
-            }
-
-            if (!params[j] && rules[i].condition[j] == POSITIVE)
-            {
-                isMatch = false;
-                break;
-            }
-        }
-
-        if (isMatch)
+        if (matchRule(params, rules[i]))
             matches.insert(i);
-    }
 }
 
 bool LCS::isCovered(bool label, const std::set<int>& matches) const

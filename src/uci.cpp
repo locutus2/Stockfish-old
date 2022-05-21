@@ -232,7 +232,7 @@ namespace {
                     "(ss-1)->excludedMove!=MOVE_NONE",
                     "(ss-2)->excludedMove!=MOVE_NONE",
                  });
-    lcs.init(20); 
+    lcs.init(100); 
 
     for(int r = 0; r < 2; ++r)
     {
