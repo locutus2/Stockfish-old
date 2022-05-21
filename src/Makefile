@@ -59,7 +59,7 @@ endif
 SRCS = benchmark.cpp bitbase.cpp bitboard.cpp endgame.cpp evaluate.cpp main.cpp \
 	material.cpp misc.cpp movegen.cpp movepick.cpp pawns.cpp position.cpp psqt.cpp \
 	search.cpp thread.cpp timeman.cpp tt.cpp uci.cpp ucioption.cpp tune.cpp syzygy/tbprobe.cpp \
-	nnue/evaluate_nnue.cpp nnue/features/half_ka_v2_hm.cpp
+	nnue/evaluate_nnue.cpp nnue/features/half_ka_v2_hm.cpp lcs.o
 
 OBJS = $(notdir $(SRCS:.cpp=.o))
 
@@ -123,7 +123,7 @@ else
 endif
 
 optimize = yes
-debug = no
+debug = yes
 sanitize = none
 bits = 64
 prefetch = no

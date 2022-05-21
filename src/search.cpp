@@ -33,9 +33,12 @@
 #include "timeman.h"
 #include "tt.h"
 #include "uci.h"
+#include "lcs.h"
 #include "syzygy/tbprobe.h"
 
 namespace Stockfish {
+
+LCS lcs;
 
 namespace Search {
 
@@ -1139,6 +1142,9 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
+      bool CC = false;
+      bool T = false;
+      std::vector<bool> C;
 
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1203,7 +1209,40 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
+          CC = true;
+          if(CC)
+          {
+            C = { PvNode,
+                  cutNode,
+                  capture,
+                  givesCheck,
+                  improving,
+                  priorCapture,
+                  type_of(move)==PROMOTION,
+                  move==ss->killers[0],
+                  move==ss->killers[1],
+                  move==countermove,
+                  ss->ttPv,
+                  (ss-1)->ttPv,
+                  (ss-2)->ttPv,
+                  ss->inCheck,
+                  (ss-1)->inCheck,
+                  (ss-2)->inCheck,
+                  (ss-1)->currentMove==MOVE_NULL,
+                  (ss-2)->currentMove==MOVE_NULL,
+                  excludedMove!=MOVE_NONE,
+                  (ss-1)->excludedMove!=MOVE_NONE,
+                  (ss-2)->excludedMove!=MOVE_NONE,
+            };
+          }
+
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+
+          if(CC)
+          {
+             T = value > alpha;
+             lcs.learn(T, C);
+          }
 
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;

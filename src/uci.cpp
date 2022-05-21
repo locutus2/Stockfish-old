@@ -30,6 +30,7 @@
 #include "timeman.h"
 #include "tt.h"
 #include "uci.h"
+#include "lcs.h"
 #include "syzygy/tbprobe.h"
 
 using namespace std;
@@ -198,6 +199,79 @@ namespace {
          << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
   }
 
+  void learn(Position& pos, istream& args, StateListPtr& states) {
+
+    string token;
+    uint64_t num, nodes = 0, cnt = 1;
+
+    vector<string> list = setup_bench(pos, args);
+    num = count_if(list.begin(), list.end(), [](string s) { return s.find("go ") == 0 || s.find("eval") == 0; });
+
+    TimePoint elapsed = now();
+
+    lcs.setParams("FailHigh", {
+                    "PvNode",
+                    "cutNode",
+                    "capture",
+                    "givesCheck",
+                    "improving",
+                    "priorCapture",
+                    "type_of(move)==PROMOTION",
+                    "move==ss->killers[0]",
+                    "move==ss->killers[1]",
+                    "move==countermove",
+                    "ss->ttPv",
+                    "(ss-1)->ttPv",
+                    "(ss-2)->ttPv",
+                    "ss->inCheck",
+                    "(ss-1)->inCheck",
+                    "(ss-2)->inCheck",
+                    "(ss-1)->currentMove==MOVE_NULL",
+                    "(ss-2)->currentMove==MOVE_NULL",
+                    "excludedMove!=MOVE_NONE",
+                    "(ss-1)->excludedMove!=MOVE_NONE",
+                    "(ss-2)->excludedMove!=MOVE_NONE",
+                 });
+    lcs.init(20); 
+
+    for(int r = 0; r < 2; ++r)
+    {
+        for (const auto& cmd : list)
+        {
+            istringstream is(cmd);
+            is >> skipws >> token;
+
+            if (token == "go" || token == "eval")
+            {
+                cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                if (token == "go")
+                {
+                   go(pos, is, states);
+                   Threads.main()->wait_for_search_finished();
+                   nodes += Threads.nodes_searched();
+                }
+                else
+                   trace_eval(pos);
+            }
+            else if (token == "setoption")  setoption(is);
+            else if (token == "position")   position(pos, is, states);
+            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+        }
+        lcs.DoLearning = false;
+        lcs.resetStats();
+    }
+
+    elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
+
+    dbg_print(); // Just before exiting
+    dbg_printc(); // Just before exiting
+
+    cerr << "\n==========================="
+         << "\nTotal time (ms) : " << elapsed
+         << "\nNodes searched  : " << nodes
+         << "\nNodes/second    : " << 1000 * nodes / elapsed << endl;
+  }
+
   // The win rate model returns the probability (per mille) of winning given an eval
   // and a game-ply. The model fits rather accurately the LTC fishtest statistics.
   int win_rate_model(Value v, int ply) {
@@ -275,6 +349,7 @@ void UCI::loop(int argc, char* argv[]) {
       // Do not use these commands during a search!
       else if (token == "flip")     pos.flip();
       else if (token == "bench")    bench(pos, is, states);
+      else if (token == "learn")    learn(pos, is, states);
       else if (token == "d")        sync_cout << pos << sync_endl;
       else if (token == "eval")     trace_eval(pos);
       else if (token == "compiler") sync_cout << compiler_info() << sync_endl;

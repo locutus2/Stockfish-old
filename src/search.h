@@ -24,10 +24,13 @@
 #include "misc.h"
 #include "movepick.h"
 #include "types.h"
+#include "lcs.h"
 
 namespace Stockfish {
 
 class Position;
+
+extern LCS lcs;
 
 namespace Search {
 
