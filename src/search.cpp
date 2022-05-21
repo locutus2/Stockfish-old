@@ -1183,11 +1183,11 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (   !PvNode
-              && !cutNode
-              && !givesCheck
+          if (   !capture
               && !improving
               && priorCapture
+              && move != countermove
+              && (ss-1)->ttPv
               && !ss->inCheck
               && !(ss-1)->inCheck
               && !(ss-2)->inCheck
