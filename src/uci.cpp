@@ -238,7 +238,7 @@ namespace {
                     "type_of(movedPiece)==QUEE",
                     "type_of(movedPiece)==KING",
                  });
-    lcs.init(100); 
+    lcs.init(1000); 
 
     for(int it = 0; it < 1; ++it)
     {

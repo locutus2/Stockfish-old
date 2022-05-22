@@ -180,7 +180,8 @@ void LCS::mutate(Rule& rule, const std::vector<bool>& params) const
             if (ONLY_CORRECT_MUTATIONS)
                 rule.condition[i] = rule.condition[i] == NONE ? (params[i] ? POSITIVE : NEGATIVE) : NONE;
             else
-                rule.condition[i] = (Condition)rnd(3);
+                rule.condition[i] = (Condition)((rule.condition[i] + 1 + rnd(2))%3);
+                //rule.condition[i] = (Condition)rnd(3);
         }
 }
 

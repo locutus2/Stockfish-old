@@ -1209,7 +1209,8 @@ moves_loop: // When in check, search starts here
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
-          CC = depth <= 3 && d > 1;
+          //CC = depth <= 3 && d > 1;
+          CC = d > 1;
           if(CC)
           {
             C = { PvNode,
