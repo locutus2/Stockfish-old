@@ -1258,6 +1258,9 @@ moves_loop: // When in check, search starts here
                   ss->statScore > 0,
                   (ss-1)->statScore > 0,
                   (ss-2)->statScore > 0,
+                  deeper==0,
+                  deeper==1,
+                  deeper==2,
             };
           }
 
