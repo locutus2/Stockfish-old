@@ -1183,13 +1183,9 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (   !capture
-              && !improving
-              && priorCapture
-              && move != countermove
-              && (ss-1)->ttPv
-              && !ss->inCheck
-              && !(ss-1)->inCheck
+          if (   depth <= 3
+              && ss->ttPv
+              && move != ss->killers[0]
               && !(ss-2)->inCheck
               && (ss-2)->currentMove != MOVE_NULL
               && !(ss-2)->excludedMove)
