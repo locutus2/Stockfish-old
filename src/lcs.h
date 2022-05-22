@@ -11,6 +11,7 @@ class LCS
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
     const bool USE_SUBSUMPTION = false;
+    const double RANDOM_SKIPPING = 0.5;
     const double MAX_FITNESS = 1.0;
     const double MIN_FITNESS = 0.0;
     const double MIN_COVERAGE = 0.01;

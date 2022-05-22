@@ -308,6 +308,8 @@ void LCS::learn(bool label, const std::vector<bool>& params)
 {
     assert(params.size() == paramsText.size());
 
+    if (rnd() < RANDOM_SKIPPING) return;
+
     std::set<int> matches;
     match(params, matches);
 
