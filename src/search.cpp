@@ -1183,7 +1183,7 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (   depth <= 5
+          if (   depth <= 2
               && (ss-1)->ttPv
               && !(ss-2)->inCheck)
               r++;
