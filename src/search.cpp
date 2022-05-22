@@ -1004,6 +1004,10 @@ moves_loop: // When in check, search starts here
 
       Value delta = beta - alpha;
 
+      bool CC = false;
+      bool T = false;
+      std::vector<bool> C;
+
       // Step 14. Pruning at shallow depth (~98 Elo). Depth conditions are important for mate finding.
       if (  !rootNode
           && pos.non_pawn_material(us)
@@ -1054,6 +1058,61 @@ moves_loop: // When in check, search starts here
               // Prune moves with negative SEE (~3 Elo)
               if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
                   continue;
+
+              if(LCS_PRUNE)
+              {
+                  //CC = depth <= 3;
+                  CC = true;
+                  if(CC)
+                  {
+                    Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
+                    C = { PvNode,
+                          cutNode,
+                          capture,
+                          givesCheck,
+                          improving,
+                          priorCapture,
+                          type_of(move)==PROMOTION,
+                          move==ss->killers[0],
+                          move==ss->killers[1],
+                          move==countermove,
+                          ss->ttHit,
+                          (ss-1)->ttHit,
+                          (ss-2)->ttHit,
+                          ss->ttPv,
+                          (ss-1)->ttPv,
+                          (ss-2)->ttPv,
+                          ss->inCheck,
+                          (ss-1)->inCheck,
+                          (ss-2)->inCheck,
+                          (ss-1)->currentMove==MOVE_NULL,
+                          (ss-2)->currentMove==MOVE_NULL,
+                          excludedMove!=MOVE_NONE,
+                          (ss-1)->excludedMove!=MOVE_NONE,
+                          (ss-2)->excludedMove!=MOVE_NONE,
+                          type_of(movedPiece)==PAWN,
+                          type_of(movedPiece)==KNIGHT,
+                          type_of(movedPiece)==BISHOP,
+                          type_of(movedPiece)==ROOK,
+                          type_of(movedPiece)==QUEEN,
+                          type_of(movedPiece)==KING,
+                          type_of(captured)==PAWN,
+                          type_of(captured)==KNIGHT,
+                          type_of(captured)==BISHOP,
+                          type_of(captured)==ROOK,
+                          type_of(captured)==QUEEN,
+                          complexity < 200,
+                          complexity < 400,
+                          complexity < 600,
+                          complexity < 800,
+                          complexity < 1000,
+                          captureHistory[movedPiece][to_sq(move)][type_of(captured)] > 0,
+                          ss->statScore > 0,
+                          (ss-1)->statScore > 0,
+                          (ss-2)->statScore > 0,
+                      };
+                  }
+              }
           }
       }
 
@@ -1142,9 +1201,6 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
-      bool CC = false;
-      bool T = false;
-      std::vector<bool> C;
 
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1211,63 +1267,66 @@ moves_loop: // When in check, search starts here
 
           //CC = depth <= 3 && d > 1;
           //CC = d > 1;
-          CC = depth <= 3 && d > 1;
-          if(CC)
+          if(LCS_LMR)
           {
-            Piece captured = pos.captured_piece();
-            C = { PvNode,
-                  cutNode,
-                  capture,
-                  givesCheck,
-                  improving,
-                  priorCapture,
-                  type_of(move)==PROMOTION,
-                  move==ss->killers[0],
-                  move==ss->killers[1],
-                  move==countermove,
-                  ss->ttHit,
-                  (ss-1)->ttHit,
-                  (ss-2)->ttHit,
-                  ss->ttPv,
-                  (ss-1)->ttPv,
-                  (ss-2)->ttPv,
-                  ss->inCheck,
-                  (ss-1)->inCheck,
-                  (ss-2)->inCheck,
-                  (ss-1)->currentMove==MOVE_NULL,
-                  (ss-2)->currentMove==MOVE_NULL,
-                  excludedMove!=MOVE_NONE,
-                  (ss-1)->excludedMove!=MOVE_NONE,
-                  (ss-2)->excludedMove!=MOVE_NONE,
-                  type_of(movedPiece)==PAWN,
-                  type_of(movedPiece)==KNIGHT,
-                  type_of(movedPiece)==BISHOP,
-                  type_of(movedPiece)==ROOK,
-                  type_of(movedPiece)==QUEEN,
-                  type_of(movedPiece)==KING,
-                  type_of(captured)==PAWN,
-                  type_of(captured)==KNIGHT,
-                  type_of(captured)==BISHOP,
-                  type_of(captured)==ROOK,
-                  type_of(captured)==QUEEN,
-                  complexity < 200,
-                  complexity < 400,
-                  complexity < 600,
-                  complexity < 800,
-                  complexity < 1000,
-                  captureHistory[movedPiece][to_sq(move)][type_of(captured)] > 0,
-                  ss->statScore > 0,
-                  (ss-1)->statScore > 0,
-                  (ss-2)->statScore > 0,
-                  deeper==0,
-                  deeper==1,
-                  deeper==2,
-            };
+              CC = depth <= 3 && d > 1;
+              if(CC)
+              {
+                Piece captured = pos.captured_piece();
+                C = { PvNode,
+                      cutNode,
+                      capture,
+                      givesCheck,
+                      improving,
+                      priorCapture,
+                      type_of(move)==PROMOTION,
+                      move==ss->killers[0],
+                      move==ss->killers[1],
+                      move==countermove,
+                      ss->ttHit,
+                      (ss-1)->ttHit,
+                      (ss-2)->ttHit,
+                      ss->ttPv,
+                      (ss-1)->ttPv,
+                      (ss-2)->ttPv,
+                      ss->inCheck,
+                      (ss-1)->inCheck,
+                      (ss-2)->inCheck,
+                      (ss-1)->currentMove==MOVE_NULL,
+                      (ss-2)->currentMove==MOVE_NULL,
+                      excludedMove!=MOVE_NONE,
+                      (ss-1)->excludedMove!=MOVE_NONE,
+                      (ss-2)->excludedMove!=MOVE_NONE,
+                      type_of(movedPiece)==PAWN,
+                      type_of(movedPiece)==KNIGHT,
+                      type_of(movedPiece)==BISHOP,
+                      type_of(movedPiece)==ROOK,
+                      type_of(movedPiece)==QUEEN,
+                      type_of(movedPiece)==KING,
+                      type_of(captured)==PAWN,
+                      type_of(captured)==KNIGHT,
+                      type_of(captured)==BISHOP,
+                      type_of(captured)==ROOK,
+                      type_of(captured)==QUEEN,
+                      complexity < 200,
+                      complexity < 400,
+                      complexity < 600,
+                      complexity < 800,
+                      complexity < 1000,
+                      captureHistory[movedPiece][to_sq(move)][type_of(captured)] > 0,
+                      ss->statScore > 0,
+                      (ss-1)->statScore > 0,
+                      (ss-2)->statScore > 0,
+                      deeper==0,
+                      deeper==1,
+                      deeper==2,
+                  };
+              }
           }
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
-          if(CC)
+          if(LCS_LMR && CC)
           {
              T = value > alpha;
              lcs.learn(T, C);
@@ -1357,6 +1416,12 @@ moves_loop: // When in check, search starts here
               // is not a problem when sorting because the sort is stable and the
               // move position in the list is preserved - just the PV is pushed up.
               rm.score = -VALUE_INFINITE;
+      }
+
+      if(LCS_PRUNE && CC)
+      {
+          T = value > alpha;
+          lcs.learn(T, C);
       }
 
       if (value > bestValue)

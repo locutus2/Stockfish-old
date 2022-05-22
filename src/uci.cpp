@@ -209,7 +209,7 @@ namespace {
 
     TimePoint elapsed = now();
 
-    lcs.setParams("FailHigh", {
+    std::vector<std::string> paramsText = {
                     "PvNode",
                     "cutNode",
                     "capture",
@@ -254,10 +254,17 @@ namespace {
                     "ss->statScore > 0",
                     "(ss-1)->statScore > 0",
                     "(ss-2)->statScore > 0",
-                    "deeper==0",
-                    "deeper==1",
-                    "deeper==2",
-                 });
+                 };
+
+    if(LCS_LMR)
+    {
+        paramsText.push_back("deeper==0");
+        paramsText.push_back("deeper==1");
+        paramsText.push_back("deeper==2");
+    }
+
+    lcs.setParams("FailHigh", paramsText);
+
     lcs.init(1000); 
 
     for(int it = 0; it < 1; ++it)
