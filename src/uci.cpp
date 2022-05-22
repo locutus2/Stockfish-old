@@ -234,33 +234,45 @@ namespace {
                  });
     lcs.init(100); 
 
-    for(int r = 0; r < 2; ++r)
+    for(int it = 0; it < 1; ++it)
     {
-        for (const auto& cmd : list)
+        lcs.DoLearning = true;
+        std::cerr << "### Iteration " << it+1 << std::endl;
+        for(int r = 0; r < 2; ++r)
         {
-            istringstream is(cmd);
-            is >> skipws >> token;
-
-            if (token == "go" || token == "eval")
+            for (const auto& cmd : list)
             {
-                cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
-                if (token == "go")
+                istringstream is(cmd);
+                is >> skipws >> token;
+
+                if (token == "go" || token == "eval")
                 {
-                   go(pos, is, states);
-                   Threads.main()->wait_for_search_finished();
-                   nodes += Threads.nodes_searched();
+                    cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                    if (token == "go")
+                    {
+                       go(pos, is, states);
+                       Threads.main()->wait_for_search_finished();
+                       nodes += Threads.nodes_searched();
+                    }
+                    else
+                       trace_eval(pos);
                 }
-                else
-                   trace_eval(pos);
+                else if (token == "setoption")  setoption(is);
+                else if (token == "position")   position(pos, is, states);
+                else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
             }
-            else if (token == "setoption")  setoption(is);
-            else if (token == "position")   position(pos, is, states);
-            else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+            //lcs.print(r == 0);
+            std::cerr << "Phase: "<< (lcs.DoLearning ? "Learning" : "Prediction") << std::endl;
+            lcs.print();
+
+            if(r == 0)
+            {
+                lcs.storeRules();
+                lcs.DoLearning = false;
+                lcs.resetStats();
+            }
         }
-        //lcs.print(r == 0);
-        lcs.print();
-        lcs.DoLearning = false;
-        lcs.resetStats();
+        lcs.restoreRules();
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'

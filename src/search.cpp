@@ -1870,7 +1870,7 @@ void MainThread::check_time() {
   if (tick - lastInfoTime >= 1000)
   {
       lastInfoTime = tick;
-      dbg_print();
+      //dbg_print();
   }
 
   // We should not stop pondering until told so by the GUI

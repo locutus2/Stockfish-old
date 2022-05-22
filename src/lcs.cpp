@@ -8,11 +8,11 @@
 
 // LCS learning (see https://en.wikipedia.org/wiki/Learning_classifier_system
 
-LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0), fitness(0)
+LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0), accuracy(0), fitness(0), coverage(0)
 {
 }
 
-LCS::LCS() : NC(0), DoLearning(true)
+LCS::LCS() : NC(0), nLearned(0), DoLearning(true)
 {
     std::srand(123); // e123.txt
     //std::srand(124); // e124.txt
@@ -28,13 +28,43 @@ double LCS::rnd() const
     return std::rand() / (double)RAND_MAX;
 }
 
+double LCS::calculateFitness(const Rule& rule) const
+{
+    double val = 0;
+    val = 100.0 * rule.accuracy;
+    //val = 100.0 * rule.accuracy * rule.coverage;
+    return val;
+}
+
+double LCS::calculateSubsumptionFitness(const Rule& rule) const
+{
+    double val = 0;
+    val = 100.0 * rule.accuracy * (rule.coverage < MIN_COVERAGE ? rule.coverage / MIN_COVERAGE : 1.0);
+    //val = 100.0 * rule.accuracy * rule.coverage;
+    return val;
+}
+
+void LCS::storeRules()
+{
+    savedRules.push_back(rules);
+}
+
+void LCS::restoreRules()
+{
+    if (!savedRules.empty())
+    {
+        rules = savedRules.back();
+        savedRules.pop_back();
+    }
+}
+
 void LCS::printRule(const Rule& rule, std::ostream& out) const
 {
     assert(rule.condition.size() == paramsText.size());
 
-    double accuracy = (rule.nPredictions ? 100.0 * rule.correctPredictions / rule.nPredictions : 0.0);
-    out << "[accuracy: " << rule.correctPredictions << "/" << rule.nPredictions << "=" << std::fixed << std::setprecision(2) << accuracy << "%,"
+    out << "[accuracy: " << rule.correctPredictions << "/" << rule.nPredictions << "=" << std::fixed << std::setprecision(2) << rule.accuracy << "%"
         << "|fitness: " << rule.fitness
+        << "|coverage: " << std::fixed << std::setprecision(2) << 100 * rule.coverage << "%"
         << "|age: "     << rule.age
         << "|numerosity: " << rule.numerosity
         << "]";
@@ -82,6 +112,7 @@ void LCS::init(int max_rules)
     maxRules = max_rules;
     rules.clear();
     steps = 0;
+    nLearned = 0;
 }
 
 bool LCS::subsumption()
@@ -135,8 +166,8 @@ void LCS::crossover(Rule& r1, Rule& r2) const
     r1.age = r2.age = 0;
     r1.nPredictions = r2.nPredictions = 0;
     r1.correctPredictions = r2.correctPredictions = 0;
-    r1.fitness = r2.fitness = 0;
     r1.numerosity = r2.numerosity = 1;
+    r1.fitness = r2.fitness = MIN_FITNESS;
 }
 
 void LCS::mutate(Rule& rule) const
@@ -148,9 +179,11 @@ void LCS::mutate(Rule& rule) const
 
 bool LCS::subsumpRule(const Rule& gRule, const Rule& sRule) const
 {
+    double gFitness = calculateSubsumptionFitness(gRule);
+    double sFitness = calculateSubsumptionFitness(sRule);
     if (   gRule.result != sRule.result
-        || gRule.fitness < sRule.fitness
-        || (gRule.fitness == sRule.fitness && gRule.nPredictions < sRule.nPredictions))
+        || gFitness < sFitness
+        || (gFitness == sFitness && gRule.nPredictions < sRule.nPredictions))
         return false;
 
     bool theSame = true;
@@ -266,8 +299,9 @@ void LCS::resetStats()
     {
         r.nPredictions = 0;
         r.correctPredictions = 0;
-        r.fitness = 0;
+        r.fitness = MIN_FITNESS;
     }
+    nLearned = 0;
 }
 
 void LCS::learn(bool label, const std::vector<bool>& params)
@@ -277,6 +311,7 @@ void LCS::learn(bool label, const std::vector<bool>& params)
     std::set<int> matches;
     match(params, matches);
 
+    ++nLearned;
     for(int r : matches)
         updateRule(rules[r], label);
 
@@ -311,7 +346,9 @@ void LCS::updateRule(Rule& rule, bool label)
         ++rule.correctPredictions;
 
     ++rule.nPredictions;
-    rule.fitness = 100.0 * rule.correctPredictions / rule.nPredictions;
+    rule.accuracy = (double)rule.correctPredictions / rule.nPredictions;
+    rule.coverage = (double)rule.nPredictions / nLearned;
+    rule.fitness = calculateFitness(rule);
 }
 
 void LCS::learnStep(bool label, const std::vector<bool>& params, const std::set<int>& matches)

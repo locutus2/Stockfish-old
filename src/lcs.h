@@ -10,9 +10,10 @@ class LCS
 {
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
-    const bool USE_SUBSUMPTION = false;
+    const bool USE_SUBSUMPTION = true;
     const double MAX_FITNESS = 1.0;
     const double MIN_FITNESS = 0.0;
+    const double MIN_COVERAGE = 0.01;
     const double MUTATION = 0.04;
 
     struct Rule
@@ -23,7 +24,9 @@ class LCS
         int64_t age;
         int64_t nPredictions;
         int64_t correctPredictions;
+        double accuracy;
         double fitness;
+        double coverage;
 
         Rule();
     };
@@ -31,10 +34,14 @@ class LCS
     int NC;
     int maxRules;
     int steps;
+    int nLearned;
     std::string labelText;
     std::vector<std::string> paramsText;
     std::vector<Rule> rules;
+    std::vector<std::vector<Rule>> savedRules;
 
+    double calculateSubsumptionFitness(const Rule& rule) const;
+    double calculateFitness(const Rule& rule) const;
     bool subsumpRule(const Rule& gRule, const Rule& sRule) const;
     void mutate(Rule& rule) const;
     void copyRule(const Rule& r1, Rule& r2) const;
@@ -61,6 +68,8 @@ class LCS
     LCS();
     void setParams(const std::string& label, const std::vector<std::string>& params);
     void resetStats();
+    void storeRules();
+    void restoreRules();
     void init(int max_rules = 10);
     void learn(bool label, const std::vector<bool>& params);
     void print(bool sort = true, std::ostream& out = std::cerr);
