@@ -34,6 +34,7 @@ class LCS
     std::vector<std::string> paramsText;
     std::vector<Rule> rules;
 
+    bool subsumpRule(const Rule& gRule, const Rule& sRule) const;
     void mutate(Rule& rule) const;
     void copyRule(const Rule& r1, Rule& r2) const;
     void crossover(Rule& r1, Rule& r2) const;
@@ -47,7 +48,7 @@ class LCS
     void learnStep(bool label, const std::vector<bool>& params, const std::set<int>& matches);
     bool isCovered(bool label, const std::set<int>& matches) const;
     void addCoveringRule(bool label, const std::vector<bool>& params);
-    void subsumption();
+    bool subsumption();
     void ruleDiscoveryStep(bool label, const std::vector<bool>& params, const std::set<int>& matches);
     void deletionStep();
     int rnd(int n) const;

@@ -83,8 +83,30 @@ void LCS::init(int max_rules)
     steps = 0;
 }
 
-void LCS::subsumption()
+bool LCS::subsumption()
 {
+    bool deleted = false;
+    for (int i = 0; i < (int)rules.size(); ++i)
+    {
+        for (int j = (int)rules.size()-1; j > i; --j)
+        {
+            if (subsumpRule(rules[i], rules[j]))
+            {
+                rules[i].numerosity += rules[j].numerosity;
+                rules.erase(rules.begin()+j);
+                deleted = true;
+            }
+            else if (subsumpRule(rules[j], rules[i]))
+            {
+                rules[j].numerosity += rules[i].numerosity;
+                rules.erase(rules.begin()+i);
+                --i;
+                deleted = true;
+                break;
+            }
+        }
+    }
+    return deleted;
 }
 
 void LCS::copyRule(const Rule& r1, Rule& r2) const
@@ -113,6 +135,20 @@ void LCS::mutate(Rule& rule) const
     for (int i = 0; i < NC; ++i)
         if (rnd() < MUTATION)
             rule.condition[i] = (Condition)rnd(3);
+}
+
+bool LCS::subsumpRule(const Rule& gRule, const Rule& sRule) const
+{
+    if (   gRule.result != sRule.result
+        || gRule.fitness < sRule.fitness
+        || (gRule.fitness == sRule.fitness && gRule.nPredictions < sRule.nPredictions))
+        return false;
+
+    for (int i = 0; i < NC; ++i)
+        if(gRule.condition[i] != NONE && gRule.condition[i] != sRule.condition[i])
+            return false;
+
+    return true;
 }
 
 void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const std::set<int>& matches)
@@ -228,7 +264,13 @@ void LCS::learn(bool label, const std::vector<bool>& params)
     if (DoLearning)
     {
         learnStep(label, params, matches);
-        subsumption();
+
+        if(subsumption())
+        {
+            matches.clear();
+            match(params, matches);
+        }
+
         ruleDiscoveryStep(label, params, matches);
         deletionStep();
     }
