@@ -11,11 +11,12 @@ class LCS
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
     const bool USE_SUBSUMPTION = false;
+    const bool ONLY_CORRECT_MUTATIONS = true;
     const double RANDOM_SKIPPING = 0.5;
     const double MAX_FITNESS = 1.0;
     const double MIN_FITNESS = 0.0;
     const double MIN_COVERAGE = 0.01;
-    const double MUTATION = 0.04;
+    const double MUTATION = 0.05;
 
     struct Rule
     {
@@ -44,7 +45,7 @@ class LCS
     double calculateSubsumptionFitness(const Rule& rule) const;
     double calculateFitness(const Rule& rule) const;
     bool subsumpRule(const Rule& gRule, const Rule& sRule) const;
-    void mutate(Rule& rule) const;
+    void mutate(Rule& rule, const std::vector<bool>& params) const;
     void copyRule(const Rule& r1, Rule& r2) const;
     void crossover(Rule& r1, Rule& r2) const;
     int wheelSelectionBest(bool label, const std::set<int>& matches, int excludedRule = -1) const;

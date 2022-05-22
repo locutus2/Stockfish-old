@@ -172,11 +172,16 @@ void LCS::crossover(Rule& r1, Rule& r2) const
     r1.fitness = r2.fitness = MIN_FITNESS;
 }
 
-void LCS::mutate(Rule& rule) const
+void LCS::mutate(Rule& rule, const std::vector<bool>& params) const
 {
     for (int i = 0; i < NC; ++i)
         if (rnd() < MUTATION)
-            rule.condition[i] = (Condition)rnd(3);
+        {
+            if (ONLY_CORRECT_MUTATIONS)
+                rule.condition[i] = rule.condition[i] == NONE ? (params[i] ? POSITIVE : NEGATIVE) : NONE;
+            else
+                rule.condition[i] = (Condition)rnd(3);
+        }
 }
 
 bool LCS::subsumpRule(const Rule& gRule, const Rule& sRule) const
@@ -212,8 +217,8 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
     copyRule(rules[parent1], child1);
     copyRule(rules[parent2], child2);
     crossover(child1, child2);
-    mutate(child1);
-    mutate(child2);
+    mutate(child1, params);
+    mutate(child2, params);
 
 
     if (matchRule(params, child1))
