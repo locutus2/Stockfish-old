@@ -1213,6 +1213,7 @@ moves_loop: // When in check, search starts here
           CC = d > 1;
           if(CC)
           {
+            Piece captured = pos.captured_piece();
             C = { PvNode,
                   cutNode,
                   capture,
@@ -1223,6 +1224,9 @@ moves_loop: // When in check, search starts here
                   move==ss->killers[0],
                   move==ss->killers[1],
                   move==countermove,
+                  ss->ttHit,
+                  (ss-1)->ttHit,
+                  (ss-2)->ttHit,
                   ss->ttPv,
                   (ss-1)->ttPv,
                   (ss-2)->ttPv,
@@ -1240,6 +1244,20 @@ moves_loop: // When in check, search starts here
                   type_of(movedPiece)==ROOK,
                   type_of(movedPiece)==QUEEN,
                   type_of(movedPiece)==KING,
+                  type_of(captured)==PAWN,
+                  type_of(captured)==KNIGHT,
+                  type_of(captured)==BISHOP,
+                  type_of(captured)==ROOK,
+                  type_of(captured)==QUEEN,
+                  complexity < 200,
+                  complexity < 400,
+                  complexity < 600,
+                  complexity < 800,
+                  complexity < 1000,
+                  captureHistory[movedPiece][to_sq(move)][type_of(captured)] > 0,
+                  ss->statScore > 0,
+                  (ss-1)->statScore > 0,
+                  (ss-2)->statScore > 0,
             };
           }
 
