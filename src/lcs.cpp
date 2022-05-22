@@ -39,8 +39,8 @@ double LCS::calculateFitness(const Rule& rule) const
 double LCS::calculateSubsumptionFitness(const Rule& rule) const
 {
     double val = 0;
-    val = 100.0 * rule.accuracy * (rule.coverage < MIN_COVERAGE ? rule.coverage / MIN_COVERAGE : 1.0);
-    //val = 100.0 * rule.accuracy * rule.coverage;
+    //val = 100.0 * rule.accuracy * (rule.coverage < MIN_COVERAGE ? rule.coverage / MIN_COVERAGE : 1.0);
+    val = 100.0 * rule.accuracy;
     return val;
 }
 
@@ -62,7 +62,7 @@ void LCS::printRule(const Rule& rule, std::ostream& out) const
 {
     assert(rule.condition.size() == paramsText.size());
 
-    out << "[accuracy: " << rule.correctPredictions << "/" << rule.nPredictions << "=" << std::fixed << std::setprecision(2) << rule.accuracy << "%"
+    out << "[accuracy: " << rule.correctPredictions << "/" << rule.nPredictions << "=" << std::fixed << std::setprecision(2) << 100 * rule.accuracy << "%"
         << "|fitness: " << rule.fitness
         << "|coverage: " << std::fixed << std::setprecision(2) << 100 * rule.coverage << "%"
         << "|age: "     << rule.age
