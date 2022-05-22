@@ -1184,11 +1184,8 @@ moves_loop: // When in check, search starts here
               r++;
 
           if (   depth <= 3
-              && ss->ttPv
-              && move != ss->killers[0]
-              && !(ss-2)->inCheck
-              && (ss-2)->currentMove != MOVE_NULL
-              && !(ss-2)->excludedMove)
+              && (ss-1)->ttPv
+              && !(ss-2)->inCheck)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
