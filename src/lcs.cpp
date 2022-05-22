@@ -93,12 +93,20 @@ bool LCS::subsumption()
             if (subsumpRule(rules[i], rules[j]))
             {
                 rules[i].numerosity += rules[j].numerosity;
+                //std::cerr << "subsum: general=";
+                //printRule(rules[i]);
+                //std::cerr << "subsum: special=";
+                //printRule(rules[j]);
                 rules.erase(rules.begin()+j);
                 deleted = true;
             }
             else if (subsumpRule(rules[j], rules[i]))
             {
                 rules[j].numerosity += rules[i].numerosity;
+                //std::cerr << "subsum: general=";
+                //printRule(rules[j]);
+                //std::cerr << "subsum: special=";
+                //printRule(rules[i]);
                 rules.erase(rules.begin()+i);
                 --i;
                 deleted = true;
@@ -144,11 +152,16 @@ bool LCS::subsumpRule(const Rule& gRule, const Rule& sRule) const
         || (gRule.fitness == sRule.fitness && gRule.nPredictions < sRule.nPredictions))
         return false;
 
+    bool theSame = true;
     for (int i = 0; i < NC; ++i)
+    {
         if(gRule.condition[i] != NONE && gRule.condition[i] != sRule.condition[i])
             return false;
+        else if(gRule.condition[i] != sRule.condition[i])
+            theSame = false;
+    }
 
-    return true;
+    return theSame ? (gRule.nPredictions >= sRule.nPredictions) : true;
 }
 
 void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const std::set<int>& matches)
@@ -166,15 +179,20 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
     mutate(child1);
     mutate(child2);
 
+
     if (matchRule(params, child1))
     {
         updateRule(child1, label);
+        //std::cerr << "child1 => ";
+        //printRule(child1);
         rules.push_back(child1);
     }
 
     if (matchRule(params, child2))
     {
         updateRule(child2, label);
+        //std::cerr << "child2 => ";
+        //printRule(child2);
         rules.push_back(child2);
     }
 }
