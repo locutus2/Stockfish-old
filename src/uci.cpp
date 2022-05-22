@@ -231,6 +231,12 @@ namespace {
                     "excludedMove!=MOVE_NONE",
                     "(ss-1)->excludedMove!=MOVE_NONE",
                     "(ss-2)->excludedMove!=MOVE_NONE",
+                    "type_of(movedPiece)==PAWN",
+                    "type_of(movedPiece)==KNIGHT",
+                    "type_of(movedPiece)==BISHOP",
+                    "type_of(movedPiece)==ROOK",
+                    "type_of(movedPiece)==QUEE",
+                    "type_of(movedPiece)==KING",
                  });
     lcs.init(100); 
 

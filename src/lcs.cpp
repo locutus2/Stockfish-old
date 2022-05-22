@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <cmath>
+#include <ctime>
 #include "lcs.h"
 #include "misc.h"
 
@@ -14,8 +15,9 @@ LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0
 
 LCS::LCS() : NC(0), nLearned(0), DoLearning(true)
 {
-    std::srand(123); // e123.txt
+    //std::srand(123); // e123.txt
     //std::srand(124); // e124.txt
+    std::srand(std::time(nullptr));
 }
 
 int LCS::rnd(int n) const

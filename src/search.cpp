@@ -1233,6 +1233,12 @@ moves_loop: // When in check, search starts here
                   excludedMove!=MOVE_NONE,
                   (ss-1)->excludedMove!=MOVE_NONE,
                   (ss-2)->excludedMove!=MOVE_NONE,
+                  type_of(movedPiece)==PAWN,
+                  type_of(movedPiece)==KNIGHT,
+                  type_of(movedPiece)==BISHOP,
+                  type_of(movedPiece)==ROOK,
+                  type_of(movedPiece)==QUEEN,
+                  type_of(movedPiece)==KING,
             };
           }
 
