@@ -1183,7 +1183,7 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (!PvNode && depth <= 3 && improving)
+          if (move == countermove && depth <= 3 && (ss-1)->currentMove != MOVE_NULL)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
