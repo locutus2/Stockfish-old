@@ -1183,13 +1183,9 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (   priorCapture
-              && (ss-2)->ttPv
-              && (ss-2)->currentMove != MOVE_NULL
-              && type_of(movedPiece) != PAWN
-              && type_of(movedPiece) != BISHOP
-              && move != ss->killers[1]
-              && type_of(move) != PROMOTION)
+          if (   depth <= 5
+              && (ss-1)->ttPv
+              && !(ss-2)->inCheck)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
