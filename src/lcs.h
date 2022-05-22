@@ -10,6 +10,7 @@ class LCS
 {
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
+    const bool USE_SUBSUMPTION = false;
     const double MAX_FITNESS = 1.0;
     const double MIN_FITNESS = 0.0;
     const double MUTATION = 0.04;

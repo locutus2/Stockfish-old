@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include "lcs.h"
+#include "misc.h"
 
 // LCS learning (see https://en.wikipedia.org/wiki/Learning_classifier_system
 
@@ -281,9 +282,10 @@ void LCS::learn(bool label, const std::vector<bool>& params)
 
     if (DoLearning)
     {
+        Stockfish::dbg_hit_on(label);
         learnStep(label, params, matches);
 
-        if(subsumption())
+        if(USE_SUBSUMPTION && subsumption())
         {
             matches.clear();
             match(params, matches);
