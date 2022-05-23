@@ -1029,15 +1029,7 @@ moves_loop: // When in check, search starts here
               if (!pos.see_ge(move, Value(-203) * depth))
                   continue;
           }
-          else if (   depth > 1
-                   || move != countermove
-                   || ss->ttHit
-                   || ss->ttPv
-                   || (ss-1)->ttPv
-                   || (ss-1)->currentMove == MOVE_NULL
-                   || (ss-1)->excludedMove
-                   || !(ss-2)->excludedMove
-                   || complexity > 800)
+          else
           {
               int history =   (*contHist[0])[movedPiece][to_sq(move)]
                             + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1057,7 +1049,22 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
-              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
+              if (   (   !cutNode
+                      || !improving
+                      || ss->ttHit
+                      || ss->ttPv
+                      || !(ss-2)->ttPv
+                      || ss->inCheck
+                      || (ss-1)->inCheck
+                      || (ss-2)->inCheck
+                      || type_of(move) == PROMOTION
+                      || move == ss->killers[0]
+                      || (ss-2)->currentMove == MOVE_NULL
+                      || (ss-1)->excludedMove
+                      || (ss-2)->excludedMove
+                      || type_of(movedPiece) != PAWN
+                      || complexity > 400)
+                  && !pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
                   continue;
           }
       }
