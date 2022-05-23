@@ -1051,6 +1051,14 @@ moves_loop: // When in check, search starts here
               // Prune moves with negative SEE (~3 Elo)
               if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
                   continue;
+
+              if (   depth <= 1
+                  && ss->inCheck
+                  && !cutNode
+                  && move != ss->killers[0]
+                  && type_of(move) != PROMOTION
+                  && !(ss-1)->excludedMove)
+                  continue;
           }
       }
 
