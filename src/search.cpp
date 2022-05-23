@@ -1061,7 +1061,7 @@ moves_loop: // When in check, search starts here
 
               if(LCS_PRUNE)
               {
-                  CC = depth <= 1;
+                  CC = depth <= 2;
                   //CC = true;
                   if(CC)
                   {
