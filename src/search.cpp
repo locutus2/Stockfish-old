@@ -1050,20 +1050,17 @@ moves_loop: // When in check, search starts here
 
               // Prune moves with negative SEE (~3 Elo)
               if (   (   !cutNode
-                      || !improving
-                      || ss->ttHit
+                      || (ss-2)->statScore > 0
+                      || complexity > 400
+                      || move == ss->killers[0]
                       || ss->ttPv
-                      || !(ss-2)->ttPv
+                      || (ss-1)->ttPv
+                      || (ss-2)->ttPv
                       || ss->inCheck
                       || (ss-1)->inCheck
-                      || (ss-2)->inCheck
-                      || type_of(move) == PROMOTION
-                      || move == ss->killers[0]
-                      || (ss-2)->currentMove == MOVE_NULL
                       || (ss-1)->excludedMove
                       || (ss-2)->excludedMove
-                      || type_of(movedPiece) != PAWN
-                      || complexity > 400)
+                      || type_of(movedPiece) != PAWN)
                   && !pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
                   continue;
           }
