@@ -1029,7 +1029,15 @@ moves_loop: // When in check, search starts here
               if (!pos.see_ge(move, Value(-203) * depth))
                   continue;
           }
-          else
+          else if (   depth > 1
+                   || move != countermove
+                   || ss->ttHit
+                   || ss->ttPv
+                   || (ss-1)->ttPv
+                   || (ss-1)->currentMove == MOVE_NULL
+                   || (ss-1)->excludedMove
+                   || !(ss-2)->excludedMove
+                   || complexity > 800)
           {
               int history =   (*contHist[0])[movedPiece][to_sq(move)]
                             + (*contHist[1])[movedPiece][to_sq(move)]
