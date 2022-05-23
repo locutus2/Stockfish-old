@@ -11,6 +11,7 @@ class LCS
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
     const bool USE_SUBSUMPTION = false;
+    const bool USE_GENERALIZATION = false;
     const bool ONLY_CORRECT_MUTATIONS = true;
     const double RANDOM_SKIPPING = 0.5;
     const double MAX_FITNESS = 1.0;
@@ -42,6 +43,8 @@ class LCS
     std::vector<Rule> rules;
     std::vector<std::vector<Rule>> savedRules;
 
+    void generalizationStep(bool label, const std::set<int>& matches);
+    void addGeneralizedRule(const Rule & rule);
     double calculateSubsumptionFitness(const Rule& rule) const;
     double calculateFitness(const Rule& rule) const;
     bool subsumpRule(const Rule& gRule, const Rule& sRule) const;

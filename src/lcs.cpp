@@ -185,6 +185,22 @@ void LCS::mutate(Rule& rule, const std::vector<bool>& params) const
         }
 }
 
+void LCS::addGeneralizedRule(const Rule & rule)
+{
+    Rule r = rule;
+    std::vector <int> cond;
+    for(int i = 0; i < NC; ++i)
+        if (rule.condition[i] != NONE)
+            cond.push_back(i);
+
+    if(!cond.empty())
+    {
+        r.condition[rnd(cond.size())] = NONE;
+        r.numerosity++;
+        rules.push_back(r);
+    }
+}
+
 bool LCS::subsumpRule(const Rule& gRule, const Rule& sRule) const
 {
     double gFitness = calculateSubsumptionFitness(gRule);
@@ -312,6 +328,15 @@ void LCS::resetStats()
     nLearned = 0;
 }
 
+void LCS::generalizationStep(bool label, const std::set<int>& matches)
+{
+    int r = wheelSelectionBest(label, matches);
+    if(r >= 0)
+    {
+        addGeneralizedRule(rules[r]);
+    }
+}
+
 void LCS::learn(bool label, const std::vector<bool>& params)
 {
     assert(params.size() == paramsText.size());
@@ -337,6 +362,14 @@ void LCS::learn(bool label, const std::vector<bool>& params)
         }
 
         ruleDiscoveryStep(label, params, matches);
+
+        if (USE_GENERALIZATION)
+        {
+            matches.clear();
+            match(params, matches);
+            generalizationStep(label, matches);
+        }
+
         deletionStep();
     }
 
