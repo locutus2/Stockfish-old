@@ -1037,7 +1037,16 @@ moves_loop: // When in check, search starts here
 
               // Continuation history based pruning (~2 Elo)
               if (   lmrDepth < 5
-                  && history < -3875 * (depth - 1))
+                  && history < -3875 * (depth - 1)
+                  && (   move != countermove
+                      || ss->ttPv
+                      || (ss-2)->inCheck
+                      || (ss-1)->currentMove == MOVE_NULL
+                      || excludedMove
+                      || (ss-1)->excludedMove
+                      || (ss-2)->excludedMove
+                      || complexity > 400)
+                  )
                   continue;
 
               history += thisThread->mainHistory[us][from_to(move)];
@@ -1049,19 +1058,7 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
-              if (   (   !cutNode
-                      || (ss-2)->statScore > 0
-                      || complexity > 400
-                      || move == ss->killers[0]
-                      || ss->ttPv
-                      || (ss-1)->ttPv
-                      || (ss-2)->ttPv
-                      || ss->inCheck
-                      || (ss-1)->inCheck
-                      || (ss-1)->excludedMove
-                      || (ss-2)->excludedMove
-                      || type_of(movedPiece) != PAWN)
-                  && !pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
+              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
                   continue;
           }
       }
