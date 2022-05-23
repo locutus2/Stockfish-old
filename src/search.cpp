@@ -1053,11 +1053,15 @@ moves_loop: // When in check, search starts here
                   continue;
 
               if (   depth <= 1
-                  && ss->inCheck
-                  && !cutNode
-                  && move != ss->killers[0]
-                  && type_of(move) != PROMOTION
-                  && !(ss-1)->excludedMove)
+                  && type_of(movedPiece) == KING
+                  && priorCapture
+                  && !ss->ttPv
+                  && !(ss-1)->ttPv
+                  && !(ss-2)->ttHit
+                  && (ss-1)->currentMove != MOVE_NULL
+                  && (ss-2)->currentMove != MOVE_NULL
+                  && complexity < 600
+                  && (ss-2)->statScore > 0)
                   continue;
           }
       }
