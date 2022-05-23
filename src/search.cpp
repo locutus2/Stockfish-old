@@ -1048,20 +1048,21 @@ moves_loop: // When in check, search starts here
                   && ss->staticEval + 122 + 138 * lmrDepth + history / 60 <= alpha)
                   continue;
 
-              // Prune moves with negative SEE (~3 Elo)
-              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
-                  continue;
-
               if (   depth <= 1
-                  && type_of(movedPiece) == KING
+                  && ss->inCheck
                   && priorCapture
+                  && type_of(move) != PROMOTION
+                  && move != ss->killers[0]
                   && !ss->ttPv
-                  && !(ss-1)->ttPv
-                  && !(ss-2)->ttHit
+                  && !(ss-2)->inCheck
                   && (ss-1)->currentMove != MOVE_NULL
                   && (ss-2)->currentMove != MOVE_NULL
-                  && complexity < 600
-                  && (ss-2)->statScore > 0)
+                  && !(ss-2)->excludedMove
+                  && complexity < 400)
+                  continue;
+
+              // Prune moves with negative SEE (~3 Elo)
+              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
                   continue;
           }
       }
