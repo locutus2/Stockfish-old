@@ -1061,8 +1061,8 @@ moves_loop: // When in check, search starts here
 
               if(LCS_PRUNE)
               {
-                  //CC = depth <= 3;
-                  CC = true;
+                  CC = depth <= 1;
+                  //CC = true;
                   if(CC)
                   {
                     Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
