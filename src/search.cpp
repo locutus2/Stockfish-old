@@ -1057,12 +1057,12 @@ moves_loop: // When in check, search starts here
 
               // Prune moves with negative SEE (~3 Elo)
               if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
-                  continue;
-
+          //        continue;
+              {
               if(LCS_PRUNE)
               {
-                  CC = depth <= 1;
-                  //CC = true;
+                  //CC = depth <= 1;
+                  CC = true;
                   if(CC)
                   {
                     Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
@@ -1112,6 +1112,9 @@ moves_loop: // When in check, search starts here
                           (ss-2)->statScore > 0,
                       };
                   }
+                  else continue;
+              }
+              else continue;
               }
           }
       }

@@ -478,15 +478,43 @@ void LCS::printExample(bool label, const std::vector<bool>& params, std::ostream
     out << std::endl;
 }
 
-void LCS::print(bool sort, std::ostream& out)
+void LCS::print(bool sort, bool pareto, std::ostream& out)
 {
-    if(sort)
-        std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
-                                                                                          || (a.fitness == b.fitness && a.nPredictions > b.nPredictions); } );
-    out << "--------- step " << steps << " ----------" << std::endl;
-    for(int i = 0; i < (int)rules.size(); ++i)
+    if (pareto)
     {
-        out << i+1 << ". ";
-        printRule(rules[i], out);
+        std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
+                                                                                              || (a.fitness == b.fitness && a.coverage > b.coverage); } );
+        out << "--------- pareto step " << steps << " ----------" << std::endl;
+        for(int label = 0; label < 2; ++label)
+        {
+            out << "=> Label: " << (label ? labelText : "NOT(" + labelText + ")") << std::endl;
+            double lastFitness  =  MIN_FITNESS;
+            double lastCoverage =  -1;
+
+            for(int i = 0, j = 0; i < (int)rules.size(); ++i)
+            {
+                if (rules[i].result == bool(label) && (rules[i].coverage  > lastCoverage || (rules[i].fitness == lastFitness && rules[i].coverage >= lastCoverage)))
+                {
+                    out << j+1 << ". ";
+                    printRule(rules[i], out);
+                    ++j;
+                    lastFitness = rules[i].fitness;
+                    lastCoverage = rules[i].coverage;
+
+                }
+            }
+        }
+    }
+    else
+    {
+        if(sort)
+            std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
+                                                                                                  || (a.fitness == b.fitness && a.coverage > b.coverage); } );
+        out << "--------- step " << steps << " ----------" << std::endl;
+        for(int i = 0; i < (int)rules.size(); ++i)
+        {
+            out << i+1 << ". ";
+            printRule(rules[i], out);
+        }
     }
 }

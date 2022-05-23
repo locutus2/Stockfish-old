@@ -297,6 +297,7 @@ namespace {
             //lcs.print(r == 0);
             std::cerr << "Phase: "<< (lcs.DoLearning ? "Learning" : "Prediction") << std::endl;
             lcs.print();
+            lcs.print(true, true);
 
             if(r == 0)
             {
