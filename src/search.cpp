@@ -1049,15 +1049,14 @@ moves_loop: // When in check, search starts here
                   continue;
 
               if (   depth <= 1
-                  && ss->inCheck
-                  && priorCapture
-                  && type_of(move) != PROMOTION
+                  && !cutNode
+                  && !improving
                   && move != ss->killers[0]
+                  && move != countermove
                   && !ss->ttPv
-                  && !(ss-2)->inCheck
+                  && !(ss-1)->ttPv
                   && (ss-1)->currentMove != MOVE_NULL
-                  && (ss-2)->currentMove != MOVE_NULL
-                  && !(ss-2)->excludedMove
+                  && type_of(movedPiece) != PAWN
                   && complexity < 400)
                   continue;
 
