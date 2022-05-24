@@ -633,7 +633,10 @@ namespace {
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     ttCapture = ttMove && pos.capture(ttMove);
     if (!excludedMove)
+    {
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
+        ss->ttMove = ttMove;
+    }
 
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
@@ -1063,6 +1066,8 @@ moves_loop: // When in check, search starts here
                           type_of(move)==PROMOTION,
                           move==ss->killers[0],
                           move==ss->killers[1],
+                          move==(ss-2)->killers[0],
+                          move==(ss-2)->killers[1],
                           move==countermove,
                           ss->ttHit,
                           (ss-1)->ttHit,
@@ -1078,6 +1083,8 @@ moves_loop: // When in check, search starts here
                           excludedMove!=MOVE_NONE,
                           (ss-1)->excludedMove!=MOVE_NONE,
                           (ss-2)->excludedMove!=MOVE_NONE,
+                          (ss-2)->excludedMove==move,
+                          (ss-2)->ttMove==move,
                           type_of(movedPiece)==PAWN,
                           type_of(movedPiece)==KNIGHT,
                           type_of(movedPiece)==BISHOP,
@@ -1299,6 +1306,8 @@ moves_loop: // When in check, search starts here
                       type_of(move)==PROMOTION,
                       move==ss->killers[0],
                       move==ss->killers[1],
+                      move==(ss-2)->killers[0],
+                      move==(ss-2)->killers[1],
                       move==countermove,
                       ss->ttHit,
                       (ss-1)->ttHit,
@@ -1314,6 +1323,8 @@ moves_loop: // When in check, search starts here
                       excludedMove!=MOVE_NONE,
                       (ss-1)->excludedMove!=MOVE_NONE,
                       (ss-2)->excludedMove!=MOVE_NONE,
+                      (ss-2)->excludedMove==move,
+                      (ss-2)->ttMove==move,
                       type_of(movedPiece)==PAWN,
                       type_of(movedPiece)==KNIGHT,
                       type_of(movedPiece)==BISHOP,
