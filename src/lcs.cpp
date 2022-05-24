@@ -502,7 +502,7 @@ void LCS::printAttrStats(std::ostream& out)
     std::stable_sort(count.begin(), count.end(), [](const std::pair<int,int>& a, const std::pair<int,int>& b) { return   a.second > b.second; } );
     for(int i = 0; i < NC; ++i)
     {
-        out << (i+1) << ". " << paramsText[count[i].first] << " count=" << count[i].second << " freq=" << 100.*count[i].second / n << "%" << std::endl;
+        out << (i+1) << ". " << " count=" << count[i].second << " freq=" << 100.*count[i].second / n << "% => " << paramsText[count[i].first] << std::endl;
     }
 }
 
