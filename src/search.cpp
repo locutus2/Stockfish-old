@@ -1039,11 +1039,12 @@ moves_loop: // When in check, search starts here
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1)
                   && (   !cutNode
-                      || ss->inCheck
-                      || (ss-2)->currentMove == MOVE_NULL
-                      || excludedMove
+                      || move != countermove
+                      || (ss-2)->inCheck
+                      || (ss-1)->excludedMove
                       || (ss-2)->excludedMove
-                      || complexity > 200)
+                      || (ss-1)->moveCount == 0
+                      || (ss+1)->cutoffCnt >= 4)
                   )
                   continue;
 
