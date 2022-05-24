@@ -1183,19 +1183,12 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (    (ss-2)->excludedMove == move
-               && improving
-               && !(ss-2)->ttHit
-               && !ss->ttPv
-               && !ss->inCheck
-               && !excludedMove
-               && !(ss-1)->excludedMove
-               && type_of(movedPiece) != KNIGHT
-               && (ss-2)->moveCount > 1
-               && extension <= 0
-               && move != countermove
-               && move != ss->killers[0]
-               && move != ss->killers[1])
+          if (   (ss-2)->excludedMove == move
+              && !priorCapture
+              && !ss->inCheck
+              && (ss-1)->moveCount > 0
+              && move != ss->killers[0]
+              && extension <= 0)
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
