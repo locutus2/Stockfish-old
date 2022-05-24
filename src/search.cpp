@@ -1038,12 +1038,12 @@ moves_loop: // When in check, search starts here
               // Continuation history based pruning (~2 Elo)
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1)
-                  && (   move != countermove
-                      || ss->ttPv
+                  && (   !cutNode
+                      || ss->inCheck
                       || (ss-2)->currentMove == MOVE_NULL
                       || excludedMove
                       || (ss-2)->excludedMove
-                      || complexity > 800)
+                      || complexity > 200)
                   )
                   continue;
 
