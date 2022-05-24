@@ -78,6 +78,7 @@ class LCS
     void init(int max_rules = 10);
     void learn(bool label, const std::vector<bool>& params);
     void print(bool sort = true, bool pareto = false, std::ostream& out = std::cerr);
+    void printAttrStats(std::ostream& out = std::cerr);
 };
 
 #endif

@@ -307,6 +307,7 @@ namespace {
             }
         }
         lcs.restoreRules();
+        lcs.printAttrStats();
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'

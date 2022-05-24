@@ -478,6 +478,34 @@ void LCS::printExample(bool label, const std::vector<bool>& params, std::ostream
     out << std::endl;
 }
 
+void LCS::printAttrStats(std::ostream& out)
+{
+    int n = 0;
+    std::vector<std::pair<int,int>> count(NC);
+
+    for(int i = 0; i < NC; ++i)
+        count[i] = { i, 0 };
+
+    for(const Rule&r : rules)
+    {
+        for(int i = 0; i < NC; ++i)
+        {
+            if(r.condition[i] != NONE)
+            {
+                count[i].second++;
+                ++n;
+            }
+        }
+    }
+
+    out << "--------- attributes stats ----------" << std::endl;
+    std::stable_sort(count.begin(), count.end(), [](const std::pair<int,int>& a, const std::pair<int,int>& b) { return   a.second > b.second; } );
+    for(int i = 0; i < NC; ++i)
+    {
+        out << (i+1) << ". " << paramsText[count[i].first] << " count=" << count[i].second << " freq=" << 100.*count[i].second / n << "%" << std::endl;
+    }
+}
+
 void LCS::print(bool sort, bool pareto, std::ostream& out)
 {
     if (pareto)
