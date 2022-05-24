@@ -451,7 +451,8 @@ void LCS::addCoveringRule(bool label, const std::vector<bool>& params)
     rule.condition.resize(NC);
     for (int i = 0; i < NC; ++i)
     {
-        if (rnd(2) == 0)
+        //if (rnd(2) == 0)
+        if (rnd(NC) == 0)
         {
             if (params[i])
                 rule.condition[i] = POSITIVE;
