@@ -1040,12 +1040,10 @@ moves_loop: // When in check, search starts here
                   && history < -3875 * (depth - 1)
                   && (   move != countermove
                       || ss->ttPv
-                      || (ss-2)->inCheck
-                      || (ss-1)->currentMove == MOVE_NULL
+                      || (ss-2)->currentMove == MOVE_NULL
                       || excludedMove
-                      || (ss-1)->excludedMove
                       || (ss-2)->excludedMove
-                      || complexity > 400)
+                      || complexity > 800)
                   )
                   continue;
 
