@@ -1098,6 +1098,19 @@ moves_loop: // When in check, search starts here
                           ss->statScore > 0,
                           (ss-1)->statScore > 0,
                           (ss-2)->statScore > 0,
+                          moveCount < 3,
+                          moveCount < 4,
+                          moveCount < 5,
+                          (ss-1)->moveCount < 1,
+                          (ss-1)->moveCount < 2,
+                          (ss-1)->moveCount < 3,
+                          (ss-2)->moveCount < 1,
+                          (ss-2)->moveCount < 2,
+                          (ss-2)->moveCount < 3,
+                          (ss+1)->cutoffCnt < 1,
+                          (ss+1)->cutoffCnt < 2,
+                          (ss+1)->cutoffCnt < 3,
+                          (ss+1)->cutoffCnt < 4,
                       };
                   }
                   else continue;
@@ -1320,9 +1333,26 @@ moves_loop: // When in check, search starts here
                       ss->statScore > 0,
                       (ss-1)->statScore > 0,
                       (ss-2)->statScore > 0,
+                      moveCount < 3,
+                      moveCount < 4,
+                      moveCount < 5,
+                      (ss-1)->moveCount < 1,
+                      (ss-1)->moveCount < 2,
+                      (ss-1)->moveCount < 3,
+                      (ss-2)->moveCount < 1,
+                      (ss-2)->moveCount < 2,
+                      (ss-2)->moveCount < 3,
+                      (ss+1)->cutoffCnt < 1,
+                      (ss+1)->cutoffCnt < 2,
+                      (ss+1)->cutoffCnt < 3,
+                      (ss+1)->cutoffCnt < 4,
+
                       deeper==0,
                       deeper==1,
                       deeper==2,
+                      extension>0,
+                      extension==0,
+                      extension<0,
                   };
               }
           }

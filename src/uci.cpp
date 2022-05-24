@@ -245,15 +245,28 @@ namespace {
                     "type_of(captured)==BISHOP",
                     "type_of(captured)==ROOK",
                     "type_of(captured)==QUEEN",
-                    "complexity < 200",
-                    "complexity < 400",
-                    "complexity < 600",
-                    "complexity < 800",
-                    "complexity < 1000",
-                    "captureHistory > 0",
-                    "ss->statScore > 0",
-                    "(ss-1)->statScore > 0",
-                    "(ss-2)->statScore > 0",
+                    "complexity<200",
+                    "complexity<400",
+                    "complexity<600",
+                    "complexity<800",
+                    "complexity<1000",
+                    "captureHistory>0",
+                    "ss->statScore>0",
+                    "(ss-1)->statScore>0",
+                    "(ss-2)->statScore>0",
+                    "moveCount<3",
+                    "moveCount<4",
+                    "moveCount<5",
+                    "(ss-1)->moveCount<1",
+                    "(ss-1)->moveCount<2",
+                    "(ss-1)->moveCount<3",
+                    "(ss-2)->moveCount<1",
+                    "(ss-2)->moveCount<2",
+                    "(ss-2)->moveCount<3",
+                    "(ss+1)->cutoffCnt<1",
+                    "(ss+1)->cutoffCnt<2",
+                    "(ss+1)->cutoffCnt<3",
+                    "(ss+1)->cutoffCnt<4",
                  };
 
     if(LCS_LMR)
@@ -261,6 +274,9 @@ namespace {
         paramsText.push_back("deeper==0");
         paramsText.push_back("deeper==1");
         paramsText.push_back("deeper==2");
+        paramsText.push_back("extension>0");
+        paramsText.push_back("extension==0");
+        paramsText.push_back("extension<0");
     }
 
     lcs.setParams("FailHigh", paramsText);
