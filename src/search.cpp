@@ -630,7 +630,10 @@ namespace {
             : ss->ttHit    ? tte->move() : MOVE_NONE;
     ttCapture = ttMove && pos.capture(ttMove);
     if (!excludedMove)
+    {
         ss->ttPv = PvNode || (ss->ttHit && tte->is_pv());
+        ss->ttMove = ttMove;
+    }
 
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
@@ -1182,6 +1185,9 @@ moves_loop: // When in check, search starts here
           // Increase reduction if next ply has a lot of fail high else reset count to 0
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
+
+          if (move == (ss-2)->ttMove)
+              r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
