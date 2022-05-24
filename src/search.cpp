@@ -1285,7 +1285,8 @@ moves_loop: // When in check, search starts here
           //CC = d > 1;
           if(LCS_LMR)
           {
-              CC = depth <= 3 && d > 1;
+              //CC = depth <= 3 && d > 1;
+              CC =  d < newDepth + deeper && (ss-2)->excludedMove == move;
               if(CC)
               {
                 Piece captured = pos.captured_piece();

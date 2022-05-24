@@ -30,8 +30,8 @@ namespace Stockfish {
 
 class Position;
 
-const bool LCS_LMR = false;
-const bool LCS_PRUNE = true;
+const bool LCS_LMR = true;
+const bool LCS_PRUNE = false;
 
 extern LCS lcs;
 
