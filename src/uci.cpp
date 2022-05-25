@@ -271,6 +271,14 @@ namespace {
                     "(ss+1)->cutoffCnt<2",
                     "(ss+1)->cutoffCnt<3",
                     "(ss+1)->cutoffCnt<4",
+                    "depth<2",
+                    "depth<3",
+                    "depth<4",
+                    "depth<5",
+                    "depth<6",
+                    "depth<7",
+                    "depth<8",
+                    "depth<9",
                  };
 
     if(LCS_LMR)

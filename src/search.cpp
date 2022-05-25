@@ -1118,6 +1118,14 @@ moves_loop: // When in check, search starts here
                           (ss+1)->cutoffCnt < 2,
                           (ss+1)->cutoffCnt < 3,
                           (ss+1)->cutoffCnt < 4,
+                          depth < 2,
+                          depth < 3,
+                          depth < 4,
+                          depth < 5,
+                          depth < 6,
+                          depth < 7,
+                          depth < 8,
+                          depth < 9,
                       };
                   }
                   else continue;
@@ -1294,7 +1302,7 @@ moves_loop: // When in check, search starts here
           {
               //CC = depth <= 3 && d > 1;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
-              CC =  d > 1 && (ss-2)->ttMove == move;
+              CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
               if(CC)
               {
                 Piece captured = pos.captured_piece();
@@ -1359,6 +1367,14 @@ moves_loop: // When in check, search starts here
                       (ss+1)->cutoffCnt < 2,
                       (ss+1)->cutoffCnt < 3,
                       (ss+1)->cutoffCnt < 4,
+                      depth < 2,
+                      depth < 3,
+                      depth < 4,
+                      depth < 5,
+                      depth < 6,
+                      depth < 7,
+                      depth < 8,
+                      depth < 9,
 
                       deeper==0,
                       deeper==1,
