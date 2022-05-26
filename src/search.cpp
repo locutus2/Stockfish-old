@@ -1186,9 +1186,6 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (move == (ss-2)->ttMove)
-              r--;
-
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
@@ -1206,6 +1203,22 @@ moves_loop: // When in check, search starts here
                        : PvNode                    ? 1
                        : cutNode && moveCount <= 8 ? 1
                        :                             0;
+
+          if (   !PvNode
+              && move == (ss-2)->ttMove
+              && !(ss-2)->inCheck
+              && !(ss-2)->excludedMove
+              && type_of(movedPiece) != QUEEN
+              && type_of(movedPiece) != KING
+              && type_of(pos.captured_piece()) != KNIGHT
+              && type_of(pos.captured_piece()) != ROOK
+              && type_of(pos.captured_piece()) != QUEEN
+              && complexity < 600
+              && (ss-1)->moveCount > 0
+              && (ss+1)->cutoffCnt < 4
+              && deeper == 0
+              && extension <= 0)
+              r--;
 
           Depth d = std::clamp(newDepth - r, 1, newDepth + deeper);
 
