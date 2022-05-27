@@ -187,16 +187,23 @@ void LCS::mutate(Rule& rule, const std::vector<bool>& params) const
 
 void LCS::addGeneralizedRule(const Rule & rule)
 {
-    Rule r = rule;
+    //Rule r = rule;
+    Rule r;
+    r.result = rule.result;
+    r.condition.resize(NC);
+    for(int i = 0; i < NC; ++i)
+        r.condition[i] = rule.condition[i];
+
     std::vector <int> cond;
     for(int i = 0; i < NC; ++i)
-        if (rule.condition[i] != NONE)
+        if (r.condition[i] != NONE)
             cond.push_back(i);
 
     if(!cond.empty())
     {
         r.condition[rnd(cond.size())] = NONE;
         r.numerosity++;
+        updateRule(r, r.result);
         rules.push_back(r);
     }
 }

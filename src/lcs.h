@@ -11,7 +11,7 @@ class LCS
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
     const bool USE_SUBSUMPTION = false;
-    const bool USE_GENERALIZATION = false;
+    const bool USE_GENERALIZATION = true;
     const bool ONLY_CORRECT_MUTATIONS = true;
     const bool COVER_ONLY_ONE_CLAUSE = true;
     const double RANDOM_SKIPPING = 0.5;
