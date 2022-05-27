@@ -1303,7 +1303,8 @@ moves_loop: // When in check, search starts here
               //CC = depth <= 3 && d > 1;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
-              CC = d > 1 && !ss->ttPv && !cutNode;
+              //CC = d > 1 && !ss->ttPv && !cutNode;
+              CC = d == newDepth + deeper && deeper == 1 && PvNode;
               if(CC)
               {
                 Piece captured = pos.captured_piece();
