@@ -13,6 +13,15 @@ LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0
 {
 }
 
+int LCS::Rule::countConditions() const
+{
+    int count = 0;
+    for (Condition c : condition)
+        if (c != NONE)
+            ++count;
+    return count;
+}
+
 LCS::LCS() : NC(0), nLearned(0), DoLearning(true)
 {
     //std::srand(123); // e123.txt
@@ -69,6 +78,7 @@ void LCS::printRule(const Rule& rule, std::ostream& out) const
         << "|coverage: " << std::fixed << std::setprecision(2) << 100 * rule.coverage << "%"
         << "|age: "     << rule.age
         << "|numerosity: " << rule.numerosity
+        << "|conditions: " << rule.countConditions()
         << "]";
 
     out << " IF";

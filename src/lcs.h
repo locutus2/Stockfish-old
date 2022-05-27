@@ -33,6 +33,7 @@ class LCS
         double coverage;
 
         Rule();
+        int countConditions() const;
     };
 
     int NC;
