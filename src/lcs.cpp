@@ -484,6 +484,9 @@ void LCS::printAttrStats(std::ostream& out)
 {
     int n = 0;
     std::vector<std::pair<int,int>> count(NC);
+    std::vector<std::pair<int,double>> accuracy(NC);
+    std::vector<std::pair<int,double>> coverage(NC);
+    std::vector<std::pair<int,double>> fitness(NC);
 
     for(int i = 0; i < NC; ++i)
         count[i] = { i, 0 };
@@ -495,6 +498,9 @@ void LCS::printAttrStats(std::ostream& out)
             if(r.condition[i] != NONE)
             {
                 count[i].second++;
+                fitness[i].second += r.fitness;
+                coverage[i].second += r.coverage;
+                accuracy[i].second += r.accuracy;
                 ++n;
             }
         }
@@ -504,7 +510,13 @@ void LCS::printAttrStats(std::ostream& out)
     std::stable_sort(count.begin(), count.end(), [](const std::pair<int,int>& a, const std::pair<int,int>& b) { return   a.second > b.second; } );
     for(int i = 0; i < NC; ++i)
     {
-        out << (i+1) << ". " << " count=" << count[i].second << " freq=" << 100.*count[i].second / n << "% => " << paramsText[count[i].first] << std::endl;
+        out << (i+1) << ". " << " count=" << count[i].second 
+            << " freq=" << 100.*count[i].second / n << "% "
+            << " fitness=" << 100.*fitness[i].second / n << "% "
+            << " accuracy=" << 100.*accuracy[i].second / n << "% " 
+            << " coverage=" << 100.*coverage[i].second / n << "% " 
+            << "=> " << paramsText[count[i].first] 
+            << std::endl;
     }
 }
 
