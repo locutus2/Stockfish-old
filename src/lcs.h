@@ -13,6 +13,7 @@ class LCS
     const bool USE_SUBSUMPTION = false;
     const bool USE_GENERALIZATION = false;
     const bool ONLY_CORRECT_MUTATIONS = true;
+    const bool COVER_ONLY_ONE_CLAUSE = true;
     const double RANDOM_SKIPPING = 0.5;
     const double MAX_FITNESS = 1.0;
     const double MIN_FITNESS = 0.0;
