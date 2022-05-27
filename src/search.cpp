@@ -1200,7 +1200,6 @@ moves_loop: // When in check, search starts here
                        : cutNode && moveCount <= 8           ? 1
                        : PvNode && (   givesCheck
                                     || improving
-                                    || depth > 4
                                     || (ss-1)->ttHit
                                     || (ss-2)->ttHit
                                     || complexity > 200
