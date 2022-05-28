@@ -1132,6 +1132,12 @@ moves_loop: // When in check, search starts here
                           bestMove==countermove,
                           bestMove==ss->killers[0],
                           bestMove==ss->killers[1],
+                          ttMove==countermove,
+                          ttMove==ss->killers[0],
+                          ttMove==ss->killers[1],
+                          countermove==ss->killers[0],
+                          countermove==ss->killers[1],
+                          ttCapture,
                       };
                   }
                   else continue;
@@ -1390,6 +1396,12 @@ moves_loop: // When in check, search starts here
                       bestMove==countermove,
                       bestMove==ss->killers[0],
                       bestMove==ss->killers[1],
+                      ttMove==countermove,
+                      ttMove==ss->killers[0],
+                      ttMove==ss->killers[1],
+                      countermove==ss->killers[0],
+                      countermove==ss->killers[1],
+                      ttCapture,
 
                       deeper==0,
                       deeper==1,

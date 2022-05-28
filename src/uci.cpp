@@ -285,6 +285,12 @@ namespace {
                     "bestMove==countermove",
                     "bestMove==ss->killers[0]",
                     "bestMove==ss->killers[1]",
+                    "ttMove==countermove",
+                    "ttMove==ss->killers[0]",
+                    "ttMove==ss->killers[1]",
+                    "countermove==ss->killers[0]",
+                    "countermove==ss->killers[1]",
+                    "ttCapture",
                  };
 
     if(LCS_LMR)
