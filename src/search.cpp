@@ -1201,6 +1201,7 @@ moves_loop: // When in check, search starts here
                        : PvNode && (   move == ss->killers[0]
                                     || move == (ss-2)->killers[0]
                                     || ss->inCheck
+                                    || depth >= 7
                                     || complexity > 1000
                                     || extension)                ? 1
                        :                                           0;
