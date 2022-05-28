@@ -515,40 +515,54 @@ void LCS::printExample(bool label, const std::vector<bool>& params, std::ostream
 
 void LCS::printAttrStats(std::ostream& out)
 {
-    int n = 0;
-    std::vector<std::pair<int,int>> count(NC);
-    std::vector<std::pair<int,double>> accuracy(NC);
-    std::vector<std::pair<int,double>> coverage(NC);
-    std::vector<std::pair<int,double>> fitness(NC);
+    int n[2] = { 0, 0 };
+    std::vector<std::tuple<int,int,int>> count(NC);
+    std::vector<std::tuple<int,int,double>> accuracy(NC);
+    std::vector<std::tuple<int,int,double>> coverage(NC);
+    std::vector<std::tuple<int,int,double>> fitness(NC);
 
     for(int i = 0; i < NC; ++i)
-        count[i] = { i, 0 };
+    {
+        count[2*i]   = { i, 0, 0 };
+        count[2*i+1] = { i, 1, 0 };
+    }
 
     for(const Rule&r : rules)
     {
         for(int i = 0; i < NC; ++i)
         {
-            if(r.condition[i] != NONE)
+            if(r.condition[i] == POSITIVE)
             {
-                count[i].second++;
-                fitness[i].second += r.fitness;
-                coverage[i].second += r.coverage;
-                accuracy[i].second += r.accuracy;
-                ++n;
+                std::get<2>(count[2*i])++;
+                std::get<2>(fitness[2*i]) += r.fitness;
+                std::get<2>(coverage[2*i]) += r.coverage;
+                std::get<2>(accuracy[2*i]) += r.accuracy;
+                ++n[0];
+            }
+            else if(r.condition[i] == NEGATIVE)
+            {
+                std::get<2>(count[2*i+1])++;
+                std::get<2>(fitness[2*i+1]) += r.fitness;
+                std::get<2>(coverage[2*i+1]) += r.coverage;
+                std::get<2>(accuracy[2*i+1]) += r.accuracy;
+                ++n[1];
             }
         }
     }
 
     out << "--------- attributes stats ----------" << std::endl;
-    std::stable_sort(count.begin(), count.end(), [](const std::pair<int,int>& a, const std::pair<int,int>& b) { return   a.second > b.second; } );
-    for(int i = 0; i < NC; ++i)
+    std::stable_sort(count.begin(), count.end(), [](const std::tuple<int,int,int>& a, const std::tuple<int,int,int>& b) { return   std::get<2>(a) > std::get<2>(b); } );
+    for(int i = 0; i < 2 * NC; ++i)
     {
-        out << (i+1) << ". " << " count=" << count[i].second 
-            << " freq=" << 100.*count[i].second / n << "% "
-            << " fitness=" << 100.*fitness[i].second / n << "% "
-            << " accuracy=" << 100.*accuracy[i].second / n << "% " 
-            << " coverage=" << 100.*coverage[i].second / n << "% " 
-            << "=> " << paramsText[count[i].first] 
+        int j = std::get<0>(count[i]);
+        int c = std::get<1>(count[i]);
+        int nn = n[c];
+        out << (i+1) << ". " << " count=" << std::get<2>(count[i])
+            << " freq=" << 100.*std::get<2>(count[i])/ nn << "% "
+            << " fitness=" << 100.*std::get<2>(fitness[j])/ nn << "% "
+            << " accuracy=" << 100.*std::get<2>(accuracy[j])/ nn << "% " 
+            << " coverage=" << 100.*std::get<2>(coverage[j])/ nn << "% " 
+            << "=> " << (c ? "NOT(" + paramsText[j] + ")" : paramsText[j]) 
             << std::endl;
     }
 }
