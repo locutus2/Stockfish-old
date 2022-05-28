@@ -1126,6 +1126,12 @@ moves_loop: // When in check, search starts here
                           depth < 7,
                           depth < 8,
                           depth < 9,
+                          bool(ttMove),
+                          bool(bestMove),
+                          bestMove==ttMove,
+                          bestMove==countermove,
+                          bestMove==ss->killers[0],
+                          bestMove==ss->killers[1],
                       };
                   }
                   else continue;
@@ -1305,7 +1311,7 @@ moves_loop: // When in check, search starts here
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
               //CC = d > 1 && !ss->ttPv && !cutNode;
               //CC = d == newDepth + deeper && deeper == 1 && PvNode;
-              CC = d > 1;
+              CC = d > 1 && !PvNode;
               if(CC)
               {
                 Piece captured = pos.captured_piece();
@@ -1378,6 +1384,12 @@ moves_loop: // When in check, search starts here
                       depth < 7,
                       depth < 8,
                       depth < 9,
+                      bool(ttMove),
+                      bool(bestMove),
+                      bestMove==ttMove,
+                      bestMove==countermove,
+                      bestMove==ss->killers[0],
+                      bestMove==ss->killers[1],
 
                       deeper==0,
                       deeper==1,

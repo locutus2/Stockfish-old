@@ -516,10 +516,10 @@ void LCS::printExample(bool label, const std::vector<bool>& params, std::ostream
 void LCS::printAttrStats(std::ostream& out)
 {
     int n[2] = { 0, 0 };
-    std::vector<std::tuple<int,int,int>> count(NC);
-    std::vector<std::tuple<int,int,double>> accuracy(NC);
-    std::vector<std::tuple<int,int,double>> coverage(NC);
-    std::vector<std::tuple<int,int,double>> fitness(NC);
+    std::vector<std::tuple<int,int,int>> count(2*NC);
+    std::vector<std::tuple<int,int,double>> accuracy(2*NC);
+    std::vector<std::tuple<int,int,double>> coverage(2*NC);
+    std::vector<std::tuple<int,int,double>> fitness(2*NC);
 
     for(int i = 0; i < NC; ++i)
     {

@@ -279,6 +279,12 @@ namespace {
                     "depth<7",
                     "depth<8",
                     "depth<9",
+                    "bool(ttMove)",
+                    "bool(bestMove)",
+                    "bestMove==ttMove",
+                    "bestMove==countermove",
+                    "bestMove==ss->killers[0]",
+                    "bestMove==ss->killers[1]",
                  };
 
     if(LCS_LMR)
