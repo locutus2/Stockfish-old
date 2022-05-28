@@ -559,7 +559,7 @@ void LCS::printAttrStats(std::ostream& out)
         int nn = n[c];
         out << (i+1) << ". " << " count=" << std::get<2>(count[i])
             << " freq=" << 100.*std::get<2>(count[i])/ nn << "% "
-            << " fitness=" << 100.*std::get<2>(fitness[j])/ nn << "% "
+            << " fitness=" << std::get<2>(fitness[j])/ nn << " "
             << " accuracy=" << 100.*std::get<2>(accuracy[j])/ nn << "% " 
             << " coverage=" << 100.*std::get<2>(coverage[j])/ nn << "% " 
             << "=> " << (c ? "NOT(" + paramsText[j] + ")" : paramsText[j]) 
