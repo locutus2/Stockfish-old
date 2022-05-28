@@ -1200,6 +1200,7 @@ moves_loop: // When in check, search starts here
                        : cutNode && moveCount <= 8            ? 1
                        : PvNode && (   capture
                                     || depth >= 7
+                                    || (ss-1)->ttHit
                                     || (ss-1)->statScore > 0) ? 1
                        :                                        0;
 
