@@ -78,7 +78,8 @@ namespace {
   }
 
   constexpr int futility_move_count(bool improving, Depth depth) {
-    return (3 + depth * depth) / (2 - improving);
+    return improving ? (3 + depth * depth)
+                     : (3 + depth * depth) / 2;
   }
 
   // History and stats update bonus, based on depth
@@ -611,7 +612,6 @@ namespace {
     (ss+2)->killers[0]   = (ss+2)->killers[1] = MOVE_NONE;
     (ss+2)->cutoffCnt    = 0;
     ss->doubleExtensions = (ss-1)->doubleExtensions;
-    ss->depth            = depth;
     Square prevSq        = to_sq((ss-1)->currentMove);
 
     // Initialize statScore to zero for the grandchildren of the current position.
@@ -875,7 +875,6 @@ namespace {
 
         MovePicker mp(pos, ttMove, probCutBeta - ss->staticEval, depth - 3, &captureHistory);
         bool ttPv = ss->ttPv;
-        bool captureOrPromotion;
         ss->ttPv = false;
 
         while ((move = mp.next_move()) != MOVE_NONE)
@@ -883,11 +882,9 @@ namespace {
             {
                 assert(pos.capture(move) || promotion_type(move) == QUEEN);
 
-                captureOrPromotion = true;
-
                 ss->currentMove = move;
                 ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
-                                                                          [captureOrPromotion]
+                                                                          [true]
                                                                           [pos.moved_piece(move)]
                                                                           [to_sq(move)];
 
