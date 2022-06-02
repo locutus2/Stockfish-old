@@ -71,6 +71,7 @@ class LCS
 
     public:
     bool DoLearning;
+    static std::string preconditionText;
 
     LCS();
     void setParams(const std::string& label, const std::vector<std::string>& params);
@@ -82,5 +83,7 @@ class LCS
     void print(bool sort = true, bool pareto = false, std::ostream& out = std::cerr);
     void printAttrStats(std::ostream& out = std::cerr);
 };
+
+#define LCS_PRECONDITION(x) (LCS::preconditionText = #x, (x))
 
 #endif

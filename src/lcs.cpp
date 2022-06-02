@@ -7,6 +7,8 @@
 #include "lcs.h"
 #include "misc.h"
 
+std::string LCS::preconditionText = "true";
+
 // LCS learning (see https://en.wikipedia.org/wiki/Learning_classifier_system
 
 LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0), accuracy(0), fitness(0), coverage(0)
@@ -574,6 +576,7 @@ void LCS::print(bool sort, bool pareto, std::ostream& out)
         std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
                                                                                               || (a.fitness == b.fitness && a.coverage > b.coverage); } );
         out << "--------- pareto step " << steps << " ----------" << std::endl;
+        out << "Pre-condition: " << LCS::preconditionText << std::endl;
         for(int label = 0; label < 2; ++label)
         {
             out << "=> Label: " << (label ? labelText : "NOT(" + labelText + ")") << std::endl;
@@ -600,6 +603,7 @@ void LCS::print(bool sort, bool pareto, std::ostream& out)
             std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
                                                                                                   || (a.fitness == b.fitness && a.coverage > b.coverage); } );
         out << "--------- step " << steps << " ----------" << std::endl;
+        out << "Pre-condition: " << LCS::preconditionText << std::endl;
         for(int i = 0; i < (int)rules.size(); ++i)
         {
             out << i+1 << ". ";

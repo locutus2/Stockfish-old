@@ -1303,13 +1303,15 @@ moves_loop: // When in check, search starts here
           //CC = d > 1;
           if(LCS_LMR || LCS_LMR2)
           {
+              CC = !LCS_LMR2 || d > 1;
               //CC = depth <= 3 && d > 1;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
               //CC = d > 1 && !ss->ttPv && !cutNode;
               //CC = d == newDepth + deeper && deeper == 1 && PvNode;
-              //CC = d > 1;
-              CC = !ss->ttPv && !cutNode;
+              //CC = !ss->ttPv && !cutNode;
+              CC = CC && LCS_PRECONDITION(!capture && ss->inCheck && !givesCheck && type_of(move) != PROMOTION
+                      && move != ss->killers[0] && move != ss->killers[1] && move != countermove);
               if(CC)
               {
                 Piece captured = pos.captured_piece();
@@ -1414,17 +1416,17 @@ moves_loop: // When in check, search starts here
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
 
-          if(LCS_LMR && CC)
-          {
-             T = value > alpha;
-             lcs.learn(T, C);
-          }
-
           if(LCS_LMR2 && CC)
           {
              T = (value > alpha) == (value2 > alpha);
              lcs.learn(T, C);
           }
+          else if(LCS_LMR && CC)
+          {
+             T = value > alpha;
+             lcs.learn(T, C);
+          }
+
 
           // If the son is reduced and fails high it will be re-searched at full depth
           doFullDepthSearch = value > alpha && d < newDepth;
