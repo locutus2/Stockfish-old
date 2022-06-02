@@ -291,6 +291,18 @@ namespace {
                     "countermove==ss->killers[0]",
                     "countermove==ss->killers[1]",
                     "ttCapture",
+                    "distance(pos.square<KING>(us),to_sq(move))<2",
+                    "distance(pos.square<KING>(us),to_sq(move))<3",
+                    "distance(pos.square<KING>(us),to_sq(move))<4",
+                    "distance(pos.square<KING>(us),to_sq(move))<5",
+                    "distance(pos.square<KING>(us),to_sq(move))<6",
+                    "distance(pos.square<KING>(us),to_sq(move))<7",
+                    "distance(pos.square<KING>(~us),to_sq(move))<2",
+                    "distance(pos.square<KING>(~us),to_sq(move))<3",
+                    "distance(pos.square<KING>(~us),to_sq(move))<4",
+                    "distance(pos.square<KING>(~us),to_sq(move))<5",
+                    "distance(pos.square<KING>(~us),to_sq(move))<6",
+                    "distance(pos.square<KING>(~us),to_sq(move))<7",
                  };
 
     if(LCS_LMR || LCS_LMR2)
