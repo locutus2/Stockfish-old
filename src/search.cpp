@@ -1301,14 +1301,14 @@ moves_loop: // When in check, search starts here
 
           //CC = depth <= 3 && d > 1;
           //CC = d > 1;
-          if(LCS_LMR)
+          if(LCS_LMR || LCS_LMR2)
           {
               //CC = depth <= 3 && d > 1;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
               //CC = d > 1 && !ss->ttPv && !cutNode;
-              CC = d == newDepth + deeper && deeper == 1 && PvNode;
-              //CC = d > 1 && !PvNode;
+              //CC = d == newDepth + deeper && deeper == 1 && PvNode;
+              CC = d > 1;
               if(CC)
               {
                 Piece captured = pos.captured_piece();
@@ -1404,11 +1404,24 @@ moves_loop: // When in check, search starts here
               }
           }
 
+          Value value2 = VALUE_ZERO;
+          if(LCS_LMR2 && CC)
+          {
+              value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d-1, true);
+          }
+
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
+
 
           if(LCS_LMR && CC)
           {
              T = value > alpha;
+             lcs.learn(T, C);
+          }
+
+          if(LCS_LMR2 && CC)
+          {
+             T = (value > alpha) == (value2 > alpha);
              lcs.learn(T, C);
           }
 

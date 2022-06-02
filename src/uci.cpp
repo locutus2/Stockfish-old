@@ -293,7 +293,7 @@ namespace {
                     "ttCapture",
                  };
 
-    if(LCS_LMR)
+    if(LCS_LMR || LCS_LMR2)
     {
         paramsText.push_back("deeper==0");
         paramsText.push_back("deeper==1");
@@ -303,7 +303,7 @@ namespace {
         paramsText.push_back("extension<0");
     }
 
-    lcs.setParams("FailHigh", paramsText);
+    lcs.setParams((LCS_LMR2 ? "Stable" : "FailHigh"), paramsText);
 
     lcs.init(1000); 
 
