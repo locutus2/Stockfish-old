@@ -305,7 +305,7 @@ namespace {
                     "distance(pos.square<KING>(~us),to_sq(move))<7",
                  };
 
-    if(LCS_LMR || LCS_LMR2)
+    if(LCS_LMR || LCS_LMR2 || LCS_LMR3)
     {
         paramsText.push_back("deeper==0");
         paramsText.push_back("deeper==1");
@@ -315,7 +315,7 @@ namespace {
         paramsText.push_back("extension<0");
     }
 
-    lcs.setParams((LCS_LMR2 ? "Stable" : "FailHigh"), paramsText);
+    lcs.setParams((LCS_LMR2 || LCS_LMR3 ? "Stable" : "FailHigh"), paramsText);
 
     lcs.init(1000); 
 
