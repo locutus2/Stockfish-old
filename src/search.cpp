@@ -1049,7 +1049,7 @@ moves_loop: // When in check, search starts here
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1))
               {
-                  if (PvNode || lmrDepth < 1)
+                  if (!cutNode || depth <= 1)
                       continue;
 
                   ss->doubleExtensions = (ss-1)->doubleExtensions;
