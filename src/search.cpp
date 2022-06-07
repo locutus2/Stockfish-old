@@ -1049,6 +1049,9 @@ moves_loop: // When in check, search starts here
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1))
               {
+                  if (!PvNode)
+                      continue;
+
                   ss->doubleExtensions = (ss-1)->doubleExtensions;
                   ss->currentMove = move;
                   ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
@@ -1056,14 +1059,11 @@ moves_loop: // When in check, search starts here
                                                                             [movedPiece]
                                                                             [to_sq(move)];
 
-                  if (PvNode)
-                  {
-                      (ss+1)->pv = pv;
-                      (ss+1)->pv[0] = MOVE_NONE;
-                  }
+                  (ss+1)->pv = pv;
+                  (ss+1)->pv[0] = MOVE_NONE;
 
                   pos.do_move(move, st, givesCheck);
-                  value = -qsearch<PvNode ? PV : NonPV>(pos, ss+1, -beta, -alpha);
+                  value = -qsearch<PV>(pos, ss+1, -beta, -alpha);
                   pos.undo_move(move);
 
                   if (value <= alpha)
