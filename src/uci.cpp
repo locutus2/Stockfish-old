@@ -315,6 +315,14 @@ namespace {
         paramsText.push_back("extension<0");
     }
 
+    if (LCS_PRUNE || LCS_PRUNE2)
+    {
+        paramsText.push_back("lmrDepth<1");
+        paramsText.push_back("lmrDepth<2");
+        paramsText.push_back("lmrDepth<3");
+        paramsText.push_back("lmrDepth<4");
+    }
+
     lcs.setParams((LCS_LMR2 || LCS_LMR3 ? "Stable" : "FailHigh"), paramsText);
 
     lcs.init(1000); 

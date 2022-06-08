@@ -32,8 +32,9 @@ class Position;
 
 const bool LCS_LMR = false;
 const bool LCS_LMR2 = false;
-const bool LCS_LMR3 = true;
+const bool LCS_LMR3 = false;
 const bool LCS_PRUNE = false;
+const bool LCS_PRUNE2 = true;
 
 extern LCS lcs;
 

@@ -1047,7 +1047,7 @@ moves_loop: // When in check, search starts here
                   && history < -3875 * (depth - 1))
               //    continue;
               {
-              if(LCS_PRUNE)
+              if(LCS_PRUNE || LCS_PRUNE2)
               {
                   //CC = depth <= 1;
                   CC = true;
@@ -1147,7 +1147,37 @@ moves_loop: // When in check, search starts here
                           distance(pos.square<KING>(~us),to_sq(move))<5,
                           distance(pos.square<KING>(~us),to_sq(move))<6,
                           distance(pos.square<KING>(~us),to_sq(move))<7,
+
+                          lmrDepth < 1,
+                          lmrDepth < 2,
+                          lmrDepth < 3,
+                          lmrDepth < 4,
                       };
+
+                    if(LCS_PRUNE2 && CC)
+                    {
+                        ss->doubleExtensions = (ss-1)->doubleExtensions;
+                        ss->currentMove = move;
+                        ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
+                                                                                  [capture]
+                                                                                  [movedPiece]
+                                                                                  [to_sq(move)];
+                        
+                        if (PvNode)
+                        {
+                            (ss+1)->pv = pv;
+                            (ss+1)->pv[0] = MOVE_NONE;
+                        }
+                       
+                        pos.do_move(move, st, givesCheck);
+                        value = -qsearch<PvNode ? PV : NonPV>(pos, ss+1, -beta, -alpha);
+                        pos.undo_move(move);
+                        
+                        T = value > alpha;
+                        lcs.learn(T, C);
+
+                        continue;
+                    }
                   }
                   else continue;
               }
