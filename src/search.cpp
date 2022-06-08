@@ -1035,22 +1035,45 @@ moves_loop: // When in check, search starts here
                             + (*contHist[1])[movedPiece][to_sq(move)]
                             + (*contHist[3])[movedPiece][to_sq(move)];
 
-              // Continuation history based pruning (~2 Elo)
-              if (   lmrDepth < 5
-                  && history < -3875 * (depth - 1))
-                  continue;
-
-              history += thisThread->mainHistory[us][from_to(move)];
-
               // Futility pruning: parent node (~9 Elo)
               if (   !ss->inCheck
                   && lmrDepth < 11
-                  && ss->staticEval + 122 + 138 * lmrDepth + history / 60 <= alpha)
+                  && ss->staticEval + 122 + 138 * lmrDepth + (history + thisThread->mainHistory[us][from_to(move)]) / 60 <= alpha)
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
               if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
                   continue;
+
+              // Continuation history based pruning (~2 Elo)
+              if (   lmrDepth < 5
+                  && history < -3875 * (depth - 1))
+              {
+                  if (   !PvNode
+                      || depth >= 2
+                      || type_of(movedPiece) != PAWN
+                      || !(ss-1)->ttPv
+                      || !(ss-2)->ttPv
+                      || ss->inCheck
+                      || (ss-2)->currentMove == MOVE_NULL
+                      || (ss-2)->excludedMove
+                      || distance(pos.square<KING>(us),to_sq(move)) >= 7)
+                      continue;
+
+                  ss->doubleExtensions = (ss-1)->doubleExtensions;
+                  ss->currentMove = move;
+                  ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
+                                                                            [capture]
+                                                                            [movedPiece]
+                                                                            [to_sq(move)];
+
+                  pos.do_move(move, st, givesCheck);
+                  value = -qsearch<NonPV>(pos, ss+1, -alpha-1, -alpha);
+                  pos.undo_move(move);
+
+                  if (value <= alpha)
+                      continue;
+              }
           }
       }
 
