@@ -1047,41 +1047,41 @@ moves_loop: // When in check, search starts here
                   && history < -3875 * (depth - 1))
               //    continue;
               {
-              if(LCS_PRUNE || LCS_PRUNE2)
-              {
-                  //CC = depth <= 1;
-                  CC = true;
-                  if(CC)
+                  if(LCS_PRUNE || LCS_PRUNE2)
                   {
-                    Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
-                    C = { PvNode,
-                          cutNode,
-                          capture,
-                          givesCheck,
-                          improving,
-                          priorCapture,
-                          type_of(move)==PROMOTION,
-                          move==ss->killers[0],
-                          move==ss->killers[1],
-                          move==(ss-2)->killers[0],
-                          move==(ss-2)->killers[1],
-                          move==countermove,
-                          ss->ttHit,
-                          (ss-1)->ttHit,
-                          (ss-2)->ttHit,
-                          ss->ttPv,
-                          (ss-1)->ttPv,
-                          (ss-2)->ttPv,
-                          ss->inCheck,
-                          (ss-1)->inCheck,
-                          (ss-2)->inCheck,
-                          (ss-1)->currentMove==MOVE_NULL,
-                          (ss-2)->currentMove==MOVE_NULL,
-                          excludedMove!=MOVE_NONE,
-                          (ss-1)->excludedMove!=MOVE_NONE,
-                          (ss-2)->excludedMove!=MOVE_NONE,
-                          (ss-2)->excludedMove==move,
-                          (ss-2)->ttMove==move,
+                      //CC = depth <= 1;
+                      CC = true;
+                      if(CC)
+                      {
+                        Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
+                        C = { PvNode,
+                              cutNode,
+                              capture,
+                              givesCheck,
+                              improving,
+                              priorCapture,
+                              type_of(move)==PROMOTION,
+                              move==ss->killers[0],
+                              move==ss->killers[1],
+                              move==(ss-2)->killers[0],
+                              move==(ss-2)->killers[1],
+                              move==countermove,
+                              ss->ttHit,
+                              (ss-1)->ttHit,
+                              (ss-2)->ttHit,
+                              ss->ttPv,
+                              (ss-1)->ttPv,
+                              (ss-2)->ttPv,
+                              ss->inCheck,
+                              (ss-1)->inCheck,
+                              (ss-2)->inCheck,
+                              (ss-1)->currentMove==MOVE_NULL,
+                              (ss-2)->currentMove==MOVE_NULL,
+                              excludedMove!=MOVE_NONE,
+                              (ss-1)->excludedMove!=MOVE_NONE,
+                              (ss-2)->excludedMove!=MOVE_NONE,
+                              (ss-2)->excludedMove==move,
+                              (ss-2)->ttMove==move,
                           type_of(movedPiece)==PAWN,
                           type_of(movedPiece)==KNIGHT,
                           type_of(movedPiece)==BISHOP,
@@ -1180,8 +1180,8 @@ moves_loop: // When in check, search starts here
                     }
                   }
                   else continue;
-              }
-              else continue;
+                }
+                else continue;
               }
 
               history += thisThread->mainHistory[us][from_to(move)];
