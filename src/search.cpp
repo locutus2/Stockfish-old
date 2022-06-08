@@ -1049,14 +1049,13 @@ moves_loop: // When in check, search starts here
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1))
               {
-                  if (   PvNode
+                  if (   ss->ttPv
                       || depth <= 1
-                      || depth >= 8
-                      || lmrDepth >= 1
-                      || (ss-2)->inCheck
+                      || depth >= 5
+                      || lmrDepth >= 2
+                      || (ss-1)->moveCount < 1
                       || (ss-2)->moveCount < 1
-                      || (ss-1)->currentMove == MOVE_NULL
-                      || (ss-2)->currentMove == MOVE_NULL
+                      || (ss-1)->excludedMove
                       || (ss-2)->excludedMove
                       || distance(pos.square<KING>(~us),to_sq(move)) < 2)
                       continue;
