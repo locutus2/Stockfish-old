@@ -1049,15 +1049,22 @@ moves_loop: // When in check, search starts here
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1))
               {
-                  if (   !PvNode
-                      || depth >= 2
-                      || type_of(movedPiece) != PAWN
-                      || !(ss-1)->ttPv
-                      || !(ss-2)->ttPv
-                      || ss->inCheck
-                      || (ss-2)->currentMove == MOVE_NULL
-                      || (ss-2)->excludedMove
-                      || distance(pos.square<KING>(us),to_sq(move)) >= 7)
+                  if (   PvNode
+                      || moveCount < 5
+                      || !improving
+                      || depth <= 1
+                      || depth >= 4
+                      || (ss-2)->statScore > 0
+                      || priorCapture
+                      || distance(pos.square<KING>(~us),to_sq(move)) >= 7
+                      || (ss-1)->excludedMove
+                      || complexity > 800
+                      || (ss-1)->inCheck
+                      || (ss-2)->inCheck
+                      || (ss-1)->moveCount < 1
+                      || move == (ss-2)->killers[0]
+                      || move == (ss-2)->killers[1]
+                      || (ss-2)->excludedMove)
                       continue;
 
                   ss->doubleExtensions = (ss-1)->doubleExtensions;
