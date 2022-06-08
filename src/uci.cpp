@@ -303,6 +303,7 @@ namespace {
                     "distance(pos.square<KING>(~us),to_sq(move))<5",
                     "distance(pos.square<KING>(~us),to_sq(move))<6",
                     "distance(pos.square<KING>(~us),to_sq(move))<7",
+                    "moveCountPruning",
                  };
 
     if(LCS_LMR || LCS_LMR2 || LCS_LMR3)

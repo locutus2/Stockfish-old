@@ -7,7 +7,7 @@
 #include "lcs.h"
 #include "misc.h"
 
-std::string LCS::preconditionText = "true";
+std::string LCS::preconditionText = "PvNode";
 
 // LCS learning (see https://en.wikipedia.org/wiki/Learning_classifier_system
 

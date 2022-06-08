@@ -1061,7 +1061,7 @@ moves_loop: // When in check, search starts here
                   {
                       //CC = depth <= 1;
                       //CC = true;
-                      CC = depth > 1;
+                      CC = PvNode;
                       if(CC)
                       {
                         Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
@@ -1158,6 +1158,7 @@ moves_loop: // When in check, search starts here
                           distance(pos.square<KING>(~us),to_sq(move))<5,
                           distance(pos.square<KING>(~us),to_sq(move))<6,
                           distance(pos.square<KING>(~us),to_sq(move))<7,
+                          moveCountPruning,
 
                           lmrDepth < 1,
                           lmrDepth < 2,
@@ -1452,6 +1453,7 @@ moves_loop: // When in check, search starts here
                       distance(pos.square<KING>(~us),to_sq(move))<5,
                       distance(pos.square<KING>(~us),to_sq(move))<6,
                       distance(pos.square<KING>(~us),to_sq(move))<7,
+                      moveCountPruning,
 
                       deeper==0,
                       deeper==1,
