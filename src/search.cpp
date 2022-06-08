@@ -1049,14 +1049,19 @@ moves_loop: // When in check, search starts here
               if (   lmrDepth < 5
                   && history < -3875 * (depth - 1))
               {
-                  if (   ss->ttPv
-                      || depth <= 1
-                      || depth >= 5
-                      || lmrDepth >= 2
+                  if (   !cutNode
+                      || lmrDepth < 1
+                      || lmrDepth >= 4
+                      || depth < 4
+                      || (ss-2)->inCheck
+                      || (ss-2)->excludedMove
+                      || type_of(movedPiece) == QUEEN
+                      || complexity > 800
+                      || move == ss->killers[0]
+                      || move == countermove
+                      || (ss-1)->statScore <= 0
                       || (ss-1)->moveCount < 1
                       || (ss-2)->moveCount < 1
-                      || (ss-1)->excludedMove
-                      || (ss-2)->excludedMove
                       || distance(pos.square<KING>(~us),to_sq(move)) < 2)
                       continue;
 
