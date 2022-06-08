@@ -1175,14 +1175,8 @@ moves_loop: // When in check, search starts here
                                                                                   [movedPiece]
                                                                                   [to_sq(move)];
                         
-                        if (PvNode)
-                        {
-                            (ss+1)->pv = pv;
-                            (ss+1)->pv[0] = MOVE_NONE;
-                        }
-                       
                         pos.do_move(move, st, givesCheck);
-                        value = -qsearch<PvNode ? PV : NonPV>(pos, ss+1, -beta, -alpha);
+                        value = -qsearch<NonPV>(pos, ss+1, -alpha-1, -alpha);
                         pos.undo_move(move);
                         
                         T = value > alpha;
