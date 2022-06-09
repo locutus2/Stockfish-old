@@ -361,6 +361,7 @@ namespace {
                 lcs.deletionStep();
                 lcs.print();
                 lcs.print(true, true);
+                dbg_print(); // Just before exiting
 
         }
         lcs.printAttrStats();
@@ -414,7 +415,6 @@ namespace {
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'
 
-    dbg_print(); // Just before exiting
     dbg_printc(); // Just before exiting
 
     cerr << "\n==========================="
