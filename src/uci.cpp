@@ -358,6 +358,7 @@ namespace {
                     else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
                 }
                 //std::cerr << "Phase: "<< (lcs.DoLearning ? "Learning" : "Prediction") << std::endl;
+                lcs.deletionStep();
                 lcs.print();
                 lcs.print(true, true);
 

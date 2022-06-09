@@ -66,7 +66,6 @@ class LCS
     void addCoveringRule(bool label, const std::vector<bool>& params);
     bool subsumption();
     void ruleDiscoveryStep(bool label, const std::vector<bool>& params, const std::set<int>& matches);
-    void deletionStep();
     int rnd(int n) const;
     double rnd() const;
 
@@ -75,6 +74,7 @@ class LCS
     static std::string preconditionText;
 
     LCS();
+    void deletionStep();
     void setParams(const std::string& label, const std::vector<std::string>& params);
     void resetStats();
     void learn();
