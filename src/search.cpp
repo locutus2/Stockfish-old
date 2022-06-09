@@ -1050,10 +1050,8 @@ moves_loop: // When in check, search starts here
                   && history < -3875 * (depth - 1))
               {
                   if (   lmrDepth < 4
-                      || priorCapture
-                      || ss->ttPv
-                      || !ttMove
-                      || distance(pos.square<KING>(us),to_sq(move)) < 2)
+                      || !cutNode
+                       || (ss-1)->excludedMove)
                       continue;
 
                   ss->doubleExtensions = (ss-1)->doubleExtensions;
