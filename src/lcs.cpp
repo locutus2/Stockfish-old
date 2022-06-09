@@ -7,7 +7,7 @@
 #include "lcs.h"
 #include "misc.h"
 
-std::string LCS::preconditionText = "PvNode";
+std::string LCS::preconditionText = "lmrDepth >= 1";
 
 // LCS learning (see https://en.wikipedia.org/wiki/Learning_classifier_system
 
@@ -121,12 +121,62 @@ void LCS::setParams(const std::string& label, const std::vector<std::string>& pa
     paramsText = params;
 }
 
-void LCS::init(int max_rules)
+void LCS::learn()
 {
+    deletionStep();
+
+    int n = (int)rules.size();
+    for(int i = 0; i < n; ++i)
+    {
+        for(int j = 0; j < NC; ++j)
+        {
+            if (rules[i].condition[j] == NONE)
+            {
+                Rule rule = rules[i];
+                rule.condition[j] = POSITIVE;
+                rules.push_back(rule);
+                rule.condition[j] = NEGATIVE;
+                rules.push_back(rule);
+            }
+        }
+    }
+}
+
+void LCS::init(int max_rules, bool top_to_bottom)
+{
+    topToBottom = top_to_bottom;
     maxRules = max_rules;
     rules.clear();
     steps = 0;
     nLearned = 0;
+
+    if (topToBottom)
+    {
+        Rule rule;
+        for (int i = 0; i < NC; ++i)
+            rule.condition.push_back(NONE);
+        rule.result = true;
+        rules.push_back(rule);
+        rule.result = false;
+        /*
+        for (int i = 0; i < NC; ++i)
+        {
+            rule.condition[i] = POSITIVE;
+            rule.result = true;
+            rules.push_back(rule);
+            rule.result = false;
+            rules.push_back(rule);
+
+            rule.condition[i] = NEGATIVE;
+            rule.result = true;
+            rules.push_back(rule);
+            rule.result = false;
+            rules.push_back(rule);
+
+            rule.condition[i] = NONE;
+        }
+        */
+    }
 }
 
 bool LCS::subsumption()
@@ -369,9 +419,9 @@ void LCS::learn(bool label, const std::vector<bool>& params)
     for(int r : matches)
         updateRule(rules[r], label);
 
+    Stockfish::dbg_hit_on(label);
     if (DoLearning)
     {
-        Stockfish::dbg_hit_on(label);
         learnStep(label, params, matches);
 
         if(USE_SUBSUMPTION && subsumption())

@@ -326,49 +326,89 @@ namespace {
 
     lcs.setParams((LCS_LMR2 || LCS_LMR3 ? "Stable" : "FailHigh"), paramsText);
 
-    lcs.init(1000); 
 
-    for(int it = 0; it < 1; ++it)
+    if (TOP_TO_BOTTOM)
     {
-        lcs.DoLearning = true;
-        std::cerr << "### Iteration " << it+1 << std::endl;
-        for(int r = 0; r < 2; ++r)
+        lcs.init(1000, true);
+        lcs.DoLearning = false;
+        for(int it = 0; it < TOP_TO_BOTTOM; ++it)
         {
-            for (const auto& cmd : list)
-            {
-                istringstream is(cmd);
-                is >> skipws >> token;
-
-                if (token == "go" || token == "eval")
+            lcs.resetStats();
+            lcs.learn();
+            std::cerr << "### Iteration " << it+1 << std::endl;
+                for (const auto& cmd : list)
                 {
-                    cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
-                    if (token == "go")
-                    {
-                       go(pos, is, states);
-                       Threads.main()->wait_for_search_finished();
-                       nodes += Threads.nodes_searched();
-                    }
-                    else
-                       trace_eval(pos);
-                }
-                else if (token == "setoption")  setoption(is);
-                else if (token == "position")   position(pos, is, states);
-                else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
-            }
-            //lcs.print(r == 0);
-            std::cerr << "Phase: "<< (lcs.DoLearning ? "Learning" : "Prediction") << std::endl;
-            lcs.print();
-            lcs.print(true, true);
+                    istringstream is(cmd);
+                    is >> skipws >> token;
 
-            if(r == 0)
-            {
-                lcs.storeRules();
-                lcs.DoLearning = false;
-                lcs.resetStats();
-            }
+                    if (token == "go" || token == "eval")
+                    {
+                        cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                        if (token == "go")
+                        {
+                           go(pos, is, states);
+                           Threads.main()->wait_for_search_finished();
+                           nodes += Threads.nodes_searched();
+                        }
+                        else
+                           trace_eval(pos);
+                    }
+                    else if (token == "setoption")  setoption(is);
+                    else if (token == "position")   position(pos, is, states);
+                    else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+                }
+                //std::cerr << "Phase: "<< (lcs.DoLearning ? "Learning" : "Prediction") << std::endl;
+                lcs.print();
+                lcs.print(true, true);
+
         }
-        lcs.restoreRules();
         lcs.printAttrStats();
+    }
+    else
+    {
+        lcs.init(1000); 
+        for(int it = 0; it < 1; ++it)
+        {
+            lcs.DoLearning = true;
+            std::cerr << "### Iteration " << it+1 << std::endl;
+            for(int r = 0; r < 2; ++r)
+            {
+                for (const auto& cmd : list)
+                {
+                    istringstream is(cmd);
+                    is >> skipws >> token;
+
+                    if (token == "go" || token == "eval")
+                    {
+                        cerr << "\nPosition: " << cnt++ << '/' << num << " (" << pos.fen() << ")" << endl;
+                        if (token == "go")
+                        {
+                           go(pos, is, states);
+                           Threads.main()->wait_for_search_finished();
+                           nodes += Threads.nodes_searched();
+                        }
+                        else
+                           trace_eval(pos);
+                    }
+                    else if (token == "setoption")  setoption(is);
+                    else if (token == "position")   position(pos, is, states);
+                    else if (token == "ucinewgame") { Search::clear(); elapsed = now(); } // Search::clear() may take some while
+                }
+                //lcs.print(r == 0);
+                std::cerr << "Phase: "<< (lcs.DoLearning ? "Learning" : "Prediction") << std::endl;
+                lcs.print();
+                lcs.print(true, true);
+
+                if(r == 0)
+                {
+                    lcs.storeRules();
+                    lcs.DoLearning = false;
+                    lcs.resetStats();
+                }
+            }
+            lcs.restoreRules();
+            lcs.printAttrStats();
+        }
     }
 
     elapsed = now() - elapsed + 1; // Ensure positivity to avoid a 'divide by zero'

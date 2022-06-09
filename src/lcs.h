@@ -36,6 +36,7 @@ class LCS
         int countConditions() const;
     };
 
+    bool topToBottom;
     int NC;
     int maxRules;
     int steps;
@@ -76,9 +77,10 @@ class LCS
     LCS();
     void setParams(const std::string& label, const std::vector<std::string>& params);
     void resetStats();
+    void learn();
     void storeRules();
     void restoreRules();
-    void init(int max_rules = 10);
+    void init(int max_rules = 10, bool top_to_bottom = false);
     void learn(bool label, const std::vector<bool>& params);
     void print(bool sort = true, bool pareto = false, std::ostream& out = std::cerr);
     void printAttrStats(std::ostream& out = std::cerr);

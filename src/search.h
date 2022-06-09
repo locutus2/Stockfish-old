@@ -30,6 +30,7 @@ namespace Stockfish {
 
 class Position;
 
+const int TOP_TO_BOTTOM = 4;
 const bool LCS_LMR = false;
 const bool LCS_LMR2 = false;
 const bool LCS_LMR3 = false;
