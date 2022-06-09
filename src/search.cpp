@@ -1050,9 +1050,8 @@ moves_loop: // When in check, search starts here
                   && history < -3875 * (depth - 1))
               {
                   if (   lmrDepth < 4
-                      || !cutNode
-                      || complexity < 200
-                      || (ss-2)->currentMove == MOVE_NULL)
+                      || depth >= 9
+                      || bestMove == ttMove)
                       continue;
 
                   ss->doubleExtensions = (ss-1)->doubleExtensions;
