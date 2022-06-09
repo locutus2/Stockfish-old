@@ -24,7 +24,7 @@ int LCS::Rule::countConditions() const
     return count;
 }
 
-LCS::LCS() : NC(0), nLearned(0), DoLearning(true)
+LCS::LCS(int maxC) : NC(0), nLearned(0), DoLearning(true), maxConditions(maxC)
 {
     //std::srand(123); // e123.txt
     //std::srand(124); // e124.txt
@@ -55,6 +55,24 @@ double LCS::calculateSubsumptionFitness(const Rule& rule) const
     //val = 100.0 * rule.accuracy * (rule.coverage < MIN_COVERAGE ? rule.coverage / MIN_COVERAGE : 1.0);
     val = 100.0 * rule.accuracy;
     return val;
+}
+
+void LCS::simplifyRule(Rule& rule) const
+{
+    if (maxConditions > 0)
+    {
+        std::vector<int> index;
+        for(int i = 0; i < NC; ++i)
+           if(rule.condition[i] != NONE)
+              index.push_back(i); 
+
+        while((int)index.size() > maxConditions)
+        {
+            int j = rnd(index.size());
+            rule.condition[index[j]] = NONE;
+            index.erase(index.begin() + j);
+        }
+    }
 }
 
 void LCS::storeRules()
@@ -227,6 +245,8 @@ void LCS::crossover(Rule& r1, Rule& r2) const
             std::iter_swap(r1.condition.begin()+i, r2.condition.begin()+i);
         }
     }
+    simplifyRule(r1);
+    simplifyRule(r2);
     r1.age = r2.age = 0;
     r1.nPredictions = r2.nPredictions = 0;
     r1.correctPredictions = r2.correctPredictions = 0;
@@ -245,6 +265,7 @@ void LCS::mutate(Rule& rule, const std::vector<bool>& params) const
                 rule.condition[i] = (Condition)((rule.condition[i] + 1 + rnd(2))%3);
                 //rule.condition[i] = (Condition)rnd(3);
         }
+    simplifyRule(rule);
 }
 
 void LCS::addGeneralizedRule(const Rule & rule)
@@ -359,10 +380,16 @@ int LCS::wheelSelectionWorst() const
 {
     std::vector<double> prob(rules.size());
 
+    int positive = 0;
+    for (int i = 0; i < (int)rules.size(); ++i)
+        positive += rules[i].result;
+
+
     double sum = 0;
     for (int i = 0; i < (int)rules.size(); ++i)
         //sum += prob[i] = std::max(0.0, std::exp(-rules[i].fitness) - std::exp(-MAX_FITNESS));
         sum += prob[i] = MAX_FITNESS - rules[i].fitness;
+        //sum += prob[i] = (MAX_FITNESS - rules[i].fitness) * (rules[i].result ? positive : (int)rules.size() - positive);
 
     double rand = rnd();
     for (int i = 0; i < (int)rules.size(); ++i)
@@ -547,6 +574,7 @@ void LCS::addCoveringRule(bool label, const std::vector<bool>& params)
                 rule.condition[i] = NONE;
         }
     }
+    simplifyRule(rule);
 
     updateRule(rule, label);
 

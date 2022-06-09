@@ -68,12 +68,14 @@ class LCS
     void ruleDiscoveryStep(bool label, const std::vector<bool>& params, const std::set<int>& matches);
     int rnd(int n) const;
     double rnd() const;
+    void simplifyRule(Rule& rule) const;
 
     public:
     bool DoLearning;
+    int maxConditions;
     static std::string preconditionText;
 
-    LCS();
+    LCS(int maxC = 4);
     void deletionStep();
     void setParams(const std::string& label, const std::vector<std::string>& params);
     void resetStats();
