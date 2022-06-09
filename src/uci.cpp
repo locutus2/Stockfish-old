@@ -407,6 +407,7 @@ namespace {
                     lcs.DoLearning = false;
                     lcs.resetStats();
                 }
+                dbg_print(); // Just before exiting
             }
             lcs.restoreRules();
             lcs.printAttrStats();

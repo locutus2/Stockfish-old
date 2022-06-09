@@ -1062,7 +1062,7 @@ moves_loop: // When in check, search starts here
                       //CC = depth <= 1;
                       //CC = true;
                       //CC = !PvNode && depth > 1;
-                      CC = lmrDepth >= 1;
+                      CC = lmrDepth >= 4;
                       if(CC)
                       {
                         Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));

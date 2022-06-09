@@ -7,7 +7,7 @@
 #include "lcs.h"
 #include "misc.h"
 
-std::string LCS::preconditionText = "lmrDepth >= 1";
+std::string LCS::preconditionText = "lmrDepth >= 4";
 
 // LCS learning (see https://en.wikipedia.org/wiki/Learning_classifier_system
 
