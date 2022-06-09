@@ -1051,7 +1051,8 @@ moves_loop: // When in check, search starts here
               {
                   if (   lmrDepth < 4
                       || !cutNode
-                       || (ss-1)->excludedMove)
+                      || complexity < 200
+                      || (ss-2)->currentMove == MOVE_NULL)
                       continue;
 
                   ss->doubleExtensions = (ss-1)->doubleExtensions;
