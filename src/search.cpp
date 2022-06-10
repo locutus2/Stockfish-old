@@ -1035,21 +1035,11 @@ moves_loop: // When in check, search starts here
                             + (*contHist[1])[movedPiece][to_sq(move)]
                             + (*contHist[3])[movedPiece][to_sq(move)];
 
-              // Futility pruning: parent node (~9 Elo)
-              if (   !ss->inCheck
-                  && lmrDepth < 11
-                  && ss->staticEval + 122 + 138 * lmrDepth + (history + thisThread->mainHistory[us][from_to(move)]) / 60 <= alpha)
-                  continue;
-
-              // Prune moves with negative SEE (~3 Elo)
-              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
-                  continue;
-
               // Continuation history based pruning (~2 Elo)
-              if (   lmrDepth < 5
+              if (   lmrDepth < 6
                   && history < -3875 * (depth - 1))
               {
-                  if (lmrDepth < 4)
+                  if (lmrDepth < 5)
                       continue;
 
                   ss->doubleExtensions = (ss-1)->doubleExtensions;
@@ -1066,6 +1056,18 @@ moves_loop: // When in check, search starts here
                   if (value <= alpha)
                       continue;
               }
+
+              history += thisThread->mainHistory[us][from_to(move)];
+
+              // Futility pruning: parent node (~9 Elo)
+              if (   !ss->inCheck
+                  && lmrDepth < 11
+                  && ss->staticEval + 122 + 138 * lmrDepth + history / 60 <= alpha)
+                  continue;
+
+              // Prune moves with negative SEE (~3 Elo)
+              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
+                  continue;
           }
       }
 
