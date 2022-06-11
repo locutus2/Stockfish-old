@@ -32,7 +32,7 @@ int LCS::Rule::countConditions() const
     return count;
 }
 
-LCS::LCS(int maxC) : NC(0), nLearned(0), DoLearning(true), maxConditions(maxC)
+LCS::LCS() : NC(0), nLearned(0), DoLearning(true), maxConditions(MAX_CONDITIONS)
 {
     //std::srand(123); // e123.txt
     //std::srand(124); // e124.txt
@@ -67,6 +67,9 @@ double LCS::calculateSubsumptionFitness(const Rule& rule) const
 
 void LCS::simplifyRule(Rule& rule) const
 {
+    if(DEBUG)
+        std::cerr << "simplify maxConditions=" << maxConditions << std::endl;
+
     if (maxConditions > 0)
     {
         std::vector<int> index;
@@ -277,8 +280,6 @@ void LCS::crossover(Rule& r1, Rule& r2) const
             std::iter_swap(r1.condition.begin()+i, r2.condition.begin()+i);
         }
     }
-    simplifyRule(r1);
-    simplifyRule(r2);
     r1.age = r2.age = 0;
     r1.nPredictions = r2.nPredictions = 0;
     r1.correctPredictions = r2.correctPredictions = 0;
@@ -297,7 +298,6 @@ void LCS::mutate(Rule& rule, const std::vector<bool>& params) const
                 rule.condition[i] = (Condition)((rule.condition[i] + 1 + rnd(2))%3);
                 //rule.condition[i] = (Condition)rnd(3);
         }
-    simplifyRule(rule);
 }
 
 void LCS::addGeneralizedRule(const Rule & rule)
@@ -316,11 +316,18 @@ void LCS::addGeneralizedRule(const Rule & rule)
 
     if(!cond.empty())
     {
-        r.condition[rnd(cond.size())] = NONE;
+        r.condition[cond[rnd(cond.size())]] = NONE;
         r.numerosity++;
         updateRule(r, r.result);
         if(!hasDuplicate(r))
+        {
+            if(DEBUG)
+            {
+               std::cerr << "add generalized rule: ";
+               printRule(r);
+            }
             rules.push_back(r);
+        }
     }
 }
 
@@ -359,7 +366,8 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
     crossover(child1, child2);
     mutate(child1, params);
     mutate(child2, params);
-
+    simplifyRule(child1);
+    simplifyRule(child2);
 
     if (matchRule(params, child1))
     {
@@ -367,7 +375,14 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
         //std::cerr << "child1 => ";
         //printRule(child1);
         if(!hasDuplicate(child1))
+        {
+            if (DEBUG)
+            {
+               std::cerr << "add child1 rule: ";
+               printRule(child1);
+            }
             rules.push_back(child1);
+        }
     }
 
     if (matchRule(params, child2))
@@ -376,7 +391,14 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
         //std::cerr << "child2 => ";
         //printRule(child2);
         if(!hasDuplicate(child2))
+        {
+            if (DEBUG)
+            {
+                std::cerr << "add child2 rule: ";
+                printRule(child2);
+            }
             rules.push_back(child2);
+        }
     }
 }
 
@@ -487,6 +509,9 @@ void LCS::learn(bool label, const std::vector<bool>& params)
     Stockfish::dbg_hit_on(label);
     if (DoLearning)
     {
+        if(DEBUG)
+            std::cerr << "=>LEARN " << (label ? labelText : "NOT(" + labelText + ")") << std::endl;
+
         learnStep(label, params, matches);
 
         if(USE_SUBSUMPTION && subsumption())
@@ -505,6 +530,9 @@ void LCS::learn(bool label, const std::vector<bool>& params)
         }
 
         deletionStep();
+
+        if(DEBUG)
+            print();
     }
 
     ++steps;
@@ -599,8 +627,8 @@ void LCS::addCoveringRule(bool label, const std::vector<bool>& params)
     {
         for (int i = 0; i < NC; ++i)
         {
-            //if (rnd(2) == 0)
-            if (rnd(NC) == 0)
+            if (rnd(2) == 0)
+            //if (rnd(NC) == 0)
             //if (true)
             {
                 if (params[i])
@@ -617,7 +645,14 @@ void LCS::addCoveringRule(bool label, const std::vector<bool>& params)
     updateRule(rule, label);
 
     if(!hasDuplicate(rule))
+    {
+        if(DEBUG)
+        {
+            std::cerr << "add covered rule: ";
+            printRule(rule);
+        }
         rules.push_back(rule);
+    }
 }
 
 void LCS::printExample(bool label, const std::vector<bool>& params, std::ostream& out) const

@@ -10,16 +10,19 @@ class LCS
 {
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
-    static const bool MAX_CONDITIONS = 4;
+    const int MAX_CONDITIONS = 4;
+    const bool USE_GENERALIZATION = MAX_CONDITIONS > 0;
     const bool USE_SUBSUMPTION = false;
-    const bool USE_GENERALIZATION = true;
     const bool ONLY_CORRECT_MUTATIONS = true;
-    const bool COVER_ONLY_ONE_CLAUSE = true;
+    const bool COVER_ONLY_ONE_CLAUSE = false;
     const double RANDOM_SKIPPING = 0.5;
     const double MAX_FITNESS = 1.0;
     const double MIN_FITNESS = 0.0;
     const double MIN_COVERAGE = 0.01;
-    const double MUTATION = 0.05;
+    //const double MUTATION = 0.05;
+    const double MUTATION = 0.01;
+
+    const bool DEBUG = false;
 
     struct Rule
     {
@@ -79,7 +82,7 @@ class LCS
     int maxConditions;
     static std::string preconditionText;
 
-    LCS(int maxC = MAX_CONDITIONS);
+    LCS();
     void deletionStep();
     void setParams(const std::string& label, const std::vector<std::string>& params);
     void resetStats();
