@@ -7,11 +7,13 @@
 #include "lcs.h"
 #include "misc.h"
 
-std::string LCS::preconditionText = "lmrDepth >= 4";
+std::string LCS::preconditionText = "lmrDepth >= 5";
+
+int LCS::Rule::nextId = 1;
 
 // LCS learning (see https://en.wikipedia.org/wiki/Learning_classifier_system
 
-LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0), accuracy(0), fitness(0), coverage(0)
+LCS::Rule::Rule() : id(nextId++), numerosity(1), age(0), nPredictions(0), correctPredictions(0), accuracy(0), fitness(0), coverage(0)
 {
 }
 
@@ -404,6 +406,7 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
     }
 }
 
+/*
 int LCS::wheelSelectionBest(bool label, const std::set<int>& matches, int excludedRule) const
 {
     std::vector<int> correct;
@@ -458,6 +461,52 @@ int LCS::wheelSelectionWorst() const
            return i;
     }
 
+
+    return rnd(rules.size());
+}
+*/
+
+int LCS::wheelSelectionBest(bool label, const std::set<int>& matches, int excludedRule) const
+{
+    return wheelSelection([&](const Rule& rule)->bool {
+                              if (rule.result != label) return false;
+                              for (auto i : matches)
+                                  if(i != excludedRule && rule.id == rules[i].id)
+                                      return true;
+                              return false;
+                          },
+                          [&](const Rule& rule)->double {
+                              return rule.fitness - MIN_FITNESS;
+                          });
+}
+
+int LCS::wheelSelectionWorst() const
+{
+    return wheelSelection([](const Rule& rule)->bool {
+                              return true;
+                          },
+                          [&](const Rule& rule)->double {
+                              return MAX_FITNESS - rule.fitness;
+                          });
+}
+
+template <typename Filter, typename Weight>
+int LCS::wheelSelection(const Filter& filter, const Weight& weight) const
+{
+    double sum = 0;
+
+    for (int i = 0; i < (int)rules.size(); ++i)
+        if (filter(rules[i]))
+            sum += weight(rules[i]);
+
+    double rand = sum * rnd();
+    for (int i = 0; i < (int)rules.size(); ++i)
+        if (filter(rules[i]))
+        {
+            rand -= weight(rules[i]);
+            if (rand <= 0)
+                return i;
+        }
 
     return rnd(rules.size());
 }

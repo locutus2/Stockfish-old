@@ -26,6 +26,8 @@ class LCS
 
     struct Rule
     {
+        static int nextId;
+        int id;
         std::vector<Condition> condition;
         bool result;
         int numerosity;
@@ -50,6 +52,9 @@ class LCS
     std::vector<std::string> paramsText;
     std::vector<Rule> rules;
     std::vector<std::vector<Rule>> savedRules;
+
+    template <typename Filter, typename Weight>
+    int wheelSelection(const Filter& filter, const Weight& weight) const;
 
     bool hasDuplicate(const Rule& rule) const;
     void removeDuplicates();

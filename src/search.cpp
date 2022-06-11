@@ -1053,7 +1053,7 @@ moves_loop: // When in check, search starts here
                   continue;
 
               // Continuation history based pruning (~2 Elo)
-              if (   lmrDepth < 5
+              if (   lmrDepth < 6
                   && history < -3875 * (depth - 1))
               //    continue;
               {
@@ -1062,7 +1062,7 @@ moves_loop: // When in check, search starts here
                       //CC = depth <= 1;
                       //CC = true;
                       //CC = !PvNode && depth > 1;
-                      CC = lmrDepth >= 4;
+                      CC = lmrDepth >= 5;
                       if(CC)
                       {
                           Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
@@ -1177,7 +1177,7 @@ moves_loop: // When in check, search starts here
                           lmrDepth < 4,
                       };
 
-                      if(LCS_PRUNE2 && CC)
+                      if(LCS_PRUNE2)
                       {
                           ss->doubleExtensions = (ss-1)->doubleExtensions;
                           ss->currentMove = move;
