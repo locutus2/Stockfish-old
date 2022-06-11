@@ -304,6 +304,13 @@ namespace {
                     "distance(pos.square<KING>(~us),to_sq(move))<6",
                     "distance(pos.square<KING>(~us),to_sq(move))<7",
                     "moveCountPruning",
+                    "pos.count<ALL_PIECES>()>8",
+                    "pos.count<ALL_PIECES>()>16",
+                    "pos.count<ALL_PIECES>()>24",
+                    "pos.count<PAWN>()>4",
+                    "pos.count<PAWN>()>8",
+                    "pos.count<PAWN>()>12",
+                    "pos.opposite_bishops()",
                  };
 
     if(LCS_LMR || LCS_LMR2 || LCS_LMR3)

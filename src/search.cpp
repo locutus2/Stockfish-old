@@ -1065,8 +1065,9 @@ moves_loop: // When in check, search starts here
                       CC = lmrDepth >= 4;
                       if(CC)
                       {
-                        Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
-                        C = { PvNode,
+                          Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
+                          C = { 
+                              PvNode,
                               cutNode,
                               capture,
                               givesCheck,
@@ -1160,6 +1161,13 @@ moves_loop: // When in check, search starts here
                           distance(pos.square<KING>(~us),to_sq(move))<6,
                           distance(pos.square<KING>(~us),to_sq(move))<7,
                           moveCountPruning,
+                          pos.count<ALL_PIECES>() > 8,
+                          pos.count<ALL_PIECES>() > 16,
+                          pos.count<ALL_PIECES>() > 24,
+                          pos.count<PAWN>() > 4,
+                          pos.count<PAWN>() > 8,
+                          pos.count<PAWN>() > 12,
+                          pos.opposite_bishops(),
 
                           lmrDepth < 1,
                           lmrDepth < 2,
@@ -1167,24 +1175,24 @@ moves_loop: // When in check, search starts here
                           lmrDepth < 4,
                       };
 
-                    if(LCS_PRUNE2 && CC)
-                    {
-                        ss->doubleExtensions = (ss-1)->doubleExtensions;
-                        ss->currentMove = move;
-                        ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
-                                                                                  [capture]
-                                                                                  [movedPiece]
-                                                                                  [to_sq(move)];
+                      if(LCS_PRUNE2 && CC)
+                      {
+                          ss->doubleExtensions = (ss-1)->doubleExtensions;
+                          ss->currentMove = move;
+                          ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
+                                                                                    [capture]
+                                                                                    [movedPiece]
+                                                                                    [to_sq(move)];
+                          
+                          pos.do_move(move, st, givesCheck);
+                          value = -qsearch<NonPV>(pos, ss+1, -alpha-1, -alpha);
+                          pos.undo_move(move);
                         
-                        pos.do_move(move, st, givesCheck);
-                        value = -qsearch<NonPV>(pos, ss+1, -alpha-1, -alpha);
-                        pos.undo_move(move);
-                        
-                        T = value > alpha;
-                        lcs.learn(T, C);
+                          T = value > alpha;
+                          lcs.learn(T, C);
 
-                        continue;
-                    }
+                          continue;
+                      }
                   }
                   else continue;
                 }
@@ -1449,6 +1457,13 @@ moves_loop: // When in check, search starts here
                       distance(pos.square<KING>(~us),to_sq(move))<6,
                       distance(pos.square<KING>(~us),to_sq(move))<7,
                       moveCountPruning,
+                      pos.count<ALL_PIECES>() > 8,
+                      pos.count<ALL_PIECES>() > 16,
+                      pos.count<ALL_PIECES>() > 24,
+                      pos.count<PAWN>() > 4,
+                      pos.count<PAWN>() > 8,
+                      pos.count<PAWN>() > 12,
+                      pos.opposite_bishops(),
 
                       deeper==0,
                       deeper==1,
