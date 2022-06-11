@@ -356,8 +356,10 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
 {
     int parent1 = wheelSelectionBest(label, matches);
     if(parent1 < 0) return;
-    int parent2 = wheelSelectionBest(label, matches, parent1);
-    if(parent2 < 0 || parent1 == parent2) return;
+    //int parent2 = wheelSelectionBest(label, matches, parent1);
+    //if(parent2 < 0 || parent1 == parent2) return;
+    int parent2 = wheelSelectionBest(label, matches);
+    if(parent2 < 0) return;
 
     Rule child1, child2;
 
