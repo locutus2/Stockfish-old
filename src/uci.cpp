@@ -311,6 +311,8 @@ namespace {
                     "pos.count<PAWN>()>8",
                     "pos.count<PAWN>()>12",
                     "pos.opposite_bishops()",
+                    "ss->ply&1",
+                    "thisThread->nodes&1",
                  };
 
     if(LCS_LMR || LCS_LMR2 || LCS_LMR3)

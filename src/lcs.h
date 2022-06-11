@@ -10,6 +10,7 @@ class LCS
 {
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
+    static const bool MAX_CONDITIONS = 4;
     const bool USE_SUBSUMPTION = false;
     const bool USE_GENERALIZATION = true;
     const bool ONLY_CORRECT_MUTATIONS = true;
@@ -75,7 +76,7 @@ class LCS
     int maxConditions;
     static std::string preconditionText;
 
-    LCS(int maxC = 4);
+    LCS(int maxC = MAX_CONDITIONS);
     void deletionStep();
     void setParams(const std::string& label, const std::vector<std::string>& params);
     void resetStats();

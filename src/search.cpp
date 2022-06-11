@@ -1168,6 +1168,8 @@ moves_loop: // When in check, search starts here
                           pos.count<PAWN>() > 8,
                           pos.count<PAWN>() > 12,
                           pos.opposite_bishops(),
+                          bool(ss->ply&1),
+                          bool(thisThread->nodes&1),
 
                           lmrDepth < 1,
                           lmrDepth < 2,
@@ -1464,6 +1466,8 @@ moves_loop: // When in check, search starts here
                       pos.count<PAWN>() > 8,
                       pos.count<PAWN>() > 12,
                       pos.opposite_bishops(),
+                      bool(ss->ply&1),
+                      bool(thisThread->nodes&1),
 
                       deeper==0,
                       deeper==1,
