@@ -15,6 +15,14 @@ LCS::Rule::Rule() : numerosity(1), age(0), nPredictions(0), correctPredictions(0
 {
 }
 
+bool LCS::Rule::operator==(const LCS::Rule& rule) const
+{
+    for(int i = 0; i < (int)condition.size(); ++i)
+        if (condition[i] != rule.condition[i])
+            return false;
+    return result == rule.result;
+}
+
 int LCS::Rule::countConditions() const
 {
     int count = 0;
@@ -89,6 +97,28 @@ void LCS::restoreRules()
     }
 }
 
+bool LCS::hasDuplicate(const Rule& rule) const
+{
+    for(int i = 0; i < (int)rules.size(); i++)
+        if(rule == rules[i])
+            return true;
+    return false;
+}
+
+void LCS::removeDuplicates()
+{
+    std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
+                                                                                          || (a.fitness == b.fitness && a.coverage > b.coverage)
+                                                                                          || (a.fitness == b.fitness && a.coverage == b.coverage && a.age > b.age); } );
+    for(int i = (int)rules.size(); i > 0; i--)
+    {
+        if(rules[i] == rules[i-1])
+        {
+            rules.erase(rules.begin() + i);
+        }
+    }
+}
+
 void LCS::printRule(const Rule& rule, std::ostream& out) const
 {
     assert(rule.condition.size() == paramsText.size());
@@ -152,9 +182,11 @@ void LCS::learn()
             {
                 Rule rule = rules[i];
                 rule.condition[j] = POSITIVE;
-                rules.push_back(rule);
+                if(!hasDuplicate(rule))
+                    rules.push_back(rule);
                 rule.condition[j] = NEGATIVE;
-                rules.push_back(rule);
+                if(!hasDuplicate(rule))
+                    rules.push_back(rule);
             }
         }
     }
@@ -287,7 +319,8 @@ void LCS::addGeneralizedRule(const Rule & rule)
         r.condition[rnd(cond.size())] = NONE;
         r.numerosity++;
         updateRule(r, r.result);
-        rules.push_back(r);
+        if(!hasDuplicate(r))
+            rules.push_back(r);
     }
 }
 
@@ -333,7 +366,8 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
         updateRule(child1, label);
         //std::cerr << "child1 => ";
         //printRule(child1);
-        rules.push_back(child1);
+        if(!hasDuplicate(child1))
+            rules.push_back(child1);
     }
 
     if (matchRule(params, child2))
@@ -341,7 +375,8 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
         updateRule(child2, label);
         //std::cerr << "child2 => ";
         //printRule(child2);
-        rules.push_back(child2);
+        if(!hasDuplicate(child2))
+            rules.push_back(child2);
     }
 }
 
@@ -405,6 +440,9 @@ int LCS::wheelSelectionWorst() const
 
 void LCS::deletionStep()
 {
+    //if ((int)rules.size() > maxRules)
+    //    removeDuplicates();
+
     while ((int)rules.size() > maxRules)
     {
         int r = wheelSelectionWorst();
@@ -578,7 +616,8 @@ void LCS::addCoveringRule(bool label, const std::vector<bool>& params)
 
     updateRule(rule, label);
 
-    rules.push_back(rule);
+    if(!hasDuplicate(rule))
+        rules.push_back(rule);
 }
 
 void LCS::printExample(bool label, const std::vector<bool>& params, std::ostream& out) const

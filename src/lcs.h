@@ -35,6 +35,7 @@ class LCS
 
         Rule();
         int countConditions() const;
+        bool operator==(const Rule& rule) const; 
     };
 
     bool topToBottom;
@@ -47,6 +48,8 @@ class LCS
     std::vector<Rule> rules;
     std::vector<std::vector<Rule>> savedRules;
 
+    bool hasDuplicate(const Rule& rule) const;
+    void removeDuplicates();
     void generalizationStep(bool label, const std::set<int>& matches);
     void addGeneralizedRule(const Rule & rule);
     double calculateSubsumptionFitness(const Rule& rule) const;
