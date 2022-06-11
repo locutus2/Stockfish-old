@@ -249,7 +249,9 @@ namespace {
                     "type_of(captured)==BISHOP",
                     "type_of(captured)==ROOK",
                     "type_of(captured)==QUEEN",
+                    "complexity<100",
                     "complexity<200",
+                    "complexity<300",
                     "complexity<400",
                     "complexity<600",
                     "complexity<800",
@@ -313,6 +315,10 @@ namespace {
                     "pos.opposite_bishops()",
                     "ss->ply&1",
                     "thisThread->nodes&1",
+                    "ss->staticEval<=alpha",
+                    "eval<=alpha",
+                    "ttValue<=alpha",
+                    "relative_rank(us,to_sq(move))>=RANK_5",
                  };
 
     if(LCS_LMR || LCS_LMR2 || LCS_LMR3)
