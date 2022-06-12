@@ -327,6 +327,10 @@ namespace {
                     "pos.non_pawn_material(WHITE)!=pos.non_pawn_material(BLACK)",
                     "depth<ss->ply",
                     "depth+ss->ply>rootDepth",
+                    "ss->staticEval<eval",
+                    "ss->ttHit&&tte->bound()&BOUND_LOWER",
+                    "ss->ttHit&&tte->bound()&BOUND_UPPER",
+                    "ttValue<ss->staticEval",
                  };
 
     if(LCS_LMR || LCS_LMR2 || LCS_LMR3)
