@@ -1048,7 +1048,7 @@ moves_loop: // When in check, search starts here
               // Futility pruning: parent node (~9 Elo)
               if (   !ss->inCheck
                   && lmrDepth < 11
-                  && ss->staticEval + 122 + 138 * lmrDepth +  thisThread->mainHistory[us][from_to(move)] / 60 <= alpha)
+                  && ss->staticEval + 122 + 138 * lmrDepth +  (history + thisThread->mainHistory[us][from_to(move)]) / 60 <= alpha)
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
