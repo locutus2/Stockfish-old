@@ -319,6 +319,12 @@ namespace {
                     "eval<=alpha",
                     "ttValue<=alpha",
                     "relative_rank(us,to_sq(move))>=RANK_5",
+                    "pos.count<PAWN>(WHITE)!=pos.count<PAWN>(BLACK)",
+                    "pos.count<KNIGHT>(WHITE)!=pos.count<KNIGHT>(BLACK)",
+                    "pos.count<BISHOP>(WHITE)!=pos.count<BISHOP>(BLACK)",
+                    "pos.count<ROOK>(WHITE)!=pos.count<ROOK>(BLACK)",
+                    "pos.count<QUEEN>(WHITE)!=pos.count<QUEEN>(BLACK)",
+                    "pos.non_pawn_material(WHITE)!=pos.non_pawn_material(BLACK)",
                  };
 
     if(LCS_LMR || LCS_LMR2 || LCS_LMR3)
