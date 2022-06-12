@@ -32,11 +32,11 @@ class Position;
 
 //const int TOP_TO_BOTTOM = 4;
 const int TOP_TO_BOTTOM = 0;
-const bool LCS_LMR = true;
+const bool LCS_LMR = false;
 const bool LCS_LMR2 = false;
 const bool LCS_LMR3 = false;
 const bool LCS_PRUNE = false;
-const bool LCS_PRUNE2 = false;
+const bool LCS_PRUNE2 = true;
 
 extern LCS lcs;
 

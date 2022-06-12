@@ -10,7 +10,7 @@ class LCS
 {
     enum Condition { NONE, POSITIVE, NEGATIVE };
 
-    const int MAX_CONDITIONS = 4;
+    const int MAX_CONDITIONS = 5;
     const bool USE_GENERALIZATION = MAX_CONDITIONS > 0;
     const bool USE_SUBSUMPTION = false;
     const bool ONLY_CORRECT_MUTATIONS = true;

@@ -7,8 +7,8 @@
 #include "lcs.h"
 #include "misc.h"
 
-//std::string LCS::preconditionText = "lmrDepth >= 5";
-std::string LCS::preconditionText = "";
+std::string LCS::preconditionText = "lmrDepth >= 5";
+//std::string LCS::preconditionText = "";
 
 int LCS::Rule::nextId = 1;
 
