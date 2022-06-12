@@ -1045,59 +1045,38 @@ moves_loop: // When in check, search starts here
                             + (*contHist[1])[movedPiece][to_sq(move)]
                             + (*contHist[3])[movedPiece][to_sq(move)];
 
-              // Futility pruning: parent node (~9 Elo)
-              if (   !ss->inCheck
-                  && lmrDepth < 11
-                  && ss->staticEval + 122 + 138 * lmrDepth +  (history + thisThread->mainHistory[us][from_to(move)]) / 60 <= alpha)
-                  continue;
-
-              // Prune moves with negative SEE (~3 Elo)
-              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
-                  continue;
-
-              // Continuation history based pruning (~2 Elo)
-              if (   lmrDepth < 5
-                  && history < -3875 * (depth - 1))
-              //    continue;
+              if(LCS_PRUNE || LCS_PRUNE2 || LCS_FUT)
               {
-                  if(LCS_PRUNE || LCS_PRUNE2)
-                  {
-                      //CC = depth <= 1;
-                      //CC = true;
-                      //CC = !PvNode && depth > 1;
-                      CC = lmrDepth >= 4;
-                      if(CC)
-                      {
-                          Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
-                          C = { 
-                              PvNode,
-                              cutNode,
-                              capture,
-                              givesCheck,
-                              improving,
-                              priorCapture,
-                              type_of(move)==PROMOTION,
-                              move==ss->killers[0],
-                              move==ss->killers[1],
-                              move==(ss-2)->killers[0],
-                              move==(ss-2)->killers[1],
-                              move==countermove,
-                              ss->ttHit,
-                              (ss-1)->ttHit,
-                              (ss-2)->ttHit,
-                              ss->ttPv,
-                              (ss-1)->ttPv,
-                              (ss-2)->ttPv,
-                              ss->inCheck,
-                              (ss-1)->inCheck,
-                              (ss-2)->inCheck,
-                              (ss-1)->currentMove==MOVE_NULL,
-                              (ss-2)->currentMove==MOVE_NULL,
-                              excludedMove!=MOVE_NONE,
-                              (ss-1)->excludedMove!=MOVE_NONE,
-                              (ss-2)->excludedMove!=MOVE_NONE,
-                              (ss-2)->excludedMove==move,
-                              (ss-2)->ttMove==move,
+                  Piece captured = type_of(move) == EN_PASSANT ? W_PAWN : pos.piece_on(to_sq(move));
+                  C = { 
+                          PvNode,
+                          cutNode,
+                          capture,
+                          givesCheck,
+                          improving,
+                          priorCapture,
+                          type_of(move)==PROMOTION,
+                          move==ss->killers[0],
+                          move==ss->killers[1],
+                          move==(ss-2)->killers[0],
+                          move==(ss-2)->killers[1],
+                          move==countermove,
+                          ss->ttHit,
+                          (ss-1)->ttHit,
+                          (ss-2)->ttHit,
+                          ss->ttPv,
+                          (ss-1)->ttPv,
+                          (ss-2)->ttPv,
+                          ss->inCheck,
+                          (ss-1)->inCheck,
+                          (ss-2)->inCheck,
+                          (ss-1)->currentMove==MOVE_NULL,
+                          (ss-2)->currentMove==MOVE_NULL,
+                          excludedMove!=MOVE_NONE,
+                          (ss-1)->excludedMove!=MOVE_NONE,
+                          (ss-2)->excludedMove!=MOVE_NONE,
+                          (ss-2)->excludedMove==move,
+                          (ss-2)->ttMove==move,
                           type_of(movedPiece)==PAWN,
                           type_of(movedPiece)==KNIGHT,
                           type_of(movedPiece)==BISHOP,
@@ -1197,27 +1176,57 @@ moves_loop: // When in check, search starts here
                           lmrDepth < 3,
                           lmrDepth < 4,
                       };
+              }
 
-                      if(LCS_PRUNE2)
-                      {
-                          ss->doubleExtensions = (ss-1)->doubleExtensions;
-                          ss->currentMove = move;
-                          ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
-                                                                                    [capture]
-                                                                                    [movedPiece]
-                                                                                    [to_sq(move)];
-                          
-                          pos.do_move(move, st, givesCheck);
-                          value = -qsearch<NonPV>(pos, ss+1, -alpha-1, -alpha);
-                          pos.undo_move(move);
-                        
-                          T = value > alpha;
-                          lcs.learn(T, C);
-
-                          continue;
-                      }
+              // Futility pruning: parent node (~9 Elo)
+              if (   !ss->inCheck
+                  && lmrDepth < 11
+                  && ss->staticEval + 122 + 138 * lmrDepth +  (history + thisThread->mainHistory[us][from_to(move)]) / 60 <= alpha)
+              {
+                  if (LCS_FUT)
+                  {
+                      //CC = lmrDepth >= 10;
+                      CC = true;
                   }
-                  else continue;
+                  if(!CC) continue;
+              }
+
+              // Prune moves with negative SEE (~3 Elo)
+              if (!pos.see_ge(move, Value(-25 * lmrDepth * lmrDepth - 20 * lmrDepth)))
+                  continue;
+
+              // Continuation history based pruning (~2 Elo)
+              if (   lmrDepth < 5
+                  && history < -3875 * (depth - 1))
+              //    continue;
+              {
+                  if(LCS_PRUNE || LCS_PRUNE2)
+                  {
+                      //CC = depth <= 1;
+                      //CC = true;
+                      //CC = !PvNode && depth > 1;
+                      CC = lmrDepth >= 4;
+                      if(CC)
+                      {
+                          if(LCS_PRUNE2)
+                          {
+                              ss->doubleExtensions = (ss-1)->doubleExtensions;
+                              ss->currentMove = move;
+                              ss->continuationHistory = &thisThread->continuationHistory[ss->inCheck]
+                                                                                        [capture]
+                                                                                        [movedPiece]
+                                                                                        [to_sq(move)];
+                              
+                              pos.do_move(move, st, givesCheck);
+                              value = -qsearch<NonPV>(pos, ss+1, -alpha-1, -alpha);
+                              pos.undo_move(move);
+                            
+                              T = value > alpha;
+                              lcs.learn(T, C);
+
+                              continue;
+                          }
+                      }
                 }
                 else continue;
               }
@@ -1635,7 +1644,7 @@ moves_loop: // When in check, search starts here
               rm.score = -VALUE_INFINITE;
       }
 
-      if(LCS_PRUNE && CC)
+      if((LCS_PRUNE || LCS_FUT) && CC)
       {
           T = value > alpha;
           lcs.learn(T, C);

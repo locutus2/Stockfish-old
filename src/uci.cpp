@@ -343,7 +343,7 @@ namespace {
         paramsText.push_back("extension<0");
     }
 
-    if (LCS_PRUNE || LCS_PRUNE2)
+    if (LCS_PRUNE || LCS_PRUNE2 || LCS_FUT)
     {
         paramsText.push_back("lmrDepth<1");
         paramsText.push_back("lmrDepth<2");
