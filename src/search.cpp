@@ -1046,9 +1046,10 @@ moves_loop: // When in check, search starts here
               if (   !ss->inCheck
                   && lmrDepth < 11
                   && ss->staticEval + 122 + 138 * lmrDepth + history / 60 <= alpha
-                  && (   depth >= 5
-                      || complexity >= 800
-                      || (ss-1)->moveCount < 3))
+                  && (   depth >= std::min(8, ss->ply)
+                      || distance(pos.square<KING>(~us), to_sq(move)) >= 7
+                      || ss->staticEval <= alpha
+                      || pos.count<QUEEN>(WHITE) != pos.count<QUEEN>(BLACK)))
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
