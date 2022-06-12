@@ -1046,11 +1046,9 @@ moves_loop: // When in check, search starts here
               if (   !ss->inCheck
                   && lmrDepth < 11
                   && ss->staticEval + 122 + 138 * lmrDepth + history / 60 <= alpha
-                  && (   depth >= 4
-                      || moveCount >= 5
-                      || !cutNode
-                      || pos.count<ALL_PIECES>() > 16
-                      || pos.count<PAWN>() > 12))
+                  && (   depth >= 5
+                      || complexity >= 800
+                      || (ss-1)->moveCount < 3))
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
