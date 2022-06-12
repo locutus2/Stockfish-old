@@ -1373,7 +1373,7 @@ moves_loop: // When in check, search starts here
               //CC = !ss->ttPv && !cutNode;
               //CC = CC && LCS_PRECONDITION(!capture && ss->inCheck && !givesCheck && type_of(move) != PROMOTION
               //        && move != ss->killers[0] && move != ss->killers[1] && move != countermove);
-              CC = CC && !capture && move == countermove;
+              //CC = CC && !capture && move == countermove;
               if(CC)
               {
                 Piece captured = pos.captured_piece();
@@ -1504,27 +1504,33 @@ moves_loop: // When in check, search starts here
           }
 
           Value value2 = VALUE_ZERO;
-          if(LCS_LMR2 && CC)
+          if (CC)
           {
-              value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d-1, true);
-          }
-          if(LCS_LMR3 && CC)
-          {
-              value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d+1, true);
+              if(LCS_LMR2)
+              {
+                  value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d-1, true);
+              }
+              else if(LCS_LMR3)
+              {
+                  value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d+1, true);
+              }
           }
 
           value = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d, true);
 
 
-          if((LCS_LMR2 || LCS_LMR3) && CC)
+          if (CC)
           {
-             T = (value > alpha) == (value2 > alpha);
-             lcs.learn(T, C);
-          }
-          else if(LCS_LMR && CC)
-          {
-             T = value > alpha;
-             lcs.learn(T, C);
+              if(LCS_LMR2 || LCS_LMR3)
+              {
+                 T = (value > alpha) == (value2 > alpha);
+                 lcs.learn(T, C);
+              }
+              else if(LCS_LMR)
+              {
+                 T = value > alpha;
+                 lcs.learn(T, C);
+              }
           }
 
 

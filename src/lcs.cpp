@@ -7,7 +7,8 @@
 #include "lcs.h"
 #include "misc.h"
 
-std::string LCS::preconditionText = "lmrDepth >= 5";
+//std::string LCS::preconditionText = "lmrDepth >= 5";
+std::string LCS::preconditionText = "";
 
 int LCS::Rule::nextId = 1;
 
@@ -406,7 +407,6 @@ void LCS::ruleDiscoveryStep(bool label, const std::vector<bool>& params, const s
     }
 }
 
-/*
 int LCS::wheelSelectionBest(bool label, const std::set<int>& matches, int excludedRule) const
 {
     std::vector<int> correct;
@@ -464,8 +464,8 @@ int LCS::wheelSelectionWorst() const
 
     return rnd(rules.size());
 }
-*/
 
+/*
 int LCS::wheelSelectionBest(bool label, const std::set<int>& matches, int excludedRule) const
 {
     return wheelSelection([&](const Rule& rule)->bool {
@@ -489,6 +489,7 @@ int LCS::wheelSelectionWorst() const
                               return MAX_FITNESS - rule.fitness;
                           });
 }
+*/
 
 template <typename Filter, typename Weight>
 int LCS::wheelSelection(const Filter& filter, const Weight& weight) const
