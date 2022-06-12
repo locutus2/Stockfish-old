@@ -1046,11 +1046,11 @@ moves_loop: // When in check, search starts here
               if (   !ss->inCheck
                   && lmrDepth < 11
                   && ss->staticEval + 122 + 138 * lmrDepth + history / 60 <= alpha
-                  && (   depth >= 5
-                      || eval <= alpha
-                      || pos.opposite_bishops()
-                      || type_of(movedPiece) == PAWN
-                      || move == ss->killers[1]))
+                  && (   depth >= 4
+                      || moveCount >= 5
+                      || !cutNode
+                      || pos.count<ALL_PIECES>() > 16
+                      || pos.count<PAWN>() > 12))
                   continue;
 
               // Prune moves with negative SEE (~3 Elo)
