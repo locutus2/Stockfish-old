@@ -1180,10 +1180,11 @@ moves_loop: // When in check, search starts here
 
           if (   capture
               && givesCheck
-              && moveCount < 3
-              && depth < 9
-              && (ss+1)->cutoffCnt > 0
-              && ttValue > alpha)
+              && depth < 7
+              && !ss->ttHit
+              && distance(pos.square<KING>( us), to_sq(move)) > 2
+              && distance(pos.square<KING>(~us), to_sq(move)) > 2
+              && pos.count<BISHOP>(WHITE) != pos.count<BISHOP>(BLACK))
               r--;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
