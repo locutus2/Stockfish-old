@@ -1379,9 +1379,9 @@ moves_loop: // When in check, search starts here
 
           //CC = depth <= 3 && d > 1;
           //CC = d > 1;
-          if(LCS_LMR || LCS_LMR2 || LCS_LMR3)
+          if(LCS_LMR || LCS_LMR2 || LCS_LMR3 || LCS_LMR4)
           {
-              CC = (!LCS_LMR2 && !LCS_LMR2) || (LCS_LMR2 && d > 1) || (LCS_LMR3 && d < newDepth + deeper);
+              CC = (!LCS_LMR2 && !LCS_LMR3) || (LCS_LMR2 && d > 1) || (LCS_LMR3 && d < newDepth + deeper);
               //CC = !LCS_LMR2 || d > 1;
               //CC = depth <= 3 && d > 1;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
@@ -1392,6 +1392,8 @@ moves_loop: // When in check, search starts here
               //CC = CC && LCS_PRECONDITION(!capture && ss->inCheck && !givesCheck && type_of(move) != PROMOTION
               //        && move != ss->killers[0] && move != ss->killers[1] && move != countermove);
               //CC = CC && !capture && move == countermove;
+              //CC = CC && capture && distance(pos.square<KING>(~us), to_sq(move)) <= 2;
+              CC = CC && capture && givesCheck;
               if(CC)
               {
                 Piece captured = pos.captured_piece();
@@ -1644,7 +1646,7 @@ moves_loop: // When in check, search starts here
               rm.score = -VALUE_INFINITE;
       }
 
-      if((LCS_PRUNE || LCS_FUT) && CC)
+      if((LCS_PRUNE || LCS_FUT || LCS_LMR4) && CC)
       {
           T = value > alpha;
           lcs.learn(T, C);

@@ -7,8 +7,11 @@
 #include "lcs.h"
 #include "misc.h"
 
-std::string LCS::preconditionText = "lmrDepth >= 5";
-//std::string LCS::preconditionText = "";
+std::string LCS::preconditionText
+//= "";
+//= "lmrDepth >= 5";
+//= "capture && distance(pos.square<KING>(~us), to_sq(move)) <= 2";
+= "capture && givesCheck";
 
 int LCS::Rule::nextId = 1;
 
