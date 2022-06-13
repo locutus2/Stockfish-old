@@ -780,26 +780,45 @@ void LCS::print(bool sort, bool pareto, std::ostream& out)
 {
     if (pareto)
     {
-        std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
-                                                                                              || (a.fitness == b.fitness && a.coverage > b.coverage); } );
+        const bool REVERSE = true;
+
+        if (REVERSE)
+            std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
+                                                                                                  || (a.fitness == b.fitness && a.coverage < b.coverage); } );
+        else
+            std::stable_sort(rules.begin(), rules.end(), [](const Rule& a, const Rule& b) { return   a.fitness > b.fitness
+                                                                                                  || (a.fitness == b.fitness && a.coverage > b.coverage); } );
         out << "--------- pareto step " << steps << " ----------" << std::endl;
         out << "Pre-condition: " << LCS::preconditionText << std::endl;
         for(int label = 0; label < 2; ++label)
         {
             out << "=> Label: " << (label ? labelText : "NOT(" + labelText + ")") << std::endl;
             double lastFitness  =  MIN_FITNESS;
-            double lastCoverage =  -1;
+            double lastCoverage =  REVERSE ? 2 : -1;
 
             for(int i = 0, j = 0; i < (int)rules.size(); ++i)
             {
-                if (rules[i].result == bool(label) && (rules[i].coverage  > lastCoverage || (rules[i].fitness == lastFitness && rules[i].coverage >= lastCoverage)))
+                if (REVERSE)
                 {
-                    out << j+1 << ". ";
-                    printRule(rules[i], out);
-                    ++j;
-                    lastFitness = rules[i].fitness;
-                    lastCoverage = rules[i].coverage;
-
+                    if (rules[i].result == bool(label) && (rules[i].coverage  < lastCoverage || (rules[i].fitness == lastFitness && rules[i].coverage <= lastCoverage)))
+                    {
+                        out << j+1 << ". ";
+                        printRule(rules[i], out);
+                        ++j;
+                        lastFitness = rules[i].fitness;
+                        lastCoverage = rules[i].coverage;
+                    }
+                }
+                else
+                {
+                    if (rules[i].result == bool(label) && (rules[i].coverage  > lastCoverage || (rules[i].fitness == lastFitness && rules[i].coverage >= lastCoverage)))
+                    {
+                        out << j+1 << ". ";
+                        printRule(rules[i], out);
+                        ++j;
+                        lastFitness = rules[i].fitness;
+                        lastCoverage = rules[i].coverage;
+                    }
                 }
             }
         }
