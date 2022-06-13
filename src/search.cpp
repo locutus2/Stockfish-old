@@ -1178,13 +1178,11 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (   capture
-              && givesCheck
-              && depth > 5
-              && type_of(pos.captured_piece()) != KNIGHT
-              && distance(pos.square<KING>(~us), to_sq(move)) < 7
-              && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] <= 0
-              && pos.count<ALL_PIECES>() > 16)
+          if (   PvNode
+              && depth > 7
+              && bestMove
+              && capture
+              && givesCheck)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
