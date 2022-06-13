@@ -1178,6 +1178,13 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
+          if (   capture
+              && givesCheck
+              && moveCount < 5
+              && ttValue >= ss->staticEval
+              && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] > 0)
+              r--;
+
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
