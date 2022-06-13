@@ -1180,10 +1180,9 @@ moves_loop: // When in check, search starts here
 
           if (   capture
               && givesCheck
-              && !ttCapture
-              && ttValue <= alpha
-              && !(ss->ttHit && tte->bound() & BOUND_LOWER)
-              && !excludedMove)
+              && depth > 5
+              && thisThread->captureHistory[movedPiece][to_sq(move)][type_of(pos.captured_piece())] <= 0
+              && pos.count<ALL_PIECES>() > 16)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
