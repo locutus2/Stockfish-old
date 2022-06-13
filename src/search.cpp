@@ -1178,11 +1178,12 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          if (   PvNode
-              && depth > 7
-              && bestMove
-              && capture
-              && givesCheck)
+          if (   capture
+              && givesCheck
+              && !ttCapture
+              && ttValue <= alpha
+              && !(ss->ttHit && tte->bound() & BOUND_LOWER)
+              && !excludedMove)
               r++;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
