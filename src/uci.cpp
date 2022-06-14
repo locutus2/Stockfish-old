@@ -351,7 +351,7 @@ namespace {
         paramsText.push_back("lmrDepth<4");
     }
 
-    lcs.setParams((LCS_LMR2 || LCS_LMR3 ? "Stable" : "FailHigh"), paramsText);
+    lcs.setParams((LCS_LMR2 || LCS_LMR3 || LCS_LMR5 ? "Stable" : "FailHigh"), paramsText);
 
 
     if (TOP_TO_BOTTOM)

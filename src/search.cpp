@@ -1319,6 +1319,7 @@ moves_loop: // When in check, search starts here
       pos.do_move(move, st, givesCheck);
 
       bool doDeeperSearch = false;
+      Value value2 = VALUE_ZERO;
 
       // Step 17. Late moves reduction / extension (LMR, ~98 Elo)
       // We use various heuristics for the sons of a node after the first son has
@@ -1379,9 +1380,9 @@ moves_loop: // When in check, search starts here
 
           //CC = depth <= 3 && d > 1;
           //CC = d > 1;
-          if(LCS_LMR || LCS_LMR2 || LCS_LMR3 || LCS_LMR4)
+          if(LCS_LMR || LCS_LMR2 || LCS_LMR3 || LCS_LMR4 || LCS_LMR5)
           {
-              CC = (!LCS_LMR2 && !LCS_LMR3) || (LCS_LMR2 && d > 1) || (LCS_LMR3 && d < newDepth + deeper);
+              CC = (!LCS_LMR2 && !LCS_LMR3 && !LCS_LMR5) || (LCS_LMR2 && d > 1) || (LCS_LMR3 && d < newDepth + deeper) || (LCS_LMR5 && d > 1);
               //CC = !LCS_LMR2 || d > 1;
               //CC = depth <= 3 && d > 1;
               //CC =  d < newDepth + deeper && (ss-2)->ttMove == move;
@@ -1529,10 +1530,9 @@ moves_loop: // When in check, search starts here
               }
           }
 
-          Value value2 = VALUE_ZERO;
           if (CC)
           {
-              if(LCS_LMR2)
+              if(LCS_LMR2 || LCS_LMR5)
               {
                   value2 = -search<NonPV>(pos, ss+1, -(alpha+1), -alpha, d-1, true);
               }
@@ -1646,10 +1646,18 @@ moves_loop: // When in check, search starts here
               rm.score = -VALUE_INFINITE;
       }
 
-      if((LCS_PRUNE || LCS_FUT || LCS_LMR4) && CC)
+      if (CC)
       {
-          T = value > alpha;
-          lcs.learn(T, C);
+          if(LCS_PRUNE || LCS_FUT || LCS_LMR4)
+          {
+              T = value > alpha;
+              lcs.learn(T, C);
+          }
+          else if (LCS_LMR5)
+          {
+              T = (value2 <= alpha) == (value <= alpha);
+              lcs.learn(T, C);
+          }
       }
 
       if (value > bestValue)
