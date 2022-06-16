@@ -914,7 +914,7 @@ namespace {
     if (    cutNode
         &&  depth >= 8
         && !ttMove)
-        depth--;
+        depth -= 2;
 
 moves_loop: // When in check, search starts here
 
