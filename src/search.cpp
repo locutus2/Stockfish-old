@@ -906,7 +906,7 @@ namespace {
     // Use qsearch if depth is equal or below zero (~4 Elo)
     if (    PvNode
         && !ttMove)
-        depth -= 5;
+        depth -= 3;
 
     if (depth <= 0)
         return qsearch<PV>(pos, ss, alpha, beta);
@@ -914,7 +914,7 @@ namespace {
     if (    cutNode
         &&  depth >= 8
         && !ttMove)
-        depth--;
+        depth -= 3;
 
 moves_loop: // When in check, search starts here
 
@@ -1168,7 +1168,7 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r -= 1 + 15 / (3 + depth);
 
-          if (PvNode && !ttMove && !ss->inCheck)
+          if (cutNode && depth >= 8 && !ttMove && !ss->inCheck)
               r -= 2;
 
           // Increase reduction if next ply has a lot of fail high else reset count to 0
