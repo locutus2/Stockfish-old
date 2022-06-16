@@ -1394,7 +1394,8 @@ moves_loop: // When in check, search starts here
               //        && move != ss->killers[0] && move != ss->killers[1] && move != countermove);
               //CC = CC && !capture && move == countermove;
               //CC = CC && capture && distance(pos.square<KING>(~us), to_sq(move)) <= 2;
-              CC = CC && capture && givesCheck;
+              //CC = CC && capture && givesCheck;
+              CC = CC && !capture && !givesCheck && !ss->inCheck && type_of(move) == NORMAL;
               if(CC)
               {
                 Piece captured = pos.captured_piece();

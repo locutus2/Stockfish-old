@@ -11,7 +11,8 @@ std::string LCS::preconditionText
 //= "";
 //= "lmrDepth >= 5";
 //= "capture && distance(pos.square<KING>(~us), to_sq(move)) <= 2";
-= "capture && givesCheck";
+//= "capture && givesCheck";
+= "!capture && !givesCheck && !ss->inCheck && type_of(move) == NORMAL";
 
 int LCS::Rule::nextId = 1;
 
