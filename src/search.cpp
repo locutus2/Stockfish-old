@@ -554,7 +554,7 @@ namespace {
     TTEntry* tte;
     Key posKey;
     Move ttMove, move, excludedMove, bestMove;
-    Depth extension, newDepth;
+    Depth extension, newDepth, initialDepth;
     Value bestValue, value, ttValue, eval, maxValue, probCutBeta;
     bool givesCheck, improving, didLMR, priorCapture;
     bool capture, doFullDepthSearch, moveCountPruning, ttCapture;
@@ -570,6 +570,7 @@ namespace {
     moveCount          = captureCount = quietCount = ss->moveCount = 0;
     bestValue          = -VALUE_INFINITE;
     maxValue           = VALUE_INFINITE;
+    initialDepth       = depth;
 
     // Check for the available remaining time
     if (thisThread == Threads.main())
@@ -914,7 +915,7 @@ namespace {
     if (    cutNode
         &&  depth >= 8
         && !ttMove)
-        depth -= 2;
+        depth--;
 
 moves_loop: // When in check, search starts here
 
@@ -1168,7 +1169,7 @@ moves_loop: // When in check, search starts here
           if (PvNode)
               r -= 1 + 15 / (3 + depth);
 
-          if (cutNode && depth >= 8 && !ttMove && !ss->inCheck)
+          if (depth < initialDepth)
               r--;
 
           // Increase reduction if next ply has a lot of fail high else reset count to 0
