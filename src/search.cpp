@@ -1286,8 +1286,8 @@ moves_loop: // When in check, search starts here
               {
                   alpha = value;
 
-                  if(!capture && move != ttMove && depth > 3)
-                      update_continuation_histories(ss, movedPiece, to_sq(move), stat_bonus(depth - 3));
+                  if(!capture && move != ttMove && depth > 1)
+                      update_continuation_histories(ss, movedPiece, to_sq(move), stat_bonus(depth - 1));
 
                   // Reduce other moves if we have found at least one score improvement
                   if (   depth > 2
