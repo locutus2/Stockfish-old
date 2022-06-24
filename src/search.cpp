@@ -1287,7 +1287,7 @@ moves_loop: // When in check, search starts here
                   alpha = value;
 
                   if(!capture)
-                      update_continuation_histories(ss, movedPiece, to_sq(move), stat_bonus(std::max(depth * depth / thisThread->rootDepth, 1)));
+                      update_continuation_histories(ss, movedPiece, to_sq(move), stat_bonus(std::max(8 * depth / thisThread->rootDepth, 1)));
 
                   // Reduce other moves if we have found at least one score improvement
                   if (   depth > 2
