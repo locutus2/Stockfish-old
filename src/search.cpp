@@ -1028,7 +1028,7 @@ moves_loop: // When in check, search starts here
 
               // Continuation history based pruning (~2 Elo)
               if (   lmrDepth < 5
-                  && history < 875 - 3875 * depth)
+                  && history < -125 - 3875 * depth)
                   continue;
 
               history += thisThread->mainHistory[us][from_to(move)];
