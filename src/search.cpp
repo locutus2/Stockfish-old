@@ -1029,7 +1029,7 @@ moves_loop: // When in check, search starts here
 
               // Continuation history based pruning (~2 Elo)
               if (   lmrDepth < 5
-                  && history < 100 * depth * depth - 6099 * depth + 4125)
+                  && history < 100 * depth * depth - 6300 * depth + 5125)
                   continue;
 
               // Futility pruning: parent node (~9 Elo)
