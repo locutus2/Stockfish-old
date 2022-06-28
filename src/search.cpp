@@ -314,12 +314,14 @@ void Thread::search() {
   optimism[~us] = -optimism[us];
 
   int searchAgainCounter = 0;
+  int iter = 0;
 
   // Iterative deepening loop until requested to stop or the target depth is reached
-  while (   ++rootDepth < MAX_PLY
+  while (   (rootDepth = (++iter + 1) / 2, rootDepth < MAX_PLY)
          && !Threads.stop
          && !(Limits.depth && mainThread && rootDepth > Limits.depth))
   {
+
       // Age out PV variability metric
       if (mainThread)
           totBestMoveChanges /= 2;
