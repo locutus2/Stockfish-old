@@ -58,6 +58,8 @@ using namespace Search;
 
 namespace {
 
+  enum SearchType { FindBest, VerifyBest };
+
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV, Root };
 
@@ -274,6 +276,7 @@ void Thread::search() {
   double timeReduction = 1, totBestMoveChanges = 0;
   Color us = rootPos.side_to_move();
   int iterIdx = 0;
+  StateInfo st;
 
   std::memset(ss-7, 0, 10 * sizeof(Stack));
   for (int i = 7; i > 0; i--)
@@ -349,85 +352,113 @@ void Thread::search() {
           // Reset UCI info selDepth for each depth and each PV line
           selDepth = 0;
 
-          // Reset aspiration window starting size
-          if (rootDepth >= 4)
+          for (SearchType ST : { FindBest, VerifyBest})
           {
-              Value prev = rootMoves[pvIdx].averageScore;
-              delta = Value(16) + int(prev) * prev / 19178;
-              alpha = std::max(prev - delta,-VALUE_INFINITE);
-              beta  = std::min(prev + delta, VALUE_INFINITE);
+              // Reset aspiration window starting size
+              if (rootDepth >= 4)
+              {
+                  Value prev = rootMoves[pvIdx].averageScore;
+                  delta = Value(16) + int(prev) * prev / 19178;
+                  alpha = std::max(prev - delta,-VALUE_INFINITE);
+                  beta  = std::min(prev + delta, VALUE_INFINITE);
 
-              // Adjust trend and optimism based on root move's previousScore
-              int tr = sigmoid(prev, 3, 8, 90, 125, 1);
-              trend = (us == WHITE ?  make_score(tr, tr / 2)
-                                   : -make_score(tr, tr / 2));
+                  // Adjust trend and optimism based on root move's previousScore
+                  int tr = sigmoid(prev, 3, 8, 90, 125, 1);
+                  trend = (us == WHITE ?  make_score(tr, tr / 2)
+                                       : -make_score(tr, tr / 2));
 
-              int opt = sigmoid(prev, 8, 17, 144, 13966, 183);
-              optimism[ us] = Value(opt);
-              optimism[~us] = -optimism[us];
-          }
+                  int opt = sigmoid(prev, 8, 17, 144, 13966, 183);
+                  optimism[ us] = Value(opt);
+                  optimism[~us] = -optimism[us];
+              }
 
-          // Start with a small aspiration window and, in the case of a fail
-          // high/low, re-search with a bigger window until we don't fail
-          // high/low anymore.
-          int failedHighCnt = 0;
-          while (true)
-          {
-              Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
-              bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
+              // Start with a small aspiration window and, in the case of a fail
+              // high/low, re-search with a bigger window until we don't fail
+              // high/low anymore.
+              int failedHighCnt = 0;
+              while (true)
+              {
+                  Depth adjustedDepth = std::max(1, rootDepth - failedHighCnt - searchAgainCounter);
 
-              // Bring the best move to the front. It is critical that sorting
-              // is done with a stable algorithm because all the values but the
-              // first and eventually the new best one are set to -VALUE_INFINITE
-              // and we want to keep the same order for all the moves except the
-              // new PV that goes to the front. Note that in case of MultiPV
-              // search the already searched PV lines are preserved.
-              std::stable_sort(rootMoves.begin() + pvIdx, rootMoves.begin() + pvLast);
+                  if (ST == VerifyBest)
+                  {
+                      Move bestpv[MAX_PLY+1];
+                      ss->currentMove = rootMoves[pvIdx].pv[0];
+                      ss->moveCount = 1;
+                      (ss+1)->pv = bestpv;
+                      (ss+1)->pv[0] = MOVE_NONE;
 
-              // If search has been stopped, we break immediately. Sorting is
-              // safe because RootMoves is still valid, although it refers to
-              // the previous iteration.
-              if (Threads.stop)
-                  break;
+                      rootPos.do_move(rootMoves[pvIdx].pv[0], st);
+                      bestValue = -Stockfish::search<PV>(rootPos, ss+1, -beta, -alpha, adjustedDepth - 1, false);
+                      rootPos.undo_move(rootMoves[pvIdx].pv[0]);
 
-              // When failing high/low give some update (without cluttering
-              // the UI) before a re-search.
-              if (   mainThread
-                  && multiPV == 1
-                  && (bestValue <= alpha || bestValue >= beta)
-                  && Time.elapsed() > 3000)
+                      rootMoves[pvIdx].score = bestValue;
+                      rootMoves[pvIdx].selDepth = selDepth;
+                      rootMoves[pvIdx].pv.resize(1);
+
+                      assert((ss+1)->pv);
+
+                      for (Move* m = (ss+1)->pv; *m != MOVE_NONE; ++m)
+                          rootMoves[pvIdx].pv.push_back(*m);
+                  }
+                  else
+                  {
+                      bestValue = Stockfish::search<Root>(rootPos, ss, alpha, beta, adjustedDepth, false);
+                  }
+
+                  // Bring the best move to the front. It is critical that sorting
+                  // is done with a stable algorithm because all the values but the
+                  // first and eventually the new best one are set to -VALUE_INFINITE
+                  // and we want to keep the same order for all the moves except the
+                  // new PV that goes to the front. Note that in case of MultiPV
+                  // search the already searched PV lines are preserved.
+                  std::stable_sort(rootMoves.begin() + pvIdx, rootMoves.begin() + pvLast);
+
+                  // If search has been stopped, we break immediately. Sorting is
+                  // safe because RootMoves is still valid, although it refers to
+                  // the previous iteration.
+                  if (Threads.stop)
+                      break;
+
+                  // When failing high/low give some update (without cluttering
+                  // the UI) before a re-search.
+                  if (   mainThread
+                      && multiPV == 1
+                      && (bestValue <= alpha || bestValue >= beta)
+                      && Time.elapsed() > 3000)
+                      sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
+
+                  // In case of failing low/high increase aspiration window and
+                  // re-search, otherwise exit the loop.
+                  if (bestValue <= alpha)
+                  {
+                      beta = (alpha + beta) / 2;
+                      alpha = std::max(bestValue - delta, -VALUE_INFINITE);
+
+                      failedHighCnt = 0;
+                      if (mainThread)
+                          mainThread->stopOnPonderhit = false;
+                  }
+                  else if (bestValue >= beta)
+                  {
+                      beta = std::min(bestValue + delta, VALUE_INFINITE);
+                      ++failedHighCnt;
+                  }
+                  else
+                      break;
+
+                  delta += delta / 4 + 2;
+
+                  assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
+              }
+
+              // Sort the PV lines searched so far and update the GUI
+              std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
+
+              if (    mainThread
+                  && (Threads.stop || pvIdx + 1 == multiPV || Time.elapsed() > 3000))
                   sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
-
-              // In case of failing low/high increase aspiration window and
-              // re-search, otherwise exit the loop.
-              if (bestValue <= alpha)
-              {
-                  beta = (alpha + beta) / 2;
-                  alpha = std::max(bestValue - delta, -VALUE_INFINITE);
-
-                  failedHighCnt = 0;
-                  if (mainThread)
-                      mainThread->stopOnPonderhit = false;
-              }
-              else if (bestValue >= beta)
-              {
-                  beta = std::min(bestValue + delta, VALUE_INFINITE);
-                  ++failedHighCnt;
-              }
-              else
-                  break;
-
-              delta += delta / 4 + 2;
-
-              assert(alpha >= -VALUE_INFINITE && beta <= VALUE_INFINITE);
           }
-
-          // Sort the PV lines searched so far and update the GUI
-          std::stable_sort(rootMoves.begin() + pvFirst, rootMoves.begin() + pvIdx + 1);
-
-          if (    mainThread
-              && (Threads.stop || pvIdx + 1 == multiPV || Time.elapsed() > 3000))
-              sync_cout << UCI::pv(rootPos, rootDepth, alpha, beta) << sync_endl;
       }
 
       if (!Threads.stop)
@@ -436,13 +467,13 @@ void Thread::search() {
       if (rootMoves[0].pv[0] != lastBestMove) {
          lastBestMove = rootMoves[0].pv[0];
          lastBestMoveDepth = rootDepth;
-      }
 
       // Have we found a "mate in x"?
       if (   Limits.mate
           && bestValue >= VALUE_MATE_IN_MAX_PLY
           && VALUE_MATE - bestValue <= 2 * Limits.mate)
           Threads.stop = true;
+      }
 
       if (!mainThread)
           continue;
