@@ -389,7 +389,7 @@ void Thread::search() {
                       (ss+1)->pv[0] = MOVE_NONE;
 
                       rootPos.do_move(rootMoves[pvIdx].pv[0], st);
-                      bestValue = -Stockfish::search<PV>(rootPos, ss+1, -beta, -alpha, adjustedDepth - 1, false);
+                      bestValue = -Stockfish::search<PV>(rootPos, ss+1, -beta, -alpha, adjustedDepth, false);
                       rootPos.undo_move(rootMoves[pvIdx].pv[0]);
 
                       rootMoves[pvIdx].score = bestValue;
