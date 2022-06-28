@@ -317,7 +317,7 @@ void Thread::search() {
   int iter = 0;
 
   // Iterative deepening loop until requested to stop or the target depth is reached
-  while (   (rootDepth = (++iter + 1) / 2, rootDepth < MAX_PLY)
+  while (   (rootDepth = (++iter + 1) * 2 / 3, rootDepth < MAX_PLY)
          && !Threads.stop
          && !(Limits.depth && mainThread && rootDepth > Limits.depth))
   {
