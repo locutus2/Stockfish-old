@@ -354,6 +354,10 @@ void Thread::search() {
 
           for (SearchType ST : { FindBest, VerifyBest})
           {
+              // Do verify best only for each 8th thread
+              if (ST == VerifyBest && id() % 8 != 7)
+                  break;
+
               // Reset aspiration window starting size
               if (rootDepth >= 4)
               {
