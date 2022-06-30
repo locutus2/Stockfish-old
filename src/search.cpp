@@ -37,6 +37,10 @@
 
 namespace Stockfish {
 
+int P[37];
+
+TUNE(SetRange(-15914, 15914), P);
+
 namespace Search {
 
   LimitsType Limits;
@@ -1173,7 +1177,45 @@ moves_loop: // When in check, search starts here
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
-                         - 4334;
+                         - 4334
+                         + P[0] * givesCheck
+                         + P[1] * !givesCheck
+                         + P[2] * ss->inCheck
+                         + P[3] * !ss->inCheck
+                         + P[4] * capture
+                         + P[5] * !capture
+                         + P[6] * improving
+                         + P[7] * !improving
+                         + P[8] * PvNode
+                         + P[9] * !PvNode
+                         + P[10] * cutNode
+                         + P[11] * !cutNode
+                         + P[12] * ss->ttPv
+                         + P[13] * !ss->ttPv
+                         + P[14] * ss->ttHit
+                         + P[15] * !ss->ttHit
+                         + P[16] * priorCapture
+                         + P[17] * !priorCapture
+                         + P[18] * likelyFailLow
+                         + P[19] * !likelyFailLow
+                         + P[20] * ttCapture
+                         + P[21] * !ttCapture
+                         + P[22] * bool(excludedMove)
+                         + P[23] * !excludedMove
+                         + P[24] * ((ss-1)->currentMove == MOVE_NULL)
+                         + P[25] * !((ss-1)->currentMove == MOVE_NULL)
+                         + P[26] * (extension < 0)
+                         + P[27] * (extension == 0)
+                         + P[28] * (extension > 0)
+                         + P[29] * (type_of(movedPiece) == PAWN)
+                         + P[30] * (type_of(movedPiece) == KNIGHT)
+                         + P[31] * (type_of(movedPiece) == BISHOP)
+                         + P[32] * (type_of(movedPiece) == ROOK)
+                         + P[33] * (type_of(movedPiece) == QUEEN)
+                         + P[34] * (type_of(movedPiece) == KING)
+                         + P[35] * (type_of(move) == PROMOTION)
+                         + P[36] * !(type_of(move) == PROMOTION)
+                         ;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 15914;
