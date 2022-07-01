@@ -58,6 +58,8 @@ using namespace Search;
 
 namespace {
 
+  const int statScorePieceOffset[PIECE_TYPE_NB] = { 0, 2238, -1410, 416, -2227, -388, -1968 };
+
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV, Root };
 
@@ -1173,7 +1175,22 @@ moves_loop: // When in check, search starts here
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
-                         - 4334;
+                         + 3642 * ss->ttPv
+                         + 3565 * priorCapture
+                         - 3072 * ttCapture
+                         + 2253 * bool(excludedMove)
+                         + 2247 * ss->inCheck
+                         - 2160 * ss->ttHit
+                         - 2111 * improving
+                         + 1733 * likelyFailLow
+                         - 1373 * cutNode
+                         + 1159 * PvNode
+                         -  841 * extension
+                         +  528 * givesCheck
+                         +  438 * capture
+                         +  120 * (type_of(move) == PROMOTION)
+                         + statScorePieceOffset[type_of(movedPiece)]
+                         - 5460;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 15914;
