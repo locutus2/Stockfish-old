@@ -1171,7 +1171,7 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          int A = 1, B = 1;
+          const int A = 1, B = 1;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
@@ -1193,7 +1193,7 @@ moves_loop: // When in check, search starts here
                          -  426 * A / B * ss->inCheck
                          +  318 * A / B * ((ss-1)->currentMove == MOVE_NULL)
                          -  132 * A / B * cutNode
-                         - 1201 * A / B
+                         - (1201 - 3076) * A / B
                          - 4334;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
