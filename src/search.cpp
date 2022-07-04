@@ -1140,7 +1140,7 @@ moves_loop: // When in check, search starts here
           && (   !ss->ttPv
               || !capture
               || (cutNode && (ss-1)->moveCount > 1))
-          && (!PvNode || ss->ply > 1 || LMRcount++ > 0))
+          && (!PvNode || ss->ply > 2 || LMRcount++ > 0))
       {
           Depth r = reduction(improving, depth, moveCount, delta, thisThread->rootDelta);
 
