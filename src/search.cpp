@@ -1243,8 +1243,8 @@ moves_loop: // When in check, search starts here
           RootMove& rm = *std::find(thisThread->rootMoves.begin(),
                                     thisThread->rootMoves.end(), move);
 
-          int weightValue = 2 * depth;
-          int weightAverage = depth + 3;
+          int weightValue = 2 * depth + 13;
+          int weightAverage = depth + 29;
           rm.averageScore = rm.averageScore != -VALUE_INFINITE ? (weightValue * value + weightAverage * rm.averageScore) / (weightValue + weightAverage) : value;
 
           // PV move or new best move?
