@@ -1171,7 +1171,8 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          const int A = 1, B = 2;
+          const int A = 1, B = 4;
+          const int C = 1, D = 1;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
@@ -1190,7 +1191,7 @@ moves_loop: // When in check, search starts here
                          - 1648 * A / B * (type_of(move) == PROMOTION)
                          -  934 * A / B * ss->inCheck
                          +  907 * A / B * ((ss-1)->currentMove == MOVE_NULL)
-                         -  (786 - 3722/2) * A / B
+                         -  (786 - 3722 * C / D) * A / B
                          -  708 * A / B * bool(extension)
                          -  501 * A / B * givesCheck
                          -  459 * A / B * cutNode
