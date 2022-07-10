@@ -1173,30 +1173,32 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          const int A = 2, B = 1;
-          const int C = 1, D = 2;
+          const int A = 1, B = 1;
+          const int C = 0, D = 1;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
-                         + statScorePieceOffset[type_of(movedPiece)] * A / B
-                         - 5911 * A / B * improving
-                         + 5725 * A / B * capture
-                         + 4709 * A / B * ss->ttPv
-                         + 3662 * A / B * priorCapture
-                         - 2514 * A / B * ttCapture
-                         + 2497 * A / B * bool(excludedMove)
-                         - 2457 * A / B * ss->ttHit
-                         + 1840 * A / B * likelyFailLow
-                         + 1657 * A / B * PvNode
-                         - 1648 * A / B * (type_of(move) == PROMOTION)
-                         -  934 * A / B * ss->inCheck
-                         +  907 * A / B * ((ss-1)->currentMove == MOVE_NULL)
-                         -  (786 - 3722 * C / D) * A / B
-                         -  708 * A / B * bool(extension)
-                         -  501 * A / B * givesCheck
-                         -  459 * A / B * cutNode
+                         + (
+                             + statScorePieceOffset[type_of(movedPiece)] * A / B
+                             - 5911 * A / B * improving
+                             + 5725 * A / B * capture
+                             + 4709 * A / B * ss->ttPv
+                             + 3662 * A / B * priorCapture
+                             - 2514 * A / B * ttCapture
+                             + 2497 * A / B * bool(excludedMove)
+                             - 2457 * A / B * ss->ttHit
+                             + 1840 * A / B * likelyFailLow
+                             + 1657 * A / B * PvNode
+                             - 1648 * A / B * (type_of(move) == PROMOTION)
+                             -  934 * A / B * ss->inCheck
+                             +  907 * A / B * ((ss-1)->currentMove == MOVE_NULL)
+                             -  (786 - 3722 * C / D) * A / B
+                             -  708 * A / B * bool(extension)
+                             -  501 * A / B * givesCheck
+                             -  459 * A / B * cutNode
+                         ) / depth
                          - 4334;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
