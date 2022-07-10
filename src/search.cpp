@@ -1174,7 +1174,7 @@ moves_loop: // When in check, search starts here
               r++;
 
           const int A = 15, B = 1;
-          const int C = 0, D = 1;
+          const int C = 1, D = 1;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
