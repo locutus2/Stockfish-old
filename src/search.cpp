@@ -38,8 +38,10 @@
 namespace Stockfish {
 
 int P[37];
+int Q[37];
 
 TUNE(SetRange(-15914, 15914), P);
+TUNE(SetRange(-1000, 1000), Q);
 
 namespace Search {
 
@@ -1180,43 +1182,43 @@ moves_loop: // When in check, search starts here
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          - 4334
-                         + P[0] * givesCheck
-                         + P[1] * !givesCheck
-                         + P[2] * ss->inCheck
-                         + P[3] * !ss->inCheck
-                         + P[4] * capture
-                         + P[5] * !capture
-                         + P[6] * improving
-                         + P[7] * !improving
-                         + P[8] * PvNode
-                         + P[9] * !PvNode
-                         + P[10] * cutNode
-                         + P[11] * !cutNode
-                         + P[12] * ss->ttPv
-                         + P[13] * !ss->ttPv
-                         + P[14] * ss->ttHit
-                         + P[15] * !ss->ttHit
-                         + P[16] * priorCapture
-                         + P[17] * !priorCapture
-                         + P[18] * likelyFailLow
-                         + P[19] * !likelyFailLow
-                         + P[20] * ttCapture
-                         + P[21] * !ttCapture
-                         + P[22] * bool(excludedMove)
-                         + P[23] * !excludedMove
-                         + P[24] * ((ss-1)->currentMove == MOVE_NULL)
-                         + P[25] * !((ss-1)->currentMove == MOVE_NULL)
-                         + P[26] * (extension < 0)
-                         + P[27] * (extension == 0)
-                         + P[28] * (extension > 0)
-                         + P[29] * (type_of(movedPiece) == PAWN)
-                         + P[30] * (type_of(movedPiece) == KNIGHT)
-                         + P[31] * (type_of(movedPiece) == BISHOP)
-                         + P[32] * (type_of(movedPiece) == ROOK)
-                         + P[33] * (type_of(movedPiece) == QUEEN)
-                         + P[34] * (type_of(movedPiece) == KING)
-                         + P[35] * (type_of(move) == PROMOTION)
-                         + P[36] * !(type_of(move) == PROMOTION)
+                         + (P[0] + Q[0] * depth) * givesCheck
+                         + (P[1] + Q[1] * depth) * !givesCheck
+                         + (P[2] + Q[2] * depth) * ss->inCheck
+                         + (P[3] + Q[3] * depth) * !ss->inCheck
+                         + (P[4] + Q[4] * depth) * capture
+                         + (P[5] + Q[5] * depth) * !capture
+                         + (P[6] + Q[6] * depth) * improving
+                         + (P[7] + Q[7] * depth) * !improving
+                         + (P[8] + Q[8] * depth) * PvNode
+                         + (P[9] + Q[9] * depth) * !PvNode
+                         + (P[10] + Q[10] * depth) * cutNode
+                         + (P[11] + Q[11] * depth) * !cutNode
+                         + (P[12] + Q[12] * depth) * ss->ttPv
+                         + (P[13] + Q[13] * depth) * !ss->ttPv
+                         + (P[14] + Q[14] * depth) * ss->ttHit
+                         + (P[15] + Q[15] * depth) * !ss->ttHit
+                         + (P[16] + Q[16] * depth) * priorCapture
+                         + (P[17] + Q[17] * depth) * !priorCapture
+                         + (P[18] + Q[18] * depth) * likelyFailLow
+                         + (P[19] + Q[19] * depth) * !likelyFailLow
+                         + (P[20] + Q[20] * depth) * ttCapture
+                         + (P[21] + Q[21] * depth) * !ttCapture
+                         + (P[22] + Q[22] * depth) * bool(excludedMove)
+                         + (P[23] + Q[23] * depth) * !excludedMove
+                         + (P[24] + Q[24] * depth) * ((ss-1)->currentMove == MOVE_NULL)
+                         + (P[25] + Q[25] * depth) * !((ss-1)->currentMove == MOVE_NULL)
+                         + (P[26] + Q[26] * depth) * (extension < 0)
+                         + (P[27] + Q[27] * depth) * (extension == 0)
+                         + (P[28] + Q[28] * depth) * (extension > 0)
+                         + (P[29] + Q[29] * depth) * (type_of(movedPiece) == PAWN)
+                         + (P[30] + Q[30] * depth) * (type_of(movedPiece) == KNIGHT)
+                         + (P[31] + Q[31] * depth) * (type_of(movedPiece) == BISHOP)
+                         + (P[32] + Q[32] * depth) * (type_of(movedPiece) == ROOK)
+                         + (P[33] + Q[33] * depth) * (type_of(movedPiece) == QUEEN)
+                         + (P[34] + Q[34] * depth) * (type_of(movedPiece) == KING)
+                         + (P[35] + Q[35] * depth) * (type_of(move) == PROMOTION)
+                         + (P[36] + Q[36] * depth) * !(type_of(move) == PROMOTION)
                          ;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
