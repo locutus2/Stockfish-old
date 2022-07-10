@@ -1198,7 +1198,7 @@ moves_loop: // When in check, search starts here
                              -  708 * A / B * bool(extension)
                              -  501 * A / B * givesCheck
                              -  459 * A / B * cutNode
-                         ) / depth
+                         ) * (depth + 1) / (2 * depth)
                          - 4334;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
