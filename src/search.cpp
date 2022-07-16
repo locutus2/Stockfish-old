@@ -1175,6 +1175,7 @@ moves_loop: // When in check, search starts here
               r++;
 
           const int A = 1, B = 1;
+          const int C = 1, D = 1;
 
           ss->statScore =  thisThread->mainHistory[us][from_to(move)]
                          + (*contHist[0])[movedPiece][to_sq(move)]
@@ -1198,8 +1199,8 @@ moves_loop: // When in check, search starts here
                          + (891 * A / B + 87 * A / B * depth) * (extension > 0)
                          + (322 * A / B - 233 * A / B * depth) * givesCheck
                          + (1727 * A / B + 11 * A / B * depth) * cutNode
-                         - 161 * A / B * depth
-                         - 4622 * A / B
+                         - (161 + 30 * C / D) * A / B * depth
+                         - (4622 + 3959 * C / D) * A / B
                          - 4334;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
