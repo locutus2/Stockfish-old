@@ -1143,7 +1143,7 @@ moves_loop: // When in check, search starts here
               || !capture
               || (cutNode && (ss-1)->moveCount > 1)))
       {
-          Depth r = reduction(improving, std::clamp(depth - extension, 0 , MAX_MOVES - 1), moveCount, delta, thisThread->rootDelta);
+          Depth r = reduction(improving, std::clamp(depth - 2 * extension, 0 , MAX_MOVES - 1), moveCount, delta, thisThread->rootDelta);
 
           // Decrease reduction if position is or has been on the PV
           // and node is not likely to fail low. (~3 Elo)
