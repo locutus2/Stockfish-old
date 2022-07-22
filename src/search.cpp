@@ -1180,7 +1180,7 @@ moves_loop: // When in check, search starts here
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
           r -= ss->statScore / 15914;
 
-          r += reduction(improving, depth, std::clamp(moveCount - extension, 0, MAX_MOVES - 1), delta, thisThread->rootDelta);
+          r += reduction(improving, depth, std::clamp(moveCount - r / 2, 0, MAX_MOVES - 1), delta, thisThread->rootDelta);
 
           // In general we want to cap the LMR depth search at newDepth, but when
           // reduction is negative, we allow this move a limited search extension
