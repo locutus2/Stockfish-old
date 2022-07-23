@@ -954,6 +954,8 @@ moves_loop: // When in check, search starts here
                          && (tte->bound() & BOUND_UPPER)
                          && tte->depth() >= depth;
 
+    int moveCountThreshold = PvNode ? MAX_MOVES : MoveList<LEGAL>(pos).size() * 3 / 8;
+
     // Step 13. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
     while ((move = mp.next_move(moveCountPruning)) != MOVE_NONE)
@@ -1304,6 +1306,8 @@ moves_loop: // When in check, search starts here
                   break;
               }
           }
+          else if (!PvNode && moveCount > moveCountThreshold)
+              break;
       }
       else
          ss->cutoffCnt = 0;
