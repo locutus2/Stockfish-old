@@ -1332,7 +1332,7 @@ moves_loop: // When in check, search starts here
               quietsSearched[quietCount++] = move;
       }
 
-      if (!rootNode && PvNode && bestMove && moveCount > moveCountThreshold())
+      if (PvNode && bestMove && ss->ply > 1 && moveCount > moveCountThreshold())
           break;
 
     }
