@@ -154,7 +154,7 @@ namespace {
       MoveCountThreshold(const Position& position) : pos(position), threshold(-1) {}
       int operator()() {
           if (threshold < 0)
-              threshold = MoveList<LEGAL>(pos).size() * 31 / 32;
+              threshold = MoveList<LEGAL>(pos).size() * 15 / 16;
           return threshold;
       }
 
@@ -1332,7 +1332,7 @@ moves_loop: // When in check, search starts here
               quietsSearched[quietCount++] = move;
       }
 
-      if (PvNode && bestMove && moveCount > moveCountThreshold())
+      if (PvNode && bestMove && moveCount > depth + moveCountThreshold())
           break;
 
     }
