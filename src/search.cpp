@@ -154,7 +154,7 @@ namespace {
       MoveCountThreshold(const Position& position) : pos(position), threshold(-1) {}
       int operator()() {
           if (threshold < 0)
-              threshold = MoveList<LEGAL>(pos).size() * 7 / 8;
+              threshold = MoveList<LEGAL>(pos).size() * 6 / 8;
           return threshold;
       }
 
