@@ -1318,12 +1318,9 @@ moves_loop: // When in check, search starts here
                   break;
               }
           }
-          else if (!PvNode && moveCount > moveCountThreshold())
-              break;
       }
       else
          ss->cutoffCnt = 0;
-
 
       // If the move is worse than some previously searched move, remember it to update its stats later
       if (move != bestMove)
@@ -1334,6 +1331,10 @@ moves_loop: // When in check, search starts here
           else if (!capture && quietCount < 64)
               quietsSearched[quietCount++] = move;
       }
+
+      if (PvNode && bestMove && moveCount > moveCountThreshold())
+          break;
+
     }
 
     // The following condition would detect a stop only after move loop has been
