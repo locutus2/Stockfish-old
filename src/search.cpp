@@ -150,6 +150,18 @@ namespace {
     return nodes;
   }
 
+  struct MoveCountThreshold {
+      MoveCountThreshold(const Position& position) : pos(position), threshold(-1) {}
+      int operator()() {
+          if (threshold < 0)
+              threshold = MoveList<LEGAL>(pos).size() * 3 / 8;
+          return threshold;
+      }
+
+      const Position &pos;
+      int threshold;
+  };
+
 } // namespace
 
 
@@ -954,7 +966,7 @@ moves_loop: // When in check, search starts here
                          && (tte->bound() & BOUND_UPPER)
                          && tte->depth() >= depth;
 
-    int moveCountThreshold = PvNode ? MAX_MOVES : MoveList<LEGAL>(pos).size() * 3 / 8;
+    MoveCountThreshold moveCountThreshold(pos);
 
     // Step 13. Loop through all pseudo-legal moves until no moves remain
     // or a beta cutoff occurs.
@@ -1306,7 +1318,7 @@ moves_loop: // When in check, search starts here
                   break;
               }
           }
-          else if (!PvNode && moveCount > moveCountThreshold)
+          else if (!PvNode && moveCount > moveCountThreshold())
               break;
       }
       else
