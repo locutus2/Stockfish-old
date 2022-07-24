@@ -58,7 +58,7 @@ using namespace Search;
 
 namespace {
 
-  const int statScorePieceOffset[PIECE_TYPE_NB] = { 0, 1011, -745, 372, -1432, 473, -2890 };
+  const int statScorePieceOffset[PIECE_TYPE_NB] = { 0, -1717, -578, -117, 1810, 1835, -1785 };
 
   // Different node types, used as a template parameter
   enum NodeType { NonPV, PV, Root };
@@ -1180,22 +1180,23 @@ moves_loop: // When in check, search starts here
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
                          + statScorePieceOffset[type_of(movedPiece)] * A / B
-                         - 5911 * A / B * improving
-                         + 5725 * A / B * capture
-                         + 4709 * A / B * ss->ttPv
-                         + 3662 * A / B * priorCapture
-                         - 2514 * A / B * ttCapture
-                         + 2497 * A / B * bool(excludedMove)
-                         - 2457 * A / B * ss->ttHit
-                         + 1840 * A / B * likelyFailLow
-                         + 1657 * A / B * PvNode
-                         - 1648 * A / B * (type_of(move) == PROMOTION)
-                         -  934 * A / B * ss->inCheck
-                         +  907 * A / B * ((ss-1)->currentMove == MOVE_NULL)
-                         -  (786 - 3722/2) * A / B
-                         -  708 * A / B * bool(extension)
-                         -  501 * A / B * givesCheck
-                         -  459 * A / B * cutNode
+                         - 4258 * A / B * ttCapture
+                         - 3635 * A / B * improving
+                         + 2536 * A / B * likelyFailLow
+                         + 1887 * A / B * bool(excludedMove)
+                         - 1849 * A / B * (type_of(move) == PROMOTION)
+                         + 1447 * A / B * ss->ttPv
+                         + 1243 * A / B * givesCheck
+                         - 1132 * A / B * priorCapture
+                         +  978 * A / B * ss->inCheck
+                         -  924 * A / B * ((ss-1)->currentMove == MOVE_NULL)
+                         +  903 * A / B * PvNode
+                         -  700 * A / B * cutNode
+                         +  606 * A / B * (extension < 0)
+                         +  640 * A / B * (extension > 0)
+                         +  579 * A / B * ss->ttHit
+                         -  548 * A / B * capture
+                         +  286 * A / B
                          - 4334;
 
           // Decrease/increase reduction for moves with a good/bad history (~30 Elo)
