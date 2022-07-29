@@ -1033,7 +1033,7 @@ moves_loop: // When in check, search starts here
                   && history < -3875 * (depth - 1))
                   continue;
 
-              history += 2 * thisThread->mainHistory[us][from_to(move)];
+              history += thisThread->mainHistory[us][from_to(move)] / 2;
 
               // Futility pruning: parent node (~9 Elo)
               if (   !ss->inCheck
@@ -1171,7 +1171,7 @@ moves_loop: // When in check, search starts here
           if ((ss+1)->cutoffCnt > 3 && !PvNode)
               r++;
 
-          ss->statScore =  2 * thisThread->mainHistory[us][from_to(move)]
+          ss->statScore =  thisThread->mainHistory[us][from_to(move)] / 2
                          + (*contHist[0])[movedPiece][to_sq(move)]
                          + (*contHist[1])[movedPiece][to_sq(move)]
                          + (*contHist[3])[movedPiece][to_sq(move)]
