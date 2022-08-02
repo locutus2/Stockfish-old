@@ -637,7 +637,7 @@ namespace {
     // At non-PV nodes we check for an early TT cutoff
     if (  !PvNode
         && ss->ttHit
-        && tte->depth() > depth - ((int)thisThread->id() & 0x1)
+        && tte->depth() > depth - ((int)thisThread->id() & 0x1) - (tte->bound() == BOUND_EXACT)
         && ttValue != VALUE_NONE // Possible in case of TT access race
         && (tte->bound() & (ttValue >= beta ? BOUND_LOWER : BOUND_UPPER)))
     {
@@ -1156,7 +1156,7 @@ moves_loop: // When in check, search starts here
               r--;
 
           // Increase reduction for cut nodes (~3 Elo)
-          if (cutNode && move != ss->killers[0])
+          if (cutNode)
               r += 2;
 
           // Increase reduction if ttMove is a capture (~3 Elo)
